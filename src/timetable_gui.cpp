@@ -169,13 +169,13 @@ static void ChangeTimetableStartCallback(const Window *w, Date date)
 
 struct TimetableWindow : Window {
 	int sel_index;
-	const Vehicle *vehicle; ///< Vehicle monitored by the window.
-	bool show_expected;     ///< Whether we show expected arrival or scheduled
-	uint deparr_time_width; ///< The width of the departure/arrival time
-	uint deparr_abbr_width; ///< The width of the departure/arrival abbreviation
+	const Vehicle *vehicle;               ///< Vehicle monitored by the window.
+	bool show_expected;                   ///< Whether we show expected arrival or scheduled
+	uint deparr_time_width;               ///< The width of the departure/arrival time
+	uint deparr_abbr_width;               ///< The width of the departure/arrival abbreviation
 	Scrollbar *vscroll;
-	TTSepSettings NewSettings; ///< New separation settings
-	TimetableViewWindowWidgets query_widget; ///< Required to determinate source of input query
+	TTSepSettings NewSettings;            ///< New separation settings
+	VehicleTimetableWidgets query_widget; ///< Required to determinate source of input query
 
 	TimetableWindow(const WindowDesc *desc, WindowNumber window_number) :
 			Window(),
@@ -615,7 +615,7 @@ struct TimetableWindow : Window {
 					}
 				}
 
-				query_widget = TTV_CHANGE_TIME;
+				query_widget = WID_VT_CHANGE_TIME;
 				ShowQueryString(current, STR_TIMETABLE_CHANGE_TIME, 31, this, CS_NUMERAL, QSF_NONE);
 				break;
 			}
@@ -674,7 +674,7 @@ struct TimetableWindow : Window {
 
 	virtual void OnQueryTextFinished(char *str)
 	{
-		if(query_widget == TTV_CHANGE_TIME)
+		if(query_widget == WID_VT_CHANGE_TIME)
 		{
 			if (str != NULL && !StrEmpty(str)) {
 

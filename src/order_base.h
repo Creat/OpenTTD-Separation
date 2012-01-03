@@ -214,21 +214,6 @@ struct TTSepSettings {
 };
 
 /** Shared order list linking together the linked list of orders and the list
-/** Working modes for timetable separation */
-enum TTSep_Mode {
-	TTS_MODE_AUTO,
-	TTS_MODE_OFF,
-	TTS_MODE_MAN_T,
-	TTS_MODE_MAN_N,
-};
-
-struct TTSepSettings {
-	TTSep_Mode mode;
-	uint num_veh, sep_ticks;
-	TTSepSettings() : mode(TTS_MODE_AUTO), num_veh(0), sep_ticks(0) { }
-};
-
-/** Shared order list linking together the linked list of orders and the list
  *  of vehicles sharing this order list.
  */
 struct OrderList : OrderListPool::PoolItem<&_orderlist_pool> {
@@ -332,7 +317,7 @@ public:
 
 	TTSepSettings GetSepSettings();
 
-	void const SetSepSettings(TTSepSettings s);
+	void SetSepSettings(TTSepSettings s);
 	void SetSepSettings(TTSep_Mode Mode, uint Parameter);
 
 	bool IsVehicleInSharedOrdersList(const Vehicle *v) const;
