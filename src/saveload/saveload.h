@@ -15,6 +15,8 @@
 #include "../fileio_type.h"
 #include "../strings_type.h"
 
+#define SL_TTSEP_VER 200
+
 /** Save or load result codes. */
 enum SaveOrLoadResult {
 	SL_OK     = 0, ///< completed successfully
