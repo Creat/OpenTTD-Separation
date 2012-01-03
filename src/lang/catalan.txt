@@ -339,6 +339,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Situa ob
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Desa l'escenari
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Carrega un escenari
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Desa mapa d'alçades
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Carrega Mapa d'alçades
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Surt de l'editor
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -356,6 +357,7 @@ STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Mostra els noms
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Mostra els noms de les estacions
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Mostra els punts de control
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Mostra les senyals
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Mostra noms i senyals dels competidors
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Animació completa
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Detall complet
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Edificis Transparents
@@ -448,6 +450,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Ampliació en l
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Captura de pantalla de tot el mapa
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Quant a 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Alineador d'sprite
+STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Commuta les caixes delimitadores
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -859,19 +862,19 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_FRAME                           :{BLACK}Unitats 
 STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}Selecció d'unitats de moneda
 
 ############ start of currency region
-STR_GAME_OPTIONS_CURRENCY_GBP                                   :Lliures (£)
-STR_GAME_OPTIONS_CURRENCY_USD                                   :Dòlars ($)
-STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :Iens (¥)
+STR_GAME_OPTIONS_CURRENCY_GBP                                   :Lliura Esterlina (GBP)
+STR_GAME_OPTIONS_CURRENCY_USD                                   :Dòlar Americà (USD)
+STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (EUR)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :Ien Japonès (JPY)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :Shillings Austríacs (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :Francs Belgues (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :Francs Suïssos (CHF)
 STR_GAME_OPTIONS_CURRENCY_CZK                                   :Corones Txeques (CZK)
 STR_GAME_OPTIONS_CURRENCY_DEM                                   :Marcs Alemanys (DEM)
 STR_GAME_OPTIONS_CURRENCY_DKK                                   :Corones Daneses (DKK)
-STR_GAME_OPTIONS_CURRENCY_ESP                                   :Pesseta (ESP)
+STR_GAME_OPTIONS_CURRENCY_ESP                                   :Pesseta Espanyola (ESP)
 STR_GAME_OPTIONS_CURRENCY_FIM                                   :Marcs Finesos (FIM)
-STR_GAME_OPTIONS_CURRENCY_FRF                                   :Franc (FRF)
+STR_GAME_OPTIONS_CURRENCY_FRF                                   :Franc Francès (FRF)
 STR_GAME_OPTIONS_CURRENCY_GRD                                   :Dracmes Gregues (GRD)
 STR_GAME_OPTIONS_CURRENCY_HUF                                   :Florí Hongarès (HUF)
 STR_GAME_OPTIONS_CURRENCY_ISK                                   :Corones Islandeses (ISK)
@@ -1057,6 +1060,11 @@ STR_SEA_LEVEL_HIGH                                              :Alt
 STR_SEA_LEVEL_CUSTOM                                            :Personalitzat
 STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Personalitzat ({NUM}%)
 
+STR_RIVERS_NONE                                                 :Cap
+STR_RIVERS_FEW                                                  :Pocs
+STR_RIVERS_MODERATE                                             :Mitjà
+STR_RIVERS_LOT                                                  :Molts
+
 STR_DISASTER_NONE                                               :Cap
 STR_DISASTER_REDUCED                                            :Reduït
 STR_DISASTER_NORMAL                                             :Normal
@@ -1111,8 +1119,8 @@ STR_CONFIG_SETTING_TRAIN_LENGTH                                 :{LTBLUE}Llargad
 STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}Quantitat de fum/xispes del vehicle: {ORANGE}{STRING}
 STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :{LTBLUE}Model d'acceleració del Tren: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :{LTBLUE}Model d'acceleració per als vehicles: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Inclinació de les pujades per als trens {ORANGE}{STRING}%
-STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Inclinació de les pujades per als vehicles {ORANGE}{STRING}%
+STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Inclinació de les pujades per als trens: {ORANGE}{STRING}%
+STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Inclinació de les pujades per als vehicles: {ORANGE}{STRING}%
 STR_CONFIG_SETTING_FORBID_90_DEG                                :{LTBLUE}Prohibeix fer girs de 90 graus als trens i vaixells: {ORANGE}{STRING}
 STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :{LTBLUE}Permet ajuntar estacions no annexes: {ORANGE}{STRING}
 STR_CONFIG_SETTING_IMPROVEDLOAD                                 :{LTBLUE}Utilitza algorisme millorat de càrrega: {ORANGE}{STRING}
@@ -1393,6 +1401,8 @@ STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Mostra e
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Comprova si hi ha continguts nous i actualitzats per a descarregar
 STR_INTRO_TOOLTIP_AI_SETTINGS                                   :{BLACK}Mostra els paràmetres IA
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Surt d'OpenTTD
+
+STR_INTRO_TRANSLATION                                           :{BLACK}A aquesta traducció li falta {NUM} string{P "" s}. Si us plau ajuda a fer millor OpenTTD unint-te com a traductor. Veure readme.txt per més detalls.
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Surt
@@ -2279,6 +2289,7 @@ STR_SAVELOAD_LOAD_CAPTION                                       :{WHITE}Carrega 
 STR_SAVELOAD_SAVE_SCENARIO                                      :{WHITE}Desa l'Escenari
 STR_SAVELOAD_LOAD_SCENARIO                                      :{WHITE}Carrega un Escenari
 STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Carrega un Mapa d'alçades
+STR_SAVELOAD_SAVE_HEIGHTMAP                                     :{WHITE}Desa Mapa d'alçades
 STR_SAVELOAD_HOME_BUTTON                                        :{BLACK}Prem aquí per anar a la carpeta per defecte actual de desa/carrega
 STR_SAVELOAD_BYTES_FREE                                         :{BLACK}{BYTES} lliures
 STR_SAVELOAD_LIST_TOOLTIP                                       :{BLACK}Llista de dispositius de disc, carpetes i arxius de jocs desats
@@ -2314,6 +2325,7 @@ STR_MAPGEN_LAND_GENERATOR                                       :{BLACK}Gen. de 
 STR_MAPGEN_TREE_PLACER                                          :{BLACK}Algoritme d'arbres:
 STR_MAPGEN_TERRAIN_TYPE                                         :{BLACK}Tipus de terreny:
 STR_MAPGEN_QUANTITY_OF_SEA_LAKES                                :{BLACK}Nivell del mar:
+STR_MAPGEN_QUANTITY_OF_RIVERS                                   :{BLACK}Rius:
 STR_MAPGEN_SMOOTHNESS                                           :{BLACK}Planitut:
 STR_MAPGEN_VARIETY                                              :{BLACK}Distribució de la varietat:
 STR_MAPGEN_GENERATE                                             :{WHITE}Genera
@@ -2358,6 +2370,7 @@ STR_GENERATION_ABORT_MESSAGE                                    :{YELLOW}Realmen
 STR_GENERATION_PROGRESS                                         :{WHITE}{NUM}% complet
 STR_GENERATION_PROGRESS_NUM                                     :{BLACK}{NUM} / {NUM}
 STR_GENERATION_WORLD_GENERATION                                 :{BLACK}Generació del món
+STR_GENERATION_RIVER_GENERATION                                 :{BLACK}Generació de rius
 STR_GENERATION_TREE_GENERATION                                  :{BLACK}Generació d'arbres
 STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Generació inamovible
 STR_GENERATION_CLEARING_TILES                                   :{BLACK}Generació d'una àrea escarpada i rocosa
@@ -2472,6 +2485,9 @@ STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING
 STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Conté múltiples Accions 8 entrades
 STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lectura després de la fi d'un pseudo-sprite
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Al joc de gràfics base establert actualment li falten un nombre d'sprites.{}Si us plau actualitza el joc de gràfics base
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Els recursos GRF demanats no estan disponibles
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} ha estat desactivat per {4:STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Format de disposició d'Sprites invàlid/desconegut
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Alerta!
@@ -2507,6 +2523,12 @@ STR_NEWGRF_INVALID_CARGO_ABBREV                                 :??
 STR_NEWGRF_INVALID_CARGO_QUANTITY                               :{COMMA} de <càrrega invàlida>
 STR_NEWGRF_INVALID_ENGINE                                       :<model de vehicle invàlid>
 STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<indústria invàlida>
+
+# NewGRF scanning window
+STR_NEWGRF_SCAN_CAPTION                                         :{WHITE}Escanejant NewGRFs
+STR_NEWGRF_SCAN_MESSAGE                                         :{BLACK}Escanejant NewGRFs. Depenent de la quantitat pot trigar una estona...
+STR_NEWGRF_SCAN_STATUS                                          :{BLACK}{NUM} NewGRF{P "" s} escanejats de {NUM} NewGRF{P "" s} estimats
+STR_NEWGRF_SCAN_ARCHIVES                                        :Escanejant arxius
 
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Llista de senyals - {COMMA} Senyal{P "" s}
@@ -2815,6 +2837,8 @@ STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :Nou Avió
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}Cost: {GOLD}{CURRENCY}{BLACK} Pes: {GOLD}{WEIGHT_S}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}Velocitat: {GOLD}{VELOCITY}{BLACK} Potència: {GOLD}{POWER}
 STR_PURCHASE_INFO_SPEED                                         :{BLACK}Velocitat: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_OCEAN                                   :{BLACK}Velocitat al mar: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_CANAL                                   :{BLACK}Velocitat al canal/riu: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_RUNNINGCOST                                   :{BLACK}Cost d'utilització: {GOLD}{CURRENCY}/any
 STR_PURCHASE_INFO_CAPACITY                                      :{BLACK}Capacitat: {GOLD}{CARGO} {STRING}
 STR_PURCHASE_INFO_REFITTABLE                                    :(remodelable)
@@ -3175,12 +3199,15 @@ STR_ORDER_DROP_HALT_DEPOT                                       :Para
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}Salta aquesta ordre si no és que es necessita una revisió
 
 STR_ORDER_CONDITIONAL_VARIABLE_TOOLTIP                          :{BLACK}Dades del vehicle on basar el salt a
+
+# Conditional order variables, must follow order of OrderConditionVariable enum
 STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE                           :Percentatge de càrrega
 STR_ORDER_CONDITIONAL_RELIABILITY                               :Fiabilitat
 STR_ORDER_CONDITIONAL_MAX_SPEED                                 :Velocitat màxima
-STR_ORDER_CONDITIONAL_AGE                                       :Antiguitat del vehicle (anys)
+STR_ORDER_CONDITIONAL_AGE                                       :Antiguitat (anys)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :Necessita revisió
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :Sempre
+STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :Temps de vida restant (anys)
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}Com comparar les dades del vehicle al valor donat
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :és igual a
@@ -3235,7 +3262,7 @@ STR_ORDER_STOP_ORDER                                            :(Para)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :(Automàtic)
+STR_ORDER_IMPLICIT                                              :(Implícit)
 
 STR_ORDER_FULL_LOAD                                             :(Carrega del tot)
 STR_ORDER_FULL_LOAD_ANY                                         :(Carrega del tot qualsevol càrrega)
@@ -3426,6 +3453,8 @@ STR_ERROR_PNGMAP_MISC                                           :{WHITE}... algu
 STR_ERROR_BMPMAP                                                :{WHITE}Impossible carregar el terreny des del BMP...
 STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... no s'ha pogut convertir el tipus d'imatge
 
+STR_ERROR_HEIGHTMAP_TOO_LARGE                                   :{WHITE}... l'imatge és massa gran
+
 STR_WARNING_HEIGHTMAP_SCALE_CAPTION                             :{WHITE}Alerta d'escala
 STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}No es recomana redimensionar massa el mapa d'origen. Vols continuar amb la generació?
 
@@ -3520,6 +3549,8 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... nom�
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... només pot ser construït en zones baixes
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... només es pot situar prop dels límits del mapa
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... els boscos només es poden plantar sota la cota de neu
+STR_ERROR_CAN_ONLY_BE_BUILT_ABOVE_SNOW_LINE                     :{WHITE}... només es pot construir per sobre la cota de neu
+STR_ERROR_CAN_ONLY_BE_BUILT_BELOW_SNOW_LINE                     :{WHITE}... només es pot construir per sota la cota de neu
 
 # Station construction related errors
 STR_ERROR_CAN_T_BUILD_RAILROAD_STATION                          :{WHITE}Aquí no es pot construir una estació de tren...
@@ -3641,6 +3672,9 @@ STR_ERROR_CAN_T_BUILD_LOCKS                                     :{WHITE}Aquí no
 STR_ERROR_CAN_T_PLACE_RIVERS                                    :{WHITE}Aquí no es poden posar rius...
 STR_ERROR_MUST_BE_BUILT_ON_WATER                                :{WHITE}... s'han de construir sobre l'aigua
 STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... no es pot construir sobre l'aigua
+STR_ERROR_CAN_T_BUILD_ON_SEA                                    :{WHITE}... no es pot construir a mar obert
+STR_ERROR_CAN_T_BUILD_ON_CANAL                                  :{WHITE}... no es pot construir sobre el canal
+STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... no es pot construir sobre el riu
 STR_ERROR_MUST_DEMOLISH_CANAL_FIRST                             :{WHITE}Has de demolir el canal primer
 STR_ERROR_CAN_T_BUILD_AQUEDUCT_HERE                             :{WHITE}Aquí no es pot construir un aqüeducte...
 

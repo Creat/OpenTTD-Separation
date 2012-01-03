@@ -158,12 +158,12 @@ byte NetworkSpectatorCount()
  * @param password The unhashed password we like to set ('*' or '' resets the password)
  * @return The password.
  */
-const char *NetworkChangeCompanyPassword(CompanyID company_id, const char *password, bool already_hashed)
+const char *NetworkChangeCompanyPassword(CompanyID company_id, const char *password)
 {
 	if (strcmp(password, "*") == 0) password = "";
 
 	if (_network_server) {
-		NetworkServerSetCompanyPassword(company_id, password, already_hashed);
+		NetworkServerSetCompanyPassword(company_id, password, false);
 	} else {
 		NetworkClientSetCompanyPassword(password);
 	}
@@ -755,7 +755,7 @@ void NetworkReboot()
 		}
 
 		ServerNetworkAdminSocketHandler *as;
-		FOR_ALL_ADMIN_SOCKETS(as) {
+		FOR_ALL_ACTIVE_ADMIN_SOCKETS(as) {
 			as->SendNewGame();
 			as->SendPackets();
 		}
@@ -782,7 +782,7 @@ void NetworkDisconnect(bool blocking, bool close_admins)
 
 		if (close_admins) {
 			ServerNetworkAdminSocketHandler *as;
-			FOR_ALL_ADMIN_SOCKETS(as) {
+			FOR_ALL_ACTIVE_ADMIN_SOCKETS(as) {
 				as->SendShutdown();
 				as->SendPackets();
 			}
@@ -837,7 +837,6 @@ void NetworkUDPGameLoop()
 	} else {
 		_udp_client_socket->ReceivePackets();
 		if (_network_udp_broadcast > 0) _network_udp_broadcast--;
-		NetworkGameListRequery();
 	}
 }
 

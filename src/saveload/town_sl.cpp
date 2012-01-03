@@ -146,8 +146,7 @@ static const SaveLoad _town_desc[] = {
 	SLE_CONDVAR(Town, new_act_pass,          SLE_UINT32,                 9, SL_MAX_VERSION),
 	SLE_CONDVAR(Town, new_act_mail,          SLE_UINT32,                 9, SL_MAX_VERSION),
 
-	    SLE_VAR(Town, pct_pass_transported,  SLE_UINT8),
-	    SLE_VAR(Town, pct_mail_transported,  SLE_UINT8),
+	SLE_CONDNULL(2, 0, 163),                 ///< pct_pass_transported / pct_mail_transported, now computed on the fly
 
 	    SLE_VAR(Town, act_food,              SLE_UINT16),
 	    SLE_VAR(Town, act_water,             SLE_UINT16),
@@ -170,6 +169,8 @@ static const SaveLoad _town_desc[] = {
 
 	SLE_CONDVAR(Town, larger_town,           SLE_BOOL,                  56, SL_MAX_VERSION),
 	SLE_CONDVAR(Town, layout,                SLE_UINT8,                113, SL_MAX_VERSION),
+
+	SLE_CONDLST(Town, psa_list,            REF_STORAGE,                161, SL_MAX_VERSION),
 
 	/* reserve extra space in savegame here. (currently 30 bytes) */
 	SLE_CONDNULL(30, 2, SL_MAX_VERSION),
@@ -207,7 +208,20 @@ static void Load_TOWN()
 	}
 }
 
+/** Fix pointers when loading town data. */
+static void Ptrs_TOWN()
+{
+	/* Don't run when savegame version lower than 161. */
+	if (IsSavegameVersionBefore(161)) return;
+
+	Town *t;
+	FOR_ALL_TOWNS(t) {
+		SlObject(t, _town_desc);
+	}
+}
+
+/** Chunk handler for towns. */
 extern const ChunkHandler _town_chunk_handlers[] = {
-	{ 'HIDS', Save_HIDS, Load_HIDS, NULL, NULL, CH_ARRAY },
-	{ 'CITY', Save_TOWN, Load_TOWN, NULL, NULL, CH_ARRAY | CH_LAST},
+	{ 'HIDS', Save_HIDS, Load_HIDS,      NULL, NULL, CH_ARRAY },
+	{ 'CITY', Save_TOWN, Load_TOWN, Ptrs_TOWN, NULL, CH_ARRAY | CH_LAST},
 };

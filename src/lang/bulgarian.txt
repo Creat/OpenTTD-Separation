@@ -860,7 +860,7 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}Избо
 STR_GAME_OPTIONS_CURRENCY_GBP                                   :британска лира (£)
 STR_GAME_OPTIONS_CURRENCY_USD                                   :долар ($)
 STR_GAME_OPTIONS_CURRENCY_EUR                                   :евро (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :йена (¥)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :йена (¥)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :австрийски шилинг (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :белгийски франк (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :швейцарски франк (CHF)
@@ -3222,7 +3222,7 @@ STR_ORDER_STOP_ORDER                                            :(Спри)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :{G=n}(Автоматично)
+STR_ORDER_IMPLICIT                                              :{G=n}(Автоматично)
 
 STR_ORDER_FULL_LOAD                                             :(Напълно натовари)
 STR_ORDER_FULL_LOAD_ANY                                         :(Напълно натовари какъвто и да е товар)

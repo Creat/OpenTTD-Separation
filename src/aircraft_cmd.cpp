@@ -549,6 +549,11 @@ void UpdateAircraftCache(Aircraft *v)
 		/* Use the default max speed of the vehicle. */
 		v->vcache.cached_max_speed = AircraftVehInfo(v->engine_type)->max_speed;
 	}
+
+	/* Update cargo aging period. */
+	v->vcache.cached_cargo_age_period = GetVehicleProperty(v, PROP_AIRCRAFT_CARGO_AGE_PERIOD, EngInfo(v->engine_type)->cargo_age_period);
+	Aircraft *u = v->Next(); // Shadow for mail
+	u->vcache.cached_cargo_age_period = GetVehicleProperty(u, PROP_AIRCRAFT_CARGO_AGE_PERIOD, EngInfo(u->engine_type)->cargo_age_period);
 }
 
 
@@ -1062,7 +1067,7 @@ static void HandleAircraftSmoke(Aircraft *v)
 			smoke_pos[v->direction].x,
 			smoke_pos[v->direction].y,
 			2,
-			EV_SMOKE
+			EV_BREAKDOWN_SMOKE_AIRCRAFT
 		);
 	}
 }
@@ -1243,12 +1248,20 @@ void AircraftNextAirportPos_and_Order(Aircraft *v)
 	v->pos = v->previous_pos = AircraftGetEntryPoint(v, apc, rotation);
 }
 
-void AircraftLeaveHangar(Aircraft *v)
+/**
+ * Aircraft is about to leave the hangar.
+ * @param v Aircraft leaving.
+ * @param exit_dir The direction the vehicle leaves the hangar.
+ * @note This function is called in AfterLoadGame for old savegames, so don't rely
+ *       on any data to be valid, especially don't rely on the fact that the vehicle
+ *       is actually on the ground inside a depot.
+ */
+void AircraftLeaveHangar(Aircraft *v, Direction exit_dir)
 {
 	v->cur_speed = 0;
 	v->subspeed = 0;
 	v->progress = 0;
-	v->direction = DIR_SE;
+	v->direction = exit_dir;
 	v->vehstatus &= ~VS_HIDDEN;
 	{
 		Vehicle *u = v->Next();
@@ -1333,7 +1346,8 @@ static void AircraftEventHandler_InHangar(Aircraft *v, const AirportFTAClass *ap
 		/* airplane goto state takeoff, helicopter to helitakeoff */
 		v->state = (v->subtype == AIR_HELICOPTER) ? HELITAKEOFF : TAKEOFF;
 	}
-	AircraftLeaveHangar(v);
+	const Station *st = Station::GetByTile(v->tile);
+	AircraftLeaveHangar(v, st->airport.GetHangarExitDirection(v->tile));
 	AirportMove(v, apc);
 }
 

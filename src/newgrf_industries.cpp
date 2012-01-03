@@ -180,7 +180,7 @@ uint32 IndustryGetVariable(const ResolverObject *object, byte variable, byte par
 	/* Shall the variable get resolved in parent scope and are we not yet in parent scope? */
 	if (object->u.industry.gfx == INVALID_INDUSTRYTILE && object->scope == VSG_SCOPE_PARENT) {
 		/* Pass the request on to the town of the industry */
-		const Town *t;
+		Town *t;
 
 		if (industry != NULL) {
 			t = industry->town;
@@ -191,7 +191,7 @@ uint32 IndustryGetVariable(const ResolverObject *object, byte variable, byte par
 			return UINT_MAX;
 		}
 
-		return TownGetVariable(variable, parameter, available, t);
+		return TownGetVariable(variable, parameter, available, t, object->grffile);
 	}
 
 	if (industry == NULL) {
@@ -283,7 +283,7 @@ uint32 IndustryGetVariable(const ResolverObject *object, byte variable, byte par
 		}
 
 		/* Get a variable from the persistent storage */
-		case 0x7C: return industry->psa.Get(parameter);
+		case 0x7C: return (industry->psa != NULL) ? industry->psa->GetValue(parameter) : 0;
 
 		/* Industry structure access*/
 		case 0x80: return industry->location.tile;
@@ -376,6 +376,37 @@ static void IndustrySetTriggers(const ResolverObject *object, int triggers)
 	ind->random_triggers = triggers;
 }
 
+/**
+ * Store a value into the object's persistent storage.
+ * @param object Object that we want to query.
+ * @param pos Position in the persistent storage to use.
+ * @param value Value to store.
+ */
+void IndustryStorePSA(ResolverObject *object, uint pos, int32 value)
+{
+	Industry *ind = object->u.industry.ind;
+	if (ind->index == INVALID_INDUSTRY) return;
+
+	if (object->scope != VSG_SCOPE_SELF) {
+		/* Pass the request on to the town of the industry. */
+		TownStorePSA(ind->town, object->grffile, pos, value);
+		return;
+	}
+
+	if (ind->psa == NULL) {
+		/* There is no need to create a storage if the value is zero. */
+		if (value == 0) return;
+
+		/* Create storage on first modification. */
+		const IndustrySpec *indsp = GetIndustrySpec(ind->type);
+		uint32 grfid = (indsp->grf_prop.grffile != NULL) ? indsp->grf_prop.grffile->grfid : 0;
+		assert(PersistentStorage::CanAllocateItem());
+		ind->psa = new PersistentStorage(grfid);
+	}
+
+	ind->psa->StoreValue(pos, value);
+}
+
 static void NewIndustryResolver(ResolverObject *res, TileIndex tile, Industry *indus, IndustryType type)
 {
 	res->GetRandomBits = IndustryGetRandomBits;
@@ -383,8 +414,8 @@ static void NewIndustryResolver(ResolverObject *res, TileIndex tile, Industry *i
 	res->SetTriggers   = IndustrySetTriggers;
 	res->GetVariable   = IndustryGetVariable;
 	res->ResolveReal   = IndustryResolveReal;
+	res->StorePSA      = IndustryStorePSA;
 
-	res->psa             = &indus->psa;
 	res->u.industry.tile = tile;
 	res->u.industry.ind  = indus;
 	res->u.industry.gfx  = INVALID_INDUSTRYTILE;
@@ -393,10 +424,7 @@ static void NewIndustryResolver(ResolverObject *res, TileIndex tile, Industry *i
 	res->callback        = CBID_NO_CALLBACK;
 	res->callback_param1 = 0;
 	res->callback_param2 = 0;
-	res->last_value      = 0;
-	res->trigger         = 0;
-	res->reseed          = 0;
-	res->count           = 0;
+	res->ResetState();
 
 	const IndustrySpec *indspec = GetIndustrySpec(type);
 	res->grffile         = (indspec != NULL ? indspec->grf_prop.grffile : NULL);
@@ -434,7 +462,7 @@ uint32 IndustryLocationGetVariable(const ResolverObject *object, byte variable, 
 	TileIndex tile = object->u.industry.tile;
 
 	if (object->scope == VSG_SCOPE_PARENT) {
-		return TownGetVariable(variable, parameter, available, industry->town);
+		return TownGetVariable(variable, parameter, available, industry->town, object->grffile);
 	}
 
 	switch (variable) {
@@ -516,20 +544,9 @@ CommandCost CheckIfCallBackAllowsCreation(TileIndex tile, IndustryType type, uin
 	 * the building of the industry, as that's how it's done in TTDP. */
 	if (group == NULL) return CommandCost();
 	uint16 result = group->GetCallbackResult();
-	if (result == 0x400 || result == CALLBACK_FAILED) return CommandCost();
+	if (result == CALLBACK_FAILED) return CommandCost();
 
-	/* Copy some parameters from the registers to the error message text ref. stack */
-	SwitchToErrorRefStack();
-	PrepareTextRefStackUsage(4);
-	SwitchToNormalRefStack();
-
-	switch (result) {
-		case 0x401: return_cmd_error(STR_ERROR_SITE_UNSUITABLE);
-		case 0x402: return_cmd_error(STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST);
-		case 0x403: return_cmd_error(STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT);
-		default:    return_cmd_error(GetGRFStringID(indspec->grf_prop.grffile->grfid, 0xD000 + result));
-	}
-	NOT_REACHED();
+	return GetErrorMessageFromLocationCallbackResult(result, indspec->grf_prop.grffile->grfid, STR_ERROR_SITE_UNSUITABLE);
 }
 
 /**

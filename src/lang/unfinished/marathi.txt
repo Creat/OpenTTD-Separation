@@ -488,7 +488,7 @@ STR_NEWS_NEW_VEHICLE_TYPE                                       :{BIGFONT}{BLACK
 STR_GAME_OPTIONS_CURRENCY_GBP                                   :पौंड (£)
 STR_GAME_OPTIONS_CURRENCY_USD                                   :डोल्लर ($)
 STR_GAME_OPTIONS_CURRENCY_EUR                                   :युरो (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :येन (¥)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :येन (¥)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :ओस्त्रिअन शिल्लिंग (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :बेल्गीअन फ्रांक (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :स्विस फ्रांक (CHF)
@@ -1177,7 +1177,7 @@ STR_ORDERS_DELETE_ALL_TOOLTIP                                   :{BLACK}सर�
 
 
 
-STR_ORDER_AUTOMATIC                                             :(आपोआप)
+STR_ORDER_IMPLICIT                                              :(आपोआप)
 
 
 

@@ -56,7 +56,7 @@ enum CallbackID {
 	CBID_HOUSE_ALLOW_CONSTRUCTION        = 0x17, // 8 bit callback
 
 	/** AI construction/purchase selection */
-	CBID_GENERIC_AI_PURCHASE_SELECTION   = 0x18, // 8 bit callback, not implemented
+	CBID_GENERIC_AI_PURCHASE_SELECTION   = 0x18, // 8 bit callback, implemented for stations only
 
 	/** Determine the cargo "suffixes" for each refit possibility of a cargo. */
 	CBID_VEHICLE_CARGO_SUFFIX            = 0x19,
@@ -211,7 +211,7 @@ enum CallbackID {
 	CBID_HOUSE_WATCHED_CARGO_ACCEPTED    = 0x148, // 15 bit callback, not implemented
 
 	/** Callback done for each tile of a station to check the slope. */
-	CBID_STATION_LAND_SLOPE_CHECK        = 0x149, // 15 bit callback, not implemented
+	CBID_STATION_LAND_SLOPE_CHECK        = 0x149, // 15 bit callback
 
 	/** Called to determine the colour of an industry. */
 	CBID_INDUSTRY_DECIDE_COLOUR          = 0x14A, // 4 bit callback

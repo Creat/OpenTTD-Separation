@@ -178,7 +178,7 @@ void UpdateOldAircraft()
 				continue;
 			}
 
-			AircraftLeaveHangar(a); // make airplane visible if it was in a depot for example
+			AircraftLeaveHangar(a, a->direction); // make airplane visible if it was in a depot for example
 			a->vehstatus &= ~VS_STOPPED; // make airplane moving
 			UpdateAircraftCache(a);
 			a->cur_speed = a->vcache.cached_max_speed; // so aircraft don't have zero speed while in air
@@ -236,6 +236,8 @@ static void CheckValidVehicles()
 		}
 	}
 }
+
+extern byte _age_cargo_skip_counter; // From misc_sl.cpp
 
 /** Called after load to update coordinates */
 void AfterLoadVehicles(bool part_of_load)
@@ -336,10 +338,17 @@ void AfterLoadVehicles(bool part_of_load)
 		if (IsSavegameVersionBefore(160)) {
 			/* In some old savegames there might be some "crap" stored. */
 			FOR_ALL_VEHICLES(v) {
-				if (!v->IsPrimaryVehicle()) {
+				if (!v->IsPrimaryVehicle() && v->type != VEH_DISASTER) {
 					v->current_order.Free();
 					v->unitnumber = 0;
 				}
+			}
+		}
+
+		if (IsSavegameVersionBefore(162)) {
+			/* Set the vehicle-local cargo age counter from the old global counter. */
+			FOR_ALL_VEHICLES(v) {
+				v->cargo_age_counter = _age_cargo_skip_counter;
 			}
 		}
 	}
@@ -499,12 +508,13 @@ const SaveLoad *GetVehicleDescription(VehicleType vt)
 		     SLE_VAR(Vehicle, cargo_cap,             SLE_UINT16),
 		SLEG_CONDVAR(         _cargo_count,          SLE_UINT16,                   0,  67),
 		 SLE_CONDLST(Vehicle, cargo.packets,         REF_CARGO_PACKET,            68, SL_MAX_VERSION),
+		 SLE_CONDVAR(Vehicle, cargo_age_counter,     SLE_UINT16,                 162, SL_MAX_VERSION),
 
 		     SLE_VAR(Vehicle, day_counter,           SLE_UINT8),
 		     SLE_VAR(Vehicle, tick_counter,          SLE_UINT8),
 		 SLE_CONDVAR(Vehicle, running_ticks,         SLE_UINT8,                   88, SL_MAX_VERSION),
 
-		     SLE_VAR(Vehicle, cur_auto_order_index,  SLE_UINT8),
+		     SLE_VAR(Vehicle, cur_implicit_order_index,  SLE_UINT8),
 		 SLE_CONDVAR(Vehicle, cur_real_order_index,  SLE_UINT8,                  158, SL_MAX_VERSION),
 		/* num_orders is now part of OrderList and is not saved but counted */
 		SLE_CONDNULL(1,                                                            0, 104),

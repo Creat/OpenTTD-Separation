@@ -26,6 +26,7 @@
 #include "widgets/dropdown_type.h"
 #include "core/geometry_func.hpp"
 #include "hotkeys.h"
+#include "vehicle_func.h"
 #include "sprite.h"
 
 #include "table/strings.h"
@@ -195,6 +196,7 @@ Window *ShowBuildAirToolbar()
 
 EventState AirportToolbarGlobalHotkeys(uint16 key, uint16 keycode)
 {
+	if (!CanBuildVehicleInfrastructure(VEH_AIRCRAFT)) return ES_NOT_HANDLED;
 	int num = CheckHotkeyMatch<BuildAirToolbarWindow>(_airtoolbar_hotkeys, keycode, NULL, true);
 	if (num == -1) return ES_NOT_HANDLED;
 	Window *w = ShowBuildAirToolbar();
@@ -422,11 +424,6 @@ public:
 		_selected_airport_index = airport_index;
 		_selected_airport_layout = 0;
 
-		if (_selected_airport_index != -1) {
-			const AirportSpec *as = AirportClass::Get(_selected_airport_class, _selected_airport_index);
-			this->preview_sprite = GetCustomAirportSprite(as, _selected_airport_layout);
-		}
-
 		this->UpdateSelectSize();
 		this->SetDirty();
 	}
@@ -444,6 +441,8 @@ public:
 			Direction rotation = as->rotation[_selected_airport_layout];
 			if (rotation == DIR_E || rotation == DIR_W) Swap(w, h);
 			SetTileSelectSize(w, h);
+
+			this->preview_sprite = GetCustomAirportSprite(as, _selected_airport_layout);
 
 			this->SetWidgetDisabledState(BAIRW_LAYOUT_DECREASE, _selected_airport_layout == 0);
 			this->SetWidgetDisabledState(BAIRW_LAYOUT_INCREASE, _selected_airport_layout + 1 >= as->num_table);
@@ -578,7 +577,7 @@ static const NWidgetPart _nested_build_airport_widgets[] = {
 static const WindowDesc _build_airport_desc(
 	WDP_AUTO, 0, 0,
 	WC_BUILD_STATION, WC_BUILD_TOOLBAR,
-	WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION | WDF_UNCLICK_BUTTONS,
 	_nested_build_airport_widgets, lengthof(_nested_build_airport_widgets)
 );
 
@@ -590,4 +589,5 @@ static void ShowBuildAirportPicker(Window *parent)
 void InitializeAirportGui()
 {
 	_selected_airport_class = APC_BEGIN;
+	_selected_airport_index = -1;
 }

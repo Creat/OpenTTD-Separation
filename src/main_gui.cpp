@@ -18,7 +18,7 @@
 #include "viewport_func.h"
 #include "command_func.h"
 #include "console_gui.h"
-#include "genworld.h"
+#include "progress.h"
 #include "transparency_gui.h"
 #include "map_func.h"
 #include "sound_func.h"
@@ -244,6 +244,7 @@ struct MainWindow : Window
 	MainWindow() : Window()
 	{
 		this->InitNested(&_main_window_desc, 0);
+		CLRBITS(this->flags4, WF_WHITE_BORDER_MASK);
 		ResizeWindow(this, _screen.width, _screen.height);
 
 		NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(MW_VIEWPORT);
@@ -282,7 +283,7 @@ struct MainWindow : Window
 		 * generating the world, otherwise they create threading
 		 * problem during the generating, resulting in random
 		 * assertions that are hard to trigger and debug */
-		if (IsGeneratingWorld()) return ES_NOT_HANDLED;
+		if (HasModalProgress()) return ES_NOT_HANDLED;
 
 		switch (num) {
 			case GHK_ABANDON:
@@ -301,9 +302,7 @@ struct MainWindow : Window
 				return ES_HANDLED;
 
 			case GHK_BOUNDING_BOXES:
-				extern bool _draw_bounding_boxes;
-				_draw_bounding_boxes = !_draw_bounding_boxes;
-				MarkWholeScreenDirty();
+				ToggleBoundingBoxes();
 				return ES_HANDLED;
 		}
 

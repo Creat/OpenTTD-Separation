@@ -35,12 +35,6 @@ RandomizedSpriteGroup::~RandomizedSpriteGroup()
 	free((void*)this->groups);
 }
 
-TileLayoutSpriteGroup::~TileLayoutSpriteGroup()
-{
-	free((void*)this->dts->seq);
-	free(this->dts);
-}
-
 TemporaryStorageArray<int32, 0x110> _temp_store;
 
 
@@ -59,7 +53,7 @@ static inline uint32 GetVariable(const ResolverObject *object, byte variable, by
 
 		case 0x5F: return (object->GetRandomBits(object) << 8) | object->GetTriggers(object);
 
-		case 0x7D: return _temp_store.Get(parameter);
+		case 0x7D: return _temp_store.GetValue(parameter);
 
 		case 0x7F:
 			if (object == NULL || object->grffile == NULL) return 0;
@@ -117,9 +111,9 @@ static U EvalAdjustT(const DeterministicSpriteGroupAdjust *adjust, ResolverObjec
 		case DSGA_OP_AND:  return last_value & value;
 		case DSGA_OP_OR:   return last_value | value;
 		case DSGA_OP_XOR:  return last_value ^ value;
-		case DSGA_OP_STO:  _temp_store.Store((U)value, (S)last_value); return last_value;
+		case DSGA_OP_STO:  _temp_store.StoreValue((U)value, (S)last_value); return last_value;
 		case DSGA_OP_RST:  return value;
-		case DSGA_OP_STOP: if (object->psa != NULL) object->psa->Store((U)value, (S)last_value); return last_value;
+		case DSGA_OP_STOP: if (object->StorePSA != NULL) object->StorePSA(object, (U)value, (S)last_value); return last_value;
 		case DSGA_OP_ROR:  return RotateRight(last_value, value);
 		case DSGA_OP_SCMP: return ((S)last_value == (S)value) ? 1 : ((S)last_value < (S)value ? 0 : 2);
 		case DSGA_OP_UCMP: return ((U)last_value == (U)value) ? 1 : ((U)last_value < (U)value ? 0 : 2);
@@ -213,7 +207,7 @@ const SpriteGroup *RandomizedSpriteGroup::Resolve(ResolverObject *object) const
 
 		if (res) {
 			waiting_triggers &= ~match;
-			object->reseed |= (this->num_groups - 1) << this->lowest_randbit;
+			object->reseed[this->var_scope] |= (this->num_groups - 1) << this->lowest_randbit;
 		} else {
 			waiting_triggers |= object->trigger;
 		}
@@ -231,4 +225,30 @@ const SpriteGroup *RandomizedSpriteGroup::Resolve(ResolverObject *object) const
 const SpriteGroup *RealSpriteGroup::Resolve(ResolverObject *object) const
 {
 	return object->ResolveReal(object, this);
+}
+
+/**
+ * Process registers and the construction stage into the sprite layout.
+ * The passed construction stage might get reset to zero, if it gets incorporated into the layout
+ * during the preprocessing.
+ * @param [in, out] stage Construction stage (0-3), or NULL if not applicable.
+ * @return sprite layout to draw.
+ */
+const DrawTileSprites *TileLayoutSpriteGroup::ProcessRegisters(uint8 *stage) const
+{
+	if (!this->dts.NeedsPreprocessing()) {
+		if (stage != NULL && this->dts.consistent_max_offset > 0) *stage = GetConstructionStageOffset(*stage, this->dts.consistent_max_offset);
+		return &this->dts;
+	}
+
+	static DrawTileSprites result;
+	uint8 actual_stage = stage != NULL ? *stage : 0;
+	this->dts.PrepareLayout(0, 0, 0, actual_stage, false);
+	this->dts.ProcessRegisters(0, 0, false);
+	result.seq = this->dts.GetLayout(&result.ground);
+
+	/* Stage has been processed by PrepareLayout(), set it to zero. */
+	if (stage != NULL) *stage = 0;
+
+	return &result;
 }

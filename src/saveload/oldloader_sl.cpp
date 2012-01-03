@@ -355,14 +355,14 @@ static bool FixTTOEngines()
 	static const EngineID ttd_to_tto[] = {
 		  0, 255, 255, 255, 255, 255, 255, 255,   5,   7,   8,   9,  10,  11,  12,  13,
 		255, 255, 255, 255, 255, 255,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,
-		25,   26,  27,  28,  29,  30, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+		25,   26,  27,  29,  28,  30, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 		255, 255, 255, 255, 255, 255, 255,  31, 255,  32,  33,  34,  35,  36,  37,  38,
 		 39,  40,  41,  42, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 		255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 		255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 		255, 255, 255, 255,  44,  45,  46, 255, 255, 255, 255,  47,  48, 255,  49,  50,
-		255, 255, 255, 255,  51,  52, 255,  53,  54, 255,  55,  56, 255,  57,  58, 255,
-		 59,  60, 255,  61,  62, 255,  63,  64, 255,  65,  66, 255, 255, 255, 255, 255,
+		255, 255, 255, 255,  51,  52, 255,  53,  54, 255,  55,  56, 255,  57,  59, 255,
+		 58,  60, 255,  61,  62, 255,  63,  64, 255,  65,  66, 255, 255, 255, 255, 255,
 		255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 		255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 		255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,  67,  68,  69,  70,
@@ -374,8 +374,8 @@ static bool FixTTOEngines()
 	/** TTO->TTD remapping of engines. SVXConverter uses the same table. */
 	static const EngineID tto_to_ttd[] = {
 		  0,   0,   8,   8,   8,   8,   8,   9,  10,  11,  12,  13,  14,  15,  15,  22,
-		 23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  55,
-		 57,  58,  59,  60,  61,  62,  63,  64,  65,  66,  67, 116, 116, 117, 118, 123,
+		 23,  24,  25,  26,  27,  29,  28,  30,  31,  32,  33,  34,  35,  36,  37,  55,
+		 57,  59,  58,  60,  61,  62,  63,  64,  65,  66,  67, 116, 116, 117, 118, 123,
 		124, 126, 127, 132, 133, 135, 136, 138, 139, 141, 142, 144, 145, 147, 148, 150,
 		151, 153, 154, 204, 205, 206, 207, 208, 211, 212, 211, 212, 211, 212, 215, 216,
 		217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232,
@@ -388,7 +388,7 @@ static bool FixTTOEngines()
 		v->engine_type = tto_to_ttd[v->engine_type];
 	}
 
-	/* Load the default engine set. Many of them will be overriden later */
+	/* Load the default engine set. Many of them will be overridden later */
 	uint j = 0;
 	for (uint i = 0; i < lengthof(_orig_rail_vehicle_info); i++, j++) new (GetTempDataEngine(j)) Engine(VEH_TRAIN, i);
 	for (uint i = 0; i < lengthof(_orig_road_vehicle_info); i++, j++) new (GetTempDataEngine(j)) Engine(VEH_ROAD, i);
@@ -517,9 +517,9 @@ static void ReadTTDPatchFlags()
 	_old_vehicle_names = MallocT<StringID>(_old_vehicle_multiplier * 850);
 
 	/* TTDPatch increases the Vehicle-part in the middle of the game,
-	 * so if the multipler is anything else but 1, the assert fails..
+	 * so if the multiplier is anything else but 1, the assert fails..
 	 * bump the assert value so it doesn't!
-	 * (1 multipler == 850 vehicles
+	 * (1 multiplier == 850 vehicles
 	 * 1 vehicle   == 128 bytes */
 	_bump_assert_value = (_old_vehicle_multiplier - 1) * 850 * 128;
 
@@ -577,8 +577,7 @@ static const OldChunks town_chunk[] = {
 	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, act_pass ),
 	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, act_mail ),
 
-	OCL_SVAR(  OC_UINT8, Town, pct_pass_transported ),
-	OCL_SVAR(  OC_UINT8, Town, pct_mail_transported ),
+	OCL_NULL( 2 ),         ///< pct_pass_transported / pct_mail_transported, now computed on the fly
 
 	OCL_SVAR( OC_TTD | OC_UINT16, Town, new_act_food ),
 	OCL_SVAR( OC_TTD | OC_UINT16, Town, new_act_water ),
@@ -708,8 +707,8 @@ static bool LoadOldGood(LoadgameState *ls, int num)
 
 	if (!LoadChunk(ls, ge, goods_chunk)) return false;
 
-	SB(ge->acceptance_pickup, GoodsEntry::ACCEPTANCE, 1, HasBit(_waiting_acceptance, 15));
-	SB(ge->acceptance_pickup, GoodsEntry::PICKUP, 1, _cargo_source != 0xFF);
+	SB(ge->acceptance_pickup, GoodsEntry::GES_ACCEPTANCE, 1, HasBit(_waiting_acceptance, 15));
+	SB(ge->acceptance_pickup, GoodsEntry::GES_PICKUP, 1, _cargo_source != 0xFF);
 	if (GB(_waiting_acceptance, 0, 12) != 0 && CargoPacket::CanAllocateItem()) {
 		ge->cargo.Append(new CargoPacket(GB(_waiting_acceptance, 0, 12), _cargo_days, (_cargo_source == 0xFF) ? INVALID_STATION : _cargo_source, 0, 0));
 	}
@@ -1141,7 +1140,7 @@ static const OldChunks vehicle_chunk[] = {
 	OCL_VAR ( OC_UINT16,   1, &_old_order ),
 
 	OCL_NULL ( 1 ), ///< num_orders, now calculated
-	OCL_SVAR(  OC_UINT8, Vehicle, cur_auto_order_index ),
+	OCL_SVAR(  OC_UINT8, Vehicle, cur_implicit_order_index ),
 	OCL_SVAR(   OC_TILE, Vehicle, dest_tile ),
 	OCL_SVAR( OC_UINT16, Vehicle, load_unload_ticks ),
 	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Vehicle, date_of_last_service ),
@@ -1573,6 +1572,7 @@ static bool LoadTTDPatchExtraChunks(LoadgameState *ls, int num)
 extern TileIndex _cur_tileloop_tile;
 extern uint16 _disaster_delay;
 extern byte _trees_tick_ctr;
+extern byte _age_cargo_skip_counter; // From misc_sl.cpp
 static const OldChunks main_chunk[] = {
 	OCL_ASSERT( OC_TTD, 0 ),
 	OCL_ASSERT( OC_TTO, 0 ),

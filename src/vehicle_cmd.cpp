@@ -30,6 +30,7 @@
 #include "autoreplace_gui.h"
 #include "company_base.h"
 #include "order_backup.h"
+#include "ship.h"
 
 #include "table/strings.h"
 
@@ -373,9 +374,15 @@ CommandCost CmdRefitVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, uint
 				break;
 
 			case VEH_SHIP:
+				v->InvalidateNewGRFCacheOfChain();
+				v->colourmap = PAL_NONE; // invalidate vehicle colour map
+				Ship::From(v)->UpdateCache();
+				break;
+
 			case VEH_AIRCRAFT:
 				v->InvalidateNewGRFCacheOfChain();
 				v->colourmap = PAL_NONE; // invalidate vehicle colour map
+				UpdateAircraftCache(Aircraft::From(v));
 				break;
 
 			default: NOT_REACHED();
@@ -519,9 +526,10 @@ CommandCost CmdDepotSellAllVehicles(TileIndex tile, DoCommandFlag flags, uint32 
 
 	CommandCost cost(EXPENSES_NEW_VEHICLES);
 	VehicleType vehicle_type = Extract<VehicleType, 0, 3>(p1);
-	uint sell_command = GetCmdSellVeh(vehicle_type);
 
 	if (!IsCompanyBuildableVehicleType(vehicle_type)) return CMD_ERROR;
+
+	uint sell_command = GetCmdSellVeh(vehicle_type);
 
 	/* Get the list of vehicles in the depot */
 	BuildDepotVehicleList(vehicle_type, tile, &list, &list);

@@ -233,6 +233,7 @@ void Train::ConsistChanged(bool same_length)
 		}
 
 		u->cargo_cap = GetVehicleCapacity(u);
+		u->vcache.cached_cargo_age_period = GetVehicleProperty(u, PROP_TRAIN_CARGO_AGE_PERIOD, e_u->info.cargo_age_period);
 
 		/* check the vehicle length (callback) */
 		uint16 veh_len = CALLBACK_FAILED;
@@ -354,7 +355,7 @@ int Train::GetCurveSpeedLimit() const
 			if (lastpos != -1) {
 				numcurve++;
 				sum += pos - lastpos;
-				if (pos - lastpos == 1) {
+				if (pos - lastpos == 1 && max_speed > 88) {
 					max_speed = 88;
 				}
 			}
@@ -2292,7 +2293,7 @@ private:
 	TileIndex      old_dest_tile;
 	StationID      old_last_station_visited;
 	VehicleOrderID index;
-	bool           suppress_automatic_orders;
+	bool           suppress_implicit_orders;
 
 public:
 	VehicleOrderSaver(Train *_v) :
@@ -2301,7 +2302,7 @@ public:
 		old_dest_tile(_v->dest_tile),
 		old_last_station_visited(_v->last_station_visited),
 		index(_v->cur_real_order_index),
-		suppress_automatic_orders(HasBit(_v->gv_flags, GVF_SUPPRESS_AUTOMATIC_ORDERS))
+		suppress_implicit_orders(HasBit(_v->gv_flags, GVF_SUPPRESS_IMPLICIT_ORDERS))
 	{
 	}
 
@@ -2310,7 +2311,7 @@ public:
 		this->v->current_order = this->old_order;
 		this->v->dest_tile = this->old_dest_tile;
 		this->v->last_station_visited = this->old_last_station_visited;
-		SB(this->v->gv_flags, GVF_SUPPRESS_AUTOMATIC_ORDERS, 1, suppress_automatic_orders ? 1: 0);
+		SB(this->v->gv_flags, GVF_SUPPRESS_IMPLICIT_ORDERS, 1, suppress_implicit_orders ? 1: 0);
 	}
 
 	/**
@@ -2340,8 +2341,7 @@ public:
 				case OT_GOTO_STATION:
 				case OT_GOTO_WAYPOINT:
 					this->v->current_order = *order;
-					UpdateOrderDest(this->v, order);
-					return true;
+					return UpdateOrderDest(this->v, order, 0, true);
 				case OT_CONDITIONAL: {
 					if (conditional_depth > this->v->GetNumOrders()) return false;
 					VehicleOrderID next = ProcessConditionalOrder(order, this->v);
@@ -3770,7 +3770,7 @@ static void CheckIfTrainNeedsService(Train *v)
 		return;
 	}
 
-	SetBit(v->gv_flags, GVF_SUPPRESS_AUTOMATIC_ORDERS);
+	SetBit(v->gv_flags, GVF_SUPPRESS_IMPLICIT_ORDERS);
 	v->current_order.MakeGoToDepot(depot, ODTFB_SERVICE);
 	v->dest_tile = tfdd.tile;
 	SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
@@ -3778,11 +3778,12 @@ static void CheckIfTrainNeedsService(Train *v)
 
 void Train::OnNewDay()
 {
+	AgeVehicle(this);
+
 	if ((++this->day_counter & 7) == 0) DecreaseVehicleValue(this);
 
 	if (this->IsFrontEngine()) {
 		CheckVehicleBreakdown(this);
-		AgeVehicle(this);
 
 		CheckIfTrainNeedsService(this);
 
@@ -3806,9 +3807,6 @@ void Train::OnNewDay()
 			SetWindowDirty(WC_VEHICLE_DETAILS, this->index);
 			SetWindowClassesDirty(WC_TRAINS_LIST);
 		}
-	} else if (this->IsEngine()) {
-		/* Also age engines that aren't front engines */
-		AgeVehicle(this);
 	}
 }
 

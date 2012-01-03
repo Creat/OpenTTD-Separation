@@ -56,7 +56,7 @@ typedef SimpleTinyEnumT<SettingGuiFlagLong, uint16> SettingGuiFlag;
 
 
 typedef bool OnChange(int32 var);           ///< callback prototype on data modification
-typedef int32 OnConvert(const char *value); ///< callback prototype for convertion error
+typedef size_t OnConvert(const char *value); ///< callback prototype for convertion error
 
 /** Properties of config file settings. */
 struct SettingDescBase {
@@ -92,7 +92,5 @@ const SettingDesc *GetSettingFromName(const char *name, uint *i);
 bool SetSettingValue(uint index, int32 value, bool force_newgame = false);
 bool SetSettingValue(uint index, const char *value, bool force_newgame = false);
 void SetCompanySetting(uint index, int32 value);
-
-extern VehicleDefaultSettings _old_vds;
 
 #endif /* SETTINGS_INTERNAL_H */

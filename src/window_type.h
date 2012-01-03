@@ -93,7 +93,7 @@ enum WindowClass {
 	WC_ENDSCREEN,
 	WC_SIGN_LIST,
 	WC_GENERATE_LANDSCAPE,
-	WC_GENERATE_PROGRESS_WINDOW,
+	WC_MODAL_PROGRESS,
 	WC_CONFIRM_POPUP_QUERY,
 	WC_TRANSPARENCY_TOOLBAR,
 	WC_VEHICLE_TIMETABLE,
@@ -113,6 +113,17 @@ enum WindowClass {
 	WC_BUILD_OBJECT,
 
 	WC_INVALID = 0xFFFF
+};
+
+/**
+ * Data value for #Window::OnInvalidateData() of windows with class #WC_GAME_OPTIONS.
+ */
+enum GameOptionsInvalidationData {
+	GOID_DEFAULT = 0,
+	GOID_NEWGRF_RESCANNED,     ///< NewGRFs were just rescanned.
+	GOID_NEWGRF_LIST_EDITED,   ///< List of active NewGRFs is being edited.
+	GOID_NEWGRF_PRESET_LOADED, ///< A NewGRF preset was picked.
+	GOID_DIFFICULTY_CHANGED,   ///< Difficulty settings were changed.
 };
 
 struct Window;

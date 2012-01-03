@@ -338,6 +338,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Sijoita 
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Tallenna skenaario
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Lataa skenaario
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Tallenna korkeuskartta
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Lataa korkeuskartta
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Sulje muokkain
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -355,6 +356,7 @@ STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Kaupunkien nime
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Asemien nimet näkyvissä
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Reittipisteitten nimet näkyvissä
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Kyltit näkyvissä
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Vastustajien kyltit ja nimet näkyvissä
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Täysi animointi
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Kaikki yksityiskohdat
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Läpinäkyvät rakennukset
@@ -447,6 +449,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Lähennetty kuv
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Koko kartan kuvakaappaus
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Tietoja 'OpenTTD':stä
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Sprite-kohdistaja
+STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Reunat päälle/pois
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -858,26 +861,26 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_FRAME                           :{BLACK}Rahayksi
 STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}Rahayksikön valinta.
 
 ############ start of currency region
-STR_GAME_OPTIONS_CURRENCY_GBP                                   :Punta (£)
-STR_GAME_OPTIONS_CURRENCY_USD                                   :Dollari ($)
-STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :Jeni (¥)
+STR_GAME_OPTIONS_CURRENCY_GBP                                   :Englannin punta (GBP)
+STR_GAME_OPTIONS_CURRENCY_USD                                   :Yhdysvaltain dollari (USD)
+STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (EUR)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :Japanin jeni (JPY)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :Itävallan shillinki (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :Belgian frangi (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :Sveitsin frangi (CHF)
 STR_GAME_OPTIONS_CURRENCY_CZK                                   :Tsekin koruna (CZK)
 STR_GAME_OPTIONS_CURRENCY_DEM                                   :Saksan markka (DEM)
 STR_GAME_OPTIONS_CURRENCY_DKK                                   :Tanskan kruunu (DKK)
-STR_GAME_OPTIONS_CURRENCY_ESP                                   :Peseta (ESP)
+STR_GAME_OPTIONS_CURRENCY_ESP                                   :Espanjan peseta (ESP)
 STR_GAME_OPTIONS_CURRENCY_FIM                                   :Suomen markka (FIM)
-STR_GAME_OPTIONS_CURRENCY_FRF                                   :Frangi (FRF)
+STR_GAME_OPTIONS_CURRENCY_FRF                                   :Ranskan frangi (FRF)
 STR_GAME_OPTIONS_CURRENCY_GRD                                   :Kreikan drakma (GRD)
 STR_GAME_OPTIONS_CURRENCY_HUF                                   :Unkarin forintti (HUF)
 STR_GAME_OPTIONS_CURRENCY_ISK                                   :Islannin kruunu (ISK)
 STR_GAME_OPTIONS_CURRENCY_ITL                                   :Italian liira (ITL)
 STR_GAME_OPTIONS_CURRENCY_NLG                                   :Hollannin guldeni (NLG)
 STR_GAME_OPTIONS_CURRENCY_NOK                                   :Norjan kruunu (NOK)
-STR_GAME_OPTIONS_CURRENCY_PLN                                   :Puolan zloty (PLN)
+STR_GAME_OPTIONS_CURRENCY_PLN                                   :Puolan złoty (PLN)
 STR_GAME_OPTIONS_CURRENCY_RON                                   :Romanian leu (RON)
 STR_GAME_OPTIONS_CURRENCY_RUR                                   :Venjän rupla (RUR)
 STR_GAME_OPTIONS_CURRENCY_SIT                                   :Slovenian tolari (SIT)
@@ -1056,6 +1059,11 @@ STR_SEA_LEVEL_HIGH                                              :Korkea
 STR_SEA_LEVEL_CUSTOM                                            :Oma
 STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Oma ({NUM}%)
 
+STR_RIVERS_NONE                                                 :Ei yhtään
+STR_RIVERS_FEW                                                  :Vähän
+STR_RIVERS_MODERATE                                             :Keskisuuri
+STR_RIVERS_LOT                                                  :Monia
+
 STR_DISASTER_NONE                                               :Ei mitään
 STR_DISASTER_REDUCED                                            :Vähennetty
 STR_DISASTER_NORMAL                                             :Tavallinen
@@ -1110,8 +1118,8 @@ STR_CONFIG_SETTING_TRAIN_LENGTH                                 :{LTBLUE}Junien 
 STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}Kulkuneuvon savun/kipinöiden määrä: {ORANGE}{STRING}
 STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :{LTBLUE}Junien kiihdytysmalli: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :{LTBLUE}Ajoneuvojen kiihdytysmalli: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Mäkien jyrkkyys junille {ORANGE}{STRING}%
-STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Mäkien jyrkkyys ajoneuvoille {ORANGE}{STRING}%
+STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Mäkien jyrkkyys junille: {ORANGE}{STRING}%
+STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Mäkien jyrkkyys ajoneuvoille: {ORANGE}{STRING}%
 STR_CONFIG_SETTING_FORBID_90_DEG                                :{LTBLUE}90 asteen käännökset kielletty junilta ja laivoilta: {ORANGE}{STRING}
 STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :{LTBLUE}Salli ei-vierekkäisten asemien yhdistäminen: {ORANGE}{STRING}
 STR_CONFIG_SETTING_IMPROVEDLOAD                                 :{LTBLUE}Käytä kehittyneempää lastausalgoritmia: {ORANGE}{STRING}
@@ -1392,6 +1400,8 @@ STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Näytä 
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Tarkista uutta ja päivitettyä sisältöä ladattavaksi
 STR_INTRO_TOOLTIP_AI_SETTINGS                                   :{BLACK}Näytä tekoälyasetukset
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Sulje OpenTTD.
+
+STR_INTRO_TRANSLATION                                           :{BLACK}Tästä käännöksestä puuttuu {NUM} merkkijono{P "" a}. Auta tekemään OpenTTD:stä parempi rekisteröitymällä kääntäjäksi. Lisätietoja tiedostossa readme.txt.
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Sulje
@@ -2278,6 +2288,7 @@ STR_SAVELOAD_LOAD_CAPTION                                       :{WHITE}Lataa pe
 STR_SAVELOAD_SAVE_SCENARIO                                      :{WHITE}Tallenna skenaario
 STR_SAVELOAD_LOAD_SCENARIO                                      :{WHITE}Lataa skenaario
 STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Lataa korkeuskartta
+STR_SAVELOAD_SAVE_HEIGHTMAP                                     :{WHITE}Tallenna Korkeuskartta
 STR_SAVELOAD_HOME_BUTTON                                        :{BLACK}Siirry tallennusten oletuskansioon napsauttamalla tätä
 STR_SAVELOAD_BYTES_FREE                                         :{BLACK}{BYTES} vapaana
 STR_SAVELOAD_LIST_TOOLTIP                                       :{BLACK}Lista asemista, hakemistoista ja tallennetuista peleistä.
@@ -2313,6 +2324,7 @@ STR_MAPGEN_LAND_GENERATOR                                       :{BLACK}Maastoge
 STR_MAPGEN_TREE_PLACER                                          :{BLACK}Puiden algoritmi:
 STR_MAPGEN_TERRAIN_TYPE                                         :{BLACK}Maaston tyyppi:
 STR_MAPGEN_QUANTITY_OF_SEA_LAKES                                :{BLACK}Merenpinta:
+STR_MAPGEN_QUANTITY_OF_RIVERS                                   :{BLACK}Joet:
 STR_MAPGEN_SMOOTHNESS                                           :{BLACK}Tasaisuus:
 STR_MAPGEN_VARIETY                                              :{BLACK}Vaihtelu:
 STR_MAPGEN_GENERATE                                             :{WHITE}Generoi
@@ -2357,6 +2369,7 @@ STR_GENERATION_ABORT_MESSAGE                                    :{YELLOW}Haluatk
 STR_GENERATION_PROGRESS                                         :{WHITE}{NUM}% valmiina
 STR_GENERATION_PROGRESS_NUM                                     :{BLACK}{NUM} / {NUM}
 STR_GENERATION_WORLD_GENERATION                                 :{BLACK}Maailman luominen
+STR_GENERATION_RIVER_GENERATION                                 :{BLACK}Jokien luominen
 STR_GENERATION_TREE_GENERATION                                  :{BLACK}Puiden luominen
 STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Siirtämättömän luominen
 STR_GENERATION_CLEARING_TILES                                   :{BLACK}Karun ja kivisen alueen luominen
@@ -2473,6 +2486,7 @@ STR_NEWGRF_ERROR_READ_BOUNDS                                    :Luku pseudo-spr
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Käytössä olevasta perusgrafiikkapaketista puuttuu spritejä.{}Ole hyvä ja päivitä perusgrafiikkapaketti
 STR_NEWGRF_ERROR_GRM_FAILED                                     :Pyydetyt GRF-resurssit eivät ole saatavilla
 STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{4:STRING} poisti käytöstä NewGRF:n {2:STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Virheellinen/tuntematon spriten asetteluformaatti
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Varoitus!
@@ -2508,6 +2522,12 @@ STR_NEWGRF_INVALID_CARGO_ABBREV                                 :??
 STR_NEWGRF_INVALID_CARGO_QUANTITY                               :{COMMA} <virheellistä rahtia>
 STR_NEWGRF_INVALID_ENGINE                                       :<virheellinen kulkuneuvo>
 STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<virheellinen teollisuus>
+
+# NewGRF scanning window
+STR_NEWGRF_SCAN_CAPTION                                         :{WHITE}Skannataan NewGRF-tiedostoja
+STR_NEWGRF_SCAN_MESSAGE                                         :{BLACK}Skannataan NewGRF-tiedostoja. Lukumäärästä riippuen tässä voi kestää hetki...
+STR_NEWGRF_SCAN_STATUS                                          :{BLACK}{NUM} NewGRF{P "" ää} skannattu. Arvioitu kokonaismäärä {NUM} NewGRF{P "" ää}
+STR_NEWGRF_SCAN_ARCHIVES                                        :Skannataan arkistoja
 
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Kylttilista - {COMMA} kylttiä
@@ -2816,6 +2836,8 @@ STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :Uusi lentokone
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}Kulu: {GOLD}{CURRENCY}{BLACK} Paino: {GOLD}{WEIGHT_S}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}Nopeus: {GOLD}{VELOCITY}{BLACK} Teho: {GOLD}{POWER}
 STR_PURCHASE_INFO_SPEED                                         :{BLACK}Nopeus: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_OCEAN                                   :{BLACK}Nopeus merellä: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_CANAL                                   :{BLACK}Nopeus kanaalissa/joessa: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_RUNNINGCOST                                   :{BLACK}Käyttökukustannus: {GOLD}{CURRENCY}/vuosi
 STR_PURCHASE_INFO_CAPACITY                                      :{BLACK}Kapasiteetti: {GOLD}{CARGO} {STRING}
 STR_PURCHASE_INFO_REFITTABLE                                    :(sovitettava)
@@ -3176,12 +3198,15 @@ STR_ORDER_DROP_HALT_DEPOT                                       :Pysähdy
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}Ohita tämä käsky, ellei palvelua tarvita.
 
 STR_ORDER_CONDITIONAL_VARIABLE_TOOLTIP                          :{BLACK}Kulkuneuvon tiedot, joiden perusteella hypätään
+
+# Conditional order variables, must follow order of OrderConditionVariable enum
 STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE                           :Lastin prosentuaalinen määrä
 STR_ORDER_CONDITIONAL_RELIABILITY                               :Luotettavuus
 STR_ORDER_CONDITIONAL_MAX_SPEED                                 :Huippunopeus
-STR_ORDER_CONDITIONAL_AGE                                       :Kulkuneuvon ikä (vuotta)
+STR_ORDER_CONDITIONAL_AGE                                       :Ikä (vuotta)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :Vaatii huoltoa
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :Aina
+STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :Jäljelläoleva elinikä (vuotta)
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}Miten kulkuneuvon tietoja verrataan annettuihin arvoihin
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :on yhtä kuin
@@ -3236,7 +3261,7 @@ STR_ORDER_STOP_ORDER                                            :(Pysähdy)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :(Automaattinen)
+STR_ORDER_IMPLICIT                                              :(Ehdoton)
 
 STR_ORDER_FULL_LOAD                                             :(Täysi lastaus)
 STR_ORDER_FULL_LOAD_ANY                                         :(Lastaa täyteen mitä tahansa rahtia)
@@ -3427,6 +3452,8 @@ STR_ERROR_PNGMAP_MISC                                           :{WHITE}... tapa
 STR_ERROR_BMPMAP                                                :{WHITE}Maastoa ei voida ladata BMP-tiedostosta...
 STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... kuvan tyyppiä ei voitu muuntaa
 
+STR_ERROR_HEIGHTMAP_TOO_LARGE                                   :{WHITE}... kuva on liian suuri
+
 STR_WARNING_HEIGHTMAP_SCALE_CAPTION                             :{WHITE}Mittakaava-varoitus
 STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}Lähdekartan koon liiallinen muuttaminen ei ole suositeltavaa. Haluatko jatkaa?
 
@@ -3521,6 +3548,8 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... void
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... voidaan rakentaa vain matalille alueille
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... voidaan asettaa vain kartan reunoille
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... metsää voi istuttaa vain lumirajan yläpuolelle
+STR_ERROR_CAN_ONLY_BE_BUILT_ABOVE_SNOW_LINE                     :{WHITE}... voidaan rakentaa vain lumirajan yläpuolelle
+STR_ERROR_CAN_ONLY_BE_BUILT_BELOW_SNOW_LINE                     :{WHITE}... voidaan rakentaa vain lumirajan alapuolelle
 
 # Station construction related errors
 STR_ERROR_CAN_T_BUILD_RAILROAD_STATION                          :{WHITE}Rautatieasemaa ei voi rakentaa.
@@ -3642,6 +3671,9 @@ STR_ERROR_CAN_T_BUILD_LOCKS                                     :{WHITE}Sulkua e
 STR_ERROR_CAN_T_PLACE_RIVERS                                    :{WHITE}Tähän ei voi asettaa jokea...
 STR_ERROR_MUST_BE_BUILT_ON_WATER                                :{WHITE}... se pitää rakentaa veteen.
 STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... veteen ei voi rakentaa.
+STR_ERROR_CAN_T_BUILD_ON_SEA                                    :{WHITE}... ei voida rakentaa merelle
+STR_ERROR_CAN_T_BUILD_ON_CANAL                                  :{WHITE}... ei voida rakentaa kanaaliin
+STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... ei voida rakentaa jokeen
 STR_ERROR_MUST_DEMOLISH_CANAL_FIRST                             :{WHITE}Kanava täytyy purkaa ensin
 STR_ERROR_CAN_T_BUILD_AQUEDUCT_HERE                             :{WHITE}Tähän ei voi rakentaa akveduktia...
 

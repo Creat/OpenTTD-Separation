@@ -319,6 +319,7 @@ public:
 	 * @param height The height of the station.
 	 * @param radius The radius of the station.
 	 * @pre AIMap::IsValidTile(tile).
+	 * @pre AICargo::IsValidCargo(cargo_type)
 	 * @pre width > 0.
 	 * @pre height > 0.
 	 * @pre radius >= 0.
@@ -335,6 +336,7 @@ public:
 	 * @param height The height of the station.
 	 * @param radius The radius of the station.
 	 * @pre AIMap::IsValidTile(tile).
+	 * @pre AICargo::IsValidCargo(cargo_type)
 	 * @pre width > 0.
 	 * @pre height > 0.
 	 * @pre radius >= 0.
@@ -439,12 +441,22 @@ public:
 
 	/**
 	 * Find out if this tile is within the rating influence of a town.
-	 *  Stations on this tile influence the rating of the town.
+	 *  If a station sign would be on this tile, the servicing quality of the station would
+	 *  influence the rating of the town.
 	 * @param tile The tile to check.
 	 * @param town_id The town to check.
 	 * @return True if the tile is within the rating influence of the town.
 	 */
 	static bool IsWithinTownInfluence(TileIndex tile, TownID town_id);
+
+	/**
+	 * Find the town which has authority for the tile.
+	 *  The rating of your company in this town will be checked and affected when
+	 *  building stations, trees etc.
+	 * @param tile The tile to check.
+	 * @return The TownID of the town which has authority on this tile.
+	 */
+	static TownID GetTownAuthority(TileIndex tile);
 
 	/**
 	 * Find the town that is closest to a tile. Stations you build at this tile

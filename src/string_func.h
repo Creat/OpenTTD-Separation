@@ -41,7 +41,7 @@ char *CDECL str_fmt(const char *str, ...) WARN_FORMAT(1, 2);
 
 void str_validate(char *str, const char *last, bool allow_newlines = false, bool ignore = false);
 void str_strip_colours(char *str);
-void strtolower(char *str);
+bool strtolower(char *str);
 
 bool StrValid(const char *str, const char *last);
 
@@ -195,7 +195,7 @@ static inline bool IsWhitespace(WChar c)
 #endif
 
 /* strndup is a GNU extension */
-#if defined(_GNU_SOURCE) || (defined(__NetBSD_Version__) && 400000000 <= __NetBSD_Version__) || (defined(__FreeBSD_version) && 701101 <= __FreeBSD_version)
+#if defined(_GNU_SOURCE) || (defined(__NetBSD_Version__) && 400000000 <= __NetBSD_Version__) || (defined(__FreeBSD_version) && 701101 <= __FreeBSD_version) || (defined(__DARWIN_C_LEVEL) && __DARWIN_C_LEVEL >= 200809L)
 #	undef DEFINE_STRNDUP
 #else
 #	define DEFINE_STRNDUP

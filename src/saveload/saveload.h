@@ -15,13 +15,6 @@
 #include "../fileio_type.h"
 #include "../strings_type.h"
 
-#ifdef SIZE_MAX
-#undef SIZE_MAX
-#endif
-#define SL_TTSEP_VER 161
-
-#define SIZE_MAX ((size_t)-1)
-
 /** Save or load result codes. */
 enum SaveOrLoadResult {
 	SL_OK     = 0, ///< completed successfully
@@ -89,6 +82,7 @@ enum SLRefType {
 	REF_ENGINE_RENEWS = 6, ///< Load/save a reference to an engine renewal (autoreplace).
 	REF_CARGO_PACKET  = 7, ///< Load/save a reference to a cargo packet.
 	REF_ORDERLIST     = 8, ///< Load/save a reference to an orderlist.
+	REF_STORAGE       = 9, ///< Load/save a reference to a persistent storage.
 };
 
 /** Highest possible savegame version. */

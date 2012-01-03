@@ -50,7 +50,7 @@ static uint32 CanalGetVariable(const ResolverObject *object, byte variable, byte
 		case 0x80: {
 			uint z = GetTileZ(tile) / TILE_HEIGHT;
 			/* Return consistent height within locks */
-			if (IsTileType(tile, MP_WATER) && IsLock(tile) && GetSection(tile) == LOCK_UPPER) z--;
+			if (IsTileType(tile, MP_WATER) && IsLock(tile) && GetLockPart(tile) == LOCK_PART_UPPER) z--;
 			return z;
 		}
 
@@ -89,10 +89,8 @@ static void NewCanalResolver(ResolverObject *res, TileIndex tile, const GRFFile 
 	res->callback        = CBID_NO_CALLBACK;
 	res->callback_param1 = 0;
 	res->callback_param2 = 0;
-	res->last_value      = 0;
-	res->trigger         = 0;
-	res->reseed          = 0;
-	res->count           = 0;
+	res->ResetState();
+
 	res->grffile         = grffile;
 }
 

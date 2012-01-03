@@ -225,8 +225,11 @@
  *  158   21933
  *  159   21962
  *  160   21974
+ *  161   22567
+ *  162   22713
+ *  163   22767
  */
-extern const uint16 SAVEGAME_VERSION = SL_TTSEP_VER; ///< Current savegame version of OpenTTD.
+extern const uint16 SAVEGAME_VERSION = 200; ///< Current savegame version of OpenTTD.
 
 SavegameType _savegame_type; ///< type of savegame we are loading
 
@@ -404,6 +407,7 @@ extern const ChunkHandler _autoreplace_chunk_handlers[];
 extern const ChunkHandler _labelmaps_chunk_handlers[];
 extern const ChunkHandler _airport_chunk_handlers[];
 extern const ChunkHandler _object_chunk_handlers[];
+extern const ChunkHandler _persistent_storage_chunk_handlers[];
 
 /** Array of all chunks in a savegame, \c NULL terminated. */
 static const ChunkHandler * const _chunk_handlers[] = {
@@ -434,6 +438,7 @@ static const ChunkHandler * const _chunk_handlers[] = {
 	_labelmaps_chunk_handlers,
 	_airport_chunk_handlers,
 	_object_chunk_handlers,
+	_persistent_storage_chunk_handlers,
 	NULL,
 };
 
@@ -1173,9 +1178,10 @@ static size_t ReferenceToInt(const void *obj, SLRefType rt)
 		case REF_TOWN:      return ((const     Town*)obj)->index + 1;
 		case REF_ORDER:     return ((const    Order*)obj)->index + 1;
 		case REF_ROADSTOPS: return ((const RoadStop*)obj)->index + 1;
-		case REF_ENGINE_RENEWS: return ((const EngineRenew*)obj)->index + 1;
-		case REF_CARGO_PACKET:  return ((const CargoPacket*)obj)->index + 1;
-		case REF_ORDERLIST:     return ((const   OrderList*)obj)->index + 1;
+		case REF_ENGINE_RENEWS: return ((const       EngineRenew*)obj)->index + 1;
+		case REF_CARGO_PACKET:  return ((const       CargoPacket*)obj)->index + 1;
+		case REF_ORDERLIST:     return ((const         OrderList*)obj)->index + 1;
+		case REF_STORAGE:       return ((const PersistentStorage*)obj)->index + 1;
 		default: NOT_REACHED();
 	}
 }
@@ -1244,6 +1250,10 @@ static void *IntToReference(size_t index, SLRefType rt)
 		case REF_CARGO_PACKET:
 			if (CargoPacket::IsValidID(index)) return CargoPacket::Get(index);
 			SlErrorCorrupt("Referencing invalid CargoPacket");
+
+		case REF_STORAGE:
+			if (PersistentStorage::IsValidID(index)) return PersistentStorage::Get(index);
+			SlErrorCorrupt("Referencing invalid PersistentStorage");
 
 		default: NOT_REACHED();
 	}
@@ -2549,8 +2559,6 @@ static SaveOrLoadResult DoLoad(LoadFilter *reader, bool load_check)
 	_next_offs = 0;
 
 	if (!load_check) {
-		_engine_mngr.ResetToDefaultMapping();
-
 		/* Old maps were hardcoded to 256x256 and thus did not contain
 		 * any mapsize information. Pre-initialize to 256x256 to not to
 		 * confuse old games */
@@ -2654,7 +2662,6 @@ SaveOrLoadResult SaveOrLoad(const char *filename, int mode, Subdirectory sb, boo
 
 	/* Load a TTDLX or TTDPatch game */
 	if (mode == SL_OLD_LOAD) {
-		_engine_mngr.ResetToDefaultMapping();
 		InitializeGame(256, 256, true, true); // set a mapsize of 256x256 for TTDPatch games or it might get confused
 
 		/* TTD/TTO savegames have no NewGRFs, TTDP savegame have them

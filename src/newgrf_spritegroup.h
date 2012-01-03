@@ -32,7 +32,18 @@
 static inline uint32 GetRegister(uint i)
 {
 	extern TemporaryStorageArray<int32, 0x110> _temp_store;
-	return _temp_store.Get(i);
+	return _temp_store.GetValue(i);
+}
+
+/**
+ * Clears the value of a so-called newgrf "register".
+ * @param i index of the register
+ * @pre i < 0x110
+ */
+static inline void ClearRegister(uint i)
+{
+	extern TemporaryStorageArray<int32, 0x110> _temp_store;
+	_temp_store.StoreValue(i, 0);
 }
 
 /* List of different sprite group types */
@@ -111,12 +122,15 @@ protected:
 
 /* Shared by deterministic and random groups. */
 enum VarSpriteGroupScope {
-	VSG_SCOPE_SELF,
-	/* Engine of consists for vehicles, city for stations. */
-	VSG_SCOPE_PARENT,
-	/* Any vehicle in the consist (vehicles only) */
-	VSG_SCOPE_RELATIVE,
+	VSG_BEGIN,
+
+	VSG_SCOPE_SELF = VSG_BEGIN, ///< Resolved object itself
+	VSG_SCOPE_PARENT,           ///< Related object of the resolved one
+	VSG_SCOPE_RELATIVE,         ///< Relative position (vehicles only)
+
+	VSG_END
 };
+DECLARE_POSTFIX_INCREMENT(VarSpriteGroupScope)
 
 enum DeterministicSpriteGroupSize {
 	DSG_SIZE_BYTE,
@@ -183,7 +197,7 @@ struct DeterministicSpriteGroup : SpriteGroup {
 
 	VarSpriteGroupScope var_scope;
 	DeterministicSpriteGroupSize size;
-	byte num_adjusts;
+	uint num_adjusts;
 	byte num_ranges;
 	DeterministicSpriteGroupAdjust *adjusts;
 	DeterministicSpriteGroupRange *ranges; // Dynamically allocated
@@ -267,12 +281,16 @@ struct ResultSpriteGroup : SpriteGroup {
 	byte GetNumResults() const { return this->num_sprites; }
 };
 
+/**
+ * Action 2 sprite layout for houses, industry tiles, objects and airport tiles.
+ */
 struct TileLayoutSpriteGroup : SpriteGroup {
 	TileLayoutSpriteGroup() : SpriteGroup(SGT_TILELAYOUT) {}
-	~TileLayoutSpriteGroup();
+	~TileLayoutSpriteGroup() {}
 
-	byte num_building_stages;    ///< Number of building stages to show for this house/industry tile
-	struct DrawTileSprites *dts;
+	NewGRFSpriteLayout dts;
+
+	const DrawTileSprites *ProcessRegisters(uint8 *stage) const;
 };
 
 struct IndustryProductionSpriteGroup : SpriteGroup {
@@ -293,12 +311,10 @@ struct ResolverObject {
 	byte trigger;
 
 	uint32 last_value;          ///< Result of most recent DeterministicSpriteGroup (including procedure calls)
-	uint32 reseed;              ///< Collects bits to rerandomise while triggering triggers.
+	uint32 reseed[VSG_END];     ///< Collects bits to rerandomise while triggering triggers.
 
 	VarSpriteGroupScope scope;  ///< Scope of currently resolved DeterministicSpriteGroup resp. RandomizedSpriteGroup
 	byte count;                 ///< Additional scope for RandomizedSpriteGroup
-
-	BaseStorageArray *psa;      ///< The persistent storage array of this resolved object.
 
 	const GRFFile *grffile;     ///< GRFFile the resolved SpriteGroup belongs to
 
@@ -314,13 +330,14 @@ struct ResolverObject {
 		} canal;
 		struct {
 			TileIndex tile;
-			const struct BaseStation *st;
+			struct BaseStation *st;
 			const struct StationSpec *statspec;
 			CargoID cargo_type;
+			Axis axis;                     ///< Station axis, used only for the slope check callback.
 		} station;
 		struct {
 			TileIndex tile;
-			const Town *town;
+			Town *town;                    ///< Town of this house
 			HouseID house_id;
 			uint16 initial_random_bits;    ///< Random bits during construction checks
 			bool not_yet_constructed;      ///< True for construction check
@@ -349,13 +366,13 @@ struct ResolverObject {
 			TileContext context;           ///< Are we resolving sprites for the upper halftile, or on a bridge?
 		} routes;
 		struct {
-			const struct Station *st;      ///< Station of the airport for which the callback is run, or NULL for build gui.
+			struct Station *st;            ///< Station of the airport for which the callback is run, or NULL for build gui.
 			byte airport_id;               ///< Type of airport for which the callback is run
 			byte layout;                   ///< Layout of the airport to build.
 			TileIndex tile;                ///< Tile for the callback, only valid for airporttile callbacks.
 		} airport;
 		struct {
-			const struct Object *o;        ///< The object the callback is ran for.
+			struct Object *o;              ///< The object the callback is ran for.
 			TileIndex tile;                ///< The tile related to the object.
 			uint8 view;                    ///< The view of the object.
 		} object;
@@ -366,6 +383,32 @@ struct ResolverObject {
 	void (*SetTriggers)(const struct ResolverObject*, int);
 	uint32 (*GetVariable)(const struct ResolverObject*, byte, byte, bool*);
 	const SpriteGroup *(*ResolveReal)(const struct ResolverObject*, const RealSpriteGroup*);
+	void (*StorePSA)(struct ResolverObject*, uint, int32);
+
+	/**
+	 * Returns the OR-sum of all bits that need reseeding
+	 * independent of the scope they were accessed with.
+	 * @return OR-sum of the bits.
+	 */
+	uint32 GetReseedSum() const
+	{
+		uint32 sum = 0;
+		for (VarSpriteGroupScope vsg = VSG_BEGIN; vsg < VSG_END; vsg++) {
+			sum |= this->reseed[vsg];
+		}
+		return sum;
+	}
+
+	/**
+	 * Resets the dynamic state of the resolver object.
+	 * To be called before resolving an Action-1-2-3 chain.
+	 */
+	void ResetState()
+	{
+		this->last_value = 0;
+		this->trigger    = 0;
+		memset(this->reseed, 0, sizeof(this->reseed));
+	}
 };
 
 #endif /* NEWGRF_SPRITEGROUP_H */

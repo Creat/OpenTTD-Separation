@@ -502,10 +502,10 @@ bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallbac
 	/* Cost estimation is generally only done when the
 	 * local user presses shift while doing somthing.
 	 * However, in case of incoming network commands,
-	 * map generation of the pause button we do want
+	 * map generation or the pause button we do want
 	 * to execute. */
 	bool estimate_only = _shift_pressed && IsLocalCompany() &&
-			!IsGeneratingWorld() &&
+			!_generating_world &&
 			!(cmd & CMD_NETWORK_COMMAND) &&
 			(cmd & CMD_ID_MASK) != CMD_PAUSE;
 
@@ -532,7 +532,7 @@ bool DoCommandP(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd, CommandCallbac
 		/* Only show the error when it's for us. */
 		StringID error_part1 = GB(cmd, 16, 16);
 		if (estimate_only || (IsLocalCompany() && error_part1 != 0 && my_cmd)) {
-			ShowErrorMessage(error_part1, res.GetErrorMessage(), WL_INFO, x, y);
+			ShowErrorMessage(error_part1, res.GetErrorMessage(), WL_INFO, x, y, res.GetTextRefStackSize(), res.GetTextRefStack());
 		}
 	} else if (estimate_only) {
 		ShowEstimatedCostOrIncome(res.GetCost(), x, y);
@@ -735,5 +735,27 @@ void CommandCost::AddCost(const CommandCost &ret)
 	if (this->success && !ret.success) {
 		this->message = ret.message;
 		this->success = false;
+	}
+}
+
+/**
+ * Values to put on the #TextRefStack for the error message.
+ * There is only one static instance of the array, just like there is only one
+ * instance of normal DParams.
+ */
+uint32 CommandCost::textref_stack[16];
+
+/**
+ * Activate usage of the NewGRF #TextRefStack for the error message.
+ * @param number of entries to copy from the temporary NewGRF registers
+ */
+void CommandCost::UseTextRefStack(uint num_registers)
+{
+	extern TemporaryStorageArray<int32, 0x110> _temp_store;
+
+	assert(num_registers < lengthof(textref_stack));
+	this->textref_stack_size = num_registers;
+	for (uint i = 0; i < num_registers; i++) {
+		textref_stack[i] = _temp_store.GetValue(0x100 + i);
 	}
 }

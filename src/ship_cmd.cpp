@@ -32,8 +32,28 @@
 #include "pathfinder/opf/opf_ship.h"
 #include "engine_base.h"
 #include "company_base.h"
+#include "tunnelbridge_map.h"
 
 #include "table/strings.h"
+
+/**
+ * Determine the effective #WaterClass for a ship travelling on a tile.
+ * @param tile Tile of interest
+ * @return the waterclass to be used by the ship.
+ */
+WaterClass GetEffectiveWaterClass(TileIndex tile)
+{
+	if (HasTileWaterClass(tile)) return GetWaterClass(tile);
+	if (IsTileType(tile, MP_TUNNELBRIDGE)) {
+		assert(GetTunnelBridgeTransportType(tile) == TRANSPORT_WATER);
+		return WATER_CLASS_CANAL;
+	}
+	if (IsTileType(tile, MP_RAILWAY)) {
+		assert(GetRailGroundType(tile) == RAIL_GROUND_WATER);
+		return WATER_CLASS_SEA;
+	}
+	NOT_REACHED();
+}
 
 static const uint16 _ship_sprites[] = {0x0E5D, 0x0E55, 0x0E65, 0x0E6D};
 
@@ -155,7 +175,15 @@ static void CheckIfShipNeedsService(Vehicle *v)
  */
 void Ship::UpdateCache()
 {
-	this->vcache.cached_max_speed = GetVehicleProperty(this, PROP_SHIP_SPEED, ShipVehInfo(this->engine_type)->max_speed);
+	const ShipVehicleInfo *svi = ShipVehInfo(this->engine_type);
+
+	/* Get speed fraction for the current water type. Aqueducts are always canals. */
+	bool is_ocean = GetEffectiveWaterClass(this->tile) == WATER_CLASS_SEA;
+	uint raw_speed = GetVehicleProperty(this, PROP_SHIP_SPEED, svi->max_speed);
+	this->vcache.cached_max_speed = svi->ApplyWaterClassSpeedFrac(raw_speed, is_ocean);
+
+	/* Update cargo aging period. */
+	this->vcache.cached_cargo_age_period = GetVehicleProperty(this, PROP_SHIP_CARGO_AGE_PERIOD, EngInfo(this->engine_type)->cargo_age_period);
 
 	this->UpdateVisualEffect();
 }
@@ -545,6 +573,11 @@ static void ShipController(Ship *v)
 			if (!HasBit(r, VETS_ENTERED_WORMHOLE)) {
 				v->tile = gp.new_tile;
 				v->state = TrackToTrackBits(track);
+
+				/* Update ship cache when the water class changes. Aqueducts are always canals. */
+				WaterClass old_wc = GetEffectiveWaterClass(gp.old_tile);
+				WaterClass new_wc = GetEffectiveWaterClass(gp.new_tile);
+				if (old_wc != new_wc) v->UpdateCache();
 			}
 
 			v->direction = (Direction)b[2];

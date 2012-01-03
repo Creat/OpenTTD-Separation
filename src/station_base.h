@@ -23,10 +23,18 @@ extern StationPool _station_pool;
 
 static const byte INITIAL_STATION_RATING = 175;
 
+/**
+ * Stores station stats for a single cargo.
+ */
 struct GoodsEntry {
-	enum AcceptancePickup {
-		ACCEPTANCE,
-		PICKUP
+	/** Status of this cargo for the station. */
+	enum GoodsEntryStatus {
+		GES_ACCEPTANCE,       ///< This cargo is currently being accepted by the station.
+		GES_PICKUP,           ///< This cargo has been picked up at this station at least once.
+		GES_EVER_ACCEPTED,    ///< The cargo has been accepted at least once.
+		GES_LAST_MONTH,       ///< The cargo was accepted last month.
+		GES_CURRENT_MONTH,    ///< The cargo was accepted this month.
+		GES_ACCEPTED_BIGTICK, ///< The cargo has been accepted since the last periodic processing.
 	};
 
 	GoodsEntry() :
@@ -37,26 +45,25 @@ struct GoodsEntry {
 		last_age(255)
 	{}
 
-	byte acceptance_pickup;
-	byte days_since_pickup;
-	byte rating;
-	byte last_speed;
-	byte last_age;
+	byte acceptance_pickup; ///< Status of this cargo, see #GoodsEntryStatus.
+	byte days_since_pickup; ///< Number of days since the last pickup for this cargo (up to 255).
+	byte rating;            ///< Station rating for this cargo.
+	byte last_speed;        ///< Maximum speed of the last vehicle that picked up this cargo (up to 255).
+	byte last_age;          ///< Age in years of the last vehicle that picked up this cargo.
 	byte amount_fract;      ///< Fractional part of the amount in the cargo list
 	StationCargoList cargo; ///< The cargo packets of cargo waiting in this station
 };
 
 /** All airport-related information. Only valid if tile != INVALID_TILE. */
 struct Airport : public TileArea {
-	typedef PersistentStorageArray<int32, 16> PersistentStorage;
-
 	Airport() : TileArea(INVALID_TILE, 0, 0) {}
 
 	uint64 flags;       ///< stores which blocks on the airport are taken. was 16 bit earlier on, then 32
 	byte type;          ///< Type of this airport, @see AirportTypes.
 	byte layout;        ///< Airport layout number.
 	Direction rotation; ///< How this airport is rotated.
-	PersistentStorage psa; ///< Persistent storage for NewGRF airports
+
+	PersistentStorage *psa; ///< Persistent storage for NewGRF airports.
 
 	/**
 	 * Get the AirportSpec that from the airport type of this airport. If there
@@ -128,20 +135,28 @@ struct Airport : public TileArea {
 	}
 
 	/**
-	 * Get the hangar number of the hangar on a specific tile.
+	 * Get the exit direction of the hangar at a specific tile.
+	 * @param tile The tile to query.
+	 * @pre IsHangarTile(tile).
+	 * @return The exit direction of the hangar, taking airport rotation into account.
+	 */
+	FORCEINLINE Direction GetHangarExitDirection(TileIndex tile) const
+	{
+		const AirportSpec *as = this->GetSpec();
+		const HangarTileTable *htt = GetHangarDataByTile(tile);
+		return ChangeDir(htt->dir, DirDifference(this->rotation, as->rotation[0]));
+	}
+
+	/**
+	 * Get the hangar number of the hangar at a specific tile.
 	 * @param tile The tile to query.
 	 * @pre IsHangarTile(tile).
 	 * @return The hangar number of the hangar at the given tile.
 	 */
 	FORCEINLINE uint GetHangarNum(TileIndex tile) const
 	{
-		const AirportSpec *as = this->GetSpec();
-		for (uint i = 0; i < as->nof_depots; i++) {
-			if (this->GetRotatedTileFromOffset(as->depot_table[i].ti) == tile) {
-				return as->depot_table[i].hangar_num;
-			}
-		}
-		NOT_REACHED();
+		const HangarTileTable *htt = GetHangarDataByTile(tile);
+		return htt->hangar_num;
 	}
 
 	/** Get the number of hangars on this airport. */
@@ -157,6 +172,24 @@ struct Airport : public TileArea {
 			}
 		}
 		return num;
+	}
+
+private:
+	/**
+	 * Retrieve hangar information of a hangar at a given tile.
+	 * @param tile %Tile containing the hangar.
+	 * @return The requested hangar information.
+	 * @pre The \a tile must be at a hangar tile at an airport.
+	 */
+	FORCEINLINE const HangarTileTable *GetHangarDataByTile(TileIndex tile) const
+	{
+		const AirportSpec *as = this->GetSpec();
+		for (uint i = 0; i < as->nof_depots; i++) {
+			if (this->GetRotatedTileFromOffset(as->depot_table[i].ti) == tile) {
+				return as->depot_table + i;
+			}
+		}
+		NOT_REACHED();
 	}
 };
 

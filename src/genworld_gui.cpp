@@ -25,10 +25,10 @@
 #include "landscape_type.h"
 #include "querystring_gui.h"
 #include "town.h"
-#include "thread/thread.h"
 #include "settings_func.h"
 #include "core/geometry_func.hpp"
 #include "core/random_func.hpp"
+#include "progress.h"
 
 #include "table/strings.h"
 #include "table/sprites.h"
@@ -86,12 +86,12 @@ enum GenerateLandscapeWindowWidgets {
 	GLAND_LANDSCAPE_PULLDOWN, ///< Dropdown 'Land generator'
 
 	GLAND_HEIGHTMAP_NAME_TEXT,         ///< Heightmap name
-	GLAND_HEIGHTMAP_NAME_SPACER,       ///< Spacer used for aligning items in the second column nicely
 	GLAND_HEIGHTMAP_SIZE_TEXT,         ///< Size of heightmap
 	GLAND_HEIGHTMAP_ROTATION_PULLDOWN, ///< Dropdown 'Heightmap rotation'
 
 	GLAND_TERRAIN_PULLDOWN,    ///< Dropdown 'Terrain type'
 	GLAND_WATER_PULLDOWN,      ///< Dropdown 'Sea level'
+	GLAND_RIVER_PULLDOWN,      ///< Dropdown 'Rivers'
 	GLAND_SMOOTHNESS_PULLDOWN, ///< Dropdown 'Smoothness'
 	GLAND_VARIETY_PULLDOWN,    ///< Dropdown 'Variety distribution'
 
@@ -181,6 +181,10 @@ static const NWidgetPart _nested_generate_landscape_widgets[] = {
 					EndContainer(),
 				EndContainer(),
 				NWidget(WWT_TEXTBTN, COLOUR_ORANGE, GLAND_RANDOM_BUTTON), SetDataTip(STR_MAPGEN_RANDOM, STR_MAPGEN_RANDOM_HELP), SetFill(1, 0),
+				NWidget(NWID_HORIZONTAL), SetPIP(0, 3, 0),
+					NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_QUANTITY_OF_RIVERS, STR_NULL), SetFill(1, 1),
+					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_RIVER_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
+				EndContainer(),
 				NWidget(NWID_SPACER), SetFill(1, 1),
 				NWidget(WWT_TEXTBTN, COLOUR_GREEN, GLAND_GENERATE_BUTTON), SetMinimalSize(84, 30), SetDataTip(STR_MAPGEN_GENERATE, STR_NULL), SetFill(1, 0),
 			EndContainer(),
@@ -245,49 +249,54 @@ static const NWidgetPart _nested_heightmap_load_widgets[] = {
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_NUMBER_OF_TOWNS, STR_NULL), SetFill(1, 1),
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_NUMBER_OF_INDUSTRIES, STR_NULL), SetFill(1, 1),
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_RANDOM_SEED, STR_NULL), SetFill(1, 1),
+				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_QUANTITY_OF_RIVERS, STR_NULL), SetFill(1, 1),
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_TREE_PLACER, STR_NULL), SetFill(1, 1),
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_HEIGHTMAP_ROTATION, STR_NULL), SetFill(1, 1),
 			EndContainer(),
 			/* Widgets at the right of the labels. */
-			NWidget(NWID_VERTICAL, NC_EQUALSIZE), SetPIP(0, 4, 0),
-				NWidget(WWT_EMPTY, COLOUR_ORANGE, GLAND_HEIGHTMAP_NAME_TEXT), SetFill(1, 0),
-				/* Mapsize X * Y. */
-				NWidget(NWID_HORIZONTAL), SetPIP(0, 4, 0),
-					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_MAPSIZE_X_PULLDOWN), SetDataTip(STR_JUST_INT, STR_NULL), SetFill(1, 0),
-					NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_BY, STR_NULL), SetPadding(1, 0, 0, 0), SetFill(1, 1),
-					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_MAPSIZE_Y_PULLDOWN), SetDataTip(STR_JUST_INT, STR_NULL), SetFill(1, 0),
-				EndContainer(),
-				NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_TOWN_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
-				NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_INDUSTRY_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
-				NWidget(WWT_EDITBOX, COLOUR_WHITE, GLAND_RANDOM_EDITBOX), SetDataTip(STR_MAPGEN_RANDOM_SEED_OSKTITLE, STR_MAPGEN_RANDOM_SEED_HELP), SetFill(1, 1),
-				NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_TREE_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
-				NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_HEIGHTMAP_ROTATION_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
-			EndContainer(),
 			NWidget(NWID_VERTICAL), SetPIP(0, 4, 0),
-				NWidget(NWID_HORIZONTAL), SetPIP(0, 3, 0),
+				NWidget(WWT_EMPTY, COLOUR_ORANGE, GLAND_HEIGHTMAP_NAME_TEXT), SetFill(1, 0),
+				NWidget(NWID_HORIZONTAL), SetPIP(0, 5, 0),
 					NWidget(NWID_VERTICAL, NC_EQUALSIZE), SetPIP(0, 4, 0),
-						NWidget(WWT_EMPTY, INVALID_COLOUR, GLAND_HEIGHTMAP_NAME_SPACER), SetFill(1, 0),
-						NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_HEIGHTMAP_SIZE_LABEL, STR_NULL), SetFill(1, 1),
-						NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_DATE, STR_NULL), SetFill(1, 1),
-						NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_SNOW_LINE_HEIGHT, STR_NULL), SetFill(1, 1),
+						/* Mapsize X * Y. */
+						NWidget(NWID_HORIZONTAL), SetPIP(0, 4, 0),
+							NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_MAPSIZE_X_PULLDOWN), SetDataTip(STR_JUST_INT, STR_NULL), SetFill(1, 0),
+							NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_BY, STR_NULL), SetPadding(1, 0, 0, 0), SetFill(1, 1),
+							NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_MAPSIZE_Y_PULLDOWN), SetDataTip(STR_JUST_INT, STR_NULL), SetFill(1, 0),
+						EndContainer(),
+						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_TOWN_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
+						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_INDUSTRY_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
+						NWidget(WWT_EDITBOX, COLOUR_WHITE, GLAND_RANDOM_EDITBOX), SetDataTip(STR_MAPGEN_RANDOM_SEED_OSKTITLE, STR_MAPGEN_RANDOM_SEED_HELP), SetFill(1, 1),
+						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_RIVER_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
+						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_TREE_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
+						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, GLAND_HEIGHTMAP_ROTATION_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 					EndContainer(),
-					NWidget(NWID_VERTICAL, NC_EQUALSIZE), SetPIP(0, 4, 0),
-						NWidget(WWT_EMPTY, INVALID_COLOUR, GLAND_HEIGHTMAP_NAME_SPACER), SetFill(1, 0),
-						NWidget(WWT_TEXT, COLOUR_ORANGE, GLAND_HEIGHTMAP_SIZE_TEXT), SetDataTip(STR_MAPGEN_HEIGHTMAP_SIZE, STR_NULL), SetFill(1, 0),
-						NWidget(NWID_HORIZONTAL),
-							NWidget(WWT_IMGBTN, COLOUR_ORANGE, GLAND_START_DATE_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD), SetFill(0, 1),
-							NWidget(WWT_TEXTBTN, COLOUR_ORANGE, GLAND_START_DATE_TEXT), SetDataTip(STR_BLACK_DATE_LONG, STR_NULL), SetFill(1, 0),
-							NWidget(WWT_IMGBTN, COLOUR_ORANGE, GLAND_START_DATE_UP), SetDataTip(SPR_ARROW_UP, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_FORWARD), SetFill(0, 1),
+					NWidget(NWID_VERTICAL), SetPIP(0, 4, 0),
+						NWidget(NWID_HORIZONTAL), SetPIP(0, 3, 0),
+							NWidget(NWID_VERTICAL, NC_EQUALSIZE), SetPIP(0, 4, 0),
+								NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_HEIGHTMAP_SIZE_LABEL, STR_NULL), SetFill(1, 1),
+								NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_DATE, STR_NULL), SetFill(1, 1),
+								NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_SNOW_LINE_HEIGHT, STR_NULL), SetFill(1, 1),
+							EndContainer(),
+							NWidget(NWID_VERTICAL, NC_EQUALSIZE), SetPIP(0, 4, 0),
+								NWidget(WWT_TEXT, COLOUR_ORANGE, GLAND_HEIGHTMAP_SIZE_TEXT), SetDataTip(STR_MAPGEN_HEIGHTMAP_SIZE, STR_NULL), SetFill(1, 0),
+								NWidget(NWID_HORIZONTAL),
+									NWidget(WWT_IMGBTN, COLOUR_ORANGE, GLAND_START_DATE_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD), SetFill(0, 1),
+									NWidget(WWT_TEXTBTN, COLOUR_ORANGE, GLAND_START_DATE_TEXT), SetDataTip(STR_BLACK_DATE_LONG, STR_NULL), SetFill(1, 0),
+									NWidget(WWT_IMGBTN, COLOUR_ORANGE, GLAND_START_DATE_UP), SetDataTip(SPR_ARROW_UP, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_FORWARD), SetFill(0, 1),
+								EndContainer(),
+								NWidget(NWID_HORIZONTAL),
+									NWidget(WWT_IMGBTN, COLOUR_ORANGE, GLAND_SNOW_LEVEL_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_MAPGEN_SNOW_LINE_DOWN), SetFill(0, 1),
+									NWidget(WWT_TEXTBTN, COLOUR_ORANGE, GLAND_SNOW_LEVEL_TEXT), SetDataTip(STR_BLACK_INT, STR_NULL), SetFill(1, 0),
+									NWidget(WWT_IMGBTN, COLOUR_ORANGE, GLAND_SNOW_LEVEL_UP), SetDataTip(SPR_ARROW_UP, STR_MAPGEN_SNOW_LINE_UP), SetFill(0, 1),
+								EndContainer(),
+							EndContainer(),
 						EndContainer(),
-						NWidget(NWID_HORIZONTAL),
-							NWidget(WWT_IMGBTN, COLOUR_ORANGE, GLAND_SNOW_LEVEL_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_MAPGEN_SNOW_LINE_DOWN), SetFill(0, 1),
-							NWidget(WWT_TEXTBTN, COLOUR_ORANGE, GLAND_SNOW_LEVEL_TEXT), SetDataTip(STR_BLACK_INT, STR_NULL), SetFill(1, 0),
-							NWidget(WWT_IMGBTN, COLOUR_ORANGE, GLAND_SNOW_LEVEL_UP), SetDataTip(SPR_ARROW_UP, STR_MAPGEN_SNOW_LINE_UP), SetFill(0, 1),
-						EndContainer(),
+						NWidget(WWT_TEXTBTN, COLOUR_ORANGE, GLAND_RANDOM_BUTTON), SetDataTip(STR_MAPGEN_RANDOM, STR_MAPGEN_RANDOM_HELP), SetFill(1, 0),
+						NWidget(NWID_SPACER), SetFill(1, 1),
+						NWidget(WWT_TEXTBTN, COLOUR_GREEN, GLAND_GENERATE_BUTTON), SetMinimalSize(84, 30), SetDataTip(STR_MAPGEN_GENERATE, STR_NULL), SetFill(1, 0),
 					EndContainer(),
 				EndContainer(),
-				NWidget(WWT_TEXTBTN, COLOUR_ORANGE, GLAND_RANDOM_BUTTON), SetDataTip(STR_MAPGEN_RANDOM, STR_MAPGEN_RANDOM_HELP), SetFill(1, 0),
-				NWidget(WWT_TEXTBTN, COLOUR_GREEN, GLAND_GENERATE_BUTTON), SetDataTip(STR_MAPGEN_GENERATE, STR_NULL), SetFill(1, 1),
 			EndContainer(),
 		EndContainer(),
 		NWidget(NWID_SPACER), SetMinimalSize(0, 9), SetFill(1, 1),
@@ -331,6 +340,7 @@ static DropDownList *BuildMapsizeDropDown()
 
 static const StringID _elevations[]  = {STR_TERRAIN_TYPE_VERY_FLAT, STR_TERRAIN_TYPE_FLAT, STR_TERRAIN_TYPE_HILLY, STR_TERRAIN_TYPE_MOUNTAINOUS, INVALID_STRING_ID};
 static const StringID _sea_lakes[]   = {STR_SEA_LEVEL_VERY_LOW, STR_SEA_LEVEL_LOW, STR_SEA_LEVEL_MEDIUM, STR_SEA_LEVEL_HIGH, STR_SEA_LEVEL_CUSTOM, INVALID_STRING_ID};
+static const StringID _rivers[]      = {STR_RIVERS_NONE, STR_RIVERS_FEW, STR_RIVERS_MODERATE, STR_RIVERS_LOT, INVALID_STRING_ID};
 static const StringID _smoothness[]  = {STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_VERY_SMOOTH, STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_SMOOTH, STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_ROUGH, STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_VERY_ROUGH, INVALID_STRING_ID};
 static const StringID _tree_placer[] = {STR_CONFIG_SETTING_TREE_PLACER_NONE, STR_CONFIG_SETTING_TREE_PLACER_ORIGINAL, STR_CONFIG_SETTING_TREE_PLACER_IMPROVED, INVALID_STRING_ID};
 static const StringID _rotation[]    = {STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_COUNTER_CLOCKWISE, STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_CLOCKWISE, INVALID_STRING_ID};
@@ -404,6 +414,7 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 				}
 				break;
 
+			case GLAND_RIVER_PULLDOWN:      SetDParam(0, _rivers[_settings_newgame.game_creation.amount_of_rivers]); break;
 			case GLAND_SMOOTHNESS_PULLDOWN: SetDParam(0, _smoothness[_settings_newgame.game_creation.tgen_smoothness]); break;
 			case GLAND_VARIETY_PULLDOWN:    SetDParam(0, _variety[_settings_newgame.game_creation.variety]); break;
 			case GLAND_BORDERS_RANDOM:      SetDParam(0, (_settings_newgame.game_creation.water_borders == BORDERS_RANDOM) ? STR_MAPGEN_BORDER_RANDOMIZE : STR_MAPGEN_BORDER_MANUAL); break;
@@ -517,6 +528,7 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 				*size = GetStringBoundingBox(STR_SEA_LEVEL_CUSTOM_PERCENTAGE);
 				break;
 
+			case GLAND_RIVER_PULLDOWN:      strs = _rivers; break;
 			case GLAND_SMOOTHNESS_PULLDOWN: strs = _smoothness; break;
 			case GLAND_VARIETY_PULLDOWN:    strs = _variety; break;
 			case GLAND_HEIGHTMAP_ROTATION_PULLDOWN: strs = _rotation; break;
@@ -531,7 +543,6 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 				*size = maxdim(GetStringBoundingBox(STR_MAPGEN_BORDER_RANDOM), maxdim(GetStringBoundingBox(STR_MAPGEN_BORDER_WATER), GetStringBoundingBox(STR_MAPGEN_BORDER_FREEFORM)));
 				break;
 
-			case GLAND_HEIGHTMAP_NAME_SPACER:
 			case GLAND_HEIGHTMAP_NAME_TEXT:
 				size->width = 0;
 				break;
@@ -552,12 +563,7 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 	{
 		switch (widget) {
 			case GLAND_HEIGHTMAP_NAME_TEXT: {
-				/* Little bit of a hack going on here; just to get the widgets
-				 * spaced without doing much magic. The space we can draw on is
-				 * covered by both the spacer and text widgets, so take their
-				 * outer most boundaries (left and right) as draw locations. */
-				const NWidgetBase *nwi_spacer = this->GetWidget<NWidgetBase>(GLAND_HEIGHTMAP_NAME_SPACER);
-				DrawString(min(r.left, nwi_spacer->pos_x), max<int>(r.right, nwi_spacer->pos_x + nwi_spacer->current_x), r.top, this->name, TC_ORANGE);
+				DrawString(r.left, r.right, r.top, this->name, TC_ORANGE);
 				break;
 			}
 		}
@@ -602,12 +608,22 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 				this->SetDirty();
 				break;
 
-			case GLAND_GENERATE_BUTTON: // Generate
+			case GLAND_GENERATE_BUTTON: { // Generate
+				/* Get rotated map size. */
+				uint map_x;
+				uint map_y;
+				if (_settings_newgame.game_creation.heightmap_rotation == HM_CLOCKWISE) {
+					map_x = this->y;
+					map_y = this->x;
+				} else {
+					map_x = this->x;
+					map_y = this->y;
+				}
 				if (mode == GLWM_HEIGHTMAP &&
-						(this->x * 2 < (1U << _settings_newgame.game_creation.map_x) ||
-						this->x / 2 > (1U << _settings_newgame.game_creation.map_x) ||
-						this->y * 2 < (1U << _settings_newgame.game_creation.map_y) ||
-						this->y / 2 > (1U << _settings_newgame.game_creation.map_y))) {
+						(map_x * 2 < (1U << _settings_newgame.game_creation.map_x) ||
+						map_x / 2 > (1U << _settings_newgame.game_creation.map_x) ||
+						map_y * 2 < (1U << _settings_newgame.game_creation.map_y) ||
+						map_y / 2 > (1U << _settings_newgame.game_creation.map_y))) {
 					ShowQuery(
 						STR_WARNING_HEIGHTMAP_SCALE_CAPTION,
 						STR_WARNING_HEIGHTMAP_SCALE_MESSAGE,
@@ -617,6 +633,7 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 					StartGeneratingLandscape(mode);
 				}
 				break;
+			}
 
 			case GLAND_START_DATE_DOWN:
 			case GLAND_START_DATE_UP: // Year buttons
@@ -679,6 +696,10 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 				ShowDropDownMenu(this, _sea_lakes, _settings_newgame.difficulty.quantity_sea_lakes, GLAND_WATER_PULLDOWN, 0, hidden_mask);
 				break;
 			}
+
+			case GLAND_RIVER_PULLDOWN: // Amount of rivers
+				ShowDropDownMenu(this, _rivers, _settings_newgame.game_creation.amount_of_rivers, GLAND_RIVER_PULLDOWN, 0, 0);
+				break;
 
 			case GLAND_SMOOTHNESS_PULLDOWN: // Map smoothness
 				ShowDropDownMenu(this, _smoothness, _settings_newgame.game_creation.tgen_smoothness, GLAND_SMOOTHNESS_PULLDOWN, 0, 0);
@@ -750,6 +771,7 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 			case GLAND_MAPSIZE_X_PULLDOWN:     _settings_newgame.game_creation.map_x = index; break;
 			case GLAND_MAPSIZE_Y_PULLDOWN:     _settings_newgame.game_creation.map_y = index; break;
 			case GLAND_TREE_PULLDOWN:          _settings_newgame.game_creation.tree_placer = index; break;
+			case GLAND_RIVER_PULLDOWN:         _settings_newgame.game_creation.amount_of_rivers = index; break;
 			case GLAND_SMOOTHNESS_PULLDOWN:    _settings_newgame.game_creation.tgen_smoothness = index;  break;
 			case GLAND_VARIETY_PULLDOWN:       _settings_newgame.game_creation.variety = index; break;
 			case GLAND_LANDSCAPE_PULLDOWN:     _settings_newgame.game_creation.land_generator = index; break;
@@ -1191,7 +1213,7 @@ static const NWidgetPart _nested_generate_progress_widgets[] = {
 
 static const WindowDesc _generate_progress_desc(
 	WDP_CENTER, 0, 0,
-	WC_GENERATE_PROGRESS_WINDOW, WC_NONE,
+	WC_MODAL_PROGRESS, WC_NONE,
 	WDF_UNCLICK_BUTTONS,
 	_nested_generate_progress_widgets, lengthof(_nested_generate_progress_widgets)
 );
@@ -1209,6 +1231,7 @@ static GenWorldStatus _gws;
 static const StringID _generation_class_table[]  = {
 	STR_GENERATION_WORLD_GENERATION,
 	STR_SCENEDIT_TOOLBAR_LANDSCAPE_GENERATION,
+	STR_GENERATION_RIVER_GENERATION,
 	STR_GENERATION_CLEARING_TILES,
 	STR_SCENEDIT_TOOLBAR_TOWN_GENERATION,
 	STR_SCENEDIT_TOOLBAR_INDUSTRY_GENERATION,
@@ -1225,7 +1248,7 @@ static void AbortGeneratingWorldCallback(Window *w, bool confirmed)
 {
 	if (confirmed) {
 		AbortGeneratingWorld();
-	} else if (IsGeneratingWorld() && !IsGeneratingWorldAborted()) {
+	} else if (HasModalProgress() && !IsGeneratingWorldAborted()) {
 		SetMouseCursor(SPR_CURSOR_ZZZ, PAL_NONE);
 	}
 }
@@ -1313,14 +1336,14 @@ void PrepareGenerateWorldProgress()
  */
 void ShowGenerateWorldProgress()
 {
-	if (BringWindowToFrontById(WC_GENERATE_PROGRESS_WINDOW, 0)) return;
+	if (BringWindowToFrontById(WC_MODAL_PROGRESS, 0)) return;
 	new GenerateProgressWindow();
 }
 
 static void _SetGeneratingWorldProgress(GenWorldProgress cls, uint progress, uint total)
 {
-	static const int percent_table[GWP_CLASS_COUNT + 1] = {0, 5, 15, 20, 40, 60, 65, 80, 85, 99, 100 };
-
+	static const int percent_table[] = {0, 5, 14, 17, 20, 40, 60, 65, 80, 85, 99, 100 };
+	assert_compile(lengthof(percent_table) == GWP_CLASS_COUNT + 1);
 	assert(cls < GWP_CLASS_COUNT);
 
 	/* Do not run this function if we aren't in a thread */
@@ -1340,7 +1363,7 @@ static void _SetGeneratingWorldProgress(GenWorldProgress cls, uint progress, uin
 	}
 
 	/* Don't update the screen too often. So update it once in every once in a while... */
-	if (!_network_dedicated && _gws.timer != 0 && _realtime_tick - _gws.timer < GENWORLD_REDRAW_TIMEOUT) return;
+	if (!_network_dedicated && _gws.timer != 0 && _realtime_tick - _gws.timer < MODAL_PROGRESS_REDRAW_TIMEOUT) return;
 
 	/* Percentage is about the number of completed tasks, so 'current - 1' */
 	_gws.percent = percent_table[cls] + (percent_table[cls + 1] - percent_table[cls]) * (_gws.current == 0 ? 0 : _gws.current - 1) / _gws.total;
@@ -1364,17 +1387,17 @@ static void _SetGeneratingWorldProgress(GenWorldProgress cls, uint progress, uin
 		return;
 	}
 
-	SetWindowDirty(WC_GENERATE_PROGRESS_WINDOW, 0);
+	SetWindowDirty(WC_MODAL_PROGRESS, 0);
 	MarkWholeScreenDirty();
 
 	/* Release the rights to the map generator, and acquire the rights to the
 	 * paint thread. The 'other' thread already has the paint thread rights so
 	 * this ensures us that we are waiting until the paint thread is done
 	 * before we reacquire the mapgen rights */
-	_genworld_mapgen_mutex->EndCritical();
-	_genworld_paint_mutex->BeginCritical();
-	_genworld_mapgen_mutex->BeginCritical();
-	_genworld_paint_mutex->EndCritical();
+	_modal_progress_work_mutex->EndCritical();
+	_modal_progress_paint_mutex->BeginCritical();
+	_modal_progress_work_mutex->BeginCritical();
+	_modal_progress_paint_mutex->EndCritical();
 
 	_gws.timer = _realtime_tick;
 }

@@ -57,7 +57,7 @@ StringID TTDPStringIDToOTTDStringIDMapping(StringID str)
 	};
 
 	/* A string straight from a NewGRF; no need to remap this as it's already mapped. */
-	if (IsInsideMM(str, 0xD000, 0xD7FF) || IsInsideMM(str, 0xDC00, 0xDCFF)) return str;
+	if (IsInsideMM(str, 0xD000, 0xD7FF)) return str;
 
 #define TEXTID_TO_STRINGID(begin, end, stringid) if (str >= begin && str <= end) return str + (stringid - begin)
 	/* We have some changes in our cargo strings, resulting in some missing. */
@@ -293,8 +293,9 @@ struct UnmappedChoiceList : ZeroedMemoryAllocator {
 
 		char *d = old_d;
 		if (lm == NULL && this->type != SCC_PLURAL_LIST) {
-			NOT_REACHED();
-			/* In case there is no mapping, just ignore everything but the default. */
+			/* In case there is no mapping, just ignore everything but the default.
+			 * A probable cause for this happening is when the language file has
+			 * been removed by the user and as such no mapping could be made. */
 			size_t len = strlen(this->strings[0]);
 			memcpy(d, this->strings[0], len);
 			return d + len;
@@ -441,7 +442,7 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 			case 0x7D:
 			case 0x7E:
 			case 0x7F:
-			case 0x80: d += Utf8Encode(d, SCC_NEWGRF_PRINT_DWORD + c - 0x7B); break;
+			case 0x80: d += Utf8Encode(d, SCC_NEWGRF_PRINT_DWORD_SIGNED + c - 0x7B); break;
 			case 0x81: {
 				if (str[0] == '\0' || str[1] == '\0') goto string_end;
 				StringID string;
@@ -453,7 +454,7 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 			}
 			case 0x82:
 			case 0x83:
-			case 0x84: d += Utf8Encode(d, SCC_NEWGRF_PRINT_DATE + c - 0x82); break;
+			case 0x84: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_DATE_LONG + c - 0x82); break;
 			case 0x85: d += Utf8Encode(d, SCC_NEWGRF_DISCARD_WORD);       break;
 			case 0x86: d += Utf8Encode(d, SCC_NEWGRF_ROTATE_TOP_4_WORDS); break;
 			case 0x87: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_VOLUME);  break;
@@ -499,11 +500,11 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 						d += Utf8Encode(d, SCC_NEWGRF_UNPRINT);
 						d += Utf8Encode(d, *str++);
 						break;
-					case 0x06: d += Utf8Encode(d, SCC_NEWGRF_PRINT_HEX_BYTE);          break;
-					case 0x07: d += Utf8Encode(d, SCC_NEWGRF_PRINT_HEX_WORD);          break;
-					case 0x08: d += Utf8Encode(d, SCC_NEWGRF_PRINT_HEX_DWORD);         break;
+					case 0x06: d += Utf8Encode(d, SCC_NEWGRF_PRINT_BYTE_HEX);          break;
+					case 0x07: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_HEX);          break;
+					case 0x08: d += Utf8Encode(d, SCC_NEWGRF_PRINT_DWORD_HEX);         break;
 					/* 0x09, 0x0A are TTDPatch internal use only string codes. */
-					case 0x0B: d += Utf8Encode(d, SCC_NEWGRF_PRINT_HEX_QWORD);         break;
+					case 0x0B: d += Utf8Encode(d, SCC_NEWGRF_PRINT_QWORD_HEX);         break;
 					case 0x0C: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_STATION_NAME); break;
 					case 0x0D: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_WEIGHT);       break;
 					case 0x0E:
@@ -565,6 +566,10 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 							mapping = new UnmappedChoiceList(mp[code - 0x13], d, code == 0x14 ? 0 : *str++);
 						}
 						break;
+
+					case 0x16:
+					case 0x17:
+					case 0x18: d += Utf8Encode(d, SCC_NEWGRF_PRINT_DWORD_DATE_LONG + code - 0x16); break;
 
 					default:
 						grfmsg(1, "missing handler for extended format code");
@@ -920,11 +925,8 @@ struct TextRefStack {
 	void RewindStack() { this->position = 0; }
 };
 
-static TextRefStack _newgrf_normal_textrefstack;
-static TextRefStack _newgrf_error_textrefstack;
-
 /** The stack that is used for TTDP compatible string code parsing */
-static TextRefStack *_newgrf_textrefstack = &_newgrf_normal_textrefstack;
+static TextRefStack _newgrf_textrefstack;
 
 /**
  * Check whether the NewGRF text stack is in use.
@@ -932,7 +934,7 @@ static TextRefStack *_newgrf_textrefstack = &_newgrf_normal_textrefstack;
  */
 bool UsingNewGRFTextStack()
 {
-	return _newgrf_textrefstack->used;
+	return _newgrf_textrefstack.used;
 }
 
 /**
@@ -941,7 +943,7 @@ bool UsingNewGRFTextStack()
  */
 struct TextRefStack *CreateTextRefStackBackup()
 {
-	return new TextRefStack(*_newgrf_textrefstack);
+	return new TextRefStack(_newgrf_textrefstack);
 }
 
 /**
@@ -950,24 +952,38 @@ struct TextRefStack *CreateTextRefStackBackup()
  */
 void RestoreTextRefStackBackup(struct TextRefStack *backup)
 {
-	*_newgrf_textrefstack = *backup;
+	_newgrf_textrefstack = *backup;
 	delete backup;
 }
 
 /**
- * Prepare the TTDP compatible string code parsing
+ * Start using the TTDP compatible string code parsing.
+ *
+ * On start a number of values is copied on the #TextRefStack.
+ * You can then use #GetString() and the normal string drawing functions,
+ * and they will use the #TextRefStack for NewGRF string codes.
+ *
+ * However, when you want to draw a string multiple times using the same stack,
+ * you have to call #RewindTextRefStack() between draws.
+ *
+ * After you are done with drawing, you must disable usage of the #TextRefStack
+ * by calling #StopTextRefStackUsage(), so NewGRF string codes operate on the
+ * normal string parameters again.
+ *
  * @param numEntries number of entries to copy from the registers
+ * @param values values to copy onto the stack; if NULL the temporary NewGRF registers will be used instead
  */
-void PrepareTextRefStackUsage(byte numEntries)
+void StartTextRefStackUsage(byte numEntries, const uint32 *values)
 {
 	extern TemporaryStorageArray<int32, 0x110> _temp_store;
 
-	_newgrf_textrefstack->ResetStack();
+	_newgrf_textrefstack.ResetStack();
 
-	byte *p = _newgrf_textrefstack->stack;
+	byte *p = _newgrf_textrefstack.stack;
 	for (uint i = 0; i < numEntries; i++) {
+		uint32 value = values != NULL ? values[i] : _temp_store.GetValue(0x100 + i);
 		for (uint j = 0; j < 32; j += 8) {
-			*p = GB(_temp_store.Get(0x100 + i), j, 8);
+			*p = GB(value, j, 8);
 			p++;
 		}
 	}
@@ -976,22 +992,12 @@ void PrepareTextRefStackUsage(byte numEntries)
 /** Stop using the TTDP compatible string code parsing */
 void StopTextRefStackUsage()
 {
-	_newgrf_textrefstack->used = false;
-}
-
-void SwitchToNormalRefStack()
-{
-	_newgrf_textrefstack = &_newgrf_normal_textrefstack;
-}
-
-void SwitchToErrorRefStack()
-{
-	_newgrf_textrefstack = &_newgrf_error_textrefstack;
+	_newgrf_textrefstack.used = false;
 }
 
 void RewindTextRefStack()
 {
-	_newgrf_textrefstack->RewindStack();
+	_newgrf_textrefstack.RewindStack();
 }
 
 /**
@@ -1004,68 +1010,75 @@ void RewindTextRefStack()
  */
 uint RemapNewGRFStringControlCode(uint scc, char *buf_start, char **buff, const char **str, int64 *argv)
 {
-	if (_newgrf_textrefstack->used) {
+	if (_newgrf_textrefstack.used) {
 		switch (scc) {
 			default: NOT_REACHED();
-			case SCC_NEWGRF_PRINT_SIGNED_BYTE:    *argv = _newgrf_textrefstack->PopSignedByte();    break;
-			case SCC_NEWGRF_PRINT_SIGNED_WORD:    *argv = _newgrf_textrefstack->PopSignedWord();    break;
-			case SCC_NEWGRF_PRINT_QWORD_CURRENCY: *argv = _newgrf_textrefstack->PopUnsignedQWord(); break;
+			case SCC_NEWGRF_PRINT_BYTE_SIGNED:      *argv = _newgrf_textrefstack.PopSignedByte();    break;
+			case SCC_NEWGRF_PRINT_QWORD_CURRENCY:   *argv = _newgrf_textrefstack.PopSignedQWord();   break;
 
 			case SCC_NEWGRF_PRINT_DWORD_CURRENCY:
-			case SCC_NEWGRF_PRINT_DWORD:          *argv = _newgrf_textrefstack->PopSignedDWord();   break;
+			case SCC_NEWGRF_PRINT_DWORD_SIGNED:     *argv = _newgrf_textrefstack.PopSignedDWord();   break;
 
-			case SCC_NEWGRF_PRINT_HEX_BYTE:       *argv = _newgrf_textrefstack->PopUnsignedByte();  break;
-			case SCC_NEWGRF_PRINT_HEX_DWORD:      *argv = _newgrf_textrefstack->PopUnsignedDWord(); break;
-			case SCC_NEWGRF_PRINT_HEX_QWORD:      *argv = _newgrf_textrefstack->PopSignedQWord(); break;
+			case SCC_NEWGRF_PRINT_BYTE_HEX:         *argv = _newgrf_textrefstack.PopUnsignedByte();  break;
+			case SCC_NEWGRF_PRINT_QWORD_HEX:        *argv = _newgrf_textrefstack.PopUnsignedQWord(); break;
 
-			case SCC_NEWGRF_PRINT_HEX_WORD:
 			case SCC_NEWGRF_PRINT_WORD_SPEED:
 			case SCC_NEWGRF_PRINT_WORD_VOLUME:
+			case SCC_NEWGRF_PRINT_WORD_SIGNED:      *argv = _newgrf_textrefstack.PopSignedWord();    break;
+
+			case SCC_NEWGRF_PRINT_WORD_HEX:
 			case SCC_NEWGRF_PRINT_WORD_WEIGHT:
+			case SCC_NEWGRF_PRINT_WORD_POWER:
 			case SCC_NEWGRF_PRINT_WORD_STATION_NAME:
-			case SCC_NEWGRF_PRINT_UNSIGNED_WORD:  *argv = _newgrf_textrefstack->PopUnsignedWord();  break;
+			case SCC_NEWGRF_PRINT_WORD_UNSIGNED:    *argv = _newgrf_textrefstack.PopUnsignedWord();  break;
 
-			case SCC_NEWGRF_PRINT_DATE:
-			case SCC_NEWGRF_PRINT_MONTH_YEAR:     *argv = _newgrf_textrefstack->PopSignedWord() + DAYS_TILL_ORIGINAL_BASE_YEAR; break;
+			case SCC_NEWGRF_PRINT_DWORD_DATE_LONG:
+			case SCC_NEWGRF_PRINT_DWORD_DATE_SHORT:
+			case SCC_NEWGRF_PRINT_DWORD_HEX:        *argv = _newgrf_textrefstack.PopUnsignedDWord(); break;
 
-			case SCC_NEWGRF_DISCARD_WORD:         _newgrf_textrefstack->PopUnsignedWord(); break;
+			case SCC_NEWGRF_PRINT_WORD_DATE_LONG:
+			case SCC_NEWGRF_PRINT_WORD_DATE_SHORT:  *argv = _newgrf_textrefstack.PopUnsignedWord() + DAYS_TILL_ORIGINAL_BASE_YEAR; break;
 
-			case SCC_NEWGRF_ROTATE_TOP_4_WORDS:   _newgrf_textrefstack->RotateTop4Words(); break;
-			case SCC_NEWGRF_PUSH_WORD:            _newgrf_textrefstack->PushWord(Utf8Consume(str)); break;
-			case SCC_NEWGRF_UNPRINT:              *buff = max(*buff - Utf8Consume(str), buf_start); break;
+			case SCC_NEWGRF_DISCARD_WORD:           _newgrf_textrefstack.PopUnsignedWord(); break;
 
-			case SCC_NEWGRF_PRINT_STRING_ID:
-				*argv = TTDPStringIDToOTTDStringIDMapping(_newgrf_textrefstack->PopUnsignedWord());
+			case SCC_NEWGRF_ROTATE_TOP_4_WORDS:     _newgrf_textrefstack.RotateTop4Words(); break;
+			case SCC_NEWGRF_PUSH_WORD:              _newgrf_textrefstack.PushWord(Utf8Consume(str)); break;
+			case SCC_NEWGRF_UNPRINT:                *buff = max(*buff - Utf8Consume(str), buf_start); break;
+
+			case SCC_NEWGRF_PRINT_WORD_STRING_ID:
+				*argv = TTDPStringIDToOTTDStringIDMapping(_newgrf_textrefstack.PopUnsignedWord());
 				break;
 		}
 	}
 
 	switch (scc) {
 		default: NOT_REACHED();
-		case SCC_NEWGRF_PRINT_DWORD:
-		case SCC_NEWGRF_PRINT_SIGNED_WORD:
-		case SCC_NEWGRF_PRINT_SIGNED_BYTE:
-		case SCC_NEWGRF_PRINT_UNSIGNED_WORD:
+		case SCC_NEWGRF_PRINT_DWORD_SIGNED:
+		case SCC_NEWGRF_PRINT_WORD_SIGNED:
+		case SCC_NEWGRF_PRINT_BYTE_SIGNED:
+		case SCC_NEWGRF_PRINT_WORD_UNSIGNED:
 			return SCC_COMMA;
 
-		case SCC_NEWGRF_PRINT_HEX_BYTE:
-		case SCC_NEWGRF_PRINT_HEX_WORD:
-		case SCC_NEWGRF_PRINT_HEX_DWORD:
-		case SCC_NEWGRF_PRINT_HEX_QWORD:
+		case SCC_NEWGRF_PRINT_BYTE_HEX:
+		case SCC_NEWGRF_PRINT_WORD_HEX:
+		case SCC_NEWGRF_PRINT_DWORD_HEX:
+		case SCC_NEWGRF_PRINT_QWORD_HEX:
 			return SCC_HEX;
 
 		case SCC_NEWGRF_PRINT_DWORD_CURRENCY:
 		case SCC_NEWGRF_PRINT_QWORD_CURRENCY:
 			return SCC_CURRENCY;
 
-		case SCC_NEWGRF_PRINT_STRING_ID:
-			return SCC_NEWGRF_PRINT_STRING_ID;
+		case SCC_NEWGRF_PRINT_WORD_STRING_ID:
+			return SCC_NEWGRF_PRINT_WORD_STRING_ID;
 
-		case SCC_NEWGRF_PRINT_DATE:
+		case SCC_NEWGRF_PRINT_WORD_DATE_LONG:
+		case SCC_NEWGRF_PRINT_DWORD_DATE_LONG:
 			return SCC_DATE_LONG;
 
-		case SCC_NEWGRF_PRINT_MONTH_YEAR:
-			return SCC_DATE_TINY;
+		case SCC_NEWGRF_PRINT_WORD_DATE_SHORT:
+		case SCC_NEWGRF_PRINT_DWORD_DATE_SHORT:
+			return SCC_DATE_SHORT;
 
 		case SCC_NEWGRF_PRINT_WORD_SPEED:
 			return SCC_VELOCITY;
@@ -1075,6 +1088,9 @@ uint RemapNewGRFStringControlCode(uint scc, char *buf_start, char **buff, const 
 
 		case SCC_NEWGRF_PRINT_WORD_WEIGHT:
 			return SCC_WEIGHT;
+
+		case SCC_NEWGRF_PRINT_WORD_POWER:
+			return SCC_POWER;
 
 		case SCC_NEWGRF_PRINT_WORD_STATION_NAME:
 			return SCC_STATION_NAME;

@@ -95,6 +95,9 @@ Town::~Town()
 		}
 	}
 
+	/* Clear the persistent storage list. */
+	this->psa_list.clear();
+
 	DeleteSubsidyWith(ST_TOWN, this->index);
 	DeleteNewGRFInspectWindow(GSF_FAKE_TOWNS, this->index);
 	CargoPacket::InvalidateAllFrom(ST_TOWN, this->index);
@@ -704,7 +707,7 @@ void OnTick_Town()
 	Town *t;
 	FOR_ALL_TOWNS(t) {
 		/* Run town tick at regular intervals, but not all at once. */
-		if ((_tick_counter + t->index) % TOWN_GROWTH_FREQUENCY == 0) {
+		if ((_tick_counter + t->index) % TOWN_GROWTH_TICKS == 0) {
 			TownTickHandler(t);
 		}
 	}
@@ -773,43 +776,40 @@ static bool IsRoadAllowedHere(Town *t, TileIndex tile, DiagDirection dir)
 {
 	if (DistanceFromEdge(tile) == 0) return false;
 
-	Slope cur_slope, desired_slope;
-
-	for (;;) {
-		/* Check if there already is a road at this point? */
-		if (GetTownRoadBits(tile) == ROAD_NONE) {
-			/* No, try if we are able to build a road piece there.
-			 * If that fails clear the land, and if that fails exit.
-			 * This is to make sure that we can build a road here later. */
-			if (DoCommand(tile, ((dir == DIAGDIR_NW || dir == DIAGDIR_SE) ? ROAD_Y : ROAD_X), 0, DC_AUTO, CMD_BUILD_ROAD).Failed() &&
-					DoCommand(tile, 0, 0, DC_AUTO, CMD_LANDSCAPE_CLEAR).Failed())
-				return false;
-		}
-
-		cur_slope = _settings_game.construction.build_on_slopes ? GetFoundationSlope(tile, NULL) : GetTileSlope(tile, NULL);
-		bool ret = !IsNeighborRoadTile(tile, dir, t->layout == TL_ORIGINAL ? 1 : 2);
-		if (cur_slope == SLOPE_FLAT) return ret;
-
-		/* If the tile is not a slope in the right direction, then
-		 * maybe terraform some. */
-		desired_slope = (dir == DIAGDIR_NW || dir == DIAGDIR_SE) ? SLOPE_NW : SLOPE_NE;
-		if (desired_slope != cur_slope && ComplementSlope(desired_slope) != cur_slope) {
-			if (Chance16(1, 8)) {
-				CommandCost res = CMD_ERROR;
-				if (!_generating_world && Chance16(1, 10)) {
-					/* Note: Do not replace "^ SLOPE_ELEVATED" with ComplementSlope(). The slope might be steep. */
-					res = DoCommand(tile, Chance16(1, 16) ? cur_slope : cur_slope ^ SLOPE_ELEVATED, 0,
-							DC_EXEC | DC_AUTO | DC_NO_WATER, CMD_TERRAFORM_LAND);
-				}
-				if (res.Failed() && Chance16(1, 3)) {
-					/* We can consider building on the slope, though. */
-					return ret;
-				}
-			}
+	/* Check if there already is a road at this point? */
+	if (GetTownRoadBits(tile) == ROAD_NONE) {
+		/* No, try if we are able to build a road piece there.
+		 * If that fails clear the land, and if that fails exit.
+		 * This is to make sure that we can build a road here later. */
+		if (DoCommand(tile, ((dir == DIAGDIR_NW || dir == DIAGDIR_SE) ? ROAD_Y : ROAD_X), 0, DC_AUTO, CMD_BUILD_ROAD).Failed() &&
+				DoCommand(tile, 0, 0, DC_AUTO, CMD_LANDSCAPE_CLEAR).Failed()) {
 			return false;
 		}
-		return ret;
 	}
+
+	Slope cur_slope = _settings_game.construction.build_on_slopes ? GetFoundationSlope(tile, NULL) : GetTileSlope(tile, NULL);
+	bool ret = !IsNeighborRoadTile(tile, dir, t->layout == TL_ORIGINAL ? 1 : 2);
+	if (cur_slope == SLOPE_FLAT) return ret;
+
+	/* If the tile is not a slope in the right direction, then
+	 * maybe terraform some. */
+	Slope desired_slope = (dir == DIAGDIR_NW || dir == DIAGDIR_SE) ? SLOPE_NW : SLOPE_NE;
+	if (desired_slope != cur_slope && ComplementSlope(desired_slope) != cur_slope) {
+		if (Chance16(1, 8)) {
+			CommandCost res = CMD_ERROR;
+			if (!_generating_world && Chance16(1, 10)) {
+				/* Note: Do not replace "^ SLOPE_ELEVATED" with ComplementSlope(). The slope might be steep. */
+				res = DoCommand(tile, Chance16(1, 16) ? cur_slope : cur_slope ^ SLOPE_ELEVATED, 0,
+						DC_EXEC | DC_AUTO | DC_NO_WATER, CMD_TERRAFORM_LAND);
+			}
+			if (res.Failed() && Chance16(1, 3)) {
+				/* We can consider building on the slope, though. */
+				return ret;
+			}
+		}
+		return false;
+	}
+	return ret;
 }
 
 static bool TerraformTownTile(TileIndex tile, int edges, int dir)
@@ -971,12 +971,11 @@ static bool GrowTownWithBridge(const Town *t, const TileIndex tile, const DiagDi
 	assert(bridge_dir < DIAGDIR_END);
 
 	const Slope slope = GetTileSlope(tile, NULL);
-	if (slope == SLOPE_FLAT) return false; // no slope, no bridge
 
 	/* Make sure the direction is compatible with the slope.
 	 * Well we check if the slope has an up bit set in the
 	 * reverse direction. */
-	if (slope & InclinedSlope(bridge_dir)) return false;
+	if (slope != SLOPE_FLAT && slope & InclinedSlope(bridge_dir)) return false;
 
 	/* Assure that the bridge is connectable to the start side */
 	if (!(GetTownRoadBits(TileAddByDiagDir(tile, ReverseDiagDir(bridge_dir))) & DiagDirToRoadBits(bridge_dir))) return false;
@@ -986,13 +985,25 @@ static bool GrowTownWithBridge(const Town *t, const TileIndex tile, const DiagDi
 	TileIndex bridge_tile = tile; // Used to store the other waterside
 
 	const int delta = TileOffsByDiagDir(bridge_dir);
-	do {
-		if (bridge_length++ >= 11) {
-			/* Max 11 tile long bridges */
-			return false;
-		}
-		bridge_tile += delta;
-	} while (TileX(bridge_tile) != 0 && TileY(bridge_tile) != 0 && IsWaterTile(bridge_tile));
+
+	if (slope == SLOPE_FLAT) {
+		/* Bridges starting on flat tiles are only allowed when crossing rivers. */
+		do {
+			if (bridge_length++ >= 4) {
+				/* Allow to cross rivers, not big lakes. */
+				return false;
+			}
+			bridge_tile += delta;
+		} while (IsValidTile(bridge_tile) && IsWaterTile(bridge_tile) && !IsSea(bridge_tile));
+	} else {
+		do {
+			if (bridge_length++ >= 11) {
+				/* Max 11 tile long bridges */
+				return false;
+			}
+			bridge_tile += delta;
+		} while (IsValidTile(bridge_tile) && IsWaterTile(bridge_tile));
+	}
 
 	/* no water tiles in between? */
 	if (bridge_length == 1) return false;
@@ -1110,9 +1121,10 @@ static void GrowTownInTile(TileIndex *tile_ptr, RoadBits cur_rb, DiagDirection t
 	} else {
 		bool allow_house = true; // Value which decides if we want to construct a house
 
-		/* Reached a tunnel/bridge? Then continue at the other side of it. */
+		/* Reached a tunnel/bridge? Then continue at the other side of it, unless
+		 * it is the starting tile. Half the time, we stay on this side then.*/
 		if (IsTileType(tile, MP_TUNNELBRIDGE)) {
-			if (GetTunnelBridgeTransportType(tile) == TRANSPORT_ROAD) {
+			if (GetTunnelBridgeTransportType(tile) == TRANSPORT_ROAD && (target_dir != DIAGDIR_END || Chance16(1, 2))) {
 				*tile_ptr = GetOtherTunnelBridgeEnd(tile);
 			}
 			return;
@@ -1236,9 +1248,14 @@ static int GrowTownAtRoad(Town *t, TileIndex tile)
 			return _grow_town_result;
 		}
 
-		/* Select a random bit from the blockmask, walk a step
-		 * and continue the search from there. */
-		do target_dir = RandomDiagDir(); while (!(cur_rb & DiagDirToRoadBits(target_dir)));
+		if (IsTileType(tile, MP_TUNNELBRIDGE)) {
+			/* Only build in the direction away from the tunnel or bridge. */
+			target_dir = ReverseDiagDir(GetTunnelBridgeDirection(tile));
+		} else {
+			/* Select a random bit from the blockmask, walk a step
+			 * and continue the search from there. */
+			do target_dir = RandomDiagDir(); while (!(cur_rb & DiagDirToRoadBits(target_dir)));
+		}
 		tile = TileAddByDiagDir(tile, target_dir);
 
 		if (IsTileType(tile, MP_ROAD) && !IsRoadDepot(tile) && HasTileRoadType(tile, ROADTYPE_ROAD)) {
@@ -1414,8 +1431,6 @@ static void DoCreateTown(Town *t, TileIndex tile, uint32 townnameparts, TownSize
 	t->act_pass = 0;
 	t->act_mail = 0;
 
-	t->pct_pass_transported = 0;
-	t->pct_mail_transported = 0;
 	t->fund_buildings_months = 0;
 	t->new_act_food = 0;
 	t->new_act_water = 0;
@@ -2053,7 +2068,7 @@ static bool CheckTownBuild2x2House(TileIndex *tile, Town *t, uint maxz, bool nos
 {
 	TileIndex tile2 = *tile;
 
-	for (DiagDirection d = DIAGDIR_SE;;d++) { // 'd' goes through DIAGDIR_SE, DIAGDIR_SW, DIAGDIR_NW, DIAGDIR_END
+	for (DiagDirection d = DIAGDIR_SE;; d++) { // 'd' goes through DIAGDIR_SE, DIAGDIR_SW, DIAGDIR_NW, DIAGDIR_END
 		if (TownLayoutAllows2x2HouseHere(t, tile2) && CheckFree2x2Area(tile2, t->index, maxz, noslope)) {
 			*tile = tile2;
 			return true;
@@ -2125,8 +2140,16 @@ static bool BuildTownHouse(Town *t, TileIndex tile)
 	}
 
 	uint maxz = GetTileMaxZ(tile);
+	TileIndex baseTile = tile;
 
 	while (probability_max > 0) {
+		/* Building a multitile building can change the location of tile.
+		 * The building would still be built partially on that tile, but
+		 * its nothern tile would be elsewere. However, if the callback
+		 * fails we would be basing further work from the changed tile.
+		 * So a next 1x1 tile building could be built on the wrong tile. */
+		tile = baseTile;
+
 		uint r = RandomRange(probability_max);
 		uint i;
 		for (i = 0; i < num; i++) {
@@ -2737,7 +2760,7 @@ static void UpdateTownGrowRate(Town *t)
 	if (_settings_game.economy.town_growth_rate == 0 && t->fund_buildings_months == 0) return;
 
 	/**
-	 * Towns are processed every TOWN_GROWTH_FREQUENCY ticks, and this is the
+	 * Towns are processed every TOWN_GROWTH_TICKS ticks, and this is the
 	 * number of times towns are processed before a new building is built.
 	 */
 	static const uint16 _grow_count_values[2][6] = {
@@ -2779,16 +2802,11 @@ static void UpdateTownGrowRate(Town *t)
 
 static void UpdateTownAmounts(Town *t)
 {
-	/* Using +1 here to prevent overflow and division by zero */
-	t->pct_pass_transported = t->new_act_pass * 256 / (t->new_max_pass + 1);
-
 	t->max_pass = t->new_max_pass; t->new_max_pass = 0;
 	t->act_pass = t->new_act_pass; t->new_act_pass = 0;
 	t->act_food = t->new_act_food; t->new_act_food = 0;
 	t->act_water = t->new_act_water; t->new_act_water = 0;
 
-	/* Using +1 here to prevent overflow and division by zero */
-	t->pct_mail_transported = t->new_act_mail * 256 / (t->new_max_mail + 1);
 	t->max_mail = t->new_max_mail; t->new_max_mail = 0;
 	t->act_mail = t->new_act_mail; t->new_act_mail = 0;
 

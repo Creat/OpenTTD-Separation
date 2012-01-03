@@ -365,7 +365,7 @@ DEF_CONSOLE_CMD(ConLoad)
 	if (item != NULL) {
 		switch (item->type) {
 			case FIOS_TYPE_FILE: case FIOS_TYPE_OLDFILE: {
-				_switch_mode = SM_LOAD;
+				_switch_mode = SM_LOAD_GAME;
 				SetFiosType(item->type);
 
 				strecpy(_file_to_saveload.name, FiosBrowseTo(item), lastof(_file_to_saveload.name));
@@ -1253,8 +1253,6 @@ DEF_CONSOLE_CMD(ConRescanAI)
 
 	TarScanner::DoScan();
 	AI::Rescan();
-	InvalidateWindowData(WC_AI_LIST, 0, 1);
-	SetWindowDirty(WC_AI_SETTINGS, 0);
 
 	return true;
 }
@@ -1268,8 +1266,7 @@ DEF_CONSOLE_CMD(ConRescanNewGRF)
 	}
 
 	TarScanner::DoScan();
-	ScanNewGRFFiles();
-	InvalidateWindowData(WC_GAME_OPTIONS, 0, 1);
+	ScanNewGRFFiles(NULL);
 
 	return true;
 }
@@ -1640,7 +1637,7 @@ DEF_CONSOLE_CMD(ConCompanyPassword)
 		return false;
 	}
 
-	password = NetworkChangeCompanyPassword(company_id, password, false);
+	password = NetworkChangeCompanyPassword(company_id, password);
 
 	if (StrEmpty(password)) {
 		IConsolePrintF(CC_WARNING, "Company password cleared");

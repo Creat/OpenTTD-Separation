@@ -142,7 +142,7 @@ protected:
 	static Tbase_set *duplicate_sets; ///< All sets that aren't available, but needed for not downloading base sets when a newer version than the one on BaNaNaS is loaded.
 	static const Tbase_set *used_set; ///< The currently used set
 
-	/* virtual */ bool AddFile(const char *filename, size_t basepath_length);
+	/* virtual */ bool AddFile(const char *filename, size_t basepath_length, const char *tar_filename);
 
 	/**
 	 * Get the extension that is used to identify this set.
@@ -198,7 +198,7 @@ enum GraphicsFileType {
 };
 
 /** All data of a graphics set. */
-struct GraphicsSet : BaseSet<GraphicsSet, MAX_GFT, DATA_DIR> {
+struct GraphicsSet : BaseSet<GraphicsSet, MAX_GFT, BASESET_DIR> {
 	PaletteType palette;       ///< Palette of this graphics set
 
 	bool FillSetDetails(struct IniFile *ini, const char *path, const char *full_filename);
@@ -210,7 +210,7 @@ public:
 };
 
 /** All data of a sounds set. */
-struct SoundsSet : BaseSet<SoundsSet, 1, DATA_DIR> {
+struct SoundsSet : BaseSet<SoundsSet, 1, BASESET_DIR> {
 };
 
 /** All data/functions related with replacing the base sounds */

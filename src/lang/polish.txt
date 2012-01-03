@@ -717,6 +717,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Umieść
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Zapisz scenariusz
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Wczytaj scenariusz
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Zapisz mapę wysokości
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Wczytaj mapę wysokości
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Wyjdź z edytora
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -734,6 +735,7 @@ STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Wyświetlanie n
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Wyświetlanie nazw stacji
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Wyświetlanie nazw pkt. orientacyjnych
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Wyświetlanie napisów
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Znaki konkurentów i nazwy są wyświetlane
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Pełna animacja
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Wszystkie detale
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Przeźroczyste budynki
@@ -826,6 +828,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Zrzut powiększ
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Zrzut ekranu całej mapy
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Info o 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Wyrównywanie sprite-ów
+STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Wł./wył. ramki
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -1238,10 +1241,10 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_FRAME                           :{BLACK}Waluta
 STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}Wybór waluty
 
 ############ start of currency region
-STR_GAME_OPTIONS_CURRENCY_GBP                                   :Funty (£)
-STR_GAME_OPTIONS_CURRENCY_USD                                   :Dolary ($)
+STR_GAME_OPTIONS_CURRENCY_GBP                                   :Funt brytyjski (£)
+STR_GAME_OPTIONS_CURRENCY_USD                                   :Dolar amerykański ($)
 STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :Jeny (¥)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :Jen japoński (¥)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :Szyling austriacki (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :Frank belgijski (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :Frank szwajcarski (CHF)
@@ -1257,7 +1260,7 @@ STR_GAME_OPTIONS_CURRENCY_ISK                                   :Korona islandzk
 STR_GAME_OPTIONS_CURRENCY_ITL                                   :Lira włoska (ITL)
 STR_GAME_OPTIONS_CURRENCY_NLG                                   :Gulden holenderski (NLG)
 STR_GAME_OPTIONS_CURRENCY_NOK                                   :Korona norweska (NOK)
-STR_GAME_OPTIONS_CURRENCY_PLN                                   :Złoty polski (PLN)
+STR_GAME_OPTIONS_CURRENCY_PLN                                   :Polski złoty (PLN)
 STR_GAME_OPTIONS_CURRENCY_RON                                   :Lej rumuński (RON)
 STR_GAME_OPTIONS_CURRENCY_RUR                                   :Rubel rosyjski (RUR)
 STR_GAME_OPTIONS_CURRENCY_SIT                                   :Tolar słowenski (SIT)
@@ -1436,6 +1439,11 @@ STR_SEA_LEVEL_HIGH                                              :Wysoki
 STR_SEA_LEVEL_CUSTOM                                            :Własny
 STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Własny ({NUM}%)
 
+STR_RIVERS_NONE                                                 :Żaden
+STR_RIVERS_FEW                                                  :Kilka
+STR_RIVERS_MODERATE                                             :Średni
+STR_RIVERS_LOT                                                  :Sporo
+
 STR_DISASTER_NONE                                               :Brak
 STR_DISASTER_REDUCED                                            :Zredukowane
 STR_DISASTER_NORMAL                                             :Normalne
@@ -1490,8 +1498,8 @@ STR_CONFIG_SETTING_TRAIN_LENGTH                                 :{LTBLUE}Maksyma
 STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}Ilość dymu / iskier lokomotywy: {ORANGE}{STRING}
 STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :{LTBLUE}Model przyspieszania pociągu: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :{LTBLUE}Model przyspieszania samochodów: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Nachylenie zboczy dla pociągów {ORANGE}{STRING}%
-STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Nachylenie zboczy dla samochodów {ORANGE}{STRING}%
+STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Nachylenie zboczy dla pociągów: {ORANGE}{STRING}%
+STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Nachylenie zboczy dla samochodów: {ORANGE}{STRING}%
 STR_CONFIG_SETTING_FORBID_90_DEG                                :{LTBLUE}Zabroń pociągom i statkom skręcać o 90 stopni: {ORANGE}{STRING}
 STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :{LTBLUE}Pozwól na łączenie stacji nie sąsiadujących bezpośrednio: {ORANGE}{STRING}
 STR_CONFIG_SETTING_IMPROVEDLOAD                                 :{LTBLUE}Użyj ulepszonego algorytmu załadunku: {ORANGE}{STRING}
@@ -1605,7 +1613,7 @@ STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :ISO (2008-12-31
 
 STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE                       :{LTBLUE}Domyślna paleta dla NewGRF które nie posiadają zdefiniowanej palety: {ORANGE}{STRING}
 STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_DOS                   :Paleta DOS
-STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_WIN                   :Paleta okien
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_WIN                   :Paleta Windows
 
 STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :{LTBLUE}Automatycznie włącz pauzę przy rozpoczęciu nowej gry: {ORANGE}{STRING}
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL                          :{LTBLUE}Zezwól w czasie wstrzymania gry na: {ORANGE}{STRING}
@@ -1772,6 +1780,8 @@ STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Wyświet
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Poszukaj nowych lub zaktualizowanych dodatków do pobrania
 STR_INTRO_TOOLTIP_AI_SETTINGS                                   :{BLACK}Wyświetl ustawienia SI
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Wyjdź z 'OpenTTD'
+
+STR_INTRO_TRANSLATION                                           :{BLACK}Tej wersji językowej brakuje jeszcze {NUM} wpis{P "" y ów}. Możesz pomóc ulepszyć nam OpenTTD rejestrując się jako tłumacz. Szczegóły znajdziesz w pliku readme.txt.
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Wyjście
@@ -2658,6 +2668,7 @@ STR_SAVELOAD_LOAD_CAPTION                                       :{WHITE}Wczytaj 
 STR_SAVELOAD_SAVE_SCENARIO                                      :{WHITE}Zapisz scenariusz
 STR_SAVELOAD_LOAD_SCENARIO                                      :{WHITE}Wczytaj scenariusz
 STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Wczytaj mapę wysokości
+STR_SAVELOAD_SAVE_HEIGHTMAP                                     :{WHITE}Zapisz mapę wysokości
 STR_SAVELOAD_HOME_BUTTON                                        :{BLACK}Kliknij tutaj aby przejść do domyślnego katalogu
 STR_SAVELOAD_BYTES_FREE                                         :{BLACK}{BYTES} wolnego miejsca
 STR_SAVELOAD_LIST_TOOLTIP                                       :{BLACK}Lista napędów, katalogów i zapisanych gier
@@ -2693,6 +2704,7 @@ STR_MAPGEN_LAND_GENERATOR                                       :{BLACK}Generato
 STR_MAPGEN_TREE_PLACER                                          :{BLACK}Algorytm drzew:
 STR_MAPGEN_TERRAIN_TYPE                                         :{BLACK}Typ terenu:
 STR_MAPGEN_QUANTITY_OF_SEA_LAKES                                :{BLACK}Poziom wody:
+STR_MAPGEN_QUANTITY_OF_RIVERS                                   :{BLACK}Rzeki:
 STR_MAPGEN_SMOOTHNESS                                           :{BLACK}Gładkość:
 STR_MAPGEN_VARIETY                                              :{BLACK}Różnorodność:
 STR_MAPGEN_GENERATE                                             :{WHITE}Stwórz
@@ -2737,6 +2749,7 @@ STR_GENERATION_ABORT_MESSAGE                                    :{YELLOW}Czy na 
 STR_GENERATION_PROGRESS                                         :{WHITE}Ukończono w {NUM} %
 STR_GENERATION_PROGRESS_NUM                                     :{BLACK}{NUM} / {NUM}
 STR_GENERATION_WORLD_GENERATION                                 :{BLACK}Tworzenie świata
+STR_GENERATION_RIVER_GENERATION                                 :{BLACK}Generator rzek
 STR_GENERATION_TREE_GENERATION                                  :{BLACK}Tworzenie drzew
 STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Tworzenie obiektów
 STR_GENERATION_CLEARING_TILES                                   :{BLACK}Tworzenie terenów skalistych i nierówności
@@ -2851,6 +2864,9 @@ STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING
 STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Zawiera wiele wpisów Action 8
 STR_NEWGRF_ERROR_READ_BOUNDS                                    :Odczyt poza koniec pseudo obrazków
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Aktualnie używany zestaw grafik jest niekompletny.{}Proszę zaktualizować podstawowy zestaw grafik
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Wymagane zasoby GRF są niedostępne
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} został wyłączony przez {4:STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Błędny lub nieznany format układu obrazów
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Uwaga!
@@ -2886,6 +2902,12 @@ STR_NEWGRF_INVALID_CARGO_ABBREV                                 :??
 STR_NEWGRF_INVALID_CARGO_QUANTITY                               :{COMMA} of <nieprawidłowy ładunek>
 STR_NEWGRF_INVALID_ENGINE                                       :<nieprawidłowy model pojazdu>
 STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<nieprawidłowy przemysł>
+
+# NewGRF scanning window
+STR_NEWGRF_SCAN_CAPTION                                         :{WHITE}Skanowanie NewGRFów
+STR_NEWGRF_SCAN_MESSAGE                                         :{BLACK}Skanuje NewGRFy. Może to zająć chwilę w zależności od ilości...
+STR_NEWGRF_SCAN_STATUS                                          :{BLACK}Przeskanowano {NUM} NewGRF{P "" y ów} z około {NUM} NewGRFów
+STR_NEWGRF_SCAN_ARCHIVES                                        :Skanowanie w poszukiwaniu archiwum
 
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Lista napisów - {COMMA} napis{P "" y ów}
@@ -3194,6 +3216,8 @@ STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :Nowy samolot
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}Koszt: {GOLD}{CURRENCY}{BLACK} Waga: {GOLD}{WEIGHT_S}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}Prędkość: {GOLD}{VELOCITY}{BLACK} Moc: {GOLD}{POWER}
 STR_PURCHASE_INFO_SPEED                                         :{BLACK}Prędkość: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_OCEAN                                   :{BLACK}Prędkość na oceanie: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_CANAL                                   :{BLACK}Prędkość na kanale/rzece: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_RUNNINGCOST                                   :{BLACK}Koszty użytkowania: {GOLD}{CURRENCY}/rok
 STR_PURCHASE_INFO_CAPACITY                                      :{BLACK}Pojemność: {GOLD}{CARGO} {STRING}
 STR_PURCHASE_INFO_REFITTABLE                                    :(przebudowywalny)
@@ -3560,12 +3584,15 @@ STR_ORDER_DROP_HALT_DEPOT                                       :Zatrzymaj
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}Pomiń to polecenie jesli serwis nie jest wymagany
 
 STR_ORDER_CONDITIONAL_VARIABLE_TOOLTIP                          :{BLACK}Dane pojazdu wykorzystane w warunku
+
+# Conditional order variables, must follow order of OrderConditionVariable enum
 STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE                           :Procent załadowania
 STR_ORDER_CONDITIONAL_RELIABILITY                               :Niezawodność
 STR_ORDER_CONDITIONAL_MAX_SPEED                                 :Prędkość maksymalna
-STR_ORDER_CONDITIONAL_AGE                                       :Wiek pojazdu (lata)
+STR_ORDER_CONDITIONAL_AGE                                       :Wiek (w latach)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :Wymaga serwisowania
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :Zawsze
+STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :Pozostały czas życia (w latach)
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}Jak porównać dane pojazdu z zadaną wartością
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :jest równy
@@ -3620,7 +3647,7 @@ STR_ORDER_STOP_ORDER                                            :(Stop)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :(Automatycznie)
+STR_ORDER_IMPLICIT                                              :(Sugerujący)
 
 STR_ORDER_FULL_LOAD                                             :(Pełen załadunek)
 STR_ORDER_FULL_LOAD_ANY                                         :(Pełen załadunek dowolnego towaru)
@@ -3809,7 +3836,9 @@ STR_ERROR_PNGMAP_IMAGE_TYPE                                     :{WHITE}... nie 
 STR_ERROR_PNGMAP_MISC                                           :{WHITE}... coś poszło nie tak (prawdopodobnie zepsuty plik)
 
 STR_ERROR_BMPMAP                                                :{WHITE}Nie można wczytać krajobrazu z BMP...
-STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... nie można konwertować typu obrazu
+STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... nie można skonwertować tego typu obrazu
+
+STR_ERROR_HEIGHTMAP_TOO_LARGE                                   :{WHITE}... obraz jest za duży
 
 STR_WARNING_HEIGHTMAP_SCALE_CAPTION                             :{WHITE}Ostrzeżenie o skali
 STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}Nie zaleca się zbyt dużej zmiany wielkości mapy źródłowej. Kontynuować tworzenie?
@@ -3905,6 +3934,8 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... moż
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... może być budowane tylko na niskich terenach
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... może być usytuowane tylko blisko krawędzi mapy
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... las może być posadzony tylko powyżej linii śniegu
+STR_ERROR_CAN_ONLY_BE_BUILT_ABOVE_SNOW_LINE                     :{WHITE}... można zbudować tylko powyżej linii śniegu
+STR_ERROR_CAN_ONLY_BE_BUILT_BELOW_SNOW_LINE                     :{WHITE}... można zbudować tylko poniżej linii śniegu
 
 # Station construction related errors
 STR_ERROR_CAN_T_BUILD_RAILROAD_STATION                          :{WHITE}Nie można tutaj wybudować stacji...
@@ -4025,7 +4056,10 @@ STR_ERROR_CAN_T_BUILD_CANALS                                    :{WHITE}Nie moż
 STR_ERROR_CAN_T_BUILD_LOCKS                                     :{WHITE}Nie można tutaj zbudować śluzy...
 STR_ERROR_CAN_T_PLACE_RIVERS                                    :{WHITE}Nie można tutaj umieścić rzeki...
 STR_ERROR_MUST_BE_BUILT_ON_WATER                                :{WHITE}... musi być wybudowane na wodzie
-STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... nie można wybudować na wodzie
+STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... nie można zbudować na wodzie
+STR_ERROR_CAN_T_BUILD_ON_SEA                                    :{WHITE}... nie można zbudować na otwartym morzu
+STR_ERROR_CAN_T_BUILD_ON_CANAL                                  :{WHITE}... nie można zbudować na kanale
+STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... nie można budować na rzece
 STR_ERROR_MUST_DEMOLISH_CANAL_FIRST                             :{WHITE}Należy najpierw usunąć kanał
 STR_ERROR_CAN_T_BUILD_AQUEDUCT_HERE                             :{WHITE}Nie można zbudować tutaj akweduktu...
 
@@ -4101,7 +4135,7 @@ STR_ERROR_CAN_T_BUY_ROAD_VEHICLE                                :{WHITE}Nie moż
 STR_ERROR_CAN_T_BUY_SHIP                                        :{WHITE}Nie można kupić statku...
 STR_ERROR_CAN_T_BUY_AIRCRAFT                                    :{WHITE}Nie można kupić samolotu...
 
-STR_ERROR_CAN_T_RENAME_TRAIN_TYPE                               :{WHITE}Nie można zmienić nazwy typu pojazdu...
+STR_ERROR_CAN_T_RENAME_TRAIN_TYPE                               :{WHITE}Nie można zmienić nazwy typu pociągu...
 STR_ERROR_CAN_T_RENAME_ROAD_VEHICLE_TYPE                        :{WHITE}Nie można zmienić nazwy typu samochodu...
 STR_ERROR_CAN_T_RENAME_SHIP_TYPE                                :{WHITE}Nie można zmienić nazwy typu statku...
 STR_ERROR_CAN_T_RENAME_AIRCRAFT_TYPE                            :{WHITE}Nie można zmienić nazwy typu samolotu...

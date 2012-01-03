@@ -27,21 +27,43 @@
 
 #include "table/strings.h"
 
+static const char * const SCREENSHOT_NAME = "screenshot"; ///< Default filename of a saved screenshot.
+static const char * const HEIGHTMAP_NAME  = "heightmap";  ///< Default filename of a saved heightmap.
 
-char _screenshot_format_name[8];
-uint _num_screenshot_formats;
-uint _cur_screenshot_format;
-static char _screenshot_name[128];
-char _full_screenshot_name[MAX_PATH];
+char _screenshot_format_name[8];      ///< Extension of the current screenshot format (corresponds with #_cur_screenshot_format).
+uint _num_screenshot_formats;         ///< Number of available screenshot formats.
+uint _cur_screenshot_format;          ///< Index of the currently selected screenshot format in #_screenshot_formats.
+static char _screenshot_name[128];    ///< Filename of the screenshot file.
+char _full_screenshot_name[MAX_PATH]; ///< Pathname of the screenshot file.
 
-/* called by the ScreenShot proc to generate screenshot lines. */
+/**
+ * Callback function signature for generating lines of pixel data to be written to the screenshot file.
+ * @param userdata Pointer to user data.
+ * @param buf      Destination buffer.
+ * @param y        Line number of the first line to write.
+ * @param pitch    Number of pixels to write (1 byte for 8bpp, 4 bytes for 32bpp). @see Colour
+ * @param n        Number of lines to write.
+ */
 typedef void ScreenshotCallback(void *userdata, void *buf, uint y, uint pitch, uint n);
+
+/**
+ * Function signature for a screenshot generation routine for one of the available formats.
+ * @param name        Filename, including extension.
+ * @param callb       Callback function for generating lines of pixels.
+ * @param userdata    User data, passed on to #callb.
+ * @param w           Width of the image in pixels.
+ * @param h           Height of the image in pixels.
+ * @param pixelformat Bits per pixel (bpp), either 8 or 32.
+ * @param palette     %Colour palette (for 8bpp images).
+ * @return File was written successfully.
+ */
 typedef bool ScreenshotHandlerProc(const char *name, ScreenshotCallback *callb, void *userdata, uint w, uint h, int pixelformat, const Colour *palette);
 
+/** Screenshot format information. */
 struct ScreenshotFormat {
-	const char *name;
-	const char *extension;
-	ScreenshotHandlerProc *proc;
+	const char *name;            ///< Name of the format.
+	const char *extension;       ///< File extension.
+	ScreenshotHandlerProc *proc; ///< Function for writing the screenshot.
 };
 
 /*************************************************
@@ -89,6 +111,7 @@ assert_compile(sizeof(RgbQuad) == 4);
  * @param pixelformat bits per pixel
  * @param palette colour palette (for 8bpp mode)
  * @return was everything ok?
+ * @see ScreenshotHandlerProc
  */
 static bool MakeBMPImage(const char *name, ScreenshotCallback *callb, void *userdata, uint w, uint h, int pixelformat, const Colour *palette)
 {
@@ -224,6 +247,18 @@ static void PNGAPI png_my_warning(png_structp png_ptr, png_const_charp message)
 	DEBUG(misc, 1, "[libpng] warning: %s - %s", message, (const char *)png_get_error_ptr(png_ptr));
 }
 
+/**
+ * Generic .PNG file image writer.
+ * @param name        Filename, including extension.
+ * @param callb       Callback function for generating lines of pixels.
+ * @param userdata    User data, passed on to #callb.
+ * @param w           Width of the image in pixels.
+ * @param h           Height of the image in pixels.
+ * @param pixelformat Bits per pixel (bpp), either 8 or 32.
+ * @param palette     %Colour palette (for 8bpp images).
+ * @return File was written successfully.
+ * @see ScreenshotHandlerProc
+ */
 static bool MakePNGImage(const char *name, ScreenshotCallback *callb, void *userdata, uint w, uint h, int pixelformat, const Colour *palette)
 {
 	png_color rq[256];
@@ -372,6 +407,7 @@ static bool MakePNGImage(const char *name, ScreenshotCallback *callb, void *user
  **** SCREENSHOT CODE FOR ZSOFT PAINTBRUSH (.PCX)
  *************************************************/
 
+/** Definition of a PCX file header. */
 struct PcxHeader {
 	byte manufacturer;
 	byte version;
@@ -391,6 +427,18 @@ struct PcxHeader {
 };
 assert_compile(sizeof(PcxHeader) == 128);
 
+/**
+ * Generic .PCX file image writer.
+ * @param name        Filename, including extension.
+ * @param callb       Callback function for generating lines of pixels.
+ * @param userdata    User data, passed on to #callb.
+ * @param w           Width of the image in pixels.
+ * @param h           Height of the image in pixels.
+ * @param pixelformat Bits per pixel (bpp), either 8 or 32.
+ * @param palette     %Colour palette (for 8bpp images).
+ * @return File was written successfully.
+ * @see ScreenshotHandlerProc
+ */
 static bool MakePCXImage(const char *name, ScreenshotCallback *callb, void *userdata, uint w, uint h, int pixelformat, const Colour *palette)
 {
 	FILE *f;
@@ -520,6 +568,7 @@ static bool MakePCXImage(const char *name, ScreenshotCallback *callb, void *user
  **** GENERIC SCREENSHOT CODE
  *************************************************/
 
+/** Available screenshot formats. */
 static const ScreenshotFormat _screenshot_formats[] = {
 #if defined(WITH_PNG)
 	{"PNG", "png", &MakePNGImage},
@@ -528,6 +577,13 @@ static const ScreenshotFormat _screenshot_formats[] = {
 	{"PCX", "pcx", &MakePCXImage},
 };
 
+/** Get filename extension of current screenshot file format. */
+const char *GetCurrentScreenshotExtension()
+{
+	return _screenshot_formats[_cur_screenshot_format].extension;
+}
+
+/** Initialize screenshot format information on startup, with #_screenshot_format_name filled from the loadsave code. */
 void InitializeScreenshotFormats()
 {
 	uint j = 0;
@@ -541,11 +597,20 @@ void InitializeScreenshotFormats()
 	_num_screenshot_formats = lengthof(_screenshot_formats);
 }
 
+/**
+ * Give descriptive name of the screenshot format.
+ * @param i Number of the screenshot format.
+ * @return String constant describing the format.
+ */
 const char *GetScreenshotFormatDesc(int i)
 {
 	return _screenshot_formats[i].name;
 }
 
+/**
+ * Set the screenshot format to use.
+ * @param i Number of the format.
+ */
 void SetScreenshotFormat(uint i)
 {
 	assert(i < _num_screenshot_formats);
@@ -553,7 +618,10 @@ void SetScreenshotFormat(uint i)
 	strecpy(_screenshot_format_name, _screenshot_formats[i].extension, lastof(_screenshot_format_name));
 }
 
-/* screenshot generator that dumps the current video buffer */
+/**
+ * Callback of the screenshot generator that dumps the current video buffer.
+ * @see ScreenshotCallback
+ */
 static void CurrentScreenCallback(void *userdata, void *buf, uint y, uint pitch, uint n)
 {
 	Blitter *blitter = BlitterFactoryBase::GetCurrentBlitter();
@@ -617,13 +685,19 @@ static void LargeWorldCallback(void *userdata, void *buf, uint y, uint pitch, ui
 	_screen_disable_anim = old_disable_anim;
 }
 
-static const char *MakeScreenshotName(const char *ext)
+/**
+ * Construct a pathname for a screenshot file.
+ * @param default_fn Default filename.
+ * @param ext        Extension to use.
+ * @return Pathname for a screenshot file.
+ */
+static const char *MakeScreenshotName(const char *default_fn, const char *ext)
 {
 	bool generate = StrEmpty(_screenshot_name);
 
 	if (generate) {
 		if (_game_mode == GM_EDITOR || _game_mode == GM_MENU || _local_company == COMPANY_SPECTATOR) {
-			strecpy(_screenshot_name, "screenshot", lastof(_screenshot_name));
+			strecpy(_screenshot_name, default_fn, lastof(_screenshot_name));
 		} else {
 			GenerateDefaultSaveName(_screenshot_name, lastof(_screenshot_name));
 		}
@@ -652,7 +726,8 @@ static const char *MakeScreenshotName(const char *ext)
 static bool MakeSmallScreenshot()
 {
 	const ScreenshotFormat *sf = _screenshot_formats + _cur_screenshot_format;
-	return sf->proc(MakeScreenshotName(sf->extension), CurrentScreenCallback, NULL, _screen.width, _screen.height, BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
+	return sf->proc(MakeScreenshotName(SCREENSHOT_NAME, sf->extension), CurrentScreenCallback, NULL, _screen.width, _screen.height,
+			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
 }
 
 /** Make a zoomed-in screenshot of the currently visible area. */
@@ -672,7 +747,8 @@ static bool MakeZoomedInScreenshot()
 	vp.height = vp.virtual_height;
 
 	const ScreenshotFormat *sf = _screenshot_formats + _cur_screenshot_format;
-	return sf->proc(MakeScreenshotName(sf->extension), LargeWorldCallback, &vp, vp.width, vp.height, BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
+	return sf->proc(MakeScreenshotName(SCREENSHOT_NAME, sf->extension), LargeWorldCallback, &vp, vp.width, vp.height,
+			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
 }
 
 /** Make a screenshot of the whole map. */
@@ -697,7 +773,50 @@ static bool MakeWorldScreenshot()
 	vp.height = vp.virtual_height;
 
 	sf = _screenshot_formats + _cur_screenshot_format;
-	return sf->proc(MakeScreenshotName(sf->extension), LargeWorldCallback, &vp, vp.width, vp.height, BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
+	return sf->proc(MakeScreenshotName(SCREENSHOT_NAME, sf->extension), LargeWorldCallback, &vp, vp.width, vp.height,
+			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
+}
+
+/**
+ * Callback for generating a heightmap. Supports 8bpp grayscale only.
+ * @param userdata Pointer to user data.
+ * @param buf      Destination buffer.
+ * @param y        Line number of the first line to write.
+ * @param pitch    Number of pixels to write (1 byte for 8bpp, 4 bytes for 32bpp). @see Colour
+ * @param n        Number of lines to write.
+ * @see ScreenshotCallback
+ */
+static void HeightmapCallback(void *userdata, void *buffer, uint y, uint pitch, uint n)
+{
+	byte *buf = (byte *)buffer;
+	while (n > 0) {
+		TileIndex ti = TileXY(MapMaxX(), y);
+		for (uint x = MapMaxX(); true; x--) {
+			*buf = 16 * TileHeight(ti);
+			buf++;
+			if (x == 0) break;
+			ti = TILE_ADDXY(ti, -1, 0);
+		}
+		y++;
+		n--;
+	}
+}
+
+/**
+ * Make a heightmap of the current map.
+ * @param filename Filename to use for saving.
+ */
+bool MakeHeightmapScreenshot(const char *filename)
+{
+	Colour palette[256];
+	for (uint i = 0; i < lengthof(palette); i++) {
+		palette[i].a = 0xff;
+		palette[i].r = i;
+		palette[i].g = i;
+		palette[i].b = i;
+	}
+	const ScreenshotFormat *sf = _screenshot_formats + _cur_screenshot_format;
+	return sf->proc(filename, HeightmapCallback, NULL, MapSizeX(), MapSizeY(), 8, palette);
 }
 
 /**
@@ -734,6 +853,12 @@ bool MakeScreenshot(ScreenshotType t, const char *name)
 		case SC_WORLD:
 			ret = MakeWorldScreenshot();
 			break;
+
+		case SC_HEIGHTMAP: {
+			const ScreenshotFormat *sf = _screenshot_formats + _cur_screenshot_format;
+			ret = MakeHeightmapScreenshot(MakeScreenshotName(HEIGHTMAP_NAME, sf->extension));
+			break;
+		}
 
 		default:
 			NOT_REACHED();

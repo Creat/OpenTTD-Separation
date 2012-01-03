@@ -1514,7 +1514,7 @@ bool AfterLoadGame()
 	 */
 	if (IsSavegameVersionBefore(83)) {
 		for (TileIndex t = 0; t < map_size; t++) {
-			if (IsTileType(t, MP_WATER) && IsShipDepot(t)) {
+			if (IsShipDepotTile(t)) {
 				_m[t].m4 = (TileHeight(t) == 0) ? OWNER_WATER : OWNER_NONE;
 			}
 		}
@@ -1525,7 +1525,7 @@ bool AfterLoadGame()
 		FOR_ALL_STATIONS(st) {
 			for (CargoID c = 0; c < NUM_CARGO; c++) {
 				st->goods[c].last_speed = 0;
-				if (st->goods[c].cargo.Count() != 0) SetBit(st->goods[c].acceptance_pickup, GoodsEntry::PICKUP);
+				if (st->goods[c].cargo.Count() != 0) SetBit(st->goods[c].acceptance_pickup, GoodsEntry::GES_PICKUP);
 			}
 		}
 	}
@@ -2565,9 +2565,9 @@ bool AfterLoadGame()
 			if (!v->IsPrimaryVehicle()) continue;
 
 			/* Older versions are less strict with indices being in range and fix them on the fly */
-			if (v->cur_auto_order_index >= v->GetNumOrders()) v->cur_auto_order_index = 0;
+			if (v->cur_implicit_order_index >= v->GetNumOrders()) v->cur_implicit_order_index = 0;
 
-			v->cur_real_order_index = v->cur_auto_order_index;
+			v->cur_real_order_index = v->cur_implicit_order_index;
 			v->UpdateRealOrderIndex();
 		}
 	}
@@ -2592,6 +2592,58 @@ bool AfterLoadGame()
 		 * since a new option (minimal at position 1) has been added */
 		if (_settings_game.difficulty.industry_density > 0) {
 			_settings_game.difficulty.industry_density++;
+		}
+	}
+
+	if (IsSavegameVersionBefore(161)) {
+		/* Before savegame version 161, persistent storages were not stored in a pool. */
+
+		if (!IsSavegameVersionBefore(76)) {
+			Industry *ind;
+			FOR_ALL_INDUSTRIES(ind) {
+				assert(ind->psa != NULL);
+
+				/* Check if the old storage was empty. */
+				bool is_empty = true;
+				for (uint i = 0; i < sizeof(ind->psa->storage); i++) {
+					if (ind->psa->GetValue(i) != 0) {
+						is_empty = false;
+						break;
+					}
+				}
+
+				if (!is_empty) {
+					ind->psa->grfid = _industry_mngr.GetGRFID(ind->type);
+				} else {
+					delete ind->psa;
+					ind->psa = NULL;
+				}
+			}
+		}
+
+		if (!IsSavegameVersionBefore(145)) {
+			Station *st;
+			FOR_ALL_STATIONS(st) {
+				if (!(st->facilities & FACIL_AIRPORT)) continue;
+				assert(st->airport.psa != NULL);
+
+				/* Check if the old storage was empty. */
+				bool is_empty = true;
+				for (uint i = 0; i < sizeof(st->airport.psa->storage); i++) {
+					if (st->airport.psa->GetValue(i) != 0) {
+						is_empty = false;
+						break;
+					}
+				}
+
+				if (!is_empty) {
+					st->airport.psa->grfid = _airport_mngr.GetGRFID(st->airport.type);
+				} else {
+					delete st->airport.psa;
+					st->airport.psa = NULL;
+
+				}
+			}
 		}
 	}
 

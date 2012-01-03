@@ -38,12 +38,12 @@ STR_CARGO_PLURAL_GRAIN                                          :{G=m}Cereais
 STR_CARGO_PLURAL_WOOD                                           :{G=f}Madeira
 STR_CARGO_PLURAL_IRON_ORE                                       :{G=m}Minério de Ferro
 STR_CARGO_PLURAL_STEEL                                          :{G=m}Aço
-STR_CARGO_PLURAL_VALUABLES                                      :{G=f}Objetos de Valor
+STR_CARGO_PLURAL_VALUABLES                                      :{G=f}Preciosidades
 STR_CARGO_PLURAL_COPPER_ORE                                     :{G=m}Minério de Cobre
 STR_CARGO_PLURAL_MAIZE                                          :{G=m}Milho
 STR_CARGO_PLURAL_FRUIT                                          :{G=f}Fruta
 STR_CARGO_PLURAL_DIAMONDS                                       :{G=m}Diamantes
-STR_CARGO_PLURAL_FOOD                                           :{G=m}Alimentos
+STR_CARGO_PLURAL_FOOD                                           :{G=m}Alimento
 STR_CARGO_PLURAL_PAPER                                          :{G=m}Papel
 STR_CARGO_PLURAL_GOLD                                           :{G=m}Ouro
 STR_CARGO_PLURAL_WATER                                          :{G=f}Água
@@ -339,6 +339,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Colocar 
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Salvar cenário
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Carregar cenário
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Salvar mapa topográfico
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Carregar mapa de elevação
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Desistir do editor
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -356,6 +357,7 @@ STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Nomes de povoad
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Nomes de estações exibidos
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Nomes de pontos de parada exibidos
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Sinais exibidos
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Placas e nomes dos competidores exibidos
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Animação total
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Detalhamento total
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Edifícios transparentes
@@ -448,6 +450,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Ampliado em cap
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Captura de tela do mapa inteiro
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Sobre 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Alinhador de "sprites"
+STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Alternar caixas limítrofes
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -540,7 +543,7 @@ STR_GRAPH_PERFORMANCE_DETAIL_TOOLTIP                            :{BLACK}Exibir a
 
 # Graph key window
 STR_GRAPH_KEY_CAPTION                                           :{WHITE}Chave para gráficos da empresa
-STR_GRAPH_KEY_COMPANY_SELECTION_TOOLTIP                         :{BLACK}Clique aqui para alternar a entrada da empresa no gráfico em ligado/desligado
+STR_GRAPH_KEY_COMPANY_SELECTION_TOOLTIP                         :{BLACK}Clique aqui para alternar a entrada da empresa no gráfico
 
 # Company league window
 STR_COMPANY_LEAGUE_TABLE_CAPTION                                :{WHITE}Tabela da Liga das Empresas
@@ -707,7 +710,7 @@ STR_SMALLMAP_ENABLE_ALL                                         :{BLACK}Habilita
 STR_SMALLMAP_SHOW_HEIGHT                                        :{BLACK}Mostrar altitude
 STR_SMALLMAP_TOOLTIP_DISABLE_ALL_INDUSTRIES                     :{BLACK}Não exibir indústrias no mapa
 STR_SMALLMAP_TOOLTIP_ENABLE_ALL_INDUSTRIES                      :{BLACK}Exibir todas as indústrias no mapa
-STR_SMALLMAP_TOOLTIP_SHOW_HEIGHT                                :{BLACK}Alternar a exibição de mapa de elevação
+STR_SMALLMAP_TOOLTIP_SHOW_HEIGHT                                :{BLACK}Alternar a exibição de mapa topográfico
 STR_SMALLMAP_TOOLTIP_DISABLE_ALL_COMPANIES                      :{BLACK}Não exibir propriedade da empresa no mapa
 STR_SMALLMAP_TOOLTIP_ENABLE_ALL_COMPANIES                       :{BLACK}Exibir todas as propriedades da empresa no mapa
 
@@ -862,7 +865,7 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}Seleçã
 STR_GAME_OPTIONS_CURRENCY_GBP                                   :Libras (£)
 STR_GAME_OPTIONS_CURRENCY_USD                                   :Dólares ($)
 STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :Yen (¥)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :Yen (¥)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :Xelim Austríaco (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :Franco Belga (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :Franco Suíço (CHF)
@@ -1057,6 +1060,11 @@ STR_SEA_LEVEL_HIGH                                              :Alto
 STR_SEA_LEVEL_CUSTOM                                            :Personalizado
 STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Personalizado ({NUM}%)
 
+STR_RIVERS_NONE                                                 :Nenhum
+STR_RIVERS_FEW                                                  :Poucos
+STR_RIVERS_MODERATE                                             :Médio
+STR_RIVERS_LOT                                                  :Muitos
+
 STR_DISASTER_NONE                                               :Nenhum
 STR_DISASTER_REDUCED                                            :Reduzido
 STR_DISASTER_NORMAL                                             :Normal
@@ -1183,7 +1191,7 @@ STR_CONFIG_SETTING_TREE_PLACER                                  :{LTBLUE}Algorí
 STR_CONFIG_SETTING_TREE_PLACER_NONE                             :Nenhum
 STR_CONFIG_SETTING_TREE_PLACER_ORIGINAL                         :Original
 STR_CONFIG_SETTING_TREE_PLACER_IMPROVED                         :Melhorado
-STR_CONFIG_SETTING_HEIGHTMAP_ROTATION                           :{LTBLUE}Rotação do mapa em relevo: {ORANGE}{STRING}
+STR_CONFIG_SETTING_HEIGHTMAP_ROTATION                           :{LTBLUE}Rotação do mapa topográfico: {ORANGE}{STRING}
 STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_COUNTER_CLOCKWISE         :Sentido Anti-Horário
 STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_CLOCKWISE                 :Sentido Horário
 STR_CONFIG_SETTING_SE_FLAT_WORLD_HEIGHT                         :{LTBLUE}A altitude de um mapa regular é de: {ORANGE}{STRING}
@@ -1362,7 +1370,7 @@ STR_INTRO_CAPTION                                               :{WHITE}OpenTTD 
 STR_INTRO_NEW_GAME                                              :{BLACK}Novo Jogo
 STR_INTRO_LOAD_GAME                                             :{BLACK}Abrir Jogo
 STR_INTRO_PLAY_SCENARIO                                         :{BLACK}Jogar Cenário
-STR_INTRO_PLAY_HEIGHTMAP                                        :{BLACK}Jogar num mapa de relevo
+STR_INTRO_PLAY_HEIGHTMAP                                        :{BLACK}Jogar num mapa topográfico
 STR_INTRO_SCENARIO_EDITOR                                       :{BLACK}Editor de Cenário
 STR_INTRO_MULTIPLAYER                                           :{BLACK}Multi-jogador
 
@@ -1376,7 +1384,7 @@ STR_INTRO_QUIT                                                  :{BLACK}Sair
 
 STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Iniciar um novo jogo. Ctrl+Clique para pular a configuração do mapa
 STR_INTRO_TOOLTIP_LOAD_GAME                                     :{BLACK}Carregar um jogo salvado
-STR_INTRO_TOOLTIP_PLAY_HEIGHTMAP                                :{BLACK}Inica um novo jogo, a partir de um mapa de relevo
+STR_INTRO_TOOLTIP_PLAY_HEIGHTMAP                                :{BLACK}Inica um novo jogo, a partir de um mapa topográfico
 STR_INTRO_TOOLTIP_PLAY_SCENARIO                                 :{BLACK}Iniciar um novo jogo, usando um cenário personalizado
 STR_INTRO_TOOLTIP_SCENARIO_EDITOR                               :{BLACK}Criar um cenário de jogo personalizado
 STR_INTRO_TOOLTIP_MULTIPLAYER                                   :{BLACK}Iniciar um jogo de vários jogadores
@@ -1393,6 +1401,8 @@ STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Exibir c
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Checar por conteúdo novo e atualizado para baixar
 STR_INTRO_TOOLTIP_AI_SETTINGS                                   :{BLACK}Exibir configs. da IA
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Sair de 'OpenTTD'
+
+STR_INTRO_TRANSLATION                                           :{BLACK}Faltam {NUM} string{P "" s} nessa tradução. Por favor faça o OpenTTD melhor se inscrevendo como tradutor. Leia Readme.txt para mais detalhes.
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Sair
@@ -1851,7 +1861,7 @@ STR_CONTENT_TYPE_NEWGRF                                         :NewGRF
 STR_CONTENT_TYPE_AI                                             :IA
 STR_CONTENT_TYPE_AI_LIBRARY                                     :IA's disponíveis
 STR_CONTENT_TYPE_SCENARIO                                       :Cenário
-STR_CONTENT_TYPE_HEIGHTMAP                                      :Mapa de altitudes
+STR_CONTENT_TYPE_HEIGHTMAP                                      :Mapa topográfico
 STR_CONTENT_TYPE_BASE_SOUNDS                                    :Sons padrão
 STR_CONTENT_TYPE_BASE_MUSIC                                     :Músicsas padrão
 
@@ -1909,7 +1919,7 @@ STR_RAIL_TOOLBAR_TOOLTIP_BUILD_AUTORAIL                         :{BLACK}Construi
 STR_RAIL_TOOLBAR_TOOLTIP_BUILD_TRAIN_DEPOT_FOR_BUILDING         :{BLACK}Construir depósito (para compra e manutenção de trens). Shift altera construção/estimação de custo
 STR_RAIL_TOOLBAR_TOOLTIP_CONVERT_RAIL_TO_WAYPOINT               :{BLACK}Converter linha em ponto de controle. Ctrl permite a união de pontos de controle. Shift altera construção/estimação de custo
 STR_RAIL_TOOLBAR_TOOLTIP_BUILD_RAILROAD_STATION                 :{BLACK}Construir estação ferroviária. Ctrl permite a união de estações. Shift altera construção/estimação de custo
-STR_RAIL_TOOLBAR_TOOLTIP_BUILD_RAILROAD_SIGNALS                 :{BLACK}Construir sinais ferroviários. Ctrl liga/desliga a constução de semáforos/sinais{}Clicar e arrastar constroi sinais até a próxima junção{}Ctrl+Clique liga/desliga a janela de seleção de sinais. Shift altera construção/estimação de custo
+STR_RAIL_TOOLBAR_TOOLTIP_BUILD_RAILROAD_SIGNALS                 :{BLACK}Construir sinais ferroviários. Ctrl alterna a construção de semáforos/sinais{}Clicar e arrastar constroi sinais até a próxima junção{}Ctrl+Clique alterna a janela de seleção de sinais. Shift altera construção/estimação de custo
 STR_RAIL_TOOLBAR_TOOLTIP_BUILD_RAILROAD_BRIDGE                  :{BLACK}Construir ponte ferroviária. Shift altera construção/estimação de custo
 STR_RAIL_TOOLBAR_TOOLTIP_BUILD_RAILROAD_TUNNEL                  :{BLACK}Construir túnel ferroviário. Shift altera construção/estimação de custo
 STR_RAIL_TOOLBAR_TOOLTIP_TOGGLE_BUILD_REMOVE_FOR                :{BLACK}Alternar construir/remover ferrovias, sinais, pontos de controle e estações. Segure ctrl para remover os trilhos de estações e pontos de controle.
@@ -2278,7 +2288,8 @@ STR_SAVELOAD_SAVE_CAPTION                                       :{WHITE}Salvar J
 STR_SAVELOAD_LOAD_CAPTION                                       :{WHITE}Abrir Jogo
 STR_SAVELOAD_SAVE_SCENARIO                                      :{WHITE}Salvar Cenário
 STR_SAVELOAD_LOAD_SCENARIO                                      :{WHITE}Abrir Cenário
-STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Carregar Relevo
+STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Carregar mapa topográfico
+STR_SAVELOAD_SAVE_HEIGHTMAP                                     :{WHITE}Salvar mapa topográfico
 STR_SAVELOAD_HOME_BUTTON                                        :{BLACK}Clique aqui para selecionar o diretório padrão de jogos salvos
 STR_SAVELOAD_BYTES_FREE                                         :{BLACK}{BYTES} livres
 STR_SAVELOAD_LIST_TOOLTIP                                       :{BLACK}Lista de unidades, diretórios e arquivos de jogos gravados
@@ -2314,6 +2325,7 @@ STR_MAPGEN_LAND_GENERATOR                                       :{BLACK}Gerador 
 STR_MAPGEN_TREE_PLACER                                          :{BLACK}Algorítimo de árvores
 STR_MAPGEN_TERRAIN_TYPE                                         :{BLACK}Tipo de terreno
 STR_MAPGEN_QUANTITY_OF_SEA_LAKES                                :{BLACK}Nível do mar:
+STR_MAPGEN_QUANTITY_OF_RIVERS                                   :{BLACK}Rios:
 STR_MAPGEN_SMOOTHNESS                                           :{BLACK}Regularidade
 STR_MAPGEN_VARIETY                                              :{BLACK}Distribuição da variedade
 STR_MAPGEN_GENERATE                                             :{WHITE}Gerar
@@ -2330,8 +2342,8 @@ STR_MAPGEN_BORDER_RANDOM                                        :{BLACK}Randômi
 STR_MAPGEN_BORDER_RANDOMIZE                                     :{BLACK}Randômico
 STR_MAPGEN_BORDER_MANUAL                                        :{BLACK}Manual
 
-STR_MAPGEN_HEIGHTMAP_ROTATION                                   :{BLACK}Rotação do mapa em relevo:
-STR_MAPGEN_HEIGHTMAP_NAME                                       :{BLACK}Nome do mapa em relevo:
+STR_MAPGEN_HEIGHTMAP_ROTATION                                   :{BLACK}Rotação do mapa topográfico:
+STR_MAPGEN_HEIGHTMAP_NAME                                       :{BLACK}Nome do mapa topográfico:
 STR_MAPGEN_HEIGHTMAP_SIZE_LABEL                                 :{BLACK}Tamanho:
 STR_MAPGEN_HEIGHTMAP_SIZE                                       :{ORANGE}{NUM} x {NUM}
 
@@ -2358,6 +2370,7 @@ STR_GENERATION_ABORT_MESSAGE                                    :{YELLOW}Você q
 STR_GENERATION_PROGRESS                                         :{WHITE}{NUM}% completo
 STR_GENERATION_PROGRESS_NUM                                     :{BLACK}{NUM} / {NUM}
 STR_GENERATION_WORLD_GENERATION                                 :{BLACK}Geração de mundo
+STR_GENERATION_RIVER_GENERATION                                 :{BLACK}Geração de rios
 STR_GENERATION_TREE_GENERATION                                  :{BLACK}Geração de árvores
 STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Geração imóvel
 STR_GENERATION_CLEARING_TILES                                   :{BLACK}Geração de area rochosa e irregular
@@ -2391,8 +2404,8 @@ STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Move o N
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Lista dos NewGRF instalados. Clique em um deles para mudar seus parâmetros
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Definir parâmetros
-STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Liga/Desliga paleta
-STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Liga/desliga a paleta do NewGRF selecionado.{}Faça isso quando os gráficos deste ficarem rosa durante o jogo
+STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Alterna paleta
+STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Alterna a paleta do NewGRF selecionado.{}Faça isso quando os gráficos deste ficarem rosa durante o jogo
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Aplicar alterações
 
 STR_NEWGRF_SETTINGS_FIND_MISSING_CONTENT_BUTTON                 :{BLACK}Procurar o conteúdo on-line
@@ -2472,6 +2485,9 @@ STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING
 STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Contém entradas múltiplas de Ação 8
 STR_NEWGRF_ERROR_READ_BOUNDS                                    :Continuar lendo após o fim do pseudo-sprite
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Estão faltando alguns sprites na base de gráficos em uso.{}Por favor atualize a base de gráficos
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Recursos GRF requisitados não estão dispon.
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} foi desativado por {4:STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Formato de layout de sprite inválido/desconh.
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Cuidado!
@@ -2507,6 +2523,12 @@ STR_NEWGRF_INVALID_CARGO_ABBREV                                 :??
 STR_NEWGRF_INVALID_CARGO_QUANTITY                               :{COMMA} de <carga inválida>
 STR_NEWGRF_INVALID_ENGINE                                       :<modelo de veíc. inválido>
 STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<indústria inválida>
+
+# NewGRF scanning window
+STR_NEWGRF_SCAN_CAPTION                                         :{WHITE}Escaneando NewGRFs
+STR_NEWGRF_SCAN_MESSAGE                                         :{BLACK}Escaneando NewGRFs. Dependendo da quantidade, isso pode levar um tempo...
+STR_NEWGRF_SCAN_STATUS                                          :{BLACK}{NUM} NewGRF{P "" s} escaneados, de estimados {NUM} NewGRF{P "" s}
+STR_NEWGRF_SCAN_ARCHIVES                                        :Procurando arquivos
 
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Lista de Placas - {COMMA} Placa{P "" s}
@@ -2815,6 +2837,8 @@ STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :Nova Aeronave
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}Custo: {GOLD}{CURRENCY}{BLACK} Peso: {GOLD}{WEIGHT_S}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}Velocidade: {GOLD}{VELOCITY}{BLACK} Potência: {GOLD}{POWER}
 STR_PURCHASE_INFO_SPEED                                         :{BLACK}Velocidade: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_OCEAN                                   :{BLACK}Velocidade em oceanos: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_CANAL                                   :{BLACK}Velocidade em canais/rios: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_RUNNINGCOST                                   :{BLACK}Manutenção: {GOLD}{CURRENCY}/ano
 STR_PURCHASE_INFO_CAPACITY                                      :{BLACK}Capacidade: {GOLD}{CARGO} {STRING}
 STR_PURCHASE_INFO_REFITTABLE                                    :(adaptável)
@@ -3175,12 +3199,15 @@ STR_ORDER_DROP_HALT_DEPOT                                       :Parar
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}Pular esta ordem a menos que necessite de manutenção
 
 STR_ORDER_CONDITIONAL_VARIABLE_TOOLTIP                          :{BLACK}Dados do veículo no qual se basear para pular ordem
+
+# Conditional order variables, must follow order of OrderConditionVariable enum
 STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE                           :Percentual carregado
 STR_ORDER_CONDITIONAL_RELIABILITY                               :Confiabilidade
 STR_ORDER_CONDITIONAL_MAX_SPEED                                 :Velocidade máxima
 STR_ORDER_CONDITIONAL_AGE                                       :Idade (anos)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :Necessia de manutenção
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :Sempre
+STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :Tempo de vida restante (anos)
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}Como comprarar os dados do veículo com o valor fornecido
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :é igual a
@@ -3235,7 +3262,7 @@ STR_ORDER_STOP_ORDER                                            :(Parar)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :(Automatico)
+STR_ORDER_IMPLICIT                                              :(Implícito)
 
 STR_ORDER_FULL_LOAD                                             :(Carregar completamente)
 STR_ORDER_FULL_LOAD_ANY                                         :(Carregar completamente qualquer carga)
@@ -3391,8 +3418,8 @@ STR_PERCENT_UP_DOWN                                             :{WHITE}{NUM}%{U
 # Income 'floats'
 STR_INCOME_FLOAT_COST_SMALL                                     :{TINYFONT}{RED}Custo: {CURRENCY}
 STR_INCOME_FLOAT_COST                                           :{RED}Custo: {CURRENCY}
-STR_INCOME_FLOAT_INCOME_SMALL                                   :{TINYFONT}{GREEN}Renda: {CURRENCY}
-STR_INCOME_FLOAT_INCOME                                         :{GREEN}Renda: {CURRENCY}
+STR_INCOME_FLOAT_INCOME_SMALL                                   :{TINYFONT}{GREEN}Lucro: {CURRENCY}
+STR_INCOME_FLOAT_INCOME                                         :{GREEN}Lucro: {CURRENCY}
 STR_FEEDER_TINY                                                 :{TINYFONT}{YELLOW}Transferir: {CURRENCY}
 STR_FEEDER                                                      :{YELLOW}Transferir: {CURRENCY}
 STR_MESSAGE_ESTIMATED_COST                                      :{WHITE}Custo Estimado: {CURRENCY}
@@ -3520,6 +3547,8 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... só 
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... só pode ser construído em áreas baixas
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... só pode ser colocado perto das bordas do mapa
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... a floresta só pode ser plantada acima do nível de neve
+STR_ERROR_CAN_ONLY_BE_BUILT_ABOVE_SNOW_LINE                     :{WHITE}... só pode ser construído acima do nível da neve
+STR_ERROR_CAN_ONLY_BE_BUILT_BELOW_SNOW_LINE                     :{WHITE}... só pode ser construída abaixo do nível da neve
 
 # Station construction related errors
 STR_ERROR_CAN_T_BUILD_RAILROAD_STATION                          :{WHITE}Impossível construir estação ferroviária aqui...
@@ -3641,6 +3670,9 @@ STR_ERROR_CAN_T_BUILD_LOCKS                                     :{WHITE}Impossí
 STR_ERROR_CAN_T_PLACE_RIVERS                                    :{WHITE}Impossível fazer rios aqui...
 STR_ERROR_MUST_BE_BUILT_ON_WATER                                :{WHITE}... deve ser construído na água
 STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... Impossível construir na água
+STR_ERROR_CAN_T_BUILD_ON_SEA                                    :{WHITE}... impossível construir em mar aberto
+STR_ERROR_CAN_T_BUILD_ON_CANAL                                  :{WHITE}... impossível construir no canal
+STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... impossível construir no rio
 STR_ERROR_MUST_DEMOLISH_CANAL_FIRST                             :{WHITE}Remova o canal antes
 STR_ERROR_CAN_T_BUILD_AQUEDUCT_HERE                             :{WHITE}Impossível construir aqueduto aqui
 

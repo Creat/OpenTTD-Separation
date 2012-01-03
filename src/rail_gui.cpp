@@ -7,7 +7,7 @@
  * See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with OpenTTD. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file rail_gui.cpp File for dealing with rail construction user interface */
+/** @file rail_gui.cpp %File for dealing with rail construction user interface */
 
 #include "stdafx.h"
 #include "gui.h"
@@ -31,6 +31,7 @@
 #include "core/geometry_func.hpp"
 #include "hotkeys.h"
 #include "engine_base.h"
+#include "vehicle_func.h"
 
 #include "station_map.h"
 #include "tunnelbridge_map.h"
@@ -54,7 +55,7 @@ struct RailStationGUISettings {
 
 	bool newstations;                 ///< Are custom station definitions available?
 	StationClassID station_class;     ///< Currently selected custom station class (if newstations is \c true )
-	byte station_type;                ///< Station type within the currently selected custom station class (if newstations is \c true )
+	byte station_type;                ///< %Station type within the currently selected custom station class (if newstations is \c true )
 	byte station_count;               ///< Number of custom stations (if newstations is \c true )
 };
 static RailStationGUISettings _railstation; ///< Settings of the station builder GUI
@@ -849,6 +850,7 @@ Window *ShowBuildRailToolbar(RailType railtype)
 
 EventState RailToolbarGlobalHotkeys(uint16 key, uint16 keycode)
 {
+	if (!CanBuildVehicleInfrastructure(VEH_TRAIN)) return ES_NOT_HANDLED;
 	extern RailType _last_built_railtype;
 	int num = CheckHotkeyMatch<BuildRailToolbarWindow>(_railtoolbar_hotkeys, keycode, NULL, true);
 	if (num == -1) return ES_NOT_HANDLED;

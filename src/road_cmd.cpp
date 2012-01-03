@@ -232,7 +232,7 @@ static CommandCost RemoveRoad(TileIndex tile, DoCommandFlag flags, RoadBits piec
 					SetTileOwner(other_end, other_owner);
 				}
 
-				/* Mark tiles diry that have been repaved */
+				/* Mark tiles dirty that have been repaved */
 				MarkTileDirtyByTile(tile);
 				MarkTileDirtyByTile(other_end);
 				if (IsBridge(tile)) {
@@ -662,12 +662,14 @@ do_clear:;
 		if (ret.Failed()) return ret;
 
 	}
-	cost.AddCost(CountBits(pieces) * _price[PR_BUILD_ROAD]);
 
-	if (!need_to_clear && IsTileType(tile, MP_TUNNELBRIDGE)) {
-		/* Pay for *every* tile of the bridge or tunnel */
-		cost.MultiplyCost(GetTunnelBridgeLength(GetOtherTunnelBridgeEnd(tile), tile) + 2);
-	}
+	uint num_pieces = (!need_to_clear && IsTileType(tile, MP_TUNNELBRIDGE)) ?
+			/* There are 2 pieces on *every* tile of the bridge or tunnel */
+			2 * (GetTunnelBridgeLength(GetOtherTunnelBridgeEnd(tile), tile) + 2) :
+			/* Count pieces */
+			CountBits(pieces);
+
+	cost.AddCost(num_pieces * _price[PR_BUILD_ROAD]);
 
 	if (flags & DC_EXEC) {
 		switch (GetTileType(tile)) {
@@ -690,7 +692,7 @@ do_clear:;
 				SetRoadOwner(other_end, rt, _current_company);
 				SetRoadOwner(tile, rt, _current_company);
 
-				/* Mark tiles diry that have been repaved */
+				/* Mark tiles dirty that have been repaved */
 				MarkTileDirtyByTile(other_end);
 				MarkTileDirtyByTile(tile);
 				if (IsBridge(tile)) {
@@ -763,7 +765,7 @@ CommandCost CmdBuildLongRoad(TileIndex start_tile, DoCommandFlag flags, uint32 p
 	}
 
 	/* On the X-axis, we have to swap the initial bits, so they
-	 * will be interpreted correctly in the GTTS. Futhermore
+	 * will be interpreted correctly in the GTTS. Furthermore
 	 * when you just 'click' on one tile to build them. */
 	if ((axis == AXIS_Y) == (start_tile == end_tile && HasBit(p2, 0) == HasBit(p2, 1))) drd ^= DRD_BOTH;
 	/* No disallowed direction bits have to be toggled */
@@ -1136,7 +1138,7 @@ static void DrawRoadBits(TileInfo *ti)
 
 		/* DrawFoundation() modifies ti.
 		 * Default sloped sprites.. */
-		if (ti->tileh != SLOPE_FLAT) image = _road_sloped_sprites[ti->tileh - 1] + 0x53F;
+		if (ti->tileh != SLOPE_FLAT) image = _road_sloped_sprites[ti->tileh - 1] + SPR_ROAD_SLOPE_START;
 	}
 
 	if (image == 0) image = _road_tile_sprites_1[road != ROAD_NONE ? road : tram];
@@ -1473,8 +1475,23 @@ static bool ClickTile_Road(TileIndex tile)
 }
 
 /* Converts RoadBits to TrackBits */
-static const byte _road_trackbits[16] = {
-	0x0, 0x0, 0x0, 0x10, 0x0, 0x2, 0x8, 0x1A, 0x0, 0x4, 0x1, 0x15, 0x20, 0x26, 0x29, 0x3F,
+static const TrackBits _road_trackbits[16] = {
+	TRACK_BIT_NONE,                                  // ROAD_NONE
+	TRACK_BIT_NONE,                                  // ROAD_NW
+	TRACK_BIT_NONE,                                  // ROAD_SW
+	TRACK_BIT_LEFT,                                  // ROAD_W
+	TRACK_BIT_NONE,                                  // ROAD_SE
+	TRACK_BIT_Y,                                     // ROAD_Y
+	TRACK_BIT_LOWER,                                 // ROAD_S
+	TRACK_BIT_LEFT | TRACK_BIT_LOWER | TRACK_BIT_Y,  // ROAD_Y | ROAD_SW
+	TRACK_BIT_NONE,                                  // ROAD_NE
+	TRACK_BIT_UPPER,                                 // ROAD_N
+	TRACK_BIT_X,                                     // ROAD_X
+	TRACK_BIT_LEFT | TRACK_BIT_UPPER | TRACK_BIT_X,  // ROAD_X | ROAD_NW
+	TRACK_BIT_RIGHT,                                 // ROAD_E
+	TRACK_BIT_RIGHT | TRACK_BIT_UPPER | TRACK_BIT_Y, // ROAD_Y | ROAD_NE
+	TRACK_BIT_RIGHT | TRACK_BIT_LOWER | TRACK_BIT_X, // ROAD_X | ROAD_SE
+	TRACK_BIT_ALL,                                   // ROAD_ALL
 };
 
 static TrackStatus GetTileTrackStatus_Road(TileIndex tile, TransportType mode, uint sub_mode, DiagDirection side)

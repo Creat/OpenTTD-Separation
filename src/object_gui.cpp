@@ -45,7 +45,7 @@ class BuildObjectWindow : public PickerWindowBase {
 	int line_height;                    ///< The height of a single line.
 	int object_height;                  ///< The height of the object box.
 	int info_height;                    ///< The height of the info box.
-	Scrollbar *vscroll;                 ///< The scollbar.
+	Scrollbar *vscroll;                 ///< The scrollbar.
 
 public:
 	BuildObjectWindow(const WindowDesc *desc, Window *w) : PickerWindowBase(w), info_height(1)
@@ -236,11 +236,11 @@ public:
 					if (callback_res != CALLBACK_FAILED) {
 						StringID message = GetGRFStringID(spec->grf_prop.grffile->grfid, 0xD000 + callback_res);
 						if (message != STR_NULL && message != STR_UNDEFINED) {
-							PrepareTextRefStackUsage(6);
+							StartTextRefStackUsage(6);
 							/* Use all the available space left from where we stand up to the
 							 * end of the window. We ALSO enlarge the window if needed, so we
 							 * can 'go' wild with the bottom of the window. */
-							int y = DrawStringMultiLine(r.left, r.right, r.top, UINT16_MAX, message) - r.top;
+							int y = DrawStringMultiLine(r.left, r.right, r.top, UINT16_MAX, message, TC_ORANGE) - r.top;
 							StopTextRefStackUsage();
 							if (y > this->info_height) {
 								BuildObjectWindow *bow = const_cast<BuildObjectWindow *>(this);

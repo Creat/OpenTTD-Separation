@@ -861,7 +861,7 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}通貨�
 STR_GAME_OPTIONS_CURRENCY_GBP                                   :英ポンド（£）
 STR_GAME_OPTIONS_CURRENCY_USD                                   :米ドル（$）
 STR_GAME_OPTIONS_CURRENCY_EUR                                   :ユーロ（€）
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :日本円（￥）
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :日本円（￥）
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :オーストリアシリング（ATS）
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :ベルギーフランク（BEF）
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :スイスフランク（CHF）
@@ -3229,7 +3229,7 @@ STR_ORDER_STOP_ORDER                                            :（停止）
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :（自動的）
+STR_ORDER_IMPLICIT                                              :（自動的）
 
 STR_ORDER_FULL_LOAD                                             :(全積載)
 STR_ORDER_FULL_LOAD_ANY                                         :(いずれか一種の貨物を全積載するまで待つ)

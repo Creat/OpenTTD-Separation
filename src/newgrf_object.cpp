@@ -140,6 +140,11 @@ static uint32 GetObjectIDAtOffset(TileIndex tile, uint32 cur_grfid)
 
 	const ObjectSpec *spec = ObjectSpec::GetByTile(tile);
 
+	/* Default objects have no associated NewGRF file */
+	if (spec->grf_prop.grffile == NULL) {
+		return 0xFFFE; // Defined in another grf file
+	}
+
 	if (spec->grf_prop.grffile->grfid == cur_grfid) { // same object, same grf ?
 		return spec->grf_prop.local_id;
 	}
@@ -224,7 +229,7 @@ static uint32 ObjectGetVariable(const ResolverObject *object, byte variable, byt
 
 	if (object->scope == VSG_SCOPE_PARENT) {
 		/* Pass the request on to the town of the object */
-		return TownGetVariable(variable, parameter, available, (o == NULL) ? ClosestTownFromTile(tile, UINT_MAX) : o->town);
+		return TownGetVariable(variable, parameter, available, (o == NULL) ? ClosestTownFromTile(tile, UINT_MAX) : o->town, object->grffile);
 	}
 
 	/* We get the town from the object, or we calculate the closest
@@ -359,15 +364,32 @@ static const SpriteGroup *GetObjectSpriteGroup(const ObjectSpec *spec, const Obj
 }
 
 /**
+ * Store a value into the persistent storage of the object's parent.
+ * @param object Object that we want to query.
+ * @param pos Position in the persistent storage to use.
+ * @param value Value to store.
+ */
+void ObjectStorePSA(ResolverObject *object, uint pos, int32 value)
+{
+	/* Objects have no persistent storage. */
+	Object *o = object->u.object.o;
+	if (object->scope != VSG_SCOPE_PARENT || o == NULL) return;
+
+	/* Pass the request on to the town of the object */
+	TownStorePSA(o->town, object->grffile, pos, value);
+}
+
+/**
  * Returns a resolver object to be used with feature 0F spritegroups.
  */
-static void NewObjectResolver(ResolverObject *res, const ObjectSpec *spec, const Object *o, TileIndex tile, uint8 view = 0)
+static void NewObjectResolver(ResolverObject *res, const ObjectSpec *spec, Object *o, TileIndex tile, uint8 view = 0)
 {
 	res->GetRandomBits = ObjectGetRandomBits;
 	res->GetTriggers   = ObjectGetTriggers;
 	res->SetTriggers   = ObjectSetTriggers;
 	res->GetVariable   = ObjectGetVariable;
 	res->ResolveReal   = ObjectResolveReal;
+	res->StorePSA      = ObjectStorePSA;
 
 	res->u.object.o    = o;
 	res->u.object.tile = tile;
@@ -376,10 +398,7 @@ static void NewObjectResolver(ResolverObject *res, const ObjectSpec *spec, const
 	res->callback        = CBID_NO_CALLBACK;
 	res->callback_param1 = 0;
 	res->callback_param2 = 0;
-	res->last_value      = 0;
-	res->trigger         = 0;
-	res->reseed          = 0;
-	res->count           = 0;
+	res->ResetState();
 
 	res->grffile = spec->grf_prop.grffile;
 }
@@ -395,7 +414,7 @@ static void NewObjectResolver(ResolverObject *res, const ObjectSpec *spec, const
  * @param view     The view of the object (only used when o == NULL).
  * @return The result of the callback.
  */
-uint16 GetObjectCallback(CallbackID callback, uint32 param1, uint32 param2, const ObjectSpec *spec, const Object *o, TileIndex tile, uint8 view)
+uint16 GetObjectCallback(CallbackID callback, uint32 param1, uint32 param2, const ObjectSpec *spec, Object *o, TileIndex tile, uint8 view)
 {
 	ResolverObject object;
 	NewObjectResolver(&object, spec, o, tile, view);
@@ -417,7 +436,7 @@ uint16 GetObjectCallback(CallbackID callback, uint32 param1, uint32 param2, cons
  */
 static void DrawTileLayout(const TileInfo *ti, const TileLayoutSpriteGroup *group, const ObjectSpec *spec)
 {
-	const DrawTileSprites *dts = group->dts;
+	const DrawTileSprites *dts = group->ProcessRegisters(NULL);
 	PaletteID palette = ((spec->flags & OBJECT_FLAG_2CC_COLOUR) ? SPR_2CCMAP_BASE : PALETTE_RECOLOUR_START) + Object::GetByTile(ti->tile)->colour;
 
 	SpriteID image = dts->ground.sprite;
@@ -444,7 +463,7 @@ static void DrawTileLayout(const TileInfo *ti, const TileLayoutSpriteGroup *grou
 void DrawNewObjectTile(TileInfo *ti, const ObjectSpec *spec)
 {
 	ResolverObject object;
-	const Object *o = Object::GetByTile(ti->tile);
+	Object *o = Object::GetByTile(ti->tile);
 	NewObjectResolver(&object, spec, o, ti->tile);
 
 	const SpriteGroup *group = SpriteGroup::Resolve(GetObjectSpriteGroup(spec, o), &object);
@@ -468,7 +487,7 @@ void DrawNewObjectTileInGUI(int x, int y, const ObjectSpec *spec, uint8 view)
 	const SpriteGroup *group = SpriteGroup::Resolve(GetObjectSpriteGroup(spec, NULL), &object);
 	if (group == NULL || group->type != SGT_TILELAYOUT) return;
 
-	const DrawTileSprites *dts = ((const TileLayoutSpriteGroup *)group)->dts;
+	const DrawTileSprites *dts = ((const TileLayoutSpriteGroup *)group)->ProcessRegisters(NULL);
 
 	PaletteID palette;
 	if (Company::IsValidID(_local_company)) {
@@ -504,7 +523,7 @@ void DrawNewObjectTileInGUI(int x, int y, const ObjectSpec *spec, uint8 view)
  * @param tile     The tile the callback is called for.
  * @return The result of the callback.
  */
-uint16 StubGetObjectCallback(CallbackID callback, uint32 param1, uint32 param2, const ObjectSpec *spec, const Object *o, TileIndex tile)
+uint16 StubGetObjectCallback(CallbackID callback, uint32 param1, uint32 param2, const ObjectSpec *spec, Object *o, TileIndex tile)
 {
 	return GetObjectCallback(callback, param1, param2, spec, o, tile);
 }
@@ -537,7 +556,7 @@ void AnimateNewObjectTile(TileIndex tile)
  * @param trigger The trigger that is triggered.
  * @param spec    The spec associated with the object.
  */
-void TriggerObjectTileAnimation(const Object *o, TileIndex tile, ObjectAnimationTrigger trigger, const ObjectSpec *spec)
+void TriggerObjectTileAnimation(Object *o, TileIndex tile, ObjectAnimationTrigger trigger, const ObjectSpec *spec)
 {
 	if (!HasBit(spec->animation.triggers, trigger)) return;
 
@@ -550,7 +569,7 @@ void TriggerObjectTileAnimation(const Object *o, TileIndex tile, ObjectAnimation
  * @param trigger The trigger that is triggered.
  * @param spec    The spec associated with the object.
  */
-void TriggerObjectAnimation(const Object *o, ObjectAnimationTrigger trigger, const ObjectSpec *spec)
+void TriggerObjectAnimation(Object *o, ObjectAnimationTrigger trigger, const ObjectSpec *spec)
 {
 	if (!HasBit(spec->animation.triggers, trigger)) return;
 

@@ -80,7 +80,7 @@ bool AirportSpec::IsAvailable() const
 }
 
 /**
- * This function initialize the airportspec array.
+ * This function initializes the airportspec array.
  */
 void AirportSpec::ResetAirports()
 {
@@ -149,7 +149,7 @@ uint32 AirportGetVariable(const ResolverObject *object, byte variable, byte para
 
 	switch (variable) {
 		/* Get a variable from the persistent storage */
-		case 0x7C: return st->airport.psa.Get(parameter);
+		case 0x7C: return (st->airport.psa != NULL) ? st->airport.psa->GetValue(parameter) : 0;
 
 		case 0xF0: return st->facilities;
 		case 0xFA: return Clamp(st->build_date - DAYS_TILL_ORIGINAL_BASE_YEAR, 0, 65535);
@@ -171,8 +171,7 @@ static const SpriteGroup *AirportResolveReal(const ResolverObject *object, const
 static uint32 AirportGetRandomBits(const ResolverObject *object)
 {
 	const Station *st = object->u.airport.st;
-	const TileIndex tile = object->u.airport.tile;
-	return (st == NULL ? 0 : st->random_bits) | (tile == INVALID_TILE ? 0 : GetStationTileRandomBits(tile) << 16);
+	return st == NULL ? 0 : st->random_bits;
 }
 
 static uint32 AirportGetTriggers(const ResolverObject *object)
@@ -184,6 +183,29 @@ static void AirportSetTriggers(const ResolverObject *object, int triggers)
 {
 }
 
+/**
+ * Store a value into the object's persistent storage.
+ * @param object Object that we want to query.
+ * @param pos Position in the persistent storage to use.
+ * @param value Value to store.
+ */
+void AirportStorePSA(ResolverObject *object, uint pos, int32 value)
+{
+	Station *st = object->u.airport.st;
+	if (object->scope != VSG_SCOPE_SELF || st == NULL) return;
+
+	if (st->airport.psa == NULL) {
+		/* There is no need to create a storage if the value is zero. */
+		if (value == 0) return;
+
+		/* Create storage on first modification. */
+		uint32 grfid = (object->grffile != NULL) ? object->grffile->grfid : 0;
+		assert(PersistentStorage::CanAllocateItem());
+		st->airport.psa = new PersistentStorage(grfid);
+	}
+	st->airport.psa->StoreValue(pos, value);
+}
+
 static void NewAirportResolver(ResolverObject *res, TileIndex tile, Station *st, byte airport_id, byte layout)
 {
 	res->GetRandomBits = AirportGetRandomBits;
@@ -191,8 +213,8 @@ static void NewAirportResolver(ResolverObject *res, TileIndex tile, Station *st,
 	res->SetTriggers   = AirportSetTriggers;
 	res->GetVariable   = AirportGetVariable;
 	res->ResolveReal   = AirportResolveReal;
+	res->StorePSA      = AirportStorePSA;
 
-	res->psa                  = st != NULL ? &st->airport.psa : NULL;
 	res->u.airport.st         = st;
 	res->u.airport.airport_id = airport_id;
 	res->u.airport.layout     = layout;
@@ -201,10 +223,7 @@ static void NewAirportResolver(ResolverObject *res, TileIndex tile, Station *st,
 	res->callback        = CBID_NO_CALLBACK;
 	res->callback_param1 = 0;
 	res->callback_param2 = 0;
-	res->last_value      = 0;
-	res->trigger         = 0;
-	res->reseed          = 0;
-	res->count           = 0;
+	res->ResetState();
 
 	const AirportSpec *as = AirportSpec::Get(airport_id);
 	res->grffile         = as->grf_prop.grffile;
@@ -256,5 +275,5 @@ StringID GetAirportTextCallback(const AirportSpec *as, byte layout, uint16 callb
 	group = SpriteGroup::Resolve(as->grf_prop.spritegroup[0], &object);
 	if (group == NULL) return STR_UNDEFINED;
 
-	return GetGRFStringID(as->grf_prop.grffile->grfid, 0xD000 + group->GetResult());
+	return GetGRFStringID(as->grf_prop.grffile->grfid, 0xD000 + group->GetCallbackResult());
 }

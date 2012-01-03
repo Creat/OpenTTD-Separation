@@ -77,7 +77,7 @@ struct StationSpec {
 	 * 6-7 = platform with roof, right side
 	 */
 	uint tiles;
-	DrawTileSprites *renderdata; ///< Array of tile layouts.
+	NewGRFSpriteLayout *renderdata; ///< Array of tile layouts.
 
 	/**
 	 * Cargo threshold for choosing between little and lots of cargo
@@ -111,13 +111,10 @@ const StationSpec *GetStationSpec(TileIndex t);
 /* Evaluate a tile's position within a station, and return the result a bitstuffed format. */
 uint32 GetPlatformInfo(Axis axis, byte tile, int platforms, int length, int x, int y, bool centred);
 
-/* Get sprite offset for a given custom station and station structure (may be
- * NULL - that means we are in a build dialog). The station structure is used
- * for variational sprite groups. */
-SpriteID GetCustomStationRelocation(const StationSpec *statspec, const BaseStation *st, TileIndex tile);
-SpriteID GetCustomStationGroundRelocation(const StationSpec *statspec, const BaseStation *st, TileIndex tile);
-SpriteID GetCustomStationFoundationRelocation(const StationSpec *statspec, const BaseStation *st, TileIndex tile);
-uint16 GetStationCallback(CallbackID callback, uint32 param1, uint32 param2, const StationSpec *statspec, const BaseStation *st, TileIndex tile);
+SpriteID GetCustomStationRelocation(const StationSpec *statspec, BaseStation *st, TileIndex tile, uint32 var10 = 0);
+SpriteID GetCustomStationFoundationRelocation(const StationSpec *statspec, BaseStation *st, TileIndex tile, uint layout, uint edge_info);
+uint16 GetStationCallback(CallbackID callback, uint32 param1, uint32 param2, const StationSpec *statspec, BaseStation *st, TileIndex tile);
+CommandCost PerformStationTileSlopeCheck(TileIndex north_tile, TileIndex cur_tile, const StationSpec *statspec, Axis axis, byte plat_len, byte numtracks);
 
 /* Allocate a StationSpec to a Station. This is called once per build operation. */
 int AllocateSpecToStation(const StationSpec *statspec, BaseStation *st, bool exec);
@@ -129,7 +126,7 @@ void DeallocateSpecFromStation(BaseStation *st, byte specindex);
 bool DrawStationTile(int x, int y, RailType railtype, Axis axis, StationClassID sclass, uint station);
 
 void AnimateStationTile(TileIndex tile);
-void TriggerStationAnimation(const BaseStation *st, TileIndex tile, StationAnimationTrigger trigger, CargoID cargo_type = CT_INVALID);
+void TriggerStationAnimation(BaseStation *st, TileIndex tile, StationAnimationTrigger trigger, CargoID cargo_type = CT_INVALID);
 void StationUpdateAnimTriggers(BaseStation *st);
 
 #endif /* NEWGRF_STATION_H */

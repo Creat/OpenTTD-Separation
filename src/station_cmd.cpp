@@ -162,7 +162,7 @@ static bool CMSAMine(TileIndex tile)
 /**
  * Check whether the tile is water.
  * @param tile the tile to investigate.
- * @return true if and only if the tile is a mine
+ * @return true if and only if the tile is a water tile
  */
 static bool CMSAWater(TileIndex tile)
 {
@@ -172,7 +172,7 @@ static bool CMSAWater(TileIndex tile)
 /**
  * Check whether the tile is a tree.
  * @param tile the tile to investigate.
- * @return true if and only if the tile is a mine
+ * @return true if and only if the tile is a tree tile
  */
 static bool CMSATree(TileIndex tile)
 {
@@ -182,7 +182,7 @@ static bool CMSATree(TileIndex tile)
 /**
  * Check whether the tile is a forest.
  * @param tile the tile to investigate.
- * @return true if and only if the tile is a mine
+ * @return true if and only if the tile is a forest
  */
 static bool CMSAForest(TileIndex tile)
 {
@@ -446,7 +446,7 @@ static uint GetAcceptanceMask(const Station *st)
 	uint mask = 0;
 
 	for (CargoID i = 0; i < NUM_CARGO; i++) {
-		if (HasBit(st->goods[i].acceptance_pickup, GoodsEntry::ACCEPTANCE)) mask |= 1 << i;
+		if (HasBit(st->goods[i].acceptance_pickup, GoodsEntry::GES_ACCEPTANCE)) mask |= 1 << i;
 	}
 	return mask;
 }
@@ -588,7 +588,7 @@ void UpdateStationAcceptance(Station *st, bool show_msg)
 			amt = 0;
 		}
 
-		SB(st->goods[i].acceptance_pickup, GoodsEntry::ACCEPTANCE, 1, amt >= 8);
+		SB(st->goods[i].acceptance_pickup, GoodsEntry::GES_ACCEPTANCE, 1, amt >= 8);
 	}
 
 	/* Only show a message in case the acceptance was actually changed. */
@@ -749,21 +749,35 @@ CommandCost CheckFlatLand(TileArea tile_area, DoCommandFlag flags)
  * Checks if a rail station can be built at the given area.
  * @param tile_area Area to check.
  * @param flags Operation to perform.
- * @param invalid_dirs Prohibited directions (set of #DiagDirection).
+ * @param axis Rail station axis.
  * @param station StationID to be queried and returned if available.
  * @param rt The rail type to check for (overbuilding rail stations over rail).
  * @param affected_vehicles List of trains with PBS reservations on the tiles
+ * @param spec_class Station class.
+ * @param spec_index Index into the station class.
+ * @param plat_len Platform length.
+ * @param numtracks Number of platforms.
  * @return The cost in case of success, or an error code if it failed.
  */
-static CommandCost CheckFlatLandRailStation(TileArea tile_area, DoCommandFlag flags, uint invalid_dirs, StationID *station, RailType rt, SmallVector<Train *, 4> &affected_vehicles)
+static CommandCost CheckFlatLandRailStation(TileArea tile_area, DoCommandFlag flags, Axis axis, StationID *station, RailType rt, SmallVector<Train *, 4> &affected_vehicles, StationClassID spec_class, byte spec_index, byte plat_len, byte numtracks)
 {
 	CommandCost cost(EXPENSES_CONSTRUCTION);
 	int allowed_z = -1;
+	uint invalid_dirs = 5 << axis;
+
+	const StationSpec *statspec = StationClass::Get(spec_class, spec_index);
+	bool slope_cb = statspec != NULL && HasBit(statspec->callback_mask, CBM_STATION_SLOPE_CHECK);
 
 	TILE_AREA_LOOP(tile_cur, tile_area) {
 		CommandCost ret = CheckBuildableTile(tile_cur, invalid_dirs, allowed_z);
 		if (ret.Failed()) return ret;
 		cost.AddCost(ret);
+
+		if (slope_cb) {
+			/* Do slope check if requested. */
+			ret = PerformStationTileSlopeCheck(tile_area.tile, tile_cur, statspec, axis, plat_len, numtracks);
+			if (ret.Failed()) return ret;
+		}
 
 		/* if station is set, then we have special handling to allow building on top of already existing stations.
 		 * so station points to INVALID_STATION if we can build on any station.
@@ -1140,7 +1154,7 @@ CommandCost CmdBuildRailStation(TileIndex tile_org, DoCommandFlag flags, uint32 
 	StationID est = INVALID_STATION;
 	SmallVector<Train *, 4> affected_vehicles;
 	/* Clear the land below the station. */
-	CommandCost cost = CheckFlatLandRailStation(TileArea(tile_org, w_org, h_org), flags, 5 << axis, &est, rt, affected_vehicles);
+	CommandCost cost = CheckFlatLandRailStation(TileArea(tile_org, w_org, h_org), flags, axis, &est, rt, affected_vehicles, spec_class, spec_index, plat_len, numtracks);
 	if (cost.Failed()) return cost;
 	/* Add construction expenses. */
 	cost.AddCost((numtracks * _price[PR_BUILD_STATION_RAIL] + _price[PR_BUILD_STATION_RAIL_LENGTH]) * plat_len);
@@ -2270,6 +2284,9 @@ static CommandCost RemoveAirport(TileIndex tile, DoCommandFlag flags)
 	}
 
 	if (flags & DC_EXEC) {
+		/* Clear the persistent storage. */
+		delete st->airport.psa;
+
 		const AirportSpec *as = st->airport.GetSpec();
 		for (uint i = 0; i < st->airport.GetNumHangars(); ++i) {
 			DeleteWindowById(
@@ -2495,20 +2512,22 @@ const DrawTileSprites *GetStationTileLayout(StationType st, byte gfx)
 
 static void DrawTile_Station(TileInfo *ti)
 {
+	const NewGRFSpriteLayout *layout = NULL;
+	DrawTileSprites tmp_rail_layout;
 	const DrawTileSprites *t = NULL;
 	RoadTypes roadtypes;
 	int32 total_offset;
-	int32 custom_ground_offset;
 	const RailtypeInfo *rti = NULL;
 	uint32 relocation = 0;
-	const BaseStation *st = NULL;
+	uint32 ground_relocation = 0;
+	BaseStation *st = NULL;
 	const StationSpec *statspec = NULL;
+	uint tile_layout = 0;
 
 	if (HasStationRail(ti->tile)) {
 		rti = GetRailTypeInfo(GetRailType(ti->tile));
 		roadtypes = ROADTYPES_NONE;
 		total_offset = rti->GetRailtypeSpriteOffset();
-		custom_ground_offset = rti->fallback_railtype;
 
 		if (IsCustomStationSpecIndex(ti->tile)) {
 			/* look for customization */
@@ -2516,25 +2535,26 @@ static void DrawTile_Station(TileInfo *ti)
 			statspec = st->speclist[GetCustomStationSpecIndex(ti->tile)].spec;
 
 			if (statspec != NULL) {
-				uint tile = GetStationGfx(ti->tile);
-
-				relocation = GetCustomStationRelocation(statspec, st, ti->tile);
+				tile_layout = GetStationGfx(ti->tile);
 
 				if (HasBit(statspec->callback_mask, CBM_STATION_SPRITE_LAYOUT)) {
 					uint16 callback = GetStationCallback(CBID_STATION_SPRITE_LAYOUT, 0, 0, statspec, st, ti->tile);
-					if (callback != CALLBACK_FAILED) tile = (callback & ~1) + GetRailStationAxis(ti->tile);
+					if (callback != CALLBACK_FAILED) tile_layout = (callback & ~1) + GetRailStationAxis(ti->tile);
 				}
 
 				/* Ensure the chosen tile layout is valid for this custom station */
 				if (statspec->renderdata != NULL) {
-					t = &statspec->renderdata[tile < statspec->tiles ? tile : (uint)GetRailStationAxis(ti->tile)];
+					layout = &statspec->renderdata[tile_layout < statspec->tiles ? tile_layout : (uint)GetRailStationAxis(ti->tile)];
+					if (!layout->NeedsPreprocessing()) {
+						t = layout;
+						layout = NULL;
+					}
 				}
 			}
 		}
 	} else {
 		roadtypes = IsRoadStop(ti->tile) ? GetRoadTypes(ti->tile) : ROADTYPES_NONE;
 		total_offset = 0;
-		custom_ground_offset = 0;
 	}
 
 	if (IsAirport(ti->tile)) {
@@ -2578,13 +2598,19 @@ static void DrawTile_Station(TileInfo *ti)
 		palette = PALETTE_TO_GREY;
 	}
 
-	if (t == NULL || t->seq == NULL) t = GetStationTileLayout(GetStationType(ti->tile), GetStationGfx(ti->tile));
+	if (layout == NULL && (t == NULL || t->seq == NULL)) t = GetStationTileLayout(GetStationType(ti->tile), GetStationGfx(ti->tile));
 
 	/* don't show foundation for docks */
 	if (ti->tileh != SLOPE_FLAT && !IsDock(ti->tile)) {
 		if (statspec != NULL && HasBit(statspec->flags, SSF_CUSTOM_FOUNDATIONS)) {
-			/* Station has custom foundations. */
-			SpriteID image = GetCustomStationFoundationRelocation(statspec, st, ti->tile);
+			/* Station has custom foundations.
+			 * Check whether the foundation continues beyond the tile's upper sides. */
+			uint edge_info = 0;
+			uint z;
+			Slope slope = GetFoundationSlope(ti->tile, &z);
+			if (!HasFoundationNW(ti->tile, slope, z)) SetBit(edge_info, 0);
+			if (!HasFoundationNE(ti->tile, slope, z)) SetBit(edge_info, 1);
+			SpriteID image = GetCustomStationFoundationRelocation(statspec, st, ti->tile, tile_layout, edge_info);
 
 			if (HasBit(statspec->flags, SSF_EXTENDED_FOUNDATIONS)) {
 				/* Station provides extended foundations. */
@@ -2617,10 +2643,8 @@ static void DrawTile_Station(TileInfo *ti)
 
 				/* If foundations continue beyond the tile's upper sides then
 				 * mask out the last two pieces. */
-				uint z;
-				Slope slope = GetFoundationSlope(ti->tile, &z);
-				if (!HasFoundationNW(ti->tile, slope, z)) ClrBit(parts, 6);
-				if (!HasFoundationNE(ti->tile, slope, z)) ClrBit(parts, 7);
+				if (HasBit(edge_info, 0)) ClrBit(parts, 6);
+				if (HasBit(edge_info, 1)) ClrBit(parts, 7);
 
 				if (parts == 0) {
 					/* We always have to draw at least one sprite to make sure there is a boundingbox and a sprite with the
@@ -2660,6 +2684,27 @@ draw_default_foundation:
 			}
 		}
 	} else {
+		if (layout != NULL) {
+			/* Sprite layout which needs preprocessing */
+			bool separate_ground = HasBit(statspec->flags, SSF_SEPARATE_GROUND);
+			uint32 var10_values = layout->PrepareLayout(total_offset, rti->fallback_railtype, 0, 0, separate_ground);
+			uint8 var10;
+			FOR_EACH_SET_BIT(var10, var10_values) {
+				uint32 var10_relocation = GetCustomStationRelocation(statspec, st, ti->tile, var10);
+				layout->ProcessRegisters(var10, var10_relocation, separate_ground);
+			}
+			tmp_rail_layout.seq = layout->GetLayout(&tmp_rail_layout.ground);
+			t = &tmp_rail_layout;
+			total_offset = 0;
+		} else if (statspec != NULL) {
+			/* Simple sprite layout */
+			ground_relocation = relocation = GetCustomStationRelocation(statspec, st, ti->tile, 0);
+			if (HasBit(statspec->flags, SSF_SEPARATE_GROUND)) {
+				ground_relocation = GetCustomStationRelocation(statspec, st, ti->tile, 1);
+			}
+			ground_relocation += rti->fallback_railtype;
+		}
+
 		SpriteID image = t->ground.sprite;
 		PaletteID pal  = t->ground.pal;
 		if (rti != NULL && rti->UsesOverlay() && (image == SPR_RAIL_TRACK_X || image == SPR_RAIL_TRACK_Y)) {
@@ -2672,12 +2717,8 @@ draw_default_foundation:
 				DrawGroundSprite(overlay + (image == SPR_RAIL_TRACK_X ? RTO_X : RTO_Y), PALETTE_CRASH);
 			}
 		} else {
-			if (HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE)) {
-				image += GetCustomStationGroundRelocation(statspec, st, ti->tile);
-				image += custom_ground_offset;
-			} else {
-				image += total_offset;
-			}
+			image += HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE) ? ground_relocation : total_offset;
+			if (HasBit(pal, SPRITE_MODIFIER_CUSTOM_SPRITE)) pal += ground_relocation;
 			DrawGroundSprite(image, GroundSpritePaletteTransform(image, pal, palette));
 
 			/* PBS debugging, draw reserved tracks darker */
@@ -2977,6 +3018,13 @@ static bool StationHandleBigTick(BaseStation *st)
 		return false;
 	}
 
+	if (Station::IsExpected(st)) {
+		for (CargoID i = 0; i < NUM_CARGO; i++) {
+			ClrBit(Station::From(st)->goods[i].acceptance_pickup, GoodsEntry::GES_ACCEPTED_BIGTICK);
+		}
+	}
+
+
 	if ((st->facilities & FACIL_WAYPOINT) == 0) UpdateStationAcceptance(Station::From(st), true);
 
 	return true;
@@ -3001,12 +3049,12 @@ static void UpdateStationRating(Station *st)
 		/* Slowly increase the rating back to his original level in the case we
 		 *  didn't deliver cargo yet to this station. This happens when a bribe
 		 *  failed while you didn't moved that cargo yet to a station. */
-		if (!HasBit(ge->acceptance_pickup, GoodsEntry::PICKUP) && ge->rating < INITIAL_STATION_RATING) {
+		if (!HasBit(ge->acceptance_pickup, GoodsEntry::GES_PICKUP) && ge->rating < INITIAL_STATION_RATING) {
 			ge->rating++;
 		}
 
 		/* Only change the rating if we are moving this cargo */
-		if (HasBit(ge->acceptance_pickup, GoodsEntry::PICKUP)) {
+		if (HasBit(ge->acceptance_pickup, GoodsEntry::GES_PICKUP)) {
 			byte_inc_sat(&ge->days_since_pickup);
 
 			bool skip = false;
@@ -3121,7 +3169,7 @@ static void StationHandleSmallTick(BaseStation *st)
 	if ((st->facilities & FACIL_WAYPOINT) != 0 || !st->IsInUse()) return;
 
 	byte b = st->delete_ctr + 1;
-	if (b >= 185) b = 0;
+	if (b >= STATION_RATING_TICKS) b = 0;
 	st->delete_ctr = b;
 
 	if (b == 0) UpdateStationRating(Station::From(st));
@@ -3135,10 +3183,10 @@ void OnTick_Station()
 	FOR_ALL_BASE_STATIONS(st) {
 		StationHandleSmallTick(st);
 
-		/* Run 250 tick interval trigger for station animation.
+		/* Run STATION_ACCEPTANCE_TICKS = 250 tick interval trigger for station animation.
 		 * Station index is included so that triggers are not all done
 		 * at the same time. */
-		if ((_tick_counter + st->index) % 250 == 0) {
+		if ((_tick_counter + st->index) % STATION_ACCEPTANCE_TICKS == 0) {
 			/* Stop processing this station if it was deleted */
 			if (!StationHandleBigTick(st)) continue;
 			TriggerStationAnimation(st, st->xy, SAT_250_TICKS);
@@ -3147,9 +3195,18 @@ void OnTick_Station()
 	}
 }
 
+/** Monthly loop for stations. */
 void StationMonthlyLoop()
 {
-	/* not used */
+	Station *st;
+
+	FOR_ALL_STATIONS(st) {
+		for (CargoID i = 0; i < NUM_CARGO; i++) {
+			GoodsEntry *ge = &st->goods[i];
+			SB(ge->acceptance_pickup, GoodsEntry::GES_LAST_MONTH, 1, GB(ge->acceptance_pickup, GoodsEntry::GES_CURRENT_MONTH, 1));
+			ClrBit(ge->acceptance_pickup, GoodsEntry::GES_CURRENT_MONTH);
+		}
+	}
 }
 
 
@@ -3187,9 +3244,9 @@ static uint UpdateStationWaiting(Station *st, CargoID type, uint amount, SourceT
 
 	ge.cargo.Append(new CargoPacket(st->index, st->xy, amount, source_type, source_id));
 
-	if (!HasBit(ge.acceptance_pickup, GoodsEntry::PICKUP)) {
+	if (!HasBit(ge.acceptance_pickup, GoodsEntry::GES_PICKUP)) {
 		InvalidateWindowData(WC_STATION_LIST, st->index);
-		SetBit(ge.acceptance_pickup, GoodsEntry::PICKUP);
+		SetBit(ge.acceptance_pickup, GoodsEntry::GES_PICKUP);
 	}
 
 	TriggerStationAnimation(st, st->xy, SAT_NEW_CARGO, type);

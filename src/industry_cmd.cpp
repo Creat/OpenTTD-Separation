@@ -167,6 +167,9 @@ Industry::~Industry()
 	/* don't let any disaster vehicle target invalid industry */
 	ReleaseDisastersTargetingIndustry(this->index);
 
+	/* Clear the persistent storage. */
+	delete this->psa;
+
 	DecIndustryTypeCount(this->type);
 
 	DeleteIndustryNews(this->index);
@@ -862,7 +865,7 @@ static void TileLoop_Industry(TileIndex tile)
 		break;
 
 	case GFX_COPPER_MINE_CHIMNEY:
-		CreateEffectVehicleAbove(TileX(tile) * TILE_SIZE + 6, TileY(tile) * TILE_SIZE + 6, 43, EV_SMOKE);
+		CreateEffectVehicleAbove(TileX(tile) * TILE_SIZE + 6, TileY(tile) * TILE_SIZE + 6, 43, EV_COPPER_MINE_SMOKE);
 		break;
 
 
@@ -1068,7 +1071,7 @@ static void ProduceIndustryGoods(Industry *i)
 	i->counter--;
 
 	/* produce some cargo */
-	if ((i->counter & 0xFF) == 0) {
+	if ((i->counter % INDUSTRY_PRODUCE_TICKS) == 0) {
 		if (HasBit(indsp->callback_mask, CBM_IND_PRODUCTION_256_TICKS)) IndustryProductionCallback(i, 1);
 
 		IndustryBehaviour indbehav = indsp->behaviour;
@@ -1086,9 +1089,9 @@ static void ProduceIndustryGoods(Industry *i)
 			if (plant) PlantRandomFarmField(i);
 		}
 		if ((indbehav & INDUSTRYBEH_CUT_TREES) != 0) {
-			bool cut = ((i->counter & 0x1FF) == 0);
+			bool cut = ((i->counter % INDUSTRY_CUT_TREE_TICKS) == 0);
 			if (HasBit(indsp->callback_mask, CBM_IND_SPECIAL_EFFECT)) {
-				cut = (GetIndustryCallback(CBID_INDUSTRY_SPECIAL_EFFECT, 0, 1, i, i->type, i->location.tile) != 0);
+				cut = (GetIndustryCallback(CBID_INDUSTRY_SPECIAL_EFFECT, Random(), 1, i, i->type, i->location.tile) != 0);
 			}
 
 			if (cut) ChopLumberMillTrees(i);
@@ -1271,7 +1274,7 @@ static CheckNewIndustryProc * const _check_new_industry_procs[CHECK_END] = {
  * @precond \c *t != NULL
  * @postcon \c *t points to a town on success, and \c NULL on failure.
  */
-static CommandCost FindTownForIndustry(TileIndex tile, int type, const Town **t)
+static CommandCost FindTownForIndustry(TileIndex tile, int type, Town **t)
 {
 	*t = ClosestTownFromTile(tile, UINT_MAX);
 
@@ -1540,7 +1543,7 @@ static CommandCost CheckIfFarEnoughFromConflictingIndustry(TileIndex tile, int t
  * @param founder Founder of the industry; OWNER_NONE in case of random construction.
  * @param initial_random_bits Random bits for the industry.
  */
-static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, const IndustryTileTable *it, byte layout, const Town *t, Owner founder, uint16 initial_random_bits)
+static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, const IndustryTileTable *it, byte layout, Town *t, Owner founder, uint16 initial_random_bits)
 {
 	const IndustrySpec *indspec = GetIndustrySpec(type);
 
@@ -1704,7 +1707,7 @@ static CommandCost CreateNewIndustryHelper(TileIndex tile, IndustryType type, Do
 	ret = CheckIfFarEnoughFromConflictingIndustry(tile, type);
 	if (ret.Failed()) return ret;
 
-	const Town *t = NULL;
+	Town *t = NULL;
 	ret = FindTownForIndustry(tile, type, &t);
 	if (ret.Failed()) return ret;
 	assert(t != NULL);

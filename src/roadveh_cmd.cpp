@@ -201,6 +201,9 @@ void RoadVehUpdateCache(RoadVehicle *v)
 
 		/* Invalidate the vehicle colour map */
 		u->colourmap = PAL_NONE;
+
+		/* Update cargo aging period. */
+		u->vcache.cached_cargo_age_period = GetVehicleProperty(u, PROP_ROADVEH_CARGO_AGE_PERIOD, EngInfo(u->engine_type)->cargo_age_period);
 	}
 
 	uint max_speed = GetVehicleProperty(v, PROP_ROADVEH_SPEED, 0);
@@ -1580,7 +1583,7 @@ static void CheckIfRoadVehNeedsService(RoadVehicle *v)
 		return;
 	}
 
-	SetBit(v->gv_flags, GVF_SUPPRESS_AUTOMATIC_ORDERS);
+	SetBit(v->gv_flags, GVF_SUPPRESS_IMPLICIT_ORDERS);
 	v->current_order.MakeGoToDepot(depot, ODTFB_SERVICE);
 	v->dest_tile = rfdd.tile;
 	SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
@@ -1588,12 +1591,13 @@ static void CheckIfRoadVehNeedsService(RoadVehicle *v)
 
 void RoadVehicle::OnNewDay()
 {
+	AgeVehicle(this);
+
 	if (!this->IsFrontEngine()) return;
 
 	if ((++this->day_counter & 7) == 0) DecreaseVehicleValue(this);
 	if (this->blocked_ctr == 0) CheckVehicleBreakdown(this);
 
-	AgeVehicle(this);
 	CheckIfRoadVehNeedsService(this);
 
 	CheckOrders(this);

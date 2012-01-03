@@ -17,24 +17,21 @@
 #include "tar_type.h"
 #ifdef WIN32
 #include <windows.h>
+# define access _taccess
 #elif defined(__HAIKU__)
 #include <Path.h>
 #include <storage/FindDirectory.h>
 #else
-#if defined(OPENBSD) || defined(DOS)
 #include <unistd.h>
-#endif
 #include <pwd.h>
 #endif
 #include <sys/stat.h>
 #include <algorithm>
 
-/*************************************************/
-/* FILE IO ROUTINES ******************************/
-/*************************************************/
-
+/** Size of the #Fio data buffer. */
 #define FIO_BUFFER_SIZE 512
 
+/** Structure for keeping several open files with just one data buffer. */
 struct Fio {
 	byte *buffer, *buffer_end;             ///< position pointer in local buffer and last valid byte of buffer
 	size_t pos;                            ///< current (system) position in file
@@ -50,7 +47,7 @@ struct Fio {
 #endif /* LIMITED_FDS */
 };
 
-static Fio _fio;
+static Fio _fio; ///< #Fio instance.
 
 /** Whether the working directory should be scanned. */
 static bool _do_scan_working_directory = true;
@@ -58,17 +55,30 @@ static bool _do_scan_working_directory = true;
 extern char *_config_file;
 extern char *_highscore_file;
 
-/* Get current position in file */
+/**
+ * Get position in the current file.
+ * @return Position in the file.
+ */
 size_t FioGetPos()
 {
 	return _fio.pos + (_fio.buffer - _fio.buffer_end);
 }
 
+/**
+ * Get the filename associated with a slot.
+ * @param slot Index of queried file.
+ * @return Name of the file.
+ */
 const char *FioGetFilename(uint8 slot)
 {
 	return _fio.shortnames[slot];
 }
 
+/**
+ * Seek in the current file.
+ * @param pos New position.
+ * @param mode Type of seek (\c SEEK_CUR means \a pos is relative to current position, \c SEEK_SET means \a pos is absolute).
+ */
 void FioSeekTo(size_t pos, int mode)
 {
 	if (mode == SEEK_CUR) pos += FioGetPos();
@@ -89,7 +99,11 @@ static void FioRestoreFile(int slot)
 }
 #endif /* LIMITED_FDS */
 
-/* Seek to a file and a position */
+/**
+ * Switch to a different file and seek to a position.
+ * @param slot Slot number of the new file.
+ * @param pos New absolute position in the new file.
+ */
 void FioSeekToFile(uint8 slot, size_t pos)
 {
 	FILE *f;
@@ -104,6 +118,10 @@ void FioSeekToFile(uint8 slot, size_t pos)
 	FioSeekTo(pos, SEEK_SET);
 }
 
+/**
+ * Read a byte from the file.
+ * @return Read byte.
+ */
 byte FioReadByte()
 {
 	if (_fio.buffer == _fio.buffer_end) {
@@ -117,6 +135,10 @@ byte FioReadByte()
 	return *_fio.buffer++;
 }
 
+/**
+ * Skip \a n bytes ahead in the file.
+ * @param n Number of bytes to skip reading.
+ */
 void FioSkipBytes(int n)
 {
 	for (;;) {
@@ -129,24 +151,41 @@ void FioSkipBytes(int n)
 	}
 }
 
+/**
+ * Read a word (16 bits) from the file (in low endian format).
+ * @return Read word.
+ */
 uint16 FioReadWord()
 {
 	byte b = FioReadByte();
 	return (FioReadByte() << 8) | b;
 }
 
+/**
+ * Read a double word (32 bits) from the file (in low endian format).
+ * @return Read word.
+ */
 uint32 FioReadDword()
 {
 	uint b = FioReadWord();
 	return (FioReadWord() << 16) | b;
 }
 
+/**
+ * Read a block.
+ * @param ptr Destination buffer.
+ * @param size Number of bytes to read.
+ */
 void FioReadBlock(void *ptr, size_t size)
 {
 	FioSeekTo(FioGetPos(), SEEK_SET);
 	_fio.pos += fread(ptr, 1, size, _fio.cur_fh);
 }
 
+/**
+ * Close the file at the given slot number.
+ * @param slot File index to close.
+ */
 static inline void FioCloseFile(int slot)
 {
 	if (_fio.handles[slot] != NULL) {
@@ -162,6 +201,7 @@ static inline void FioCloseFile(int slot)
 	}
 }
 
+/** Close all slotted open files. */
 void FioCloseAll()
 {
 	for (int i = 0; i != lengthof(_fio.handles); i++) {
@@ -193,14 +233,20 @@ static void FioFreeHandle()
 }
 #endif /* LIMITED_FDS */
 
-void FioOpenFile(int slot, const char *filename)
+/**
+ * Open a slotted file.
+ * @param slot Index to assign.
+ * @param filename Name of the file at the disk.
+ * @param subdir The sub directory to search this file in.
+  */
+void FioOpenFile(int slot, const char *filename, Subdirectory subdir)
 {
 	FILE *f;
 
 #if defined(LIMITED_FDS)
 	FioFreeHandle();
 #endif /* LIMITED_FDS */
-	f = FioFOpenFile(filename);
+	f = FioFOpenFile(filename, "rb", subdir);
 	if (f == NULL) usererror("Cannot open file '%s'", filename);
 	uint32 pos = ftell(f);
 
@@ -222,7 +268,7 @@ void FioOpenFile(int slot, const char *filename)
 	FioSeekToFile(slot, pos);
 }
 
-static const char * const _subdirs[NUM_SUBDIRS] = {
+static const char * const _subdirs[] = {
 	"",
 	"save" PATHSEP,
 	"save" PATHSEP "autosave" PATHSEP,
@@ -230,10 +276,12 @@ static const char * const _subdirs[NUM_SUBDIRS] = {
 	"scenario" PATHSEP "heightmap" PATHSEP,
 	"gm" PATHSEP,
 	"data" PATHSEP,
+	"data" PATHSEP,
 	"lang" PATHSEP,
 	"ai" PATHSEP,
 	"ai" PATHSEP "library" PATHSEP,
 };
+assert_compile(lengthof(_subdirs) == NUM_SUBDIRS);
 
 const char *_searchpaths[NUM_SEARCHPATHS];
 TarList _tar_list;
@@ -244,7 +292,7 @@ static TarLinkList _tar_linklist; ///< List of directory links
 
 /**
  * Check whether the given file exists
- * @param filename the file to try for existance
+ * @param filename the file to try for existence.
  * @param subdir the subdirectory to look in
  * @return true if and only if the file can be opened
  */
@@ -255,6 +303,24 @@ bool FioCheckFileExists(const char *filename, Subdirectory subdir)
 
 	FioFCloseFile(f);
 	return true;
+}
+
+/**
+ * Test whether the given filename exists.
+ * @param filename the file to test.
+ * @return true if and only if the file exists.
+ */
+bool FileExists(const char *filename)
+{
+#if defined(WINCE)
+	/* There is always one platform that doesn't support basic commands... */
+	HANDLE hand = CreateFile(OTTD2FS(filename), 0, 0, NULL, OPEN_EXISTING, 0, NULL);
+	if (hand == INVALID_HANDLE_VALUE) return 1;
+	CloseHandle(hand);
+	return 0;
+#else
+	return access(OTTD2FS(filename), 0) == 0;
+#endif
 }
 
 /**
@@ -274,6 +340,14 @@ char *FioGetFullPath(char *buf, size_t buflen, Searchpath sp, Subdirectory subdi
 	return buf;
 }
 
+/**
+ * Find a path to the filename in one of the search directories.
+ * @param buf [out] Destination buffer for the path.
+ * @param buflen Length of the destination buffer.
+ * @param subdir Subdirectory to try.
+ * @param filename Filename to look for.
+ * @return \a buf containing the path if the path was found, else \c NULL.
+ */
 char *FioFindFullPath(char *buf, size_t buflen, Subdirectory subdir, const char *filename)
 {
 	Searchpath sp;
@@ -281,17 +355,16 @@ char *FioFindFullPath(char *buf, size_t buflen, Subdirectory subdir, const char 
 
 	FOR_ALL_SEARCHPATHS(sp) {
 		FioGetFullPath(buf, buflen, sp, subdir, filename);
-		if (FileExists(buf)) break;
+		if (FileExists(buf)) return buf;
 #if !defined(WIN32)
 		/* Be, as opening files, aware that sometimes the filename
 		 * might be in uppercase when it is in lowercase on the
-		 * disk. Ofcourse Windows doesn't care about casing. */
-		strtolower(buf + strlen(_searchpaths[sp]) - 1);
-		if (FileExists(buf)) break;
+		 * disk. Of course Windows doesn't care about casing. */
+		if (strtolower(buf + strlen(_searchpaths[sp]) - 1) && FileExists(buf)) return buf;
 #endif
 	}
 
-	return buf;
+	return NULL;
 }
 
 char *FioAppendDirectory(char *buf, size_t buflen, Searchpath sp, Subdirectory subdir)
@@ -344,8 +417,7 @@ static FILE *FioFOpenFileSp(const char *filename, const char *mode, Searchpath s
 
 	f = fopen(buf, mode);
 #if !defined(WIN32)
-	if (f == NULL) {
-		strtolower(buf + ((subdir == NO_DIRECTORY) ? 0 : strlen(_searchpaths[sp]) - 1));
+	if (f == NULL && strtolower(buf + ((subdir == NO_DIRECTORY) ? 0 : strlen(_searchpaths[sp]) - 1))) {
 		f = fopen(buf, mode);
 	}
 #endif
@@ -358,6 +430,13 @@ static FILE *FioFOpenFileSp(const char *filename, const char *mode, Searchpath s
 	return f;
 }
 
+/**
+ * Opens a file from inside a tar archive.
+ * @param entry The entry to open.
+ * @param filesize [out] If not \c NULL, size of the opened file.
+ * @return File handle of the opened file, or \c NULL if the file is not available.
+ * @note The file is read from within the tar file, and may not return \c EOF after reading the whole file.
+ */
 FILE *FioFOpenFileTar(TarFileListEntry *entry, size_t *filesize)
 {
 	FILE *f = fopen(entry->tar_filename, "rb");
@@ -368,7 +447,13 @@ FILE *FioFOpenFileTar(TarFileListEntry *entry, size_t *filesize)
 	return f;
 }
 
-/** Opens OpenTTD files somewhere in a personal or global directory */
+/**
+ * Opens a OpenTTD file somewhere in a personal or global directory.
+ * @param filename Name of the file to open.
+ * @param subdir Subdirectory to open.
+ * @param filename Name of the file to open.
+ * @return File handle of the opened file, or \c NULL if the file is not available.
+ */
 FILE *FioFOpenFile(const char *filename, const char *mode, Subdirectory subdir, size_t *filesize)
 {
 	FILE *f = NULL;
@@ -451,7 +536,7 @@ static void FioCreateDirectory(const char *name)
  * Appends, if necessary, the path separator character to the end of the string.
  * It does not add the path separator to zero-sized strings.
  * @param buf    string to append the separator to
- * @param buflen the length of the buf
+ * @param buflen the length of \a buf.
  * @return true iff the operation succeeded
  */
 bool AppendPathSeparator(char *buf, size_t buflen)
@@ -494,6 +579,10 @@ char *BuildWithFullPath(const char *dir)
 	return dest;
 }
 
+/**
+ * Find the first directory in a tar archive.
+ * @param tarname the name of the tar archive to look in.
+ */
 const char *FioTarFirstDir(const char *tarname)
 {
 	TarList::iterator it = _tar_list.find(tarname);
@@ -529,7 +618,7 @@ void FioTarAddLink(const char *src, const char *dest)
 
 /**
  * Simplify filenames from tars.
- * Replace '/' by PATHSEPCHAR, and force 'name' to lowercase.
+ * Replace '/' by #PATHSEPCHAR, and force 'name' to lowercase.
  * @param name Filename to process.
  */
 static void SimplifyFileName(char *name)
@@ -550,7 +639,7 @@ static void SimplifyFileName(char *name)
 
 	DEBUG(misc, 1, "Scanning for tars");
 	TarScanner fs;
-	uint num = fs.Scan(".tar", DATA_DIR, false);
+	uint num = fs.Scan(".tar", NEWGRF_DIR, false);
 	num += fs.Scan(".tar", AI_DIR, false);
 	num += fs.Scan(".tar", AI_LIBRARY_DIR, false);
 	num += fs.Scan(".tar", SCENARIO_DIR, false);
@@ -558,8 +647,11 @@ static void SimplifyFileName(char *name)
 	return num;
 }
 
-bool TarScanner::AddFile(const char *filename, size_t basepath_length)
+bool TarScanner::AddFile(const char *filename, size_t basepath_length, const char *tar_filename)
 {
+	/* No tar within tar. */
+	assert(tar_filename == NULL);
+
 	/* The TAR-header, repeated for every file */
 	typedef struct TarHeader {
 		char name[100];      ///< Name of the file
@@ -860,8 +952,9 @@ extern void DetermineBasePaths(const char *exe);
  * in the same way we remove the name from the executable name.
  * @param exe the path to the executable
  */
-void ChangeWorkingDirectory(const char *exe)
+static bool ChangeWorkingDirectoryToExecutable(const char *exe)
 {
+	bool success = false;
 #ifdef WITH_COCOA
 	char *app_bundle = strchr(exe, '.');
 	while (app_bundle != NULL && strncasecmp(app_bundle, ".app", 4) != 0) app_bundle = strchr(&app_bundle[1], '.');
@@ -875,12 +968,17 @@ void ChangeWorkingDirectory(const char *exe)
 		/* If we want to go to the root, we can't use cd C:, but we must use '/' */
 		if (s[-1] == ':') chdir("/");
 #endif
-		if (chdir(exe) != 0) DEBUG(misc, 0, "Directory with the binary does not exist?");
+		if (chdir(exe) != 0) {
+			DEBUG(misc, 0, "Directory with the binary does not exist?");
+		} else {
+			success = true;
+		}
 		*s = PATHSEPCHAR;
 	}
 #ifdef WITH_COCOA
 	if (app_bundle != NULL) app_bundle[0] = '.';
 #endif /* WITH_COCOA */
+	return success;
 }
 
 /**
@@ -958,14 +1056,19 @@ void DetermineBasePaths(const char *exe)
 	_do_scan_working_directory = DoScanWorkingDirectory();
 
 	/* Change the working directory to that one of the executable */
-	ChangeWorkingDirectory(exe);
-	if (getcwd(tmp, MAX_PATH) == NULL) *tmp = '\0';
-	AppendPathSeparator(tmp, MAX_PATH);
-	_searchpaths[SP_BINARY_DIR] = strdup(tmp);
+	if (ChangeWorkingDirectoryToExecutable(exe)) {
+		if (getcwd(tmp, MAX_PATH) == NULL) *tmp = '\0';
+		AppendPathSeparator(tmp, MAX_PATH);
+		_searchpaths[SP_BINARY_DIR] = strdup(tmp);
+	} else {
+		_searchpaths[SP_BINARY_DIR] = NULL;
+	}
 
 	if (_searchpaths[SP_WORKING_DIR] != NULL) {
 		/* Go back to the current working directory. */
-		ChangeWorkingDirectory(_searchpaths[SP_WORKING_DIR]);
+		if (chdir(_searchpaths[SP_WORKING_DIR]) != 0) {
+			DEBUG(misc, 0, "Failed to return to working directory!");
+		}
 	}
 
 #if defined(__MORPHOS__) || defined(__AMIGA__) || defined(DOS) || defined(OS2)
@@ -1012,9 +1115,7 @@ void DeterminePaths(const char *exe)
 		}
 	} else {
 		char personal_dir[MAX_PATH];
-		FioFindFullPath(personal_dir, lengthof(personal_dir), BASE_DIR, "openttd.cfg");
-
-		if (FileExists(personal_dir)) {
+		if (FioFindFullPath(personal_dir, lengthof(personal_dir), BASE_DIR, "openttd.cfg") != NULL) {
 			char *end = strrchr(personal_dir, PATHSEPCHAR);
 			if (end != NULL) end[1] = '\0';
 			_personal_dir = strdup(personal_dir);
@@ -1061,7 +1162,7 @@ void DeterminePaths(const char *exe)
 	FioCreateDirectory(_searchpaths[SP_AUTODOWNLOAD_DIR]);
 
 	/* Create the directory for each of the types of content */
-	const Subdirectory dirs[] = { SCENARIO_DIR, HEIGHTMAP_DIR, DATA_DIR, AI_DIR, AI_LIBRARY_DIR, GM_DIR };
+	const Subdirectory dirs[] = { SCENARIO_DIR, HEIGHTMAP_DIR, NEWGRF_DIR, AI_DIR, AI_LIBRARY_DIR, GM_DIR };
 	for (uint i = 0; i < lengthof(dirs); i++) {
 		char *tmp = str_fmt("%s%s", _searchpaths[SP_AUTODOWNLOAD_DIR], _subdirs[dirs[i]]);
 		FioCreateDirectory(tmp);
@@ -1100,6 +1201,14 @@ void SanitizeFilename(char *filename)
 	}
 }
 
+/**
+ * Load a file into memory.
+ * @param filename Name of the file to load.
+ * @param lenp [out] Length of loaded data.
+ * @param maxsize Maximum size to load.
+ * @return Pointer to new memory containing the loaded data, or \c NULL if loading failed.
+ * @note If \a maxsize less than the length of the file, loading fails.
+ */
 void *ReadFileToMem(const char *filename, size_t *lenp, size_t maxsize)
 {
 	FILE *in = fopen(filename, "rb");
@@ -1125,6 +1234,19 @@ void *ReadFileToMem(const char *filename, size_t *lenp, size_t maxsize)
 	return mem;
 }
 
+/**
+ * Helper to see whether a given filename matches the extension.
+ * @param extension The extension to look for.
+ * @param filename  The filename to look in for the extension.
+ * @return True iff the extension is NULL, or the filename ends with it.
+ */
+static bool MatchesExtension(const char *extension, const char *filename)
+{
+	if (extension == NULL) return true;
+
+	const char *ext = strrchr(filename, extension[0]);
+	return ext != NULL && strcasecmp(ext, extension) == 0;
+}
 
 /**
  * Scan a single directory (and recursively its children) and add
@@ -1162,15 +1284,7 @@ static uint ScanPath(FileScanner *fs, const char *extension, const char *path, s
 			num += ScanPath(fs, extension, filename, basepath_length, recursive);
 		} else if (S_ISREG(sb.st_mode)) {
 			/* File */
-			if (extension != NULL) {
-				char *ext = strrchr(filename, '.');
-
-				/* If no extension or extension isn't .grf, skip the file */
-				if (ext == NULL) continue;
-				if (strcasecmp(ext, extension) != 0) continue;
-			}
-
-			if (fs->AddFile(filename, basepath_length)) num++;
+			if (MatchesExtension(extension, filename) && fs->AddFile(filename, basepath_length, NULL)) num++;
 		}
 	}
 
@@ -1190,15 +1304,7 @@ static uint ScanTar(FileScanner *fs, const char *extension, TarFileList::iterato
 	uint num = 0;
 	const char *filename = (*tar).first.c_str();
 
-	if (extension != NULL) {
-		const char *ext = strrchr(filename, '.');
-
-		/* If no extension or extension isn't .grf, skip the file */
-		if (ext == NULL) return false;
-		if (strcasecmp(ext, extension) != 0) return false;
-	}
-
-	if (fs->AddFile(filename, 0)) num++;
+	if (MatchesExtension(extension, filename) && fs->AddFile(filename, 0, (*tar).second.tar_filename)) num++;
 
 	return num;
 }
@@ -1214,6 +1320,8 @@ static uint ScanTar(FileScanner *fs, const char *extension, TarFileList::iterato
  */
 uint FileScanner::Scan(const char *extension, Subdirectory sd, bool tars, bool recursive)
 {
+	this->subdir = sd;
+
 	Searchpath sp;
 	char path[MAX_PATH];
 	TarFileList::iterator tar;

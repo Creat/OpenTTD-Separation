@@ -32,18 +32,27 @@ void DrawCommonTileSeq(const TileInfo *ti, const DrawTileSprites *dts, Transpare
 {
 	bool parent_sprite_encountered = false;
 	const DrawTileSeqStruct *dtss;
+	bool skip_childs = false;
 	foreach_draw_tile_seq(dtss, dts->seq) {
 		SpriteID image = dtss->image.sprite;
+		PaletteID pal = dtss->image.pal;
+
+		if (skip_childs) {
+			if (!dtss->IsParentSprite()) continue;
+			skip_childs = false;
+		}
 
 		/* TTD sprite 0 means no sprite */
-		if (GB(image, 0, SPRITE_WIDTH) == 0 && !HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE)) continue;
-
-		/* Stop drawing sprite sequence once we meet a sprite that doesn't have to be opaque */
-		if (IsInvisibilitySet(to) && !HasBit(image, SPRITE_MODIFIER_OPAQUE)) return;
+		if ((GB(image, 0, SPRITE_WIDTH) == 0 && !HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE)) ||
+				(IsInvisibilitySet(to) && !HasBit(image, SPRITE_MODIFIER_OPAQUE))) {
+			skip_childs = dtss->IsParentSprite();
+			continue;
+		}
 
 		image += (HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE) ? newgrf_offset : orig_offset);
+		if (HasBit(pal, SPRITE_MODIFIER_CUSTOM_SPRITE)) pal += newgrf_offset;
 
-		PaletteID pal = SpriteLayoutPaletteTransform(image, dtss->image.pal, default_palette);
+		pal = SpriteLayoutPaletteTransform(image, pal, default_palette);
 
 		if (dtss->IsParentSprite()) {
 			parent_sprite_encountered = true;
@@ -86,15 +95,26 @@ void DrawCommonTileSeqInGUI(int x, int y, const DrawTileSprites *dts, int32 orig
 	const DrawTileSeqStruct *dtss;
 	Point child_offset = {0, 0};
 
+	bool skip_childs = false;
 	foreach_draw_tile_seq(dtss, dts->seq) {
 		SpriteID image = dtss->image.sprite;
+		PaletteID pal = dtss->image.pal;
+
+		if (skip_childs) {
+			if (!dtss->IsParentSprite()) continue;
+			skip_childs = false;
+		}
 
 		/* TTD sprite 0 means no sprite */
-		if (GB(image, 0, SPRITE_WIDTH) == 0 && !HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE)) continue;
+		if (GB(image, 0, SPRITE_WIDTH) == 0 && !HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE)) {
+			skip_childs = dtss->IsParentSprite();
+			continue;
+		}
 
 		image += (HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE) ? newgrf_offset : orig_offset);
+		if (HasBit(pal, SPRITE_MODIFIER_CUSTOM_SPRITE)) pal += newgrf_offset;
 
-		PaletteID pal = SpriteLayoutPaletteTransform(image, dtss->image.pal, default_palette);
+		pal = SpriteLayoutPaletteTransform(image, pal, default_palette);
 
 		if (dtss->IsParentSprite()) {
 			Point pt = RemapCoords(dtss->delta_x, dtss->delta_y, dtss->delta_z);
@@ -109,18 +129,4 @@ void DrawCommonTileSeqInGUI(int x, int y, const DrawTileSprites *dts, int32 orig
 			DrawSprite(image, pal, x + child_offset.x + offs_x, y + child_offset.y + offs_y);
 		}
 	}
-}
-
-/** Create a copy of an existing DrawTileSeqStruct array. */
-const DrawTileSeqStruct *CopyDrawTileSeqStruct(const DrawTileSeqStruct *dtss)
-{
-	const DrawTileSeqStruct *element;
-
-	size_t count = 1; // 1 for the terminator
-	foreach_draw_tile_seq(element, dtss) count++;
-
-	DrawTileSeqStruct *copy = MallocT<DrawTileSeqStruct>(count);
-	MemCpyT(copy, dtss, count);
-
-	return copy;
 }

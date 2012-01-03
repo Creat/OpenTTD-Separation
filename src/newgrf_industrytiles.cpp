@@ -148,6 +148,31 @@ static void IndustryTileSetTriggers(const ResolverObject *object, int triggers)
 	}
 }
 
+/**
+ * Store a value into the persistent storage of the object's parent.
+ * @param object Object that we want to query.
+ * @param pos Position in the persistent storage to use.
+ * @param value Value to store.
+ */
+void IndustryTileStorePSA(ResolverObject *object, uint pos, int32 value)
+{
+	Industry *ind = object->u.industry.ind;
+	if (object->scope != VSG_SCOPE_PARENT || ind->index == INVALID_INDUSTRY) return;
+
+	if (ind->psa == NULL) {
+		/* There is no need to create a storage if the value is zero. */
+		if (value == 0) return;
+
+		/* Create storage on first modification. */
+		const IndustrySpec *indsp = GetIndustrySpec(ind->type);
+		uint32 grfid = (indsp->grf_prop.grffile != NULL) ? indsp->grf_prop.grffile->grfid : 0;
+		assert(PersistentStorage::CanAllocateItem());
+		ind->psa = new PersistentStorage(grfid);
+	}
+
+	ind->psa->StoreValue(pos, value);
+}
+
 static void NewIndustryTileResolver(ResolverObject *res, IndustryGfx gfx, TileIndex tile, Industry *indus)
 {
 	res->GetRandomBits = IndustryTileGetRandomBits;
@@ -155,8 +180,8 @@ static void NewIndustryTileResolver(ResolverObject *res, IndustryGfx gfx, TileIn
 	res->SetTriggers   = IndustryTileSetTriggers;
 	res->GetVariable   = IndustryTileGetVariable;
 	res->ResolveReal   = IndustryTileResolveReal;
+	res->StorePSA      = IndustryTileStorePSA;
 
-	res->psa             = &indus->psa;
 	res->u.industry.tile = tile;
 	res->u.industry.ind  = indus;
 	res->u.industry.gfx  = gfx;
@@ -165,10 +190,7 @@ static void NewIndustryTileResolver(ResolverObject *res, IndustryGfx gfx, TileIn
 	res->callback        = CBID_NO_CALLBACK;
 	res->callback_param1 = 0;
 	res->callback_param2 = 0;
-	res->last_value      = 0;
-	res->trigger         = 0;
-	res->reseed          = 0;
-	res->count           = 0;
+	res->ResetState();
 
 	const IndustryTileSpec *its = GetIndustryTileSpec(gfx);
 	res->grffile         = (its != NULL ? its->grf_prop.grffile : NULL);
@@ -176,12 +198,13 @@ static void NewIndustryTileResolver(ResolverObject *res, IndustryGfx gfx, TileIn
 
 static void IndustryDrawTileLayout(const TileInfo *ti, const TileLayoutSpriteGroup *group, byte rnd_colour, byte stage, IndustryGfx gfx)
 {
-	const DrawTileSprites *dts = group->dts;
+	const DrawTileSprites *dts = group->ProcessRegisters(&stage);
 
 	SpriteID image = dts->ground.sprite;
 	PaletteID pal  = dts->ground.pal;
 
 	if (HasBit(image, SPRITE_MODIFIER_CUSTOM_SPRITE)) image += stage;
+	if (HasBit(pal, SPRITE_MODIFIER_CUSTOM_SPRITE)) pal += stage;
 
 	if (GB(image, 0, SPRITE_WIDTH) != 0) {
 		/* If the ground sprite is the default flat water sprite, draw also canal/river borders
@@ -240,7 +263,6 @@ bool DrawNewIndustryTile(TileInfo *ti, Industry *i, IndustryGfx gfx, const Indus
 		/* Limit the building stage to the number of stages supplied. */
 		const TileLayoutSpriteGroup *tlgroup = (const TileLayoutSpriteGroup *)group;
 		byte stage = GetIndustryConstructionStage(ti->tile);
-		stage = Clamp(stage - 4 + tlgroup->num_building_stages, 0, tlgroup->num_building_stages - 1);
 		IndustryDrawTileLayout(ti, tlgroup, i->random_colour, stage, gfx);
 		return true;
 	}
@@ -280,25 +302,14 @@ CommandCost PerformIndustryTileSlopeCheck(TileIndex ind_base_tile, TileIndex ind
 		if (callback_res != 0) return CommandCost();
 		return_cmd_error(STR_ERROR_SITE_UNSUITABLE);
 	}
-	if (callback_res == 0x400) return CommandCost();
 
-	/* Copy some parameters from the registers to the error message text ref. stack */
-	SwitchToErrorRefStack();
-	PrepareTextRefStackUsage(4);
-	SwitchToNormalRefStack();
-
-	switch (callback_res) {
-		case 0x401: return_cmd_error(STR_ERROR_SITE_UNSUITABLE);
-		case 0x402: return_cmd_error(STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST);
-		case 0x403: return_cmd_error(STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT);
-		default:    return_cmd_error(GetGRFStringID(its->grf_prop.grffile->grfid, 0xD000 + callback_res));
-	}
+	return GetErrorMessageFromLocationCallbackResult(callback_res, its->grf_prop.grffile->grfid, STR_ERROR_SITE_UNSUITABLE);
 }
 
 /* Simple wrapper for GetHouseCallback to keep the animation unified. */
-uint16 GetSimpleIndustryCallback(CallbackID callback, uint32 param1, uint32 param2, const IndustryTileSpec *spec, const Industry *ind, TileIndex tile)
+uint16 GetSimpleIndustryCallback(CallbackID callback, uint32 param1, uint32 param2, const IndustryTileSpec *spec, Industry *ind, TileIndex tile)
 {
-	return GetIndustryTileCallback(callback, param1, param2, spec - GetIndustryTileSpec(0), const_cast<Industry *>(ind), tile);
+	return GetIndustryTileCallback(callback, param1, param2, spec - GetIndustryTileSpec(0), ind, tile);
 }
 
 /** Helper class for animation control. */
@@ -345,7 +356,14 @@ bool StartStopIndustryTileAnimation(const Industry *ind, IndustryAnimationTrigge
 	return ret;
 }
 
-static void DoTriggerIndustryTile(TileIndex tile, IndustryTileTrigger trigger, Industry *ind)
+/**
+ * Trigger random triggers for an industry tile and reseed its random bits.
+ * @param tile Industry tile to trigger.
+ * @param trigger Trigger to trigger.
+ * @param ind Industry of the tile.
+ * @param [in,out] reseed_industry Collects bits to reseed for the industry.
+ */
+static void DoTriggerIndustryTile(TileIndex tile, IndustryTileTrigger trigger, Industry *ind, uint32 &reseed_industry)
 {
 	ResolverObject object;
 
@@ -366,24 +384,55 @@ static void DoTriggerIndustryTile(TileIndex tile, IndustryTileTrigger trigger, I
 
 	byte new_random_bits = Random();
 	byte random_bits = GetIndustryRandomBits(tile);
-	random_bits &= ~object.reseed;
-	random_bits |= new_random_bits & object.reseed;
+	random_bits &= ~object.reseed[VSG_SCOPE_SELF];
+	random_bits |= new_random_bits & object.reseed[VSG_SCOPE_SELF];
 	SetIndustryRandomBits(tile, random_bits);
 	MarkTileDirtyByTile(tile);
+
+	reseed_industry |= object.reseed[VSG_SCOPE_PARENT];
 }
 
+/**
+ * Reseeds the random bits of an industry.
+ * @param ind Industry.
+ * @param reseed Bits to reseed.
+ */
+static void DoReseedIndustry(Industry *ind, uint32 reseed)
+{
+	if (reseed == 0 || ind == NULL) return;
+
+	uint16 random_bits = Random();
+	ind->random &= reseed;
+	ind->random |= random_bits & reseed;
+}
+
+/**
+ * Trigger a random trigger for a single industry tile.
+ * @param tile Industry tile to trigger.
+ * @param trigger Trigger to trigger.
+ */
 void TriggerIndustryTile(TileIndex tile, IndustryTileTrigger trigger)
 {
-	DoTriggerIndustryTile(tile, trigger, Industry::GetByTile(tile));
+	uint32 reseed_industry = 0;
+	Industry *ind = Industry::GetByTile(tile);
+	DoTriggerIndustryTile(tile, trigger, ind, reseed_industry);
+	DoReseedIndustry(ind, reseed_industry);
 }
 
+/**
+ * Trigger a random trigger for all industry tiles.
+ * @param ind Industry to trigger.
+ * @param trigger Trigger to trigger.
+ */
 void TriggerIndustry(Industry *ind, IndustryTileTrigger trigger)
 {
+	uint32 reseed_industry = 0;
 	TILE_AREA_LOOP(tile, ind->location) {
 		if (IsTileType(tile, MP_INDUSTRY) && GetIndustryIndex(tile) == ind->index) {
-			DoTriggerIndustryTile(tile, trigger, ind);
+			DoTriggerIndustryTile(tile, trigger, ind, reseed_industry);
 		}
 	}
+	DoReseedIndustry(ind, reseed_industry);
 }
 
 /**

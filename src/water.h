@@ -15,6 +15,7 @@
 #include "tile_type.h"
 #include "company_type.h"
 #include "slope_type.h"
+#include "water_map.h"
 
 /**
  * Describes the behaviour of a tile during flooding.
@@ -34,10 +35,12 @@ void DoFloodTile(TileIndex target);
 
 void ConvertGroundTilesIntoWaterTiles();
 
-void DrawShipDepotSprite(int x, int y, int image);
+void DrawShipDepotSprite(int x, int y, Axis axis, DepotPart part);
 void DrawWaterClassGround(const struct TileInfo *ti);
 void DrawShoreTile(Slope tileh);
 
 void MakeWaterKeepingClass(TileIndex tile, Owner o);
+
+bool RiverModifyDesertZone(TileIndex tile, void *data);
 
 #endif /* WATER_H */

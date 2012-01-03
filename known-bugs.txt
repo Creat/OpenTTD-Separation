@@ -1,6 +1,6 @@
 OpenTTD's known bugs
-Last updated:    2011-04-01
-Release version: 1.1.0
+Last updated:    2011-09-15
+Release version: 1.1.3
 ------------------------------------------------------------------------
 
 
@@ -39,8 +39,12 @@ officially supporting Mac OS X again. For now it remains unsupported and
 we only apply bug fixes provided by the community but we are unable to fix
 these bugs ourselves.
 
-- 4420	[OSX] OS' mouse pointer still shows
-- 2484	[OSX] Cannot enter CJK characters
+- 4744  [OSX] Crash when switching to full screen with OS X Lion
+- 4689  [OSX] Crash when hiding window after coming from full screen
+- 4594  [Windows] Minimizing the windows when a modal error message is
+        shown makes it difficult to exit the game
+- 4420  [OSX] OS' mouse pointer still shows
+- 2484  [OSX] Cannot enter CJK characters
 
 2.1) Known bugs that will not be solved
 ---- ----------------------------------
@@ -263,7 +267,7 @@ OpenTTD hangs when started on 32 bits Windows [FS#4083]
 	default we are not able to detect this failure, except when Windows'
 	music initialisation function returns after several hours and then
 	there is no point in switching the music driver anymore.
-	The reason we do not use the "win32" music driver as default are
+	The reason we still use the "win32" music driver as default are
 	described in the "Long delay between switching music/song" section
 	of this document.
 
@@ -293,3 +297,44 @@ Can't change volume inside OpenTTD [FS#4416]
 	in OpenTTD. As a result you can't change the volume inside OpenTTD
 	for backends such as SDL; just use the volume control provided by
 	your operating system.
+
+Can't run OpenTTD with the -d option from a MSYS console [FS#4587]
+	The MSYS console does not allow OpenTTD to open an extra console for
+	debugging output. Compiling OpenTTD with the --enable-console
+	configure option prevents this issue and allows the -d option to use
+	the MSYS console for its output.
+
+Unreadable characters for non-latin locales [FS#4607]
+	OpenTTD does not ship a non-latin font in its graphics files. As a
+	result OpenTTD needs to acquire the font from somewhere else. What
+	OpenTTD does is ask the operating system, or a system library, for
+	the best font for a given language if the currently loaded font
+	does not provide all characters of the chosen translation. This
+	means that OpenTTD has no influence over the quality of the chosen
+	font; it just does the best it can do.
+
+	If the text is unreadable there are several steps that you can take
+	to improve this. The first step is finding a good font and configure
+	this in the configuration file. See section 9.0 of readme.txt for
+	more information. You can also increase the font size to make the
+	characters bigger and possible better readable.
+
+	If the problem is with the clarity of the font you might want to
+	enable anti-aliasing by setting the small_aa/medium_aa/large_aa
+	settings to "true". However, anti-aliasing only works when a 32 bits
+	blitter has been selected, e.g. blitter = "32bpp-anim", as with the
+	8 bits blitter there are not enough colours to properly perform the
+	anti-aliasing.
+
+Train does not crash with itself [FS#4635]:
+	When a train drives in a circle the front engine passes through
+	wagons of the same train without crashing. This is intentional.
+	Signals are only aware of tracks, they do not consider the train
+	length and whether there would be enough room for a train in some
+	circle it might drive on. Also the path a train might take is not
+	necessarily known when passing a signal.
+	Checking all circumstances would take a lot of additional computational
+	power for signals, which is not considered worth the effort, as
+	it does not add anything to gameplay.
+	Nevertheless trains shall not crash in normal operation, so making
+	a train not crash with itself is the best solution for everyone.

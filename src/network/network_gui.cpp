@@ -889,6 +889,11 @@ public:
 		this->vscroll->SetCapacityFromWidget(this, NGWW_MATRIX);
 		this->GetWidget<NWidgetCore>(NGWW_MATRIX)->widget_data = (this->vscroll->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 	}
+
+	virtual void OnTick()
+	{
+		NetworkGameListRequery();
+	}
 };
 
 Listing NetworkGameWindow::last_sorting = {false, 5};
@@ -1796,8 +1801,8 @@ struct NetworkClientListPopupWindow : Window {
 			this->AddAction(STR_NETWORK_CLIENTLIST_BAN, &ClientList_Ban);
 		}
 
-		this->flags4 &= ~WF_WHITE_BORDER_MASK;
 		this->InitNested(desc, client_id);
+		CLRBITS(this->flags4, WF_WHITE_BORDER_MASK);
 	}
 
 	virtual Point OnInitialPosition(const WindowDesc *desc, int16 sm_width, int16 sm_height, int window_number)

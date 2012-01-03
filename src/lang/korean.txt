@@ -339,6 +339,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}오브�
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :시나리오 저장
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :시나리오 불러오기
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Heightmap 저장
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Heightmap 불러오기
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :에디터 종료
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -356,6 +357,7 @@ STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :도시 이름�
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :역 이름을 표시함
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :웨이포인트 이름을 표시함
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :팻말을 표시함
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :경쟁사의 팻말과 이름을 표시
 STR_SETTINGS_MENU_FULL_ANIMATION                                :완전한 애니메이션
 STR_SETTINGS_MENU_FULL_DETAIL                                   :아주 상세하게
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :건물 안 보이기
@@ -448,6 +450,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :확대된 스�
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :맵 전체 스크린샷
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :'OpenTTD'에 대해서
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :스프라이트 정렬도구
+STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :박스 경계선 토글
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -862,7 +865,7 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}화폐 �
 STR_GAME_OPTIONS_CURRENCY_GBP                                   :파운드 (￡)
 STR_GAME_OPTIONS_CURRENCY_USD                                   :달러 ($)
 STR_GAME_OPTIONS_CURRENCY_EUR                                   :유로 (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :엔 (￥)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :엔 (￥)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :오스트리아 실링 (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :벨기에 프랑크 (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :스위스 프랑크 (CHF)
@@ -1057,6 +1060,7 @@ STR_SEA_LEVEL_HIGH                                              :높음
 STR_SEA_LEVEL_CUSTOM                                            :사용자 설정
 STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :사용자 설정 ({NUM}%)
 
+
 STR_DISASTER_NONE                                               :고장 안남
 STR_DISASTER_REDUCED                                            :적음
 STR_DISASTER_NORMAL                                             :일반
@@ -1224,6 +1228,10 @@ STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_LONG               :긴 (2008년 12
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_SHORT              :짧은 (2008.12.31)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :ISO (2008-12-31)
 
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE                       :{LTBLUE}NewGRF에서 자체 설정된 팔레트가 없을 경우 기본으로 설정할 팔레트: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_DOS                   :도스 팔레트
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_WIN                   :윈도우 팔레트
+
 STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :{LTBLUE}새 게임을 시작할 때 자동으로 일시정지: {ORANGE}{STRING}
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL                          :{LTBLUE}일시정지시 가능한 행동: {ORANGE}{STRING}
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_NO_ACTIONS               :아무 것도 못함
@@ -1341,6 +1349,7 @@ STR_CONFIG_SETTING_VEHICLES_TRAINS                              :{ORANGE}열차
 STR_CONFIG_SETTING_ECONOMY_TOWNS                                :{ORANGE}도시
 STR_CONFIG_SETTING_ECONOMY_INDUSTRIES                           :{ORANGE}산업시설
 
+STR_CONFIG_SETTING_PATHFINDER_OPF                               :오리지널
 STR_CONFIG_SETTING_PATHFINDER_NPF                               :NPF
 STR_CONFIG_SETTING_PATHFINDER_YAPF_RECOMMENDED                  :YAPF {BLUE}(추천)
 
@@ -1388,6 +1397,7 @@ STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}NewGRF �
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}새로 나왔거나 업데이트된 콘텐츠를 체크하여 다운로드합니다.
 STR_INTRO_TOOLTIP_AI_SETTINGS                                   :{BLACK}인공지능 설정 보기
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}OpenTTD를 종료합니다
+
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}종료
@@ -2274,6 +2284,7 @@ STR_SAVELOAD_LOAD_CAPTION                                       :{WHITE}게임 �
 STR_SAVELOAD_SAVE_SCENARIO                                      :{WHITE}시나리오 저장하기
 STR_SAVELOAD_LOAD_SCENARIO                                      :{WHITE}시나리오 불러오기
 STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Heightmap 불러오기
+STR_SAVELOAD_SAVE_HEIGHTMAP                                     :{WHITE}Heightmap 저장
 STR_SAVELOAD_HOME_BUTTON                                        :{BLACK}기본 저장/불러오기 폴더로 이동하려면 여기를 클릭하세요
 STR_SAVELOAD_BYTES_FREE                                         :{BLACK}{BYTES} 남음
 STR_SAVELOAD_LIST_TOOLTIP                                       :{BLACK}드라이프, 폴더, 저장된 게임 파일의 목록입니다
@@ -2467,6 +2478,9 @@ STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING
 STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Action 8 엔트리가 여러 개 존재합니다.
 STR_NEWGRF_ERROR_READ_BOUNDS                                    :객체의 읽기 범위를 초과했습니다.
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}최근에 이용한 기본 그래픽 세트에 객체가 많이 손실되었습니다.{}기본 그래픽 세트를 업데이트 하십시오.
+STR_NEWGRF_ERROR_GRM_FAILED                                     :요청한 GRF 제원을 사용할 수 없습니다
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING}(은)는 {4:STRING} 때문에 사용할 수 없습니다
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :유효하지 않은/알수 없는 스프라이트 구조 형식
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}경고!
@@ -2502,6 +2516,8 @@ STR_NEWGRF_INVALID_CARGO_ABBREV                                 :??
 STR_NEWGRF_INVALID_CARGO_QUANTITY                               :{COMMA}<인식오류 화물>의
 STR_NEWGRF_INVALID_ENGINE                                       :<인식오류 차량모델>
 STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<인식오류 산업시설>
+
+# NewGRF scanning window
 
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}팻말 목록 - 팻말 {COMMA}개
@@ -2810,6 +2826,8 @@ STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :새 항공기
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}가격: {GOLD}{CURRENCY}{BLACK} 중량: {GOLD}{WEIGHT_S}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}속력: {GOLD}{VELOCITY}{BLACK} 힘: {GOLD}{POWER}
 STR_PURCHASE_INFO_SPEED                                         :{BLACK}속력: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_OCEAN                                   :{BLACK}바다에서의 속도: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_CANAL                                   :{BLACK}운하/강에서의 속도: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_RUNNINGCOST                                   :{BLACK}운행비용: {GOLD}{CURRENCY}/년
 STR_PURCHASE_INFO_CAPACITY                                      :{BLACK}수송량: {GOLD}{CARGO} {STRING}
 STR_PURCHASE_INFO_REFITTABLE                                    :(개조 가능)
@@ -3170,12 +3188,15 @@ STR_ORDER_DROP_HALT_DEPOT                                       :멈춤
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}점검이 필요하면 이 경로를 건너뜁니다.
 
 STR_ORDER_CONDITIONAL_VARIABLE_TOOLTIP                          :{BLACK}경로를 건너뛰기 위한 차량값
+
+# Conditional order variables, must follow order of OrderConditionVariable enum
 STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE                           :적재율
 STR_ORDER_CONDITIONAL_RELIABILITY                               :신뢰도
 STR_ORDER_CONDITIONAL_MAX_SPEED                                 :최고 속력
 STR_ORDER_CONDITIONAL_AGE                                       :연식 (년)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :점검 필요성
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :항상
+STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :남은 수명 (년)
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}차량 데이터와 주어진 값을 비교하는 방법
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :=
@@ -3230,7 +3251,7 @@ STR_ORDER_STOP_ORDER                                            :(멈춤)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :(자동)
+STR_ORDER_IMPLICIT                                              :(자동)
 
 STR_ORDER_FULL_LOAD                                             :(모든 화물을 가득 실음)
 STR_ORDER_FULL_LOAD_ANY                                         :(아무 화물이나 가득 싣기)
@@ -3421,6 +3442,8 @@ STR_ERROR_PNGMAP_MISC                                           :{WHITE}... 뭔�
 STR_ERROR_BMPMAP                                                :{WHITE}BMP파일로부터 지형을 불러올 수 없습니다...
 STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... 이미지 타입을 변경할 수 없습니다.
 
+STR_ERROR_HEIGHTMAP_TOO_LARGE                                   :{WHITE}... 이미지가 너무 큽니다.
+
 STR_WARNING_HEIGHTMAP_SCALE_CAPTION                             :{WHITE}맵 크기 경고
 STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}원본 맵의 크기를 많이 조정하는 것은 좋지 않습니다. 만들기를 계속하시겠습니까?
 
@@ -3515,6 +3538,8 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... 도�
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... 낮은 지역에만 건설할 수 있습니다!
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... 맵 가장자리에만 위치할 수 있습니다.
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... 숲은 만년설 높이 이상의 고도에만 심을 수 있습니다.
+STR_ERROR_CAN_ONLY_BE_BUILT_ABOVE_SNOW_LINE                     :{WHITE}... 만년설 고도 위에만 지을 수 있습니다
+STR_ERROR_CAN_ONLY_BE_BUILT_BELOW_SNOW_LINE                     :{WHITE}... 만년설 고도 아래에만 지을 수 있습니다
 
 # Station construction related errors
 STR_ERROR_CAN_T_BUILD_RAILROAD_STATION                          :{WHITE}여기에 역을 건설할 수 없습니다...
@@ -3636,6 +3661,9 @@ STR_ERROR_CAN_T_BUILD_LOCKS                                     :{WHITE}여기�
 STR_ERROR_CAN_T_PLACE_RIVERS                                    :{WHITE}여기에 강을 만들 수 없습니다...
 STR_ERROR_MUST_BE_BUILT_ON_WATER                                :{WHITE}... 물 위에 지어져야 합니다!
 STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... 물 위에 지을 수 없습니다
+STR_ERROR_CAN_T_BUILD_ON_SEA                                    :{WHITE}... 바다 위에 지을 수 없습니다
+STR_ERROR_CAN_T_BUILD_ON_CANAL                                  :{WHITE}... 운하 위에 지을 수 없습니다
+STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... 강 위에 지을 수 없습니다
 STR_ERROR_MUST_DEMOLISH_CANAL_FIRST                             :{WHITE}운하를 먼저 제거하십시오
 STR_ERROR_CAN_T_BUILD_AQUEDUCT_HERE                             :{WHITE}여기에 수도교를 지을 수 없습니다...
 
@@ -3734,6 +3762,7 @@ STR_ERROR_VEHICLE_IS_DESTROYED                                  :{WHITE}... 차�
 # Specific vehicle errors
 STR_ERROR_CAN_T_MAKE_TRAIN_PASS_SIGNAL                          :{WHITE}너무 위험해서 신호를 무시할 수 없습니다...
 STR_ERROR_CAN_T_REVERSE_DIRECTION_TRAIN                         :{WHITE}열차를 회차시킬 수 없습니다...
+STR_ERROR_TRAIN_START_NO_POWER                                  :동력차가 없습니다
 
 STR_ERROR_CAN_T_MAKE_ROAD_VEHICLE_TURN                          :{WHITE}자동차를 U턴시킬 수 없습니다...
 

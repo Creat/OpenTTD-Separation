@@ -587,7 +587,7 @@ STR_SORT_BY_MAX_SPEED                                           :Максыма�
 STR_SORT_BY_MODEL                                               :Мадэль
 STR_SORT_BY_VALUE                                               :Кошт
 STR_SORT_BY_LENGTH                                              :Даўжыня
-STR_SORT_BY_LIFE_TIME                                           :Астатні тэрмін службы
+STR_SORT_BY_LIFE_TIME                                           :Рэшткавы тэрмін службы
 STR_SORT_BY_TIMETABLE_DELAY                                     :Адставаньне ад графіку
 STR_SORT_BY_FACILITY                                            :Тып станцыі
 STR_SORT_BY_WAITING                                             :Коль-ць грузу на станцыі
@@ -651,6 +651,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Разь
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Захаваць сцэнар
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Загрузіць сцэнар
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Захаваць мапу вышынь
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Загрузіць мапу вышыняў
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Выйсьці з рэдактара
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -668,6 +669,7 @@ STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Паказва�
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Паказваць назвы станцыяў
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Паказваць назвы пунктаў шляху
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Паказваць меткi
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Паказаны знакi й назвы канкурэнта
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Поўная анімацыя
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Поўная дэталізацыя
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Празрыстыя будынкі
@@ -760,6 +762,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Здымак э
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Здымак усёй мапы (Ctrl+G)
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Аб гульні OpenTTD
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Выраўноўваньне спрайтаў
+STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Пераключыць абмяжоўвальныя рамкі
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -1174,7 +1177,7 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}Выба
 STR_GAME_OPTIONS_CURRENCY_GBP                                   :Брытанскі фунт (£)
 STR_GAME_OPTIONS_CURRENCY_USD                                   :Даляр ЗША ($)
 STR_GAME_OPTIONS_CURRENCY_EUR                                   :Эўра (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :Японская ена (¥)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :Японская ена (¥)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :Аўстралійскі шылінг (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :Бэльгійскі франк (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :Швайцарскі франк (CHF)
@@ -1183,7 +1186,7 @@ STR_GAME_OPTIONS_CURRENCY_DEM                                   :Нямецка�
 STR_GAME_OPTIONS_CURRENCY_DKK                                   :Дацкая крона (DKK)
 STR_GAME_OPTIONS_CURRENCY_ESP                                   :Гішпанская пэсэта (ESP)
 STR_GAME_OPTIONS_CURRENCY_FIM                                   :Фінская марка (FIM)
-STR_GAME_OPTIONS_CURRENCY_FRF                                   :Францускі франк (FRF)
+STR_GAME_OPTIONS_CURRENCY_FRF                                   :Французскі франк (FRF)
 STR_GAME_OPTIONS_CURRENCY_GRD                                   :Грэцкая драхма (GRD)
 STR_GAME_OPTIONS_CURRENCY_HUF                                   :Вугорскі форынт (HUF)
 STR_GAME_OPTIONS_CURRENCY_ISK                                   :Ісьляндзкая крона (ISK)
@@ -1372,6 +1375,11 @@ STR_SEA_LEVEL_MEDIUM                                            :Сярэдня�
 STR_SEA_LEVEL_HIGH                                              :Вялiкая
 STR_SEA_LEVEL_CUSTOM                                            :Зададзены
 STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Зададзены ({NUM}%)
+
+STR_RIVERS_NONE                                                 :Няма
+STR_RIVERS_FEW                                                  :Малая
+STR_RIVERS_MODERATE                                             :Сярэдняя
+STR_RIVERS_LOT                                                  :Вялікая
 
 STR_DISASTER_NONE                                               :Выключаны
 STR_DISASTER_REDUCED                                            :Зьніжаныя
@@ -1709,6 +1717,8 @@ STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Пака
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Праверыць новы і абноўлены кантэнт, каб спампаваць
 STR_INTRO_TOOLTIP_AI_SETTINGS                                   :{BLACK}Паказаць наладкi ШI/АІ
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Выйсьці з OpenTTD
+
+STR_INTRO_TRANSLATION                                           :{BLACK}На гэту мову не перакладзен{P 0 ы ы а} {NUM} рад{P ок кі оў}. Вы можаце дапамагчы праекту, зарэгістраваўшыся як перакладнік. Інструкцыі ў файле readme.txt.
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Выхад
@@ -2615,6 +2625,7 @@ STR_SAVELOAD_LOAD_CAPTION                                       :{WHITE}Загр
 STR_SAVELOAD_SAVE_SCENARIO                                      :{WHITE}Захаваць сцэнар
 STR_SAVELOAD_LOAD_SCENARIO                                      :{WHITE}Загрузіць сцэнар
 STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Загрузіць мапу вышыняў
+STR_SAVELOAD_SAVE_HEIGHTMAP                                     :{WHITE}Захаваць мапу вышынь
 STR_SAVELOAD_HOME_BUTTON                                        :{BLACK}Націсьніце тут, каб перайсьці да вызначанага па змоўчаньні каталёга захаваньня/загрузкі
 STR_SAVELOAD_BYTES_FREE                                         :{BLACK}{BYTES} вольна
 STR_SAVELOAD_LIST_TOOLTIP                                       :{BLACK}Сьпіс дыскаў, каталёгаў і файлаў захаваных гульняў
@@ -2650,6 +2661,7 @@ STR_MAPGEN_LAND_GENERATOR                                       :{BLACK}Генэ
 STR_MAPGEN_TREE_PLACER                                          :{BLACK}Альгарытм дрэваў:
 STR_MAPGEN_TERRAIN_TYPE                                         :{BLACK}Тып ляндшафту:
 STR_MAPGEN_QUANTITY_OF_SEA_LAKES                                :{BLACK}Колькасьць азёраў/мораў:
+STR_MAPGEN_QUANTITY_OF_RIVERS                                   :{BLACK}Колькасць рэк:
 STR_MAPGEN_SMOOTHNESS                                           :{BLACK}Гладкасьць:
 STR_MAPGEN_VARIETY                                              :{BLACK}Разнастайнасьць ляндшафту:
 STR_MAPGEN_GENERATE                                             :{WHITE}Стварыць
@@ -2694,6 +2706,7 @@ STR_GENERATION_ABORT_MESSAGE                                    :{YELLOW}Вы с
 STR_GENERATION_PROGRESS                                         :{WHITE}{NUM}% гатова
 STR_GENERATION_PROGRESS_NUM                                     :{BLACK}{NUM} / {NUM}
 STR_GENERATION_WORLD_GENERATION                                 :{BLACK}Стварэньне сусьвету
+STR_GENERATION_RIVER_GENERATION                                 :{BLACK}Стварэньне рэк
 STR_GENERATION_TREE_GENERATION                                  :{BLACK}Высаджваньне лясоў
 STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Генэрацыя нерухомасьці
 STR_GENERATION_CLEARING_TILES                                   :{BLACK}Расстаноўка дэкарацыяў і камянёў
@@ -2810,6 +2823,7 @@ STR_NEWGRF_ERROR_READ_BOUNDS                                    :Дадзены�
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}У бягучым наборы базавай графікі адсутнічаюць выявы некаторых аб'ектаў.{}Калі ласка, абнавіце модуль базавай графікі.
 STR_NEWGRF_ERROR_GRM_FAILED                                     :Запрошаныя рэсурсы GRF недаступныя
 STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} быў адключаны з-за {4:STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Няслушны/невядомы фармат размяшчэння спрайтаў
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Асцярожна!
@@ -2845,6 +2859,12 @@ STR_NEWGRF_INVALID_CARGO_ABBREV                                 :??
 STR_NEWGRF_INVALID_CARGO_QUANTITY                               :{COMMA} <невядомага грузу>
 STR_NEWGRF_INVALID_ENGINE                                       :<няправільная мадэль>
 STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<невядомае прадпрыемства>
+
+# NewGRF scanning window
+STR_NEWGRF_SCAN_CAPTION                                         :{WHITE}Сканаваньне NewGRF
+STR_NEWGRF_SCAN_MESSAGE                                         :{BLACK}Ідзе сканаваньне NewGRF. Гэта зойме некаторы час...
+STR_NEWGRF_SCAN_STATUS                                          :{BLACK}Прасканаван{P 0 ы ы а} {NUM} з {NUM} модул{P я ёў ёў} NewGRF
+STR_NEWGRF_SCAN_ARCHIVES                                        :Пошук архіваў
 
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Сьпіс таблічак - {COMMA} табліч{P ка кi ак}
@@ -3153,6 +3173,8 @@ STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :Новы авi�
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}Кошт: {GOLD}{CURRENCY}{BLACK} Вага: {GOLD}{WEIGHT_S}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}Хуткасьць: {GOLD}{VELOCITY}{BLACK} Магутнасьць: {GOLD}{POWER}
 STR_PURCHASE_INFO_SPEED                                         :{BLACK}Хуткасьць: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_OCEAN                                   :{BLACK}Хуткасць у акіяне: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_CANAL                                   :{BLACK}Хуткасць у канале/рацэ: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_RUNNINGCOST                                   :{BLACK}Кошт абслугоўваньня: {GOLD}{CURRENCY}/год
 STR_PURCHASE_INFO_CAPACITY                                      :{BLACK}Ёмістасьць: {GOLD}{CARGO} {STRING}
 STR_PURCHASE_INFO_REFITTABLE                                    :(пераабст.)
@@ -3533,12 +3555,15 @@ STR_ORDER_DROP_HALT_DEPOT                                       :Стоп
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}Прапусціць гэтае заданьне, калі абслугоўваньне не патрабуецца
 
 STR_ORDER_CONDITIONAL_VARIABLE_TOOLTIP                          :{BLACK}Парамэтр транспарту для параўнаньня
+
+# Conditional order variables, must follow order of OrderConditionVariable enum
 STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE                           :Працэнт пагрузкі
 STR_ORDER_CONDITIONAL_RELIABILITY                               :Надзейнасьць
 STR_ORDER_CONDITIONAL_MAX_SPEED                                 :Макс. хуткасьць
 STR_ORDER_CONDITIONAL_AGE                                       :Узрост (гадоў)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :Патрабуецца абслугоўваньне
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :Заўсёды
+STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :Рэшткавы тэрмiн службы (гадоў)
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}Умова пераходу
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :роўна
@@ -3593,7 +3618,7 @@ STR_ORDER_STOP_ORDER                                            :(Стоп)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :(Аўтаматычна)
+STR_ORDER_IMPLICIT                                              :(Аўтаматычна)
 
 STR_ORDER_FULL_LOAD                                             :(Поўная загрузка)
 STR_ORDER_FULL_LOAD_ANY                                         :(Поўная загрузка любым грузам)
@@ -3784,6 +3809,8 @@ STR_ERROR_PNGMAP_MISC                                           :{WHITE}... не
 STR_ERROR_BMPMAP                                                :{WHITE}Не атрымалася загрузіць ляндшафт з BMP...
 STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... немагчыма пераўтварыць тып вiдарысу.
 
+STR_ERROR_HEIGHTMAP_TOO_LARGE                                   :{WHITE}... выява занадта вялiкая
+
 STR_WARNING_HEIGHTMAP_SCALE_CAPTION                             :{WHITE}Выхад за межы даступных значэньняў
 STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}Змяненьне памераў зыходнай карты да такіх значэньняў не рэкамендуецца. Працягваць?
 
@@ -3877,7 +3904,9 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... мо
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... можна будаваць толькі ў гарадах
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... можна будаваць толькі ў нізінах
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... можа знаходзіцца толькі ля краю мапы
-STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... лес можна саджаць толькі вышэй за лінію сьнегу
+STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... лес можна саджаць толькі вышэй за сьнегавую лiнiю
+STR_ERROR_CAN_ONLY_BE_BUILT_ABOVE_SNOW_LINE                     :{WHITE}... магчыма пабудаваць толькi вышэй за сьнегавую лiнiю
+STR_ERROR_CAN_ONLY_BE_BUILT_BELOW_SNOW_LINE                     :{WHITE}... магчыма пабудаваць толькi нiжэй за сьнегавую лiнiю
 
 # Station construction related errors
 STR_ERROR_CAN_T_BUILD_RAILROAD_STATION                          :{WHITE}Тут немагчыма пабудаваць чыгуначную станцыю...
@@ -3999,6 +4028,9 @@ STR_ERROR_CAN_T_BUILD_LOCKS                                     :{WHITE}Тут �
 STR_ERROR_CAN_T_PLACE_RIVERS                                    :{WHITE}Тут немагчыма разьмясьціць раку...
 STR_ERROR_MUST_BE_BUILT_ON_WATER                                :{WHITE}... трэба будаваць у вадзе
 STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... нельга будаваць у вадзе
+STR_ERROR_CAN_T_BUILD_ON_SEA                                    :{WHITE}... немагчыма пабудаваць у адкрытым моры
+STR_ERROR_CAN_T_BUILD_ON_CANAL                                  :{WHITE}... немагчыма пабудаваць на канале
+STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... немагчыма пабудаваць на рацэ
 STR_ERROR_MUST_DEMOLISH_CANAL_FIRST                             :{WHITE}Спачатку зьнясіце канал
 STR_ERROR_CAN_T_BUILD_AQUEDUCT_HERE                             :{WHITE}Тут немагчыма пабудаваць аквэдук...
 

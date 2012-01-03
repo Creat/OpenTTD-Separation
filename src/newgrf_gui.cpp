@@ -325,6 +325,7 @@ struct NewGRFParametersWindow : public Window {
 				/* One of the arrows is clicked */
 				if (IsInsideMM(x, 0, 21)) {
 					uint32 val = par_info->GetValue(this->grf_config);
+					uint32 old_val = val;
 					if (par_info->type == PTYPE_BOOL) {
 						val = !val;
 					} else {
@@ -338,16 +339,17 @@ struct NewGRFParametersWindow : public Window {
 							this->clicked_increase = false;
 						}
 					}
-					par_info->SetValue(this->grf_config, val);
+					if (val != old_val) {
+						par_info->SetValue(this->grf_config, val);
 
-					this->clicked_button = num;
-					this->timeout = 5;
+						this->clicked_button = num;
+						this->timeout = 5;
+					}
 				} else if (par_info->type == PTYPE_UINT_ENUM && click_count >= 2) {
 					/* Display a query box so users can enter a custom value. */
 					SetDParam(0, this->grf_config->param[num]);
 					ShowQueryString(STR_JUST_INT, STR_CONFIG_SETTING_QUERY_CAPTION, 10, this, CS_NUMERAL, QSF_NONE);
 				}
-
 				this->SetDirty();
 				break;
 			}
@@ -509,7 +511,7 @@ enum ShowNewGRFStateWidgets {
 /**
  * Window for showing NewGRF files
  */
-struct NewGRFWindow : public QueryStringBaseWindow {
+struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 	typedef GUIList<const GRFConfig *> GUIGRFConfigList;
 
 	static const uint EDITBOX_MAX_SIZE   =  50;
@@ -567,7 +569,7 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 		this->avails.SetFilterFuncs(this->filter_funcs);
 		this->avails.ForceRebuild();
 
-		this->OnInvalidateData(2);
+		this->OnInvalidateData(GOID_NEWGRF_LIST_EDITED);
 	}
 
 	~NewGRFWindow()
@@ -879,7 +881,7 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 				this->avail_pos = -1;
 				this->avail_sel = NULL;
 				this->avails.ForceRebuild();
-				this->InvalidateData(2);
+				this->InvalidateData(GOID_NEWGRF_LIST_EDITED);
 				break;
 			}
 
@@ -919,7 +921,7 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 				if (new_pos >= 0) this->avail_sel = this->avails[new_pos];
 
 				this->avails.ForceRebuild();
-				this->InvalidateData(2);
+				this->InvalidateData(GOID_NEWGRF_LIST_EDITED);
 				break;
 			}
 
@@ -941,7 +943,7 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 				break;
 
 			case SNGRFS_SET_PARAMETERS: { // Edit parameters
-				if (this->active_sel == NULL || !this->editable || !this->show_params) break;
+				if (this->active_sel == NULL || !this->editable || !this->show_params || this->active_sel->num_valid_params == 0) break;
 
 				OpenGRFParameterWindow(this->active_sel);
 				break;
@@ -983,15 +985,17 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 			case SNGRFS_RESCAN_FILES:
 			case SNGRFS_RESCAN_FILES2:
 				TarScanner::DoScan();
-				ScanNewGRFFiles();
-				this->avail_sel = NULL;
-				this->avail_pos = -1;
-				this->avails.ForceRebuild();
-				this->InvalidateData(1);
-				this->DeleteChildWindows(WC_QUERY_STRING); // Remove the parameter query window
-				InvalidateWindowClassesData(WC_SAVELOAD);
+				ScanNewGRFFiles(this);
 				break;
 		}
+	}
+
+	virtual void OnNewGRFsScanned()
+	{
+		this->avail_sel = NULL;
+		this->avail_pos = -1;
+		this->avails.ForceRebuild();
+		this->DeleteChildWindows(WC_QUERY_STRING); // Remove the parameter query window
 	}
 
 	virtual void OnDropdownSelect(int widget, int index)
@@ -1002,16 +1006,13 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 		this->preset = index;
 
 		if (index != -1) {
-			GRFConfig *c = LoadGRFPresetFromConfig(_grf_preset_list[index]);
-
-			this->active_sel = NULL;
-			this->actives = c;
-			this->avails.ForceRebuild();
+			this->actives = LoadGRFPresetFromConfig(_grf_preset_list[index]);
 		}
+		this->avails.ForceRebuild();
 
 		DeleteWindowByClass(WC_GRF_PARAMETERS);
 		this->active_sel = NULL;
-		this->InvalidateData(3);
+		this->InvalidateData(GOID_NEWGRF_PRESET_LOADED);
 	}
 
 	virtual void OnQueryTextFinished(char *str)
@@ -1034,24 +1035,18 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 
 	/**
 	 * Some data on this window has become invalid.
-	 * @param data Information about the changed data.
-	 *  - 0: (optionally) build availables, update button status.
-	 *  - 1: build availables, Add newly found grfs, update button status.
-	 *  - 2: (optionally) build availables, Reset preset, + 3
-	 *  - 3: (optionally) build availables, Update active scrollbar, update button status.
-	 *  - 4: Force a rebuild of the availables, + 2
+	 * @param data Information about the changed data. @see GameOptionsInvalidationData
 	 * @param gui_scope Whether the call is done from GUI scope. You may not do everything when not in GUI scope. See #InvalidateWindowData() for details.
 	 */
 	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
 	{
 		if (!gui_scope) return;
 		switch (data) {
-			default: NOT_REACHED();
-			case 0:
+			default:
 				/* Nothing important to do */
 				break;
 
-			case 1:
+			case GOID_NEWGRF_RESCANNED:
 				/* Search the list for items that are now found and mark them as such. */
 				for (GRFConfig **l = &this->actives; *l != NULL; l = &(*l)->next) {
 					GRFConfig *c = *l;
@@ -1068,14 +1063,14 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 
 					delete c;
 				}
-				/* FALL THROUGH */
-			case 4:
+
 				this->avails.ForceRebuild();
 				/* FALL THROUGH */
-			case 2:
+			case GOID_NEWGRF_LIST_EDITED:
 				this->preset = -1;
 				/* FALL THROUGH */
-			case 3: {
+			case GOID_NEWGRF_PRESET_LOADED: {
+				/* Update scrollbars */
 				int i = 0;
 				for (const GRFConfig *c = this->actives; c != NULL; c = c->next, i++) {}
 
@@ -1105,7 +1100,7 @@ struct NewGRFWindow : public QueryStringBaseWindow {
 			SNGRFS_MOVE_DOWN,
 			WIDGET_LIST_END
 		);
-		this->SetWidgetDisabledState(SNGRFS_SET_PARAMETERS, !this->show_params || disable_all);
+		this->SetWidgetDisabledState(SNGRFS_SET_PARAMETERS, !this->show_params || disable_all || this->active_sel->num_valid_params == 0);
 		this->SetWidgetDisabledState(SNGRFS_TOGGLE_PALETTE, disable_all);
 
 		if (!disable_all) {
@@ -1691,4 +1686,129 @@ void ShowNewGRFSettings(bool editable, bool show_params, bool exec_changes, GRFC
 {
 	DeleteWindowByClass(WC_GAME_OPTIONS);
 	new NewGRFWindow(&_newgrf_desc, editable, show_params, exec_changes, config);
+}
+
+/** The widgets for the scan progress. */
+enum ScanProgressWindowWidgets {
+	SPWW_PROGRESS_BAR,  ///< Simple progress bar.
+	GPWW_PROGRESS_TEXT, ///< Text explaining what is happening.
+};
+
+/** Widgets for the progress window. */
+static const NWidgetPart _nested_scan_progress_widgets[] = {
+	NWidget(WWT_CAPTION, COLOUR_GREY), SetDataTip(STR_NEWGRF_SCAN_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
+	NWidget(WWT_PANEL, COLOUR_GREY),
+		NWidget(NWID_HORIZONTAL), SetPIP(20, 0, 20),
+			NWidget(NWID_VERTICAL), SetPIP(11, 8, 11),
+				NWidget(WWT_LABEL, INVALID_COLOUR), SetDataTip(STR_NEWGRF_SCAN_MESSAGE, STR_NULL), SetFill(1, 0),
+				NWidget(WWT_EMPTY, INVALID_COLOUR, SPWW_PROGRESS_BAR), SetFill(1, 0),
+				NWidget(WWT_EMPTY, INVALID_COLOUR, GPWW_PROGRESS_TEXT), SetFill(1, 0),
+			EndContainer(),
+		EndContainer(),
+	EndContainer(),
+};
+
+/** Description of the widgets and other settings of the window. */
+static const WindowDesc _scan_progress_desc(
+	WDP_CENTER, 0, 0,
+	WC_MODAL_PROGRESS, WC_NONE,
+	WDF_UNCLICK_BUTTONS,
+	_nested_scan_progress_widgets, lengthof(_nested_scan_progress_widgets)
+);
+
+/** Window for showing the progress of NewGRF scanning. */
+struct ScanProgressWindow : public Window {
+	char *last_name; ///< The name of the last 'seen' NewGRF.
+	int scanned;     ///< The number of NewGRFs that we have seen.
+
+	/** Create the window. */
+	ScanProgressWindow() : Window(), last_name(NULL), scanned(0)
+	{
+		this->InitNested(&_scan_progress_desc);
+	}
+
+	/** Free the last name buffer. */
+	~ScanProgressWindow()
+	{
+		free(last_name);
+	}
+
+	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
+	{
+		switch (widget) {
+			case SPWW_PROGRESS_BAR: {
+				SetDParam(0, 100);
+				*size = GetStringBoundingBox(STR_GENERATION_PROGRESS);
+				/* We need some spacing for the 'border' */
+				size->height += 8;
+				size->width += 8;
+				break;
+			}
+
+			case GPWW_PROGRESS_TEXT:
+				SetDParam(0, 9999);
+				SetDParam(1, 9999);
+				/* We really don't know the width. We could determine it by scanning the NewGRFs,
+				 * but this is the status window for scanning them... */
+				size->width = max(400U, GetStringBoundingBox(STR_NEWGRF_SCAN_STATUS).width);
+				size->height = FONT_HEIGHT_NORMAL * 2 + WD_PAR_VSEP_NORMAL;
+				break;
+		}
+	}
+
+	virtual void DrawWidget(const Rect &r, int widget) const
+	{
+		switch (widget) {
+			case SPWW_PROGRESS_BAR: {
+				/* Draw the % complete with a bar and a text */
+				DrawFrameRect(r.left, r.top, r.right, r.bottom, COLOUR_GREY, FR_BORDERONLY);
+				uint percent = scanned * 100 / max(1U, _settings_client.gui.last_newgrf_count);
+				DrawFrameRect(r.left + 1, r.top + 1, (int)((r.right - r.left - 2) * percent / 100) + r.left + 1, r.bottom - 1, COLOUR_MAUVE, FR_NONE);
+				SetDParam(0, percent);
+				DrawString(r.left, r.right, r.top + 5, STR_GENERATION_PROGRESS, TC_FROMSTRING, SA_HOR_CENTER);
+				break;
+			}
+
+			case GPWW_PROGRESS_TEXT:
+				SetDParam(0, this->scanned);
+				SetDParam(1, _settings_client.gui.last_newgrf_count);
+				DrawString(r.left, r.right, r.top, STR_NEWGRF_SCAN_STATUS, TC_FROMSTRING, SA_HOR_CENTER);
+
+				DrawString(r.left, r.right, r.top + FONT_HEIGHT_NORMAL + WD_PAR_VSEP_NORMAL, this->last_name == NULL ? "" : this->last_name, TC_BLACK, SA_HOR_CENTER);
+				break;
+		}
+	}
+
+	/**
+	 * Update the NewGRF scan status.
+	 * @param num  The number of NewGRFs scanned so far.
+	 * @param name The name of the last scanned NewGRF.
+	 */
+	void UpdateNewGRFScanStatus(uint num, const char *name)
+	{
+		free(this->last_name);
+		if (name == NULL) {
+			char buf[256];
+			GetString(buf, STR_NEWGRF_SCAN_ARCHIVES, lastof(buf));
+			this->last_name = strdup(buf);
+		} else {
+			this->last_name = strdup(name);
+		}
+		this->scanned = num;
+		if (num > _settings_client.gui.last_newgrf_count) _settings_client.gui.last_newgrf_count = num;
+
+		this->SetDirty();
+	}
+};
+
+/**
+ * Update the NewGRF scan status.
+ * @param num  The number of NewGRFs scanned so far.
+ * @param name The name of the last scanned NewGRF.
+ */
+void UpdateNewGRFScanStatus(uint num, const char *name)
+{
+	ScanProgressWindow *w  = dynamic_cast<ScanProgressWindow *>(FindWindowByClass(WC_MODAL_PROGRESS));
+	if (w == NULL) w = new ScanProgressWindow();
+	w->UpdateNewGRFScanStatus(num, name);
 }

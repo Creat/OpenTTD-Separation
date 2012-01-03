@@ -339,6 +339,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Objekt p
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Szenario speichern
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Szenario laden
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Reliefkarte speichern
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Reliefkarte laden
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Editor verlassen
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -356,6 +357,7 @@ STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Städtenamen an
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Stationsnamen anzeigen
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Wegpunktsnamen anzeigen
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Schilder anzeigen
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Schilder von Wettbewerbern anzeigen
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Vollständige Animation
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Vollständige Detailansicht
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Transparenz für Gebäude
@@ -448,6 +450,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Hereingezoomter
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Riesiger Screenshot (Standard: Strg+G)
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Über 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Sprite-Ausrichtung
+STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Hüllquader anzeigen/ausblenden
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -859,24 +862,24 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_FRAME                           :{BLACK}Währung
 STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}Währung auswählen
 
 ############ start of currency region
-STR_GAME_OPTIONS_CURRENCY_GBP                                   :Engl. Pfund (GBP)
+STR_GAME_OPTIONS_CURRENCY_GBP                                   :Englische Pfund (GBP)
 STR_GAME_OPTIONS_CURRENCY_USD                                   :US-Dollar (USD)
 STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (EUR)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :Jap. Yen (JPY)
-STR_GAME_OPTIONS_CURRENCY_ATS                                   :Österreich. Schilling (ATS)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :Japanische Yen (JPY)
+STR_GAME_OPTIONS_CURRENCY_ATS                                   :Österreichische Schilling (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :Belgische Francs (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :Schweizer Franken (CHF)
 STR_GAME_OPTIONS_CURRENCY_CZK                                   :Tschechische Kronen (CZK)
 STR_GAME_OPTIONS_CURRENCY_DEM                                   :Deutsche Mark (DEM)
 STR_GAME_OPTIONS_CURRENCY_DKK                                   :Dänische Kronen (DKK)
-STR_GAME_OPTIONS_CURRENCY_ESP                                   :Span. Peseten (ESP)
+STR_GAME_OPTIONS_CURRENCY_ESP                                   :Spanische Peseten (ESP)
 STR_GAME_OPTIONS_CURRENCY_FIM                                   :Finnische Mark(FIM)
-STR_GAME_OPTIONS_CURRENCY_FRF                                   :Frz. Francs (FRF)
-STR_GAME_OPTIONS_CURRENCY_GRD                                   :Griech. Drachmen (GRD)
+STR_GAME_OPTIONS_CURRENCY_FRF                                   :Französische Francs (FRF)
+STR_GAME_OPTIONS_CURRENCY_GRD                                   :Griechische Drachmen (GRD)
 STR_GAME_OPTIONS_CURRENCY_HUF                                   :Ungarische Forint (HUF)
 STR_GAME_OPTIONS_CURRENCY_ISK                                   :Isländische Kronen (ISK)
 STR_GAME_OPTIONS_CURRENCY_ITL                                   :Italienische Lire (ITL)
-STR_GAME_OPTIONS_CURRENCY_NLG                                   :Niederländ. Gulden (NLG)
+STR_GAME_OPTIONS_CURRENCY_NLG                                   :Niederländische Gulden (NLG)
 STR_GAME_OPTIONS_CURRENCY_NOK                                   :Norwegische Kronen (NOK)
 STR_GAME_OPTIONS_CURRENCY_PLN                                   :Polnische Zloty (PLN)
 STR_GAME_OPTIONS_CURRENCY_RON                                   :Rumänische Lei (RON)
@@ -886,7 +889,7 @@ STR_GAME_OPTIONS_CURRENCY_SEK                                   :Schwedische Kro
 STR_GAME_OPTIONS_CURRENCY_TRY                                   :Türkische Lire (TRY)
 STR_GAME_OPTIONS_CURRENCY_SKK                                   :Slowakische Kronen (SKK)
 STR_GAME_OPTIONS_CURRENCY_BRL                                   :Brasilianische Reais (BRL)
-STR_GAME_OPTIONS_CURRENCY_EEK                                   :Estnische Krone (EEK)
+STR_GAME_OPTIONS_CURRENCY_EEK                                   :Estnische Kronen (EEK)
 STR_GAME_OPTIONS_CURRENCY_CUSTOM                                :Eigene...
 ############ end of currency region
 
@@ -1056,6 +1059,11 @@ STR_SEA_LEVEL_MEDIUM                                            :Mittel
 STR_SEA_LEVEL_HIGH                                              :Hoch
 STR_SEA_LEVEL_CUSTOM                                            :Individuell
 STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Individuell ({NUM}%)
+
+STR_RIVERS_NONE                                                 :Keine
+STR_RIVERS_FEW                                                  :Wenige
+STR_RIVERS_MODERATE                                             :einige
+STR_RIVERS_LOT                                                  :Viele
 
 STR_DISASTER_NONE                                               :Keine
 STR_DISASTER_REDUCED                                            :Verringert
@@ -1393,6 +1401,8 @@ STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}NewGRF-E
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Prüfe auf neue oder aktualisierte Erweiterungen zum Herunterladen
 STR_INTRO_TOOLTIP_AI_SETTINGS                                   :{BLACK}Einstellungen für KI anzeigen und / oder ändern
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}'OpenTTD' beenden
+
+STR_INTRO_TRANSLATION                                           :{BLACK}Dieser Übersetzung fehl{P 0 t en} {NUM} String{P "" s}. Bitte hilf, OpenTTD zu verbessern und melde Dich als Übersetzer an. Siehe readme.txt für weitere Details.
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Verlassen
@@ -2279,6 +2289,7 @@ STR_SAVELOAD_LOAD_CAPTION                                       :{WHITE}Spiel la
 STR_SAVELOAD_SAVE_SCENARIO                                      :{WHITE}Szenario speichern
 STR_SAVELOAD_LOAD_SCENARIO                                      :{WHITE}Szenario laden
 STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Reliefkarte laden
+STR_SAVELOAD_SAVE_HEIGHTMAP                                     :{WHITE}Reliefkarte speichern
 STR_SAVELOAD_HOME_BUTTON                                        :{BLACK}Hier klicken, um zum Standardverzeichnis für Spielstände zu gehen
 STR_SAVELOAD_BYTES_FREE                                         :{BLACK}{BYTES} frei
 STR_SAVELOAD_LIST_TOOLTIP                                       :{BLACK}Liste der Laufwerke, Verzeichnisse und gespeicherten Spiele
@@ -2314,6 +2325,7 @@ STR_MAPGEN_LAND_GENERATOR                                       :{BLACK}Landgene
 STR_MAPGEN_TREE_PLACER                                          :{BLACK}Baumalgorithmus:
 STR_MAPGEN_TERRAIN_TYPE                                         :{BLACK}Landschaftstyp:
 STR_MAPGEN_QUANTITY_OF_SEA_LAKES                                :{BLACK}Gewässermenge:
+STR_MAPGEN_QUANTITY_OF_RIVERS                                   :{BLACK}Flüsse:
 STR_MAPGEN_SMOOTHNESS                                           :{BLACK}Gleichmäßigkeit:
 STR_MAPGEN_VARIETY                                              :{BLACK}Größe der Geländeformen:
 STR_MAPGEN_GENERATE                                             :{WHITE}Erzeugen
@@ -2358,6 +2370,7 @@ STR_GENERATION_ABORT_MESSAGE                                    :{YELLOW}Soll di
 STR_GENERATION_PROGRESS                                         :{WHITE}{NUM}% abgeschlossen
 STR_GENERATION_PROGRESS_NUM                                     :{BLACK}{NUM} / {NUM}
 STR_GENERATION_WORLD_GENERATION                                 :{BLACK}Spielfeld wird erzeugt
+STR_GENERATION_RIVER_GENERATION                                 :{BLACK}Flußgenerierung
 STR_GENERATION_TREE_GENERATION                                  :{BLACK}Bäume werden erzeugt
 STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Unbewegliche Objekte werden erzeugt
 STR_GENERATION_CLEARING_TILES                                   :{BLACK}Raue, felsige Landschaft wird erzeugt
@@ -2474,6 +2487,7 @@ STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lesezugriff üb
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Den momentan verwendeten Basisgrafiken fehlen Sprites.{}Durch ein Update der Basisgrafiken kann dieser Fehler behoben werden
 STR_NEWGRF_ERROR_GRM_FAILED                                     :Die angeforderten GRF-Ressourcen sind nicht verfügbar
 STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} wurde von {4:STRING} deaktiviert
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Ungültiges/unbekanntes SpriteLayout-Format
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Achtung!
@@ -2509,6 +2523,12 @@ STR_NEWGRF_INVALID_CARGO_ABBREV                                 :??
 STR_NEWGRF_INVALID_CARGO_QUANTITY                               :{COMMA} of <ungültige Frachtart>
 STR_NEWGRF_INVALID_ENGINE                                       :<ungültiger Fahrzeugtyp>
 STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<ungültige Industrie>
+
+# NewGRF scanning window
+STR_NEWGRF_SCAN_CAPTION                                         :{WHITE}NewGRFs scannen
+STR_NEWGRF_SCAN_MESSAGE                                         :{BLACK}NewGRFs scannen. Abhängig von deren Anzahl kann dieses ein wenig dauern...
+STR_NEWGRF_SCAN_STATUS                                          :{BLACK}{NUM} NewGRF{P "" s} von geschätzten {NUM} NewGRF{P "" s} gescannt
+STR_NEWGRF_SCAN_ARCHIVES                                        :Scannen nach Archivdateien
 
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Schilderliste ({COMMA} Schild{P "" er})
@@ -2817,6 +2837,8 @@ STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :Neue Flugzeuge
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}Kosten: {GOLD}{CURRENCY}{BLACK} Gewicht: {GOLD}{WEIGHT_S}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}Geschw.: {GOLD}{VELOCITY}{BLACK} Leistung: {GOLD}{POWER}
 STR_PURCHASE_INFO_SPEED                                         :{BLACK}Geschwindigkeit: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_OCEAN                                   :{BLACK}Geschwindigkeit auf dem Meer: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_CANAL                                   :{BLACK}Geschwindigkeit auf Kanälen und Flüssen: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_RUNNINGCOST                                   :{BLACK}Betriebskosten: {GOLD}{CURRENCY} pro Jahr
 STR_PURCHASE_INFO_CAPACITY                                      :{BLACK}Kapazität: {GOLD}{CARGO} {STRING}
 STR_PURCHASE_INFO_REFITTABLE                                    :(umrüstbar)
@@ -3177,12 +3199,15 @@ STR_ORDER_DROP_HALT_DEPOT                                       :Stopp
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}Überspringe diesen Auftrag, sofern keine Wartung benötigt wird
 
 STR_ORDER_CONDITIONAL_VARIABLE_TOOLTIP                          :{BLACK}Fahrzeuginformation, welche für den Sprung ausgewertet wird
+
+# Conditional order variables, must follow order of OrderConditionVariable enum
 STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE                           :Ladezustand (Prozent)
 STR_ORDER_CONDITIONAL_RELIABILITY                               :Zuverlässigkeit
 STR_ORDER_CONDITIONAL_MAX_SPEED                                 :Höchstgeschwindigkeit
 STR_ORDER_CONDITIONAL_AGE                                       :Fahrzeugalter (Jahre)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :Benötigt Inspektion
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :Immer
+STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :Verbleibende Laufzeit (Jahre)
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}Vergleich der Farzeuginformation mit eingegebenen Wert
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :gleich
@@ -3237,7 +3262,7 @@ STR_ORDER_STOP_ORDER                                            :(Stopp)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :(Automatisch)
+STR_ORDER_IMPLICIT                                              :(Implizit)
 
 STR_ORDER_FULL_LOAD                                             :(Voll beladen)
 STR_ORDER_FULL_LOAD_ANY                                         :(Mit einer Fracht voll beladen)
@@ -3428,6 +3453,8 @@ STR_ERROR_PNGMAP_MISC                                           :{WHITE}... irge
 STR_ERROR_BMPMAP                                                :{WHITE}Landschaft kann nicht aus BMP-Datei geladen werden...
 STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... Bildtyp kann nicht umgewandelt werden
 
+STR_ERROR_HEIGHTMAP_TOO_LARGE                                   :{WHITE}... Bild ist zu groß
+
 STR_WARNING_HEIGHTMAP_SCALE_CAPTION                             :{WHITE}Skalierungswarnung
 STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}Zu starke Skalierung des Spielfeldes wird nicht empfohlen. Generierung dennoch fortsetzen?
 
@@ -3522,6 +3549,8 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... kann
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... kann nur im Tiefland gebaut werden
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... kann nur in der Nähe des Spielfeldrandes errichtet werden
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... Wald kann nur oberhalb der Schneegrenze gepflanzt werden
+STR_ERROR_CAN_ONLY_BE_BUILT_ABOVE_SNOW_LINE                     :{WHITE}... kann nur oberhalb der Schneegrenze errichtet werden
+STR_ERROR_CAN_ONLY_BE_BUILT_BELOW_SNOW_LINE                     :{WHITE}... kann nur unterhalb der Schneegrenze errichtet werden
 
 # Station construction related errors
 STR_ERROR_CAN_T_BUILD_RAILROAD_STATION                          :{WHITE}Bahnhof kann hier nicht gebaut werden...
@@ -3643,6 +3672,9 @@ STR_ERROR_CAN_T_BUILD_LOCKS                                     :{WHITE}Schleuse
 STR_ERROR_CAN_T_PLACE_RIVERS                                    :{WHITE}Flüsse können hier nicht platziert werden...
 STR_ERROR_MUST_BE_BUILT_ON_WATER                                :{WHITE}... muss auf Wasser gebaut werden
 STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... kann nicht auf Wasser gebaut werden
+STR_ERROR_CAN_T_BUILD_ON_SEA                                    :{WHITE}... kann nicht auf offener See errichtet werden
+STR_ERROR_CAN_T_BUILD_ON_CANAL                                  :{WHITE}... kann nicht auf Kanal errichtet werden
+STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... kann nicht auf Fluß errichtet werden
 STR_ERROR_MUST_DEMOLISH_CANAL_FIRST                             :{WHITE}Kanal muss erst abgerissen werden
 STR_ERROR_CAN_T_BUILD_AQUEDUCT_HERE                             :{WHITE}Aquädukt kann hier nicht gebaut werden...
 

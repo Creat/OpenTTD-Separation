@@ -72,6 +72,15 @@ struct ShipVehicleInfo {
 	SoundID sfx;
 	bool old_refittable;   ///< Is ship refittable; only used during initialisation. Later use EngineInfo::refit_mask.
 	byte visual_effect;    ///< Bitstuffed NewGRF visual effect data
+	byte ocean_speed_frac; ///< Fraction of maximum speed for ocean tiles.
+	byte canal_speed_frac; ///< Fraction of maximum speed for canal/river tiles.
+
+	/** Apply ocean/canal speed fraction to a velocity */
+	uint ApplyWaterClassSpeedFrac(uint raw_speed, bool is_ocean) const
+	{
+		/* speed_frac == 0 means no reduction while 0xFF means reduction to 1/256. */
+		return raw_speed * (256 - (is_ocean ? this->ocean_speed_frac : this->canal_speed_frac)) / 256;
+	}
 };
 
 /**
@@ -132,6 +141,7 @@ struct EngineInfo {
 	byte callback_mask; ///< Bitmask of vehicle callbacks that have to be called
 	int8 retire_early;  ///< Number of years early to retire vehicle
 	StringID string_id; ///< Default name of engine
+	uint16 cargo_age_period; ///< Number of ticks before carried cargo is aged.
 };
 
 /**

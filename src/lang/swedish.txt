@@ -338,6 +338,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Placera 
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Spara scenario
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Öppna scenario
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Spara höjdkarta
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Ladda höjdkarta
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Avsluta editor
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -355,6 +356,7 @@ STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Stadsnamn visas
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Stationsnamn visas
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Riktmärken visas
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Skyltar visas
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Motståndarnas skyltar och namn visas
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Full animering
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Full detaljnivå
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Genomskinliga byggnader
@@ -447,6 +449,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Inzoomad skärm
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Skärmdump av hela kartan
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Om 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Justering av spriteobjekt
+STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Slå av/på yttre gränser för grafiska element
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -858,19 +861,19 @@ STR_GAME_OPTIONS_CURRENCY_UNITS_FRAME                           :{BLACK}Valutaen
 STR_GAME_OPTIONS_CURRENCY_UNITS_DROPDOWN_TOOLTIP                :{BLACK}Välj valutaenhet
 
 ############ start of currency region
-STR_GAME_OPTIONS_CURRENCY_GBP                                   :Pund (£)
-STR_GAME_OPTIONS_CURRENCY_USD                                   :Dollar ($)
-STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (€)
-STR_GAME_OPTIONS_CURRENCY_YEN                                   :Yen (¥)
+STR_GAME_OPTIONS_CURRENCY_GBP                                   :Britiska pund (£)
+STR_GAME_OPTIONS_CURRENCY_USD                                   :Amerikanska Dollar (USD)
+STR_GAME_OPTIONS_CURRENCY_EUR                                   :Euro (EUR)
+STR_GAME_OPTIONS_CURRENCY_JPY                                   :Japanska Yen (¥)
 STR_GAME_OPTIONS_CURRENCY_ATS                                   :Österrikiska shilling (ATS)
 STR_GAME_OPTIONS_CURRENCY_BEF                                   :Belgiska franc (BEF)
 STR_GAME_OPTIONS_CURRENCY_CHF                                   :Schweiziska franc (CHF)
 STR_GAME_OPTIONS_CURRENCY_CZK                                   :Tjeckiska kronor (CZK)
 STR_GAME_OPTIONS_CURRENCY_DEM                                   :Tyska mark (DEM)
 STR_GAME_OPTIONS_CURRENCY_DKK                                   :Danska kronor (DKK)
-STR_GAME_OPTIONS_CURRENCY_ESP                                   :Peseta (ESP)
+STR_GAME_OPTIONS_CURRENCY_ESP                                   :Spanska Peseta (ESP)
 STR_GAME_OPTIONS_CURRENCY_FIM                                   :Finska mark (FIM)
-STR_GAME_OPTIONS_CURRENCY_FRF                                   :Franc (FRF)
+STR_GAME_OPTIONS_CURRENCY_FRF                                   :Franska Franc (FRF)
 STR_GAME_OPTIONS_CURRENCY_GRD                                   :Grekiska drachmer (GRD)
 STR_GAME_OPTIONS_CURRENCY_HUF                                   :Ungerska Forint (HUF)
 STR_GAME_OPTIONS_CURRENCY_ISK                                   :Isländska kronor (ISK)
@@ -1056,6 +1059,11 @@ STR_SEA_LEVEL_HIGH                                              :Hög
 STR_SEA_LEVEL_CUSTOM                                            :Valfri
 STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Valfri ({NUM}%)
 
+STR_RIVERS_NONE                                                 :inga
+STR_RIVERS_FEW                                                  :få
+STR_RIVERS_MODERATE                                             :mellan
+STR_RIVERS_LOT                                                  :många
+
 STR_DISASTER_NONE                                               :Ingen
 STR_DISASTER_REDUCED                                            :Reducerad
 STR_DISASTER_NORMAL                                             :Normal
@@ -1110,8 +1118,8 @@ STR_CONFIG_SETTING_TRAIN_LENGTH                                 :{LTBLUE}Maximal
 STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}Mängden rök/gnistor från fordon: {ORANGE}{STRING}
 STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :{LTBLUE}Accelerationsmodell för tåg: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :{LTBLUE}Accelerationsmodell för vägfordon: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Slutnings lutning för tåg {ORANGE}{STRING}%
-STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Lutningars lutningsgrad för vägfordon {ORANGE}{STRING}%
+STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Lutningars lutningsgrad för tåg: {ORANGE}{STRING}%
+STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Lutningars lutningsgrad för vägfordon: {ORANGE}{STRING}%
 STR_CONFIG_SETTING_FORBID_90_DEG                                :{LTBLUE}Förbjud tåg och skepp att göra 90° svängar: {ORANGE}{STRING}
 STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :{LTBLUE}Tillåt att stationer som inte är byggda direkt brevid varandra slås ihop: {ORANGE}{STRING}
 STR_CONFIG_SETTING_IMPROVEDLOAD                                 :{LTBLUE}Använd förbättrad algoritm: {ORANGE}{STRING}
@@ -1222,6 +1230,10 @@ STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES                    :{LTBLUE}Använd
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_LONG               :lång (31st Dec 2008)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_SHORT              :kort (31-12-2008)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :ISO (2008-12-31)
+
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE                       :{LTBLUE}Standardpalett för NewGRF när ingen annan palett är angiven: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_DOS                   :DOS-palett
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_WIN                   :Windows-palett
 
 STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :{LTBLUE}Pausa automatiskt vid start av nytt spel: {ORANGE}{STRING}
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL                          :{LTBLUE}Tillåt när spelet är pausat: {ORANGE}{STRING}
@@ -1388,6 +1400,8 @@ STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Visa ins
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Kolla efter nytt och nyuppdaterat innehåll för nedladdning
 STR_INTRO_TOOLTIP_AI_SETTINGS                                   :{BLACK}Visa inställningar för datorspelare
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Avsluta 'OpenTTD'
+
+STR_INTRO_TRANSLATION                                           :{BLACK}Den här översättningen saknar {NUM} sträng{P "" ar}. Hjälp gärna till att förbättra OpenTTD genom att bli översättare. Se readme.txt för mer info.
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Avsluta
@@ -2274,6 +2288,7 @@ STR_SAVELOAD_LOAD_CAPTION                                       :{WHITE}Ladda sp
 STR_SAVELOAD_SAVE_SCENARIO                                      :{WHITE}Spara scenario
 STR_SAVELOAD_LOAD_SCENARIO                                      :{WHITE}Öppna scenario
 STR_SAVELOAD_LOAD_HEIGHTMAP                                     :{WHITE}Läs höjdkarta
+STR_SAVELOAD_SAVE_HEIGHTMAP                                     :{WHITE}Spara Höjdkarta
 STR_SAVELOAD_HOME_BUTTON                                        :{BLACK}Klicka här för att gå till standardkatalogen för spara/ladda.
 STR_SAVELOAD_BYTES_FREE                                         :{BLACK}{BYTES} ledigt
 STR_SAVELOAD_LIST_TOOLTIP                                       :{BLACK}Listar enheter, kataloger och sparade spel
@@ -2298,9 +2313,9 @@ STR_MAPGEN_BY                                                   :{BLACK}*
 STR_MAPGEN_NUMBER_OF_TOWNS                                      :{BLACK}Antal städer:
 STR_MAPGEN_DATE                                                 :{BLACK}Datum:
 STR_MAPGEN_NUMBER_OF_INDUSTRIES                                 :{BLACK}Antal industrier:
-STR_MAPGEN_SNOW_LINE_HEIGHT                                     :{BLACK}Snölinjens höjd:
-STR_MAPGEN_SNOW_LINE_UP                                         :{BLACK}Höj snölinjens höjd ett upp
-STR_MAPGEN_SNOW_LINE_DOWN                                       :{BLACK}Sänk snölinjens höjd ett ner
+STR_MAPGEN_SNOW_LINE_HEIGHT                                     :{BLACK}Snögränsens höjd:
+STR_MAPGEN_SNOW_LINE_UP                                         :{BLACK}Höj snögränsens höjd ett upp
+STR_MAPGEN_SNOW_LINE_DOWN                                       :{BLACK}Sänk snögränsens höjd ett ner
 STR_MAPGEN_RANDOM_SEED                                          :{BLACK}Slumpnummer:
 STR_MAPGEN_RANDOM_SEED_HELP                                     :{BLACK}Klicka för att mata in ett slump-nummer
 STR_MAPGEN_RANDOM                                               :{BLACK}Slumpa
@@ -2309,6 +2324,7 @@ STR_MAPGEN_LAND_GENERATOR                                       :{BLACK}Landgene
 STR_MAPGEN_TREE_PLACER                                          :{BLACK}Trädalgoritm:
 STR_MAPGEN_TERRAIN_TYPE                                         :{BLACK}Terrängtyp:
 STR_MAPGEN_QUANTITY_OF_SEA_LAKES                                :{BLACK}Havsnivå
+STR_MAPGEN_QUANTITY_OF_RIVERS                                   :{BLACK}Flod:
 STR_MAPGEN_SMOOTHNESS                                           :{BLACK}Jämnhet:
 STR_MAPGEN_VARIETY                                              :{BLACK}Varierad distribution:
 STR_MAPGEN_GENERATE                                             :{WHITE}Generera
@@ -2331,7 +2347,7 @@ STR_MAPGEN_HEIGHTMAP_SIZE_LABEL                                 :{BLACK}Storlek:
 STR_MAPGEN_HEIGHTMAP_SIZE                                       :{ORANGE}{NUM} x {NUM}
 
 STR_MAPGEN_RANDOM_SEED_OSKTITLE                                 :{BLACK}Mata in ett slumpmässigt frö
-STR_MAPGEN_SNOW_LINE_QUERY_CAPT                                 :{WHITE}Ändra snölinjens höjd
+STR_MAPGEN_SNOW_LINE_QUERY_CAPT                                 :{WHITE}Ändra snögränsens höjd
 STR_MAPGEN_START_DATE_QUERY_CAPT                                :{WHITE}Ändra Startår
 
 # SE Map generation
@@ -2353,8 +2369,9 @@ STR_GENERATION_ABORT_MESSAGE                                    :{YELLOW}Vill du
 STR_GENERATION_PROGRESS                                         :{WHITE}{NUM}% färdigt
 STR_GENERATION_PROGRESS_NUM                                     :{BLACK}{NUM} / {NUM}
 STR_GENERATION_WORLD_GENERATION                                 :{BLACK}Generera Värld
+STR_GENERATION_RIVER_GENERATION                                 :{BLACK}Generera Flod
 STR_GENERATION_TREE_GENERATION                                  :{BLACK}Generera Träd
-STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Oflyttbar generera
+STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Generera Objekt
 STR_GENERATION_CLEARING_TILES                                   :{BLACK}Svår och stenig markgenerering
 STR_GENERATION_SETTINGUP_GAME                                   :{BLACK}Ställer in spel
 STR_GENERATION_PREPARING_TILELOOP                               :{BLACK}Kör tile-loop
@@ -2467,6 +2484,9 @@ STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING
 STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Innehåller flera Action 8
 STR_NEWGRF_ERROR_READ_BOUNDS                                    :Läste förbi slutetet av pseudo-sprite
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Det aktiva grafikpaketet saknar ett antal bilder.{}Var vänlig och uppdatera grafikpaketet
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Efterfrågade GRF-resurser är ej tillgängliga
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} har inaktiverats av {4:STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Ogiltig/okänd sprite layout format
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Varning!
@@ -2502,6 +2522,12 @@ STR_NEWGRF_INVALID_CARGO_ABBREV                                 :??
 STR_NEWGRF_INVALID_CARGO_QUANTITY                               :{COMMA} av <invalid cargo>
 STR_NEWGRF_INVALID_ENGINE                                       :<icke giltig fordonstyp>
 STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<icke giltig industri>
+
+# NewGRF scanning window
+STR_NEWGRF_SCAN_CAPTION                                         :{WHITE}Skannar NewGRFer
+STR_NEWGRF_SCAN_MESSAGE                                         :{BLACK}Skannar NewGRFer. Beroende på antal kan det ta en stund...
+STR_NEWGRF_SCAN_STATUS                                          :{BLACK}{NUM} NewGRF{P "" er} skannade utav uppskattningsvis {NUM} NewGRF{P "" er} totalt
+STR_NEWGRF_SCAN_ARCHIVES                                        :Skannar efter arkiv
 
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Skyltlista - {COMMA} Skylt{P "" ar}
@@ -2610,7 +2636,7 @@ STR_STATION_VIEW_CARGO_RATINGS_TITLE                            :{BLACK}Lokal v�
 STR_STATION_VIEW_CARGO_RATING                                   :{WHITE}{STRING}: {YELLOW}{STRING} ({COMMA}%)
 
 ############ range for rating starts
-STR_CARGO_RATING_APPALLING                                      :Hemskt Dålig
+STR_CARGO_RATING_APPALLING                                      :Hemskt dålig
 STR_CARGO_RATING_VERY_POOR                                      :Väldigt dålig
 STR_CARGO_RATING_POOR                                           :Dålig
 STR_CARGO_RATING_MEDIOCRE                                       :Medelmåttig
@@ -2810,6 +2836,8 @@ STR_BUY_VEHICLE_AIRCRAFT_CAPTION                                :Nytt flygplan
 STR_PURCHASE_INFO_COST_WEIGHT                                   :{BLACK}Kostnad: {GOLD}{CURRENCY}{BLACK} Vikt: {GOLD}{WEIGHT_S}
 STR_PURCHASE_INFO_SPEED_POWER                                   :{BLACK}Hastighet: {GOLD}{VELOCITY}{BLACK} Kraft: {GOLD}{POWER}
 STR_PURCHASE_INFO_SPEED                                         :{BLACK}Hastighet: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_OCEAN                                   :{BLACK}Hastighet i hav: {GOLD}{VELOCITY}
+STR_PURCHASE_INFO_SPEED_CANAL                                   :{BLACK}Hastighet i kanal/flod: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_RUNNINGCOST                                   :{BLACK}Driftkostnader: {GOLD}{CURRENCY}/år
 STR_PURCHASE_INFO_CAPACITY                                      :{BLACK}Kapacitet: {GOLD}{CARGO} {STRING}
 STR_PURCHASE_INFO_REFITTABLE                                    :(anpassningsbart)
@@ -3170,12 +3198,15 @@ STR_ORDER_DROP_HALT_DEPOT                                       :Stanna
 STR_ORDER_SERVICE_TOOLTIP                                       :{BLACK}Skippa den här ordern om service ej behövs
 
 STR_ORDER_CONDITIONAL_VARIABLE_TOOLTIP                          :{BLACK}Fordonsdata att basera hoppning på
+
+# Conditional order variables, must follow order of OrderConditionVariable enum
 STR_ORDER_CONDITIONAL_LOAD_PERCENTAGE                           :Laddningsprocent
 STR_ORDER_CONDITIONAL_RELIABILITY                               :Tillförlitlighet
 STR_ORDER_CONDITIONAL_MAX_SPEED                                 :Toppfart
-STR_ORDER_CONDITIONAL_AGE                                       :Fordonsålder (år)
+STR_ORDER_CONDITIONAL_AGE                                       :Ålder (år)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :Behöver service
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :Alltid
+STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :Återstående livstid (år)
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}Hur man jämför fordonsdata med givet värde
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :samma som
@@ -3230,7 +3261,7 @@ STR_ORDER_STOP_ORDER                                            :(Stanna)
 
 STR_ORDER_GO_TO_STATION                                         :{STRING} {STATION} {STRING}
 
-STR_ORDER_AUTOMATIC                                             :(Automatisk)
+STR_ORDER_IMPLICIT                                              :(Underförstådd)
 
 STR_ORDER_FULL_LOAD                                             :(Full last)
 STR_ORDER_FULL_LOAD_ANY                                         :(Full last någon godstyp)
@@ -3421,6 +3452,8 @@ STR_ERROR_PNGMAP_MISC                                           :{WHITE}... någ
 STR_ERROR_BMPMAP                                                :{WHITE}Kan inte ladda landskap från BMP...
 STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... kunde inte konvertera bildformat
 
+STR_ERROR_HEIGHTMAP_TOO_LARGE                                   :{WHITE}... för stor bild
+
 STR_WARNING_HEIGHTMAP_SCALE_CAPTION                             :{WHITE}Skala-varning
 STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}För stora storleksändringar av källkarta är inte rekomenderat. Fortsätt med generering?
 
@@ -3514,7 +3547,9 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... kan 
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... kan bara byggas i städer
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... kan bara byggas i låglandsområden
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... kan bara placeras nära kartans kant
-STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... skog kan bara planteras ovanför snölinjen
+STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... skog kan bara planteras ovanför snögränsen
+STR_ERROR_CAN_ONLY_BE_BUILT_ABOVE_SNOW_LINE                     :{WHITE}... kan endast byggas ovanför snögränsen
+STR_ERROR_CAN_ONLY_BE_BUILT_BELOW_SNOW_LINE                     :{WHITE}... kan endast byggas nedanför snögränsen
 
 # Station construction related errors
 STR_ERROR_CAN_T_BUILD_RAILROAD_STATION                          :{WHITE}Kan inte bygga järnvägsstation här...
@@ -3636,6 +3671,9 @@ STR_ERROR_CAN_T_BUILD_LOCKS                                     :{WHITE}Kan inte
 STR_ERROR_CAN_T_PLACE_RIVERS                                    :{WHITE}Kan inte placera flod här...
 STR_ERROR_MUST_BE_BUILT_ON_WATER                                :{WHITE}... måste byggas på vatten
 STR_ERROR_CAN_T_BUILD_ON_WATER                                  :{WHITE}... kan inte bygga på vatten
+STR_ERROR_CAN_T_BUILD_ON_SEA                                    :{WHITE}... kan inte bygga på öppet vatten
+STR_ERROR_CAN_T_BUILD_ON_CANAL                                  :{WHITE}... kan inte bygga på kanal
+STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... kan inte bygga på flod
 STR_ERROR_MUST_DEMOLISH_CANAL_FIRST                             :{WHITE}Måste först ta bort kanalen
 STR_ERROR_CAN_T_BUILD_AQUEDUCT_HERE                             :{WHITE}Kan inte bygga akvedukt här...
 
@@ -3734,6 +3772,7 @@ STR_ERROR_VEHICLE_IS_DESTROYED                                  :{WHITE}... ford
 # Specific vehicle errors
 STR_ERROR_CAN_T_MAKE_TRAIN_PASS_SIGNAL                          :{WHITE}Kan inte tillåta tåg att passera signal under fara...
 STR_ERROR_CAN_T_REVERSE_DIRECTION_TRAIN                         :{WHITE}Kan inte byta tågets riktning...
+STR_ERROR_TRAIN_START_NO_POWER                                  :Tåget har ingen kraft
 
 STR_ERROR_CAN_T_MAKE_ROAD_VEHICLE_TURN                          :{WHITE}Fordon kan inte vända...
 

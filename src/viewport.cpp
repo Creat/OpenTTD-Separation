@@ -1186,6 +1186,9 @@ static void ViewportAddStationNames(DrawPixelInfo *dpi)
 		/* Don't draw if the display options are disabled */
 		if (!HasBit(_display_opt, is_station ? DO_SHOW_STATION_NAMES : DO_SHOW_WAYPOINT_NAMES)) continue;
 
+		/* Don't draw if station is owned by another company and competitor station names are hidden. Stations owned by none are never ignored. */
+		if (!HasBit(_display_opt, DO_SHOW_COMPETITOR_SIGNS) && _local_company != st->owner && st->owner != OWNER_NONE) continue;
+
 		ViewportAddString(dpi, ZOOM_LVL_OUT_4X, &st->sign,
 				is_station ? STR_VIEWPORT_STATION : STR_VIEWPORT_WAYPOINT,
 				(is_station ? STR_VIEWPORT_STATION : STR_VIEWPORT_WAYPOINT) + 1, STR_NULL,
@@ -1201,6 +1204,11 @@ static void ViewportAddSigns(DrawPixelInfo *dpi)
 
 	const Sign *si;
 	FOR_ALL_SIGNS(si) {
+		/* Don't draw if sign is owned by another company and competitor signs should be hidden.
+		 * Note: It is intentional that also signs owned by OWNER_NONE are hidden. Bankrupt
+		 * companies can leave OWNER_NONE signs after them. */
+		if (!HasBit(_display_opt, DO_SHOW_COMPETITOR_SIGNS) && _local_company != si->owner) continue;
+
 		ViewportAddString(dpi, ZOOM_LVL_OUT_4X, &si->sign,
 				STR_WHITE_SIGN,
 				IsTransparencySet(TO_SIGNS) ? STR_VIEWPORT_SIGN_SMALL_WHITE : STR_VIEWPORT_SIGN_SMALL_BLACK, STR_NULL,
@@ -1715,8 +1723,13 @@ static void SetSelectionTilesDirty()
 		int bot_y = top_y;
 
 		do {
-			Point top = RemapCoords2(top_x, top_y); // topmost dirty point
-			Point bot = RemapCoords2(bot_x + TILE_SIZE - 1, bot_y + TILE_SIZE - 1); // bottommost point
+			/* topmost dirty point */
+			TileIndex top_tile = TileVirtXY(top_x, top_y);
+			Point top = RemapCoords(top_x, top_y, GetTileMaxZ(top_tile));
+
+			/* bottommost point */
+			TileIndex bottom_tile = TileVirtXY(bot_x, bot_y);
+			Point bot = RemapCoords(bot_x + TILE_SIZE, bot_y + TILE_SIZE, GetTileZ(bottom_tile)); // bottommost point
 
 			/* the 'x' coordinate of 'top' and 'bot' is the same (and always in the same distance from tile middle),
 			 * tile height/slope affects only the 'y' on-screen coordinate! */
@@ -1820,6 +1833,9 @@ static bool CheckClickOnStation(const ViewPort *vp, int x, int y)
 		/* Don't check if the display options are disabled */
 		if (!HasBit(_display_opt, is_station ? DO_SHOW_STATION_NAMES : DO_SHOW_WAYPOINT_NAMES)) continue;
 
+		/* Don't check if competitor signs are not shown and the sign isn't owned by the local company */
+		if (!HasBit(_display_opt, DO_SHOW_COMPETITOR_SIGNS) && _local_company != st->owner && st->owner != OWNER_NONE) continue;
+
 		if (CheckClickOnViewportSign(vp, x, y, &st->sign)) {
 			if (is_station) {
 				ShowStationViewWindow(st->index);
@@ -1841,6 +1857,9 @@ static bool CheckClickOnSign(const ViewPort *vp, int x, int y)
 
 	const Sign *si;
 	FOR_ALL_SIGNS(si) {
+		/* If competitor signs are hidden, don't check signs that aren't owned by local company */
+		if (!HasBit(_display_opt, DO_SHOW_COMPETITOR_SIGNS) && _local_company != si->owner) continue;
+
 		if (CheckClickOnViewportSign(vp, x, y, &si->sign)) {
 			HandleClickOnSign(si);
 			return true;
@@ -2778,11 +2797,11 @@ calc_heightdiff_single_direction:;
 					}
 				}
 
-				if (t0 != 1 || t1 != 1) {
+				if (dx != 1 || dy != 1) {
 					int heightdiff = CalcHeightdiff(style, 0, t0, t1);
 
-					params[index++] = dx;
-					params[index++] = dy;
+					params[index++] = dx - (style & HT_POINT ? 1 : 0);
+					params[index++] = dy - (style & HT_POINT ? 1 : 0);
 					if (heightdiff != 0) params[index++] = heightdiff;
 				}
 
@@ -2858,6 +2877,9 @@ void SetObjectToPlace(CursorID icon, PaletteID pal, HighLightStyle mode, WindowC
 		_thd.window_class = WC_INVALID;
 		if (w != NULL) w->OnPlaceObjectAbort();
 	}
+
+	/* Mark the old selection dirty, in case the selection shape or colour changes */
+	if ((_thd.drawstyle & HT_DRAG_MASK) != HT_NONE) SetSelectionTilesDirty();
 
 	SetTileSelectSize(1, 1);
 
