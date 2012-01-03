@@ -468,6 +468,8 @@ int OrderList::GetPositionInSharedOrderList(const Vehicle *v) const
  */
 bool OrderList::IsCompleteTimetable() const
 {
+	if(this == NULL) return false;
+
 	for (Order *o = this->first; o != NULL; o = o->next) {
 		/* Implicit orders are, by definition, not timetabled. */
 		if (o->IsType(OT_IMPLICIT)) continue;
@@ -505,6 +507,101 @@ void OrderList::DebugCheckSanity() const
 	DEBUG(misc, 6, "... detected %u orders (%u manual), %u vehicles, %i ticks",
 			(uint)this->num_orders, (uint)this->num_manual_orders,
 			this->num_vehicles, this->timetable_duration);
+}
+
+/**
+* (Re-)Initializes Separation if necessary and possible.
+*/
+void OrderList::InitializeSeparation()
+{
+	int num_running_vehicles = 0;
+
+	if (this->IsCompleteTimetable()
+		&& (this->current_sep_mode != TTS_MODE_OFF))
+	{
+		this->last_timetable_init = GetCurrentTickCount();
+		this->separation_counter = 0;
+
+		switch (current_sep_mode) {
+		case TTS_MODE_AUTO:
+			for (const Vehicle *v = this->first_shared; v != NULL; v = v->NextShared()) {
+				if (!(v->vehstatus & (VS_STOPPED | VS_CRASHED))) num_running_vehicles++;
+			}
+			this->current_separation = this->GetTimetableTotalDuration() / num_running_vehicles;
+			break;
+
+		case TTS_MODE_MAN_N:
+			this->current_separation = this->GetTimetableTotalDuration() / this->num_sep_vehicles;
+			break;
+
+		default:
+			break;
+		}
+
+		this->is_separation_valid = true;
+
+	} else {
+		this->is_separation_valid = false;
+	}
+}
+
+/**
+* Returns the delay setting required for correct separation and increases the separation counter by 1.
+*/
+Ticks OrderList::SeparateVehicle()
+{
+	if (this->is_separation_valid
+		&& (this->current_sep_mode != TTS_MODE_OFF))
+	{
+		Ticks result = GetCurrentTickCount() - (this->separation_counter * this->current_separation + this->last_timetable_init);
+		this->separation_counter++;
+		return result;
+	} else {
+		return INVALID_TICKS;
+	}
+}
+
+/**
+* Returns current separation settings.
+*/
+TTSepSettings OrderList::GetSepSettings() {
+	TTSepSettings result;
+	result.mode = this->current_sep_mode;
+	result.sep_ticks = GetSepTime();
+	result.num_veh = (result.mode == TTS_MODE_MAN_N) ? this->num_sep_vehicles : GetNumVehicles();
+	return result;
+}
+
+/**
+* Sets new separation settings.
+*/
+void OrderList::SetSepSettings(TTSepSettings s)
+{
+	uint32 p2 = GB<uint32>(s.mode,0,2);
+	AB<uint32, uint>(p2,2,30, (s.mode == TTS_MODE_MAN_N) ? s.num_veh : s.sep_ticks);
+	DoCommandP(0, this->first_shared->index, p2, CMD_REINIT_SEPARATION);
+}
+
+void OrderList::SetSepSettings(TTSep_Mode Mode, uint Parameter)
+{
+	this->current_sep_mode = Mode;
+
+	switch(this->current_sep_mode)
+	{
+	case TTS_MODE_MAN_N:
+		this->current_separation = this->GetTimetableTotalDuration() / Parameter;
+		this->num_sep_vehicles = Parameter;
+		break;
+
+	case TTS_MODE_MAN_T:
+		this->current_separation = Parameter;
+		this->num_sep_vehicles = this->GetTimetableTotalDuration() / current_separation;
+		break;
+	default:
+		break;
+	}
+
+	is_separation_valid = false;
 }
 
 /**

@@ -203,6 +203,13 @@ const SaveLoad *GetOrderListDescription()
 {
 	static const SaveLoad _orderlist_desc[] = {
 		SLE_REF(OrderList, first,              REF_ORDER),
+		SLE_CONDVAR(OrderList, current_sep_mode, SLE_UINT, 200, SL_MAX_VERSION),
+		SLE_CONDVAR(OrderList, num_sep_vehicles, SLE_UINT, 200, SL_MAX_VERSION),
+		SLE_CONDVAR(OrderList, separation_counter, SLE_UINT, 200, SL_MAX_VERSION),
+		SLE_CONDVAR(OrderList, separation_counter, SLE_UINT, 200, SL_MAX_VERSION),
+		SLE_CONDVAR(OrderList, is_separation_valid, SLE_BOOL, 200, SL_MAX_VERSION),
+		SLE_CONDVAR(OrderList, current_separation, SLE_INT, 200, SL_MAX_VERSION),
+		SLE_CONDVAR(OrderList, last_timetable_init, SLE_INT, 200, SL_MAX_VERSION),
 		SLE_END()
 	};
 

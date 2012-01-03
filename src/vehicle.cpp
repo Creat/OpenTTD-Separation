@@ -199,6 +199,15 @@ uint Vehicle::Crash(bool flooded)
 	return pass;
 }
 
+void Vehicle::MarkSeparationInvalid()
+{
+	if (this->orders.list != NULL) this->orders.list->MarkSeparationInvalid();
+}
+
+void Vehicle::SetSepSettings(TTSep_Mode Mode, uint Parameter)
+{
+	if (this->orders.list != NULL) this->orders.list->SetSepSettings(Mode, Parameter);
+}
 
 /**
  * Displays a "NewGrf Bug" error message for a engine, and pauses the game if not networking.
@@ -1329,6 +1338,7 @@ void VehicleEnterDepot(Vehicle *v)
 				AddVehicleNewsItem(STR_NEWS_TRAIN_IS_WAITING + v->type, NS_ADVICE, v->index);
 			}
 			AI::NewEvent(v->owner, new AIEventVehicleWaitingInDepot(v->index));
+			v->MarkSeparationInvalid();
 		}
 	}
 }
@@ -1944,6 +1954,11 @@ void Vehicle::BeginLoading()
 		}
 		this->current_order.MakeLoading(false);
 	}
+	if (_settings_game.order.automatic_timetable_separation && this->IsOrderListShared() && this->orders.list->IsCompleteTimetable()
+		&& (this->cur_real_order_index == 0)) {
+		if (!this->orders.list->IsSeparationValid()) this->orders.list->InitializeSeparation();
+		this->lateness_counter = this->orders.list->SeparateVehicle();
+	}
 
 	Station::Get(this->last_station_visited)->loading_vehicles.push_back(this);
 
@@ -2344,6 +2359,7 @@ void Vehicle::AddToShared(Vehicle *shared_chain)
 	if (this->next_shared != NULL) this->next_shared->previous_shared = this;
 
 	shared_chain->orders.list->AddVehicle(this);
+	shared_chain->orders.list->MarkSeparationInvalid();
 }
 
 /**
@@ -2356,6 +2372,7 @@ void Vehicle::RemoveFromShared()
 	bool were_first = (this->FirstShared() == this);
 	VehicleListIdentifier vli(VL_SHARED_ORDERS, this->type, this->owner, this->FirstShared()->index);
 
+	this->orders.list->MarkSeparationInvalid();
 	this->orders.list->RemoveVehicle(this);
 
 	if (!were_first) {
