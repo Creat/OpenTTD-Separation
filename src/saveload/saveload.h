@@ -18,6 +18,7 @@
 #ifdef SIZE_MAX
 #undef SIZE_MAX
 #endif
+#define SL_TTSEP_VER 161
 
 #define SIZE_MAX ((size_t)-1)
 

@@ -703,6 +703,8 @@ public:
 	bool IsEngineCountable() const;
 	bool HasDepotOrder() const;
 	void HandlePathfindingResult(bool path_found);
+	void MarkSeparationInvalid();
+	void SetSepSettings(TTSep_Mode Mode, uint Parameter);
 
 	/**
 	 * Check if the vehicle is a front engine.

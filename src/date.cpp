@@ -153,6 +153,11 @@ Date ConvertYMDToDate(Year year, Month month, Day day)
 
 	return DAYS_TILL(year) + days;
 }
+/**
+ * Converts the current day counter and date fraction into an absolute tick value.
+ * @returns current time as ticks
+ */
+Ticks GetCurrentTickCount() { return _date * DAY_TICKS + _date_fract; }
 
 /** Functions used by the IncreaseDate function */
 
