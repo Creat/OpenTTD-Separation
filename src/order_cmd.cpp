@@ -524,16 +524,17 @@ void OrderList::InitializeSeparation()
 
 		switch (current_sep_mode) {
 		case TTS_MODE_AUTO:
-
 			for (const Vehicle *v = this->first_shared; v != NULL; v = v->NextShared()) {
 				if (!(v->vehstatus & (VS_STOPPED | VS_CRASHED))) num_running_vehicles++;
 			}
-
 			this->current_separation = this->GetTimetableTotalDuration() / num_running_vehicles;
 			break;
 
 		case TTS_MODE_MAN_N:
 			this->current_separation = this->GetTimetableTotalDuration() / this->num_sep_vehicles;
+			break;
+
+		default:
 			break;
 		}
 
@@ -566,15 +567,15 @@ Ticks OrderList::SeparateVehicle()
 TTSepSettings OrderList::GetSepSettings() {
 	TTSepSettings result;
 	result.mode = this->current_sep_mode;
-	result.sep_ticks = (result.mode != TTS_MODE_OFF) ? GetSepTime() : 0;
-	result.num_veh = (result.mode == TTS_MODE_MAN_N) ? num_sep_vehicles : GetNumVehicles();
+	result.sep_ticks = GetSepTime();
+	result.num_veh = (result.mode == TTS_MODE_MAN_N) ? this->num_sep_vehicles : GetNumVehicles();
 	return result;
 }
 
 /**
 * Sets new separation settings.
 */
-void const OrderList::SetSepSettings(TTSepSettings s)
+void OrderList::SetSepSettings(TTSepSettings s)
 {
 	uint32 p2 = GB<uint32>(s.mode,0,2);
 	AB<uint32, uint>(p2,2,30, (s.mode == TTS_MODE_MAN_N) ? s.num_veh : s.sep_ticks);
@@ -595,6 +596,8 @@ void OrderList::SetSepSettings(TTSep_Mode Mode, uint Parameter)
 	case TTS_MODE_MAN_T:
 		this->current_separation = Parameter;
 		this->num_sep_vehicles = this->GetTimetableTotalDuration() / current_separation;
+		break;
+	default:
 		break;
 	}
 

@@ -182,7 +182,22 @@ void InsertOrder(Vehicle *v, Order *new_o, VehicleOrderID sel_ord);
 void DeleteOrder(Vehicle *v, VehicleOrderID sel_ord);
 
 /**
- * Shared order list linking together the linked list of orders and the list
+ * Working modes for timetable separation
+ */
+enum TTSep_Mode {
+	TTS_MODE_AUTO,
+	TTS_MODE_OFF,
+	TTS_MODE_MAN_T,
+	TTS_MODE_MAN_N,
+};
+
+struct TTSepSettings {
+	TTSep_Mode mode;
+	uint num_veh, sep_ticks;
+	TTSepSettings() : mode(TTS_MODE_AUTO), num_veh(0), sep_ticks(0) { }
+};
+
+/** Shared order list linking together the linked list of orders and the list
 /** Working modes for timetable separation */
 enum TTSep_Mode {
 	TTS_MODE_AUTO,
@@ -211,19 +226,20 @@ private:
 	uint num_vehicles;                ///< NOSAVE: Number of vehicles that share this order list.
 	Vehicle *first_shared;            ///< NOSAVE: pointer to the first vehicle in the shared order chain.
 	Ticks timetable_duration;         ///< NOSAVE: Total duration of the order list
-	Ticks last_timetable_init;          ///< The last absolute time of initialization in Ticks.
-	uint separation_counter;            ///< Counts the vehicles that arrive at the first shared order for separation timing.
-	bool is_separation_valid;           ///< Is true if the separation has been initialized since last load or vehicle list change.
-	Ticks current_separation;           ///< The current separation between vehicles in the shared order list.
-	TTSep_Mode current_sep_mode;        ///< The current mode of vehicle separation
-	uint num_sep_vehicles;              ///< Number of planned vehicles for separation
+	Ticks last_timetable_init;        ///< The last absolute time of initialization in Ticks.
+	uint separation_counter;          ///< Counts the vehicles that arrive at the first shared order for separation timing.
+	bool is_separation_valid;         ///< Is true if the separation has been initialized since last load or vehicle list change.
+	Ticks current_separation;         ///< The current separation between vehicles in the shared order list.
+	TTSep_Mode current_sep_mode;      ///< The current mode of vehicle separation
+	uint num_sep_vehicles;            ///< Number of planned vehicles for separation
 
 public:
 	/** Default constructor producing an invalid order list. */
 	OrderList(VehicleOrderID num_orders = INVALID_VEH_ORDER_ID)
 		: first(NULL), num_orders(num_orders), num_manual_orders(0), num_vehicles(0), first_shared(NULL),
-		  timetable_duration(0), separation_counter(0), last_timetable_init(INVALID_TICKS),
-		  is_separation_valid(false), current_separation(INVALID_TICKS) { }
+		  timetable_duration(0), last_timetable_init(INVALID_TICKS), separation_counter(0),
+		  is_separation_valid(false), current_separation(INVALID_TICKS), current_sep_mode(TTS_MODE_OFF),
+		  num_sep_vehicles(0) { }
 
 	/**
 	 * Create an order list with the given order chain for the given vehicle.

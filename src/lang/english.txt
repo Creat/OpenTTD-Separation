@@ -3441,7 +3441,8 @@ STR_TTSEPARATION_STATUS_DESC                                    :{BLACK}Status:{
 STR_TTSEPARATION_STATUS_INIT                                    :{RED}Initializing
 STR_TTSEPARATION_STATUS_RUNNING                                 :{GREEN}Running
 STR_TTSEPARATION_STATUS_OFF                                     :{BLACK}Off
-STR_TTSEPARATION_REQ_TIME_DESC                                  :{NUM} ticks between
+STR_TTSEPARATION_REQ_TIME_DESC_TICKS                            :{NUM} ticks between
+STR_TTSEPARATION_REQ_TIME_DESC_DAYS                             :{NUM} days between
 STR_TTSEPARATION_REQ_NUM_DESC                                   :{NUM} vehicles
 
 # Saveload messages
