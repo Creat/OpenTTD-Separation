@@ -23,9 +23,7 @@
 #include "strings_func.h"
 #include "hotkeys.h"
 
-enum HighscoreWidgets {
-	HSW_BACKGROUND,
-};
+#include "widgets/highscore_widget.h"
 
 struct EndGameHighScoreBaseWindow : Window {
 	uint32 background_img;
@@ -34,7 +32,7 @@ struct EndGameHighScoreBaseWindow : Window {
 	EndGameHighScoreBaseWindow(const WindowDesc *desc) : Window()
 	{
 		this->InitNested(desc);
-		CLRBITS(this->flags4, WF_WHITE_BORDER_MASK);
+		CLRBITS(this->flags, WF_WHITE_BORDER);
 		ResizeWindow(this, _screen.width - this->width, _screen.height - this->height);
 	}
 
@@ -200,7 +198,7 @@ struct HighScoreWindow : EndGameHighScoreBaseWindow {
 };
 
 static const NWidgetPart _nested_highscore_widgets[] = {
-	NWidget(WWT_PANEL, COLOUR_END, HSW_BACKGROUND), SetMinimalSize(641, 481), SetResize(1, 1), EndContainer(),
+	NWidget(WWT_PANEL, COLOUR_END, WID_H_BACKGROUND), SetMinimalSize(641, 481), SetResize(1, 1), EndContainer(),
 };
 
 static const WindowDesc _highscore_desc(

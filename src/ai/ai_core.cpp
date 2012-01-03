@@ -17,13 +17,18 @@
 #include "../network/network.h"
 #include "../window_func.h"
 #include "../command_func.h"
+#include "../fileio_func.h"
 #include "ai_scanner.hpp"
 #include "ai_instance.hpp"
 #include "ai_config.hpp"
-#include "api/ai_error.hpp"
+#include "ai_info.hpp"
+#include "ai.hpp"
+#include "../script/script_storage.hpp"
+#include "../script/api/script_error.hpp"
 
 /* static */ uint AI::frame_counter = 0;
-/* static */ AIScanner *AI::ai_scanner = NULL;
+/* static */ AIScannerInfo *AI::scanner_info = NULL;
+/* static */ AIScannerLibrary *AI::scanner_library = NULL;
 
 /* static */ bool AI::CanStartNew()
 {
@@ -40,11 +45,11 @@
 
 	AIConfig *config = AIConfig::GetConfig(company);
 	AIInfo *info = config->GetInfo();
-	if (info == NULL || (rerandomise_ai && config->IsRandomAI())) {
-		info = AI::ai_scanner->SelectRandomAI();
+	if (info == NULL || (rerandomise_ai && config->IsRandom())) {
+		info = AI::scanner_info->SelectRandomAI();
 		assert(info != NULL);
 		/* Load default data and store the name in the settings */
-		config->ChangeAI(info->GetName(), -1, false, true);
+		config->Change(info->GetName(), -1, false, true);
 	}
 
 	Backup<CompanyByte> cur_company(_current_company, company, FILE_LINE);
@@ -52,7 +57,8 @@
 
 	c->ai_info = info;
 	assert(c->ai_instance == NULL);
-	c->ai_instance = new AIInstance(info);
+	c->ai_instance = new AIInstance();
+	c->ai_instance->Initialize(info);
 
 	cur_company.Restore();
 
@@ -132,10 +138,16 @@
 
 /* static */ void AI::Initialize()
 {
-	if (AI::ai_scanner != NULL) AI::Uninitialize(true);
+	if (AI::scanner_info != NULL) AI::Uninitialize(true);
 
 	AI::frame_counter = 0;
-	if (AI::ai_scanner == NULL) AI::ai_scanner = new AIScanner();
+	if (AI::scanner_info == NULL) {
+		TarScanner::DoScan(TarScanner::AI);
+		AI::scanner_info = new AIScannerInfo();
+		AI::scanner_info->Initialize();
+		AI::scanner_library = new AIScannerLibrary();
+		AI::scanner_library->Initialize();
+	}
 }
 
 /* static */ void AI::Uninitialize(bool keepConfig)
@@ -147,8 +159,10 @@
 		 *  still load all the AIS, while keeping the configs in place */
 		Rescan();
 	} else {
-		delete AI::ai_scanner;
-		AI::ai_scanner = NULL;
+		delete AI::scanner_info;
+		delete AI::scanner_library;
+		AI::scanner_info = NULL;
+		AI::scanner_library = NULL;
 
 		for (CompanyID c = COMPANY_FIRST; c < MAX_COMPANIES; c++) {
 			if (_settings_game.ai_config[c] != NULL) {
@@ -169,10 +183,10 @@
 	 *  the AIConfig. If not, remove the AI from the list (which will assign
 	 *  a random new AI on reload). */
 	for (CompanyID c = COMPANY_FIRST; c < MAX_COMPANIES; c++) {
-		if (_settings_game.ai_config[c] != NULL && _settings_game.ai_config[c]->HasAI()) {
+		if (_settings_game.ai_config[c] != NULL && _settings_game.ai_config[c]->HasScript()) {
 			if (!_settings_game.ai_config[c]->ResetInfo(true)) {
-				DEBUG(ai, 0, "After a reload, the AI by the name '%s' was no longer found, and removed from the list.", _settings_game.ai_config[c]->GetName());
-				_settings_game.ai_config[c]->ChangeAI(NULL);
+				DEBUG(script, 0, "After a reload, the AI by the name '%s' was no longer found, and removed from the list.", _settings_game.ai_config[c]->GetName());
+				_settings_game.ai_config[c]->Change(NULL);
 				if (Company::IsValidAiID(c)) {
 					/* The code belonging to an already running AI was deleted. We can only do
 					 * one thing here to keep everything sane and that is kill the AI. After
@@ -186,16 +200,16 @@
 				Company::Get(c)->ai_info = _settings_game.ai_config[c]->GetInfo();
 			}
 		}
-		if (_settings_newgame.ai_config[c] != NULL && _settings_newgame.ai_config[c]->HasAI()) {
+		if (_settings_newgame.ai_config[c] != NULL && _settings_newgame.ai_config[c]->HasScript()) {
 			if (!_settings_newgame.ai_config[c]->ResetInfo(false)) {
-				DEBUG(ai, 0, "After a reload, the AI by the name '%s' was no longer found, and removed from the list.", _settings_newgame.ai_config[c]->GetName());
-				_settings_newgame.ai_config[c]->ChangeAI(NULL);
+				DEBUG(script, 0, "After a reload, the AI by the name '%s' was no longer found, and removed from the list.", _settings_newgame.ai_config[c]->GetName());
+				_settings_newgame.ai_config[c]->Change(NULL);
 			}
 		}
 	}
 }
 
-/* static */ void AI::NewEvent(CompanyID company, AIEvent *event)
+/* static */ void AI::NewEvent(CompanyID company, ScriptEvent *event)
 {
 	/* AddRef() and Release() need to be called at least once, so do it here */
 	event->AddRef();
@@ -214,13 +228,13 @@
 
 	/* Queue the event */
 	Backup<CompanyByte> cur_company(_current_company, company, FILE_LINE);
-	AIEventController::InsertEvent(event);
+	Company::Get(_current_company)->ai_instance->InsertEvent(event);
 	cur_company.Restore();
 
 	event->Release();
 }
 
-/* static */ void AI::BroadcastNewEvent(AIEvent *event, CompanyID skip_company)
+/* static */ void AI::BroadcastNewEvent(ScriptEvent *event, CompanyID skip_company)
 {
 	/* AddRef() and Release() need to be called at least once, so do it here */
 	event->AddRef();
@@ -237,27 +251,6 @@
 	}
 
 	event->Release();
-}
-
-/**
- * DoCommand callback function for all commands executed by AIs.
- * @param result The result of the command.
- * @param tile The tile on which the command was executed.
- * @param p1 p1 as given to DoCommandPInternal.
- * @param p2 p2 as given to DoCommandPInternal.
- */
-void CcAI(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
-{
-	AIObject::SetLastCommandRes(result.Succeeded());
-
-	if (result.Failed()) {
-		AIObject::SetLastError(AIError::StringToError(result.GetErrorMessage()));
-	} else {
-		AIObject::IncreaseDoCommandCosts(result.GetCost());
-		AIObject::SetLastCost(result.GetCost());
-	}
-
-	Company::Get(_current_company)->ai_instance->Continue();
 }
 
 /* static */ void AI::Save(CompanyID company)
@@ -302,40 +295,63 @@ void CcAI(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 
 /* static */ char *AI::GetConsoleList(char *p, const char *last, bool newest_only)
 {
-	return AI::ai_scanner->GetAIConsoleList(p, last, newest_only);
+	return AI::scanner_info->GetConsoleList(p, last, newest_only);
 }
 
 /* static */ char *AI::GetConsoleLibraryList(char *p, const char *last)
 {
-	 return AI::ai_scanner->GetAIConsoleLibraryList(p, last);
+	 return AI::scanner_library->GetConsoleList(p, last, true);
 }
 
-/* static */ const AIInfoList *AI::GetInfoList()
+/* static */ const ScriptInfoList *AI::GetInfoList()
 {
-	return AI::ai_scanner->GetAIInfoList();
+	return AI::scanner_info->GetInfoList();
 }
 
-/* static */ const AIInfoList *AI::GetUniqueInfoList()
+/* static */ const ScriptInfoList *AI::GetUniqueInfoList()
 {
-	return AI::ai_scanner->GetUniqueAIInfoList();
+	return AI::scanner_info->GetUniqueInfoList();
 }
 
 /* static */ AIInfo *AI::FindInfo(const char *name, int version, bool force_exact_match)
 {
-	return AI::ai_scanner->FindInfo(name, version, force_exact_match);
+	return AI::scanner_info->FindInfo(name, version, force_exact_match);
 }
 
-/* static */ bool AI::ImportLibrary(const char *library, const char *class_name, int version, HSQUIRRELVM vm)
+/* static */ AILibrary *AI::FindLibrary(const char *library, int version)
 {
-	return AI::ai_scanner->ImportLibrary(library, class_name, version, vm, Company::Get(_current_company)->ai_instance->GetController());
+	return AI::scanner_library->FindLibrary(library, version);
 }
 
 /* static */ void AI::Rescan()
 {
-	AI::ai_scanner->RescanAIDir();
+	TarScanner::DoScan(TarScanner::AI);
+
+	AI::scanner_info->RescanDir();
+	AI::scanner_library->RescanDir();
 	ResetConfig();
 
 	InvalidateWindowData(WC_AI_LIST, 0, 1);
 	SetWindowClassesDirty(WC_AI_DEBUG);
-	SetWindowDirty(WC_AI_SETTINGS, 0);
+	InvalidateWindowClassesData(WC_AI_SETTINGS);
 }
+
+#if defined(ENABLE_NETWORK)
+
+/**
+ * Check whether we have an AI (library) with the exact characteristics as ci.
+ * @param ci the characteristics to search on (shortname and md5sum)
+ * @param md5sum whether to check the MD5 checksum
+ * @return true iff we have an AI (library) matching.
+ */
+/* static */ bool AI::HasAI(const ContentInfo *ci, bool md5sum)
+{
+	return AI::scanner_info->HasScript(ci, md5sum);
+}
+
+/* static */ bool AI::HasAILibrary(const ContentInfo *ci, bool md5sum)
+{
+	return AI::scanner_library->HasScript(ci, md5sum);
+}
+
+#endif /* defined(ENABLE_NETWORK) */

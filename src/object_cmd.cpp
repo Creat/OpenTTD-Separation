@@ -93,13 +93,21 @@ void BuildObject(ObjectType type, TileIndex tile, CompanyID owner, Town *town, u
 
 	if (HasBit(spec->callback_mask, CBM_OBJ_COLOUR)) {
 		uint16 res = GetObjectCallback(CBID_OBJECT_COLOUR, o->colour, 0, spec, o, tile);
-		if (res != CALLBACK_FAILED) o->colour = GB(res, 0, 8);
+		if (res != CALLBACK_FAILED) {
+			if (res >= 0x100) ErrorUnknownCallbackResult(spec->grf_prop.grffile->grfid, CBID_OBJECT_COLOUR, res);
+			o->colour = GB(res, 0, 8);
+		}
 	}
 
 	assert(o->town != NULL);
 
 	TILE_AREA_LOOP(t, ta) {
 		WaterClass wc = (IsWaterTile(t) ? GetWaterClass(t) : WATER_CLASS_INVALID);
+		/* Update company infrastructure counts for objects build on canals owned by nobody. */
+		if (wc == WATER_CLASS_CANAL && owner != OWNER_NONE && (IsTileOwner(tile, OWNER_NONE) || IsTileOwner(tile, OWNER_WATER))) {
+			Company::Get(owner)->infrastructure.water++;
+			DirtyCompanyInfrastructureWindows(owner);
+		}
 		MakeObject(t, type, owner, o->index, wc, Random());
 		MarkTileDirtyByTile(t);
 	}
@@ -168,7 +176,7 @@ void UpdateObjectColours(const Company *c)
 	}
 }
 
-extern CommandCost CheckBuildableTile(TileIndex tile, uint invalid_dirs, int &allowed_z, bool check_bridge);
+extern CommandCost CheckBuildableTile(TileIndex tile, uint invalid_dirs, int &allowed_z, bool allow_steep, bool check_bridge);
 static CommandCost ClearTile_Object(TileIndex tile, DoCommandFlag flags);
 
 /**
@@ -204,7 +212,9 @@ CommandCost CmdBuildObject(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 		/* Owned land is special as it can be placed on any slope. */
 		cost.AddCost(DoCommand(tile, 0, 0, flags, CMD_LANDSCAPE_CLEAR));
 	} else {
-		/* Check the surface to build on. */
+		/* Check the surface to build on. At this time we can't actually execute the
+		 * the CLEAR_TILE commands since the newgrf callback later on can check
+		 * some information about the tiles. */
 		bool allow_water = (spec->flags & (OBJECT_FLAG_BUILT_ON_WATER | OBJECT_FLAG_NOT_ON_LAND)) != 0;
 		bool allow_ground = (spec->flags & OBJECT_FLAG_NOT_ON_LAND) == 0;
 		TILE_AREA_LOOP(t, ta) {
@@ -213,7 +223,7 @@ CommandCost CmdBuildObject(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 				if (!IsWaterTile(t)) {
 					/* Normal water tiles don't have to be cleared. For all other tile types clear
 					 * the tile but leave the water. */
-					cost.AddCost(DoCommand(t, 0, 0, flags & ~DC_NO_WATER, CMD_LANDSCAPE_CLEAR));
+					cost.AddCost(DoCommand(t, 0, 0, flags & ~DC_NO_WATER & ~DC_EXEC, CMD_LANDSCAPE_CLEAR));
 				} else {
 					/* Can't build on water owned by another company. */
 					Owner o = GetTileOwner(t);
@@ -222,26 +232,42 @@ CommandCost CmdBuildObject(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 			} else {
 				if (!allow_ground) return_cmd_error(STR_ERROR_MUST_BE_BUILT_ON_WATER);
 				/* For non-water tiles, we'll have to clear it before building. */
-				cost.AddCost(DoCommand(t, 0, 0, flags, CMD_LANDSCAPE_CLEAR));
+				cost.AddCost(DoCommand(t, 0, 0, flags & ~DC_EXEC, CMD_LANDSCAPE_CLEAR));
 			}
 		}
 
 		/* So, now the surface is checked... check the slope of said surface. */
 		int allowed_z;
-		if (GetTileSlope(tile, (uint*)&allowed_z) != SLOPE_FLAT) allowed_z += TILE_HEIGHT;
+		if (GetTileSlope(tile, &allowed_z) != SLOPE_FLAT) allowed_z++;
 
 		TILE_AREA_LOOP(t, ta) {
 			uint16 callback = CALLBACK_FAILED;
 			if (HasBit(spec->callback_mask, CBM_OBJ_SLOPE_CHECK)) {
 				TileIndex diff = t - tile;
-				callback = GetObjectCallback(CBID_OBJECT_LAND_SLOPE_CHECK, GetTileSlope(t, NULL), TileY(diff) << 4 | TileX(diff), spec, NULL, t, view);
+				callback = GetObjectCallback(CBID_OBJECT_LAND_SLOPE_CHECK, GetTileSlope(t), TileY(diff) << 4 | TileX(diff), spec, NULL, t, view);
 			}
 
 			if (callback == CALLBACK_FAILED) {
-				cost.AddCost(CheckBuildableTile(t, 0, allowed_z, false));
-			} else if (callback != 0) {
-				/* The meaning of bit 10 is inverted in the result of this callback. */
-				return GetErrorMessageFromLocationCallbackResult(ToggleBit(callback, 10), spec->grf_prop.grffile->grfid, STR_ERROR_LAND_SLOPED_IN_WRONG_DIRECTION);
+				cost.AddCost(CheckBuildableTile(t, 0, allowed_z, false, false));
+			} else {
+				/* The meaning of bit 10 is inverted for a grf version < 8. */
+				if (spec->grf_prop.grffile->grf_version < 8) ToggleBit(callback, 10);
+				CommandCost ret = GetErrorMessageFromLocationCallbackResult(callback, spec->grf_prop.grffile->grfid, STR_ERROR_LAND_SLOPED_IN_WRONG_DIRECTION);
+				if (ret.Failed()) return ret;
+			}
+		}
+
+		if (flags & DC_EXEC) {
+			/* This is basically a copy of the loop above with the exception that we now
+			 * execute the commands and don't check for errors, since that's already done. */
+			TILE_AREA_LOOP(t, ta) {
+				if (HasTileWaterGround(t)) {
+					if (!IsWaterTile(t)) {
+						DoCommand(t, 0, 0, (flags & ~DC_NO_WATER) | DC_NO_MODIFY_TOWN_RATING, CMD_LANDSCAPE_CLEAR);
+					}
+				} else {
+					DoCommand(t, 0, 0, flags | DC_NO_MODIFY_TOWN_RATING, CMD_LANDSCAPE_CLEAR);
+				}
 			}
 		}
 	}
@@ -251,7 +277,7 @@ CommandCost CmdBuildObject(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 	TILE_AREA_LOOP(t, ta) {
 		if (MayHaveBridgeAbove(t) && IsBridgeAbove(t) && (
 				!(spec->flags & OBJECT_FLAG_ALLOW_UNDER_BRIDGE) ||
-				(GetTileMaxZ(t) + spec->height * TILE_HEIGHT >= GetBridgeHeight(GetSouthernBridgeEnd(t))))) {
+				(GetTileMaxZ(t) + spec->height >= GetBridgeHeight(GetSouthernBridgeEnd(t))))) {
 			return_cmd_error(STR_ERROR_MUST_DEMOLISH_BRIDGE_FIRST);
 		}
 	}
@@ -260,7 +286,7 @@ CommandCost CmdBuildObject(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 	switch (type) {
 		case OBJECT_TRANSMITTER:
 		case OBJECT_LIGHTHOUSE:
-			if (GetTileSlope(tile, NULL) != SLOPE_FLAT) return_cmd_error(STR_ERROR_FLAT_LAND_REQUIRED);
+			if (GetTileSlope(tile) != SLOPE_FLAT) return_cmd_error(STR_ERROR_FLAT_LAND_REQUIRED);
 			break;
 
 		case OBJECT_OWNED_LAND:
@@ -365,15 +391,15 @@ static void DrawTile_Object(TileInfo *ti)
 	if (spec->flags & OBJECT_FLAG_ALLOW_UNDER_BRIDGE) DrawBridgeMiddle(ti);
 }
 
-static uint GetSlopeZ_Object(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_Object(TileIndex tile, uint x, uint y)
 {
 	if (IsOwnedLand(tile)) {
-		uint z;
-		Slope tileh = GetTileSlope(tile, &z);
+		int z;
+		Slope tileh = GetTilePixelSlope(tile, &z);
 
-		return z + GetPartialZ(x & 0xF, y & 0xF, tileh);
+		return z + GetPartialPixelZ(x & 0xF, y & 0xF, tileh);
 	} else {
-		return GetTileMaxZ(tile);
+		return GetTileMaxPixelZ(tile);
 	}
 }
 
@@ -626,8 +652,8 @@ void GenerateObjects()
 	for (uint i = ScaleByMapSize(1000); i != 0 && Object::CanAllocateItem(); i--) {
 		TileIndex tile = RandomTile();
 
-		uint h;
-		if (IsTileType(tile, MP_CLEAR) && GetTileSlope(tile, &h) == SLOPE_FLAT && h >= TILE_HEIGHT * 4 && !IsBridgeAbove(tile)) {
+		int h;
+		if (IsTileType(tile, MP_CLEAR) && GetTileSlope(tile, &h) == SLOPE_FLAT && h >= 4 && !IsBridgeAbove(tile)) {
 			TileIndex t = tile;
 			if (CircularTileSearch(&t, 9, HasTransmitter, NULL)) continue;
 
@@ -663,16 +689,16 @@ void GenerateObjects()
 		if (!IsTileType(tile, MP_WATER)) continue;
 
 		for (int j = 0; j < 19; j++) {
-			uint h;
-			if (IsTileType(tile, MP_CLEAR) && GetTileSlope(tile, &h) == SLOPE_FLAT && h <= TILE_HEIGHT * 2 && !IsBridgeAbove(tile)) {
+			int h;
+			if (IsTileType(tile, MP_CLEAR) && GetTileSlope(tile, &h) == SLOPE_FLAT && h <= 2 && !IsBridgeAbove(tile)) {
 				BuildObject(OBJECT_LIGHTHOUSE, tile);
 				IncreaseGeneratingWorldProgress(GWP_OBJECT);
 				lighthouses_to_build--;
 				assert(tile < MapSize());
 				break;
 			}
-			tile = AddTileIndexDiffCWrap(tile, TileIndexDiffCByDiagDir(dir));
-			if (tile == INVALID_TILE) break;
+			tile += TileOffsByDiagDir(dir);
+			if (!IsValidTile(tile)) break;
 		}
 	}
 }
@@ -700,7 +726,7 @@ static void ChangeTileOwner_Object(TileIndex tile, Owner old_owner, Owner new_ow
 	}
 }
 
-static CommandCost TerraformTile_Object(TileIndex tile, DoCommandFlag flags, uint z_new, Slope tileh_new)
+static CommandCost TerraformTile_Object(TileIndex tile, DoCommandFlag flags, int z_new, Slope tileh_new)
 {
 	ObjectType type = GetObjectType(tile);
 
@@ -715,7 +741,7 @@ static CommandCost TerraformTile_Object(TileIndex tile, DoCommandFlag flags, uin
 		 *  - Allow autoslope by default.
 		 *  - Disallow autoslope if callback succeeds and returns non-zero.
 		 */
-		Slope tileh_old = GetTileSlope(tile, NULL);
+		Slope tileh_old = GetTileSlope(tile);
 		/* TileMaxZ must not be changed. Slopes must not be steep. */
 		if (!IsSteepSlope(tileh_old) && !IsSteepSlope(tileh_new) && (GetTileMaxZ(tile) == z_new + GetSlopeMaxZ(tileh_new))) {
 			const ObjectSpec *spec = ObjectSpec::Get(type);
@@ -724,7 +750,7 @@ static CommandCost TerraformTile_Object(TileIndex tile, DoCommandFlag flags, uin
 			if (HasBit(spec->callback_mask, CBM_OBJ_AUTOSLOPE)) {
 				/* If the callback fails, allow autoslope. */
 				uint16 res = GetObjectCallback(CBID_OBJECT_AUTOSLOPE, 0, 0, spec, Object::GetByTile(tile), tile);
-				if ((res == 0) || (res == CALLBACK_FAILED)) return CommandCost(EXPENSES_CONSTRUCTION, _price[PR_BUILD_FOUNDATION]);
+				if (res == CALLBACK_FAILED || !ConvertBooleanCallback(spec->grf_prop.grffile, CBID_OBJECT_AUTOSLOPE, res)) return CommandCost(EXPENSES_CONSTRUCTION, _price[PR_BUILD_FOUNDATION]);
 			} else if (spec->enabled) {
 				/* allow autoslope */
 				return CommandCost(EXPENSES_CONSTRUCTION, _price[PR_BUILD_FOUNDATION]);
@@ -737,15 +763,15 @@ static CommandCost TerraformTile_Object(TileIndex tile, DoCommandFlag flags, uin
 
 extern const TileTypeProcs _tile_type_object_procs = {
 	DrawTile_Object,             // draw_tile_proc
-	GetSlopeZ_Object,            // get_slope_z_proc
+	GetSlopePixelZ_Object,       // get_slope_z_proc
 	ClearTile_Object,            // clear_tile_proc
 	AddAcceptedCargo_Object,     // add_accepted_cargo_proc
 	GetTileDesc_Object,          // get_tile_desc_proc
 	GetTileTrackStatus_Object,   // get_tile_track_status_proc
 	ClickTile_Object,            // click_tile_proc
 	AnimateTile_Object,          // animate_tile_proc
-	TileLoop_Object,             // tile_loop_clear
-	ChangeTileOwner_Object,      // change_tile_owner_clear
+	TileLoop_Object,             // tile_loop_proc
+	ChangeTileOwner_Object,      // change_tile_owner_proc
 	NULL,                        // add_produced_cargo_proc
 	NULL,                        // vehicle_enter_tile_proc
 	GetFoundation_Object,        // get_foundation_proc

@@ -97,7 +97,9 @@ void UpdateHousesAndTowns()
 	/* Update the population and num_house dependant values */
 	FOR_ALL_TOWNS(town) {
 		UpdateTownRadius(town);
+		UpdateTownCargoes(town);
 	}
+	UpdateTownCargoBitmap();
 }
 
 /** Save and load of towns. */
@@ -112,7 +114,7 @@ static const SaveLoad _town_desc[] = {
 	SLE_CONDVAR(Town, townnamegrfid,         SLE_UINT32, 66, SL_MAX_VERSION),
 	    SLE_VAR(Town, townnametype,          SLE_UINT16),
 	    SLE_VAR(Town, townnameparts,         SLE_UINT32),
-	SLE_CONDSTR(Town, name,                  SLE_STR, 0, 84, SL_MAX_VERSION),
+	SLE_CONDSTR(Town, name,                  SLE_STR | SLF_ALLOW_CONTROL, 0, 84, SL_MAX_VERSION),
 
 	    SLE_VAR(Town, flags,                 SLE_UINT8),
 	SLE_CONDVAR(Town, statues,               SLE_FILE_U8  | SLE_VAR_U16, 0, 103),
@@ -128,30 +130,34 @@ static const SaveLoad _town_desc[] = {
 	SLE_CONDARR(Town, unwanted,              SLE_INT8,  8,               4, 103),
 	SLE_CONDARR(Town, unwanted,              SLE_INT8,  MAX_COMPANIES, 104, SL_MAX_VERSION),
 
-	SLE_CONDVAR(Town, max_pass,              SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
-	SLE_CONDVAR(Town, max_mail,              SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
-	SLE_CONDVAR(Town, new_max_pass,          SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
-	SLE_CONDVAR(Town, new_max_mail,          SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
-	SLE_CONDVAR(Town, act_pass,              SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
-	SLE_CONDVAR(Town, act_mail,              SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
-	SLE_CONDVAR(Town, new_act_pass,          SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
-	SLE_CONDVAR(Town, new_act_mail,          SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
+	SLE_CONDVAR(Town, supplied[CT_PASSENGERS].old_max, SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
+	SLE_CONDVAR(Town, supplied[CT_MAIL].old_max,       SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
+	SLE_CONDVAR(Town, supplied[CT_PASSENGERS].new_max, SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
+	SLE_CONDVAR(Town, supplied[CT_MAIL].new_max,       SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
+	SLE_CONDVAR(Town, supplied[CT_PASSENGERS].old_act, SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
+	SLE_CONDVAR(Town, supplied[CT_MAIL].old_act,       SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
+	SLE_CONDVAR(Town, supplied[CT_PASSENGERS].new_act, SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
+	SLE_CONDVAR(Town, supplied[CT_MAIL].new_act,       SLE_FILE_U16 | SLE_VAR_U32, 0, 8),
 
-	SLE_CONDVAR(Town, max_pass,              SLE_UINT32,                 9, SL_MAX_VERSION),
-	SLE_CONDVAR(Town, max_mail,              SLE_UINT32,                 9, SL_MAX_VERSION),
-	SLE_CONDVAR(Town, new_max_pass,          SLE_UINT32,                 9, SL_MAX_VERSION),
-	SLE_CONDVAR(Town, new_max_mail,          SLE_UINT32,                 9, SL_MAX_VERSION),
-	SLE_CONDVAR(Town, act_pass,              SLE_UINT32,                 9, SL_MAX_VERSION),
-	SLE_CONDVAR(Town, act_mail,              SLE_UINT32,                 9, SL_MAX_VERSION),
-	SLE_CONDVAR(Town, new_act_pass,          SLE_UINT32,                 9, SL_MAX_VERSION),
-	SLE_CONDVAR(Town, new_act_mail,          SLE_UINT32,                 9, SL_MAX_VERSION),
+	SLE_CONDVAR(Town, supplied[CT_PASSENGERS].old_max, SLE_UINT32,                 9, 164),
+	SLE_CONDVAR(Town, supplied[CT_MAIL].old_max,       SLE_UINT32,                 9, 164),
+	SLE_CONDVAR(Town, supplied[CT_PASSENGERS].new_max, SLE_UINT32,                 9, 164),
+	SLE_CONDVAR(Town, supplied[CT_MAIL].new_max,       SLE_UINT32,                 9, 164),
+	SLE_CONDVAR(Town, supplied[CT_PASSENGERS].old_act, SLE_UINT32,                 9, 164),
+	SLE_CONDVAR(Town, supplied[CT_MAIL].old_act,       SLE_UINT32,                 9, 164),
+	SLE_CONDVAR(Town, supplied[CT_PASSENGERS].new_act, SLE_UINT32,                 9, 164),
+	SLE_CONDVAR(Town, supplied[CT_MAIL].new_act,       SLE_UINT32,                 9, 164),
 
 	SLE_CONDNULL(2, 0, 163),                 ///< pct_pass_transported / pct_mail_transported, now computed on the fly
 
-	    SLE_VAR(Town, act_food,              SLE_UINT16),
-	    SLE_VAR(Town, act_water,             SLE_UINT16),
-	    SLE_VAR(Town, new_act_food,          SLE_UINT16),
-	    SLE_VAR(Town, new_act_water,         SLE_UINT16),
+	SLE_CONDVAR(Town, received[TE_FOOD].old_act,       SLE_UINT16,                 0, 164),
+	SLE_CONDVAR(Town, received[TE_WATER].old_act,      SLE_UINT16,                 0, 164),
+	SLE_CONDVAR(Town, received[TE_FOOD].new_act,       SLE_UINT16,                 0, 164),
+	SLE_CONDVAR(Town, received[TE_WATER].new_act,      SLE_UINT16,                 0, 164),
+
+	SLE_CONDARR(Town, goal, SLE_UINT32, NUM_TE, 165, SL_MAX_VERSION),
+
+	SLE_CONDSTR(Town, text,                  SLE_STR | SLF_ALLOW_CONTROL, 0, 168, SL_MAX_VERSION),
 
 	SLE_CONDVAR(Town, time_until_rebuild,    SLE_FILE_U8 | SLE_VAR_U16,  0, 53),
 	SLE_CONDVAR(Town, grow_counter,          SLE_FILE_U8 | SLE_VAR_U16,  0, 53),
@@ -159,7 +165,9 @@ static const SaveLoad _town_desc[] = {
 
 	SLE_CONDVAR(Town, time_until_rebuild,    SLE_UINT16,                54, SL_MAX_VERSION),
 	SLE_CONDVAR(Town, grow_counter,          SLE_UINT16,                54, SL_MAX_VERSION),
-	SLE_CONDVAR(Town, growth_rate,           SLE_INT16,                 54, SL_MAX_VERSION),
+
+	SLE_CONDVAR(Town, growth_rate,           SLE_FILE_I16 | SLE_VAR_U16, 54, 164),
+	SLE_CONDVAR(Town, growth_rate,           SLE_UINT16,                 165, SL_MAX_VERSION),
 
 	    SLE_VAR(Town, fund_buildings_months, SLE_UINT8),
 	    SLE_VAR(Town, road_build_months,     SLE_UINT8),
@@ -172,8 +180,28 @@ static const SaveLoad _town_desc[] = {
 
 	SLE_CONDLST(Town, psa_list,            REF_STORAGE,                161, SL_MAX_VERSION),
 
+	SLE_CONDVAR(Town, cargo_produced,       SLE_UINT32,                166, SL_MAX_VERSION),
+
 	/* reserve extra space in savegame here. (currently 30 bytes) */
 	SLE_CONDNULL(30, 2, SL_MAX_VERSION),
+
+	SLE_END()
+};
+
+static const SaveLoad _town_supplied_desc[] = {
+	SLE_CONDVAR(TransportedCargoStat<uint32>, old_max, SLE_UINT32, 165, SL_MAX_VERSION),
+	SLE_CONDVAR(TransportedCargoStat<uint32>, new_max, SLE_UINT32, 165, SL_MAX_VERSION),
+	SLE_CONDVAR(TransportedCargoStat<uint32>, old_act, SLE_UINT32, 165, SL_MAX_VERSION),
+	SLE_CONDVAR(TransportedCargoStat<uint32>, new_act, SLE_UINT32, 165, SL_MAX_VERSION),
+
+	SLE_END()
+};
+
+static const SaveLoad _town_received_desc[] = {
+	SLE_CONDVAR(TransportedCargoStat<uint16>, old_max, SLE_UINT16, 165, SL_MAX_VERSION),
+	SLE_CONDVAR(TransportedCargoStat<uint16>, new_max, SLE_UINT16, 165, SL_MAX_VERSION),
+	SLE_CONDVAR(TransportedCargoStat<uint16>, old_act, SLE_UINT16, 165, SL_MAX_VERSION),
+	SLE_CONDVAR(TransportedCargoStat<uint16>, new_act, SLE_UINT16, 165, SL_MAX_VERSION),
 
 	SLE_END()
 };
@@ -188,13 +216,46 @@ static void Load_HIDS()
 	Load_NewGRFMapping(_house_mngr);
 }
 
+const SaveLoad *GetTileMatrixDesc()
+{
+	/* Here due to private member vars. */
+	static const SaveLoad _tilematrix_desc[] = {
+		SLE_VAR(AcceptanceMatrix, area.tile, SLE_UINT32),
+		SLE_VAR(AcceptanceMatrix, area.w,    SLE_UINT16),
+		SLE_VAR(AcceptanceMatrix, area.h,    SLE_UINT16),
+		SLE_END()
+	};
+
+	return _tilematrix_desc;
+}
+
+static void RealSave_Town(Town *t)
+{
+	SlObject(t, _town_desc);
+
+	for (CargoID i = 0; i < NUM_CARGO; i++) {
+		SlObject(&t->supplied[i], _town_supplied_desc);
+	}
+	for (int i = TE_BEGIN; i < NUM_TE; i++) {
+		SlObject(&t->received[i], _town_received_desc);
+	}
+
+	if (IsSavegameVersionBefore(166)) return;
+
+	SlObject(&t->cargo_accepted, GetTileMatrixDesc());
+	if (t->cargo_accepted.area.w != 0) {
+		uint arr_len = t->cargo_accepted.area.w / AcceptanceMatrix::GRID * t->cargo_accepted.area.h / AcceptanceMatrix::GRID;
+		SlArray(t->cargo_accepted.data, arr_len, SLE_UINT32);
+	}
+}
+
 static void Save_TOWN()
 {
 	Town *t;
 
 	FOR_ALL_TOWNS(t) {
 		SlSetArrayIndex(t->index);
-		SlObject(t, _town_desc);
+		SlAutolength((AutolengthProc*)RealSave_Town, t);
 	}
 }
 
@@ -205,6 +266,29 @@ static void Load_TOWN()
 	while ((index = SlIterateArray()) != -1) {
 		Town *t = new (index) Town();
 		SlObject(t, _town_desc);
+
+		for (CargoID i = 0; i < NUM_CARGO; i++) {
+			SlObject(&t->supplied[i], _town_supplied_desc);
+		}
+		for (int i = TE_BEGIN; i < TE_END; i++) {
+			SlObject(&t->received[i], _town_received_desc);
+		}
+
+		if (t->townnamegrfid == 0 && !IsInsideMM(t->townnametype, SPECSTR_TOWNNAME_START, SPECSTR_TOWNNAME_LAST + 1) && GB(t->townnametype, 11, 5) != 15) {
+			SlErrorCorrupt("Invalid town name generator");
+		}
+
+		if (IsSavegameVersionBefore(166)) continue;
+
+		SlObject(&t->cargo_accepted, GetTileMatrixDesc());
+		if (t->cargo_accepted.area.w != 0) {
+			uint arr_len = t->cargo_accepted.area.w / AcceptanceMatrix::GRID * t->cargo_accepted.area.h / AcceptanceMatrix::GRID;
+			t->cargo_accepted.data = MallocT<uint32>(arr_len);
+			SlArray(t->cargo_accepted.data, arr_len, SLE_UINT32);
+
+			/* Rebuild total cargo acceptance. */
+			UpdateTownCargoTotal(t);
+		}
 	}
 }
 

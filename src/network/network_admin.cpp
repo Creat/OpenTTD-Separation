@@ -23,6 +23,7 @@
 #include "../core/pool_func.hpp"
 #include "../map_func.h"
 #include "../rev.h"
+#include "../game/game.hpp"
 
 
 /* This file handles all the admin network commands. */
@@ -52,6 +53,7 @@ static const AdminUpdateFrequency _admin_update_type_frequencies[] = {
 	                       ADMIN_FREQUENCY_AUTOMATIC,                                                                                                      ///< ADMIN_UPDATE_CONSOLE
 	ADMIN_FREQUENCY_POLL,                                                                                                                                  ///< ADMIN_UPDATE_CMD_NAMES
 	                       ADMIN_FREQUENCY_AUTOMATIC,                                                                                                      ///< ADMIN_UPDATE_CMD_LOGGING
+	                       ADMIN_FREQUENCY_AUTOMATIC,                                                                                                      ///< ADMIN_UPDATE_GAMESCRIPT
 };
 /** Sanity check. */
 assert_compile(lengthof(_admin_update_type_frequencies) == ADMIN_UPDATE_END);
@@ -226,18 +228,18 @@ NetworkRecvStatus ServerNetworkAdminSocketHandler::SendClientJoin(ClientID clien
 
 /**
  * Send an initial set of data from some client's information.
- * @param cs The information about a client.
+ * @param cs The socket of the client.
+ * @param ci The information about the client.
  */
-NetworkRecvStatus ServerNetworkAdminSocketHandler::SendClientInfo(const NetworkClientSocket *cs)
+NetworkRecvStatus ServerNetworkAdminSocketHandler::SendClientInfo(const NetworkClientSocket *cs, const NetworkClientInfo *ci)
 {
 	/* Only send data when we're a proper client, not just someone trying to query the server. */
-	const NetworkClientInfo *ci = cs->GetInfo();
 	if (ci == NULL) return NETWORK_RECV_STATUS_OKAY;
 
 	Packet *p = new Packet(ADMIN_PACKET_SERVER_CLIENT_INFO);
 
 	p->Send_uint32(ci->client_id);
-	p->Send_string(const_cast<NetworkAddress &>(cs->client_address).GetHostname());
+	p->Send_string(cs == NULL ? "" : const_cast<NetworkAddress &>(cs->client_address).GetHostname());
 	p->Send_string(ci->client_name);
 	p->Send_uint8 (ci->client_lang);
 	p->Send_uint32(ci->join_date);
@@ -510,6 +512,20 @@ NetworkRecvStatus ServerNetworkAdminSocketHandler::Receive_ADMIN_RCON(Packet *p)
 	return NETWORK_RECV_STATUS_OKAY;
 }
 
+NetworkRecvStatus ServerNetworkAdminSocketHandler::Receive_ADMIN_GAMESCRIPT(Packet *p)
+{
+	if (this->status == ADMIN_STATUS_INACTIVE) return this->SendError(NETWORK_ERROR_NOT_EXPECTED);
+
+	char json[NETWORK_GAMESCRIPT_JSON_LENGTH];
+
+	p->Recv_string(json, sizeof(json));
+
+	DEBUG(net, 2, "[admin] GameScript JSON from '%s' (%s): '%s'", this->admin_name, this->admin_version, json);
+
+	Game::NewEvent(new ScriptEventAdminPort(json));
+	return NETWORK_RECV_STATUS_OKAY;
+}
+
 /**
  * Send console output of other clients.
  * @param origin The origin of the string.
@@ -527,6 +543,25 @@ NetworkRecvStatus ServerNetworkAdminSocketHandler::SendConsole(const char *origi
 
 	p->Send_string(origin);
 	p->Send_string(string);
+	this->SendPacket(p);
+
+	return NETWORK_RECV_STATUS_OKAY;
+}
+
+/**
+ * Send GameScript JSON output.
+ * @param json The JSON string.
+ */
+NetworkRecvStatus ServerNetworkAdminSocketHandler::SendGameScript(const char *json)
+{
+	/* At the moment we cannot transmit anything larger than MTU. So the string
+	 *  has to be no longer than the length of the json + '\0' + 3 bytes of the
+	 *  packet header. */
+	if (strlen(json) + 1 + 3 >= SEND_MTU) return NETWORK_RECV_STATUS_OKAY;
+
+	Packet *p = new Packet(ADMIN_PACKET_SERVER_GAMESCRIPT);
+
+	p->Send_string(json);
 	this->SendPacket(p);
 
 	return NETWORK_RECV_STATUS_OKAY;
@@ -658,12 +693,17 @@ NetworkRecvStatus ServerNetworkAdminSocketHandler::Receive_ADMIN_POLL(Packet *p)
 			/* The admin is requesting client info. */
 			const NetworkClientSocket *cs;
 			if (d1 == UINT32_MAX) {
+				this->SendClientInfo(NULL, NetworkClientInfo::GetByClientID(CLIENT_ID_SERVER));
 				FOR_ALL_CLIENT_SOCKETS(cs) {
-					this->SendClientInfo(cs);
+					this->SendClientInfo(cs, cs->GetInfo());
 				}
 			} else {
-				cs = NetworkClientSocket::GetByClientID((ClientID)d1);
-				if (cs != NULL) this->SendClientInfo(cs);
+				if (d1 == CLIENT_ID_SERVER) {
+					this->SendClientInfo(NULL, NetworkClientInfo::GetByClientID(CLIENT_ID_SERVER));
+				} else {
+					cs = NetworkClientSocket::GetByClientID((ClientID)d1);
+					if (cs != NULL) this->SendClientInfo(cs, cs->GetInfo());
+				}
 			}
 			break;
 
@@ -745,7 +785,7 @@ void NetworkAdminClientInfo(const NetworkClientSocket *cs, bool new_client)
 	ServerNetworkAdminSocketHandler *as;
 	FOR_ALL_ACTIVE_ADMIN_SOCKETS(as) {
 		if (as->update_frequency[ADMIN_UPDATE_CLIENT_INFO] & ADMIN_FREQUENCY_AUTOMATIC) {
-			as->SendClientInfo(cs);
+			as->SendClientInfo(cs, cs->GetInfo());
 			if (new_client) {
 				as->SendClientJoin(cs->client_id);
 			}
@@ -886,6 +926,20 @@ void NetworkAdminConsole(const char *origin, const char *string)
 	FOR_ALL_ACTIVE_ADMIN_SOCKETS(as) {
 		if (as->update_frequency[ADMIN_UPDATE_CONSOLE] & ADMIN_FREQUENCY_AUTOMATIC) {
 			as->SendConsole(origin, string);
+		}
+	}
+}
+
+/**
+ * Send GameScript JSON to the admin network (if they did opt in for the respective update).
+ * @param json The JSON data as received from the GameScript.
+ */
+void NetworkAdminGameScript(const char *json)
+{
+	ServerNetworkAdminSocketHandler *as;
+	FOR_ALL_ACTIVE_ADMIN_SOCKETS(as) {
+		if (as->update_frequency[ADMIN_UPDATE_GAMESCRIPT] & ADMIN_FREQUENCY_AUTOMATIC) {
+			as->SendGameScript(json);
 		}
 	}
 }

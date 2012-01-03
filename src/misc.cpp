@@ -27,6 +27,7 @@
 #include "network/network_func.h"
 #include "window_func.h"
 #include "core/pool_type.hpp"
+#include "game/game.hpp"
 
 
 extern TileIndex _cur_tileloop_tile;
@@ -35,7 +36,6 @@ extern void MakeNewgameSettingsLive();
 void InitializeSound();
 void InitializeMusic();
 void InitializeVehicles();
-void InitializeClearLand();
 void InitializeRailGui();
 void InitializeRoadGui();
 void InitializeAirportGui();
@@ -80,7 +80,6 @@ void InitializeGame(uint size_x, uint size_y, bool reset_date, bool reset_settin
 
 	InitNewsItemStructs();
 	InitializeLandscape();
-	InitializeClearLand();
 	InitializeRailGui();
 	InitializeRoadGui();
 	InitializeAirportGui();
@@ -96,6 +95,7 @@ void InitializeGame(uint size_x, uint size_y, bool reset_date, bool reset_settin
 
 	InitializeCompanies();
 	AI::Initialize();
+	Game::Initialize();
 	InitializeCheats();
 
 	InitTextEffects();

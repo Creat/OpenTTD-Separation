@@ -178,7 +178,7 @@ static void StartSound(SoundID sound_id, float pan, uint volume)
 }
 
 
-static const byte _vol_factor_by_zoom[] = {255, 190, 134, 87};
+static const byte _vol_factor_by_zoom[] = {255, 255, 255, 190, 134, 87};
 assert_compile(lengthof(_vol_factor_by_zoom) == ZOOM_LVL_COUNT);
 
 static const byte _sound_base_vol[] = {
@@ -255,10 +255,10 @@ void SndPlayTileFx(SoundID sound, TileIndex tile)
 	/* emits sound from center of the tile */
 	int x = min(MapMaxX() - 1, TileX(tile)) * TILE_SIZE + TILE_SIZE / 2;
 	int y = min(MapMaxY() - 1, TileY(tile)) * TILE_SIZE - TILE_SIZE / 2;
-	uint z = (y < 0 ? 0 : GetSlopeZ(x, y));
+	int z = (y < 0 ? 0 : GetSlopePixelZ(x, y));
 	Point pt = RemapCoords(x, y, z);
 	y += 2 * TILE_SIZE;
-	Point pt2 = RemapCoords(x, y, GetSlopeZ(x, y));
+	Point pt2 = RemapCoords(x, y, GetSlopePixelZ(x, y));
 	SndPlayScreenCoordFx(sound, pt.x, pt2.x, pt.y, pt2.y);
 }
 
@@ -281,8 +281,8 @@ INSTANTIATE_BASE_MEDIA_METHODS(BaseMedia<SoundsSet>, SoundsSet)
 static const char * const _sound_file_names[] = { "samples" };
 
 
-template <class T, size_t Tnum_files, Subdirectory Tsubdir>
-/* static */ const char * const *BaseSet<T, Tnum_files, Tsubdir>::file_names = _sound_file_names;
+template <class T, size_t Tnum_files, bool Tsearch_in_tars>
+/* static */ const char * const *BaseSet<T, Tnum_files, Tsearch_in_tars>::file_names = _sound_file_names;
 
 template <class Tbase_set>
 /* static */ const char *BaseMedia<Tbase_set>::GetExtension()

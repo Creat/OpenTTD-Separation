@@ -27,6 +27,7 @@
 #include "station_base.h"
 #include "waypoint_base.h"
 #include "company_base.h"
+#include "order_backup.h"
 
 #include "table/strings.h"
 
@@ -40,6 +41,19 @@ OrderPool _order_pool("Order");
 INSTANTIATE_POOL_METHODS(Order)
 OrderListPool _orderlist_pool("OrderList");
 INSTANTIATE_POOL_METHODS(OrderList)
+
+/** Clean everything up. */
+Order::~Order()
+{
+	if (CleaningPool()) return;
+
+	/* We can visit oil rigs and buoys that are not our own. They will be shown in
+	 * the list of stations. So, we need to invalidate that window if needed. */
+	if (this->IsType(OT_GOTO_STATION) || this->IsType(OT_GOTO_WAYPOINT)) {
+		BaseStation *bs = BaseStation::GetIfValid(this->GetDestination());
+		if (bs != NULL && bs->owner == OWNER_NONE) InvalidateWindowClassesData(WC_STATION_LIST, 0);
+	}
+}
 
 /**
  * 'Free' the order
@@ -144,10 +158,10 @@ void Order::MakeImplicit(StationID destination)
 }
 
 /**
- * Make this depot order also a refit order.
+ * Make this depot/station order also a refit order.
  * @param cargo   the cargo type to change to.
  * @param subtype the subtype to change to.
- * @pre IsType(OT_GOTO_DEPOT).
+ * @pre IsType(OT_GOTO_DEPOT) || IsType(OT_GOTO_STATION).
  */
 void Order::SetRefit(CargoID cargo, byte subtype)
 {
@@ -367,6 +381,14 @@ void OrderList::InsertOrderAt(Order *new_order, int index)
 	++this->num_orders;
 	if (!new_order->IsType(OT_IMPLICIT)) ++this->num_manual_orders;
 	this->timetable_duration += new_order->wait_time + new_order->travel_time;
+
+	/* We can visit oil rigs and buoys that are not our own. They will be shown in
+	 * the list of stations. So, we need to invalidate that window if needed. */
+	if (new_order->IsType(OT_GOTO_STATION) || new_order->IsType(OT_GOTO_WAYPOINT)) {
+		BaseStation *bs = BaseStation::Get(new_order->GetDestination());
+		if (bs->owner == OWNER_NONE) InvalidateWindowClassesData(WC_STATION_LIST, 0);
+	}
+
 }
 
 
@@ -634,14 +656,16 @@ static void DeleteOrderWarnings(const Vehicle *v)
 /**
  * Returns a tile somewhat representing the order destination (not suitable for pathfinding).
  * @param v The vehicle to get the location for.
+ * @param airport Get the airport tile and not the station location for aircraft.
  * @return destination of order, or INVALID_TILE if none.
  */
-TileIndex Order::GetLocation(const Vehicle *v) const
+TileIndex Order::GetLocation(const Vehicle *v, bool airport) const
 {
 	switch (this->GetType()) {
 		case OT_GOTO_WAYPOINT:
 		case OT_GOTO_STATION:
 		case OT_IMPLICIT:
+			if (airport && v->type == VEH_AIRCRAFT) return Station::Get(this->GetDestination())->airport.tile;
 			return BaseStation::Get(this->GetDestination())->xy;
 
 		case OT_GOTO_DEPOT:
@@ -653,10 +677,17 @@ TileIndex Order::GetLocation(const Vehicle *v) const
 	}
 }
 
-static uint GetOrderDistance(const Order *prev, const Order *cur, const Vehicle *v, int conditional_depth = 0)
+/**
+ * Get the distance between two orders of a vehicle. Conditional orders are resolved
+ * and the bigger distance of the two order branches is returned.
+ * @param prev Origin order.
+ * @param cur Destination order.
+ * @param v The vehicle to get the distance for.
+ * @param conditional_depth Internal param for resolving conditional orders.
+ * @return Maximum distance between the two orders.
+ */
+uint GetOrderDistance(const Order *prev, const Order *cur, const Vehicle *v, int conditional_depth)
 {
-	assert(v->type == VEH_SHIP);
-
 	if (cur->IsType(OT_CONDITIONAL)) {
 		if (conditional_depth > v->GetNumOrders()) return 0;
 
@@ -667,10 +698,10 @@ static uint GetOrderDistance(const Order *prev, const Order *cur, const Vehicle 
 		return max(dist1, dist2);
 	}
 
-	TileIndex prev_tile = prev->GetLocation(v);
-	TileIndex cur_tile = cur->GetLocation(v);
+	TileIndex prev_tile = prev->GetLocation(v, true);
+	TileIndex cur_tile = cur->GetLocation(v, true);
 	if (prev_tile == INVALID_TILE || cur_tile == INVALID_TILE) return 0;
-	return DistanceManhattan(prev_tile, cur_tile);
+	return v->type == VEH_AIRCRAFT ? DistanceSquare(prev_tile, cur_tile) : DistanceManhattan(prev_tile, cur_tile);
 }
 
 /**
@@ -1353,6 +1384,7 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 		switch (mof) {
 			case MOF_NON_STOP:
 				order->SetNonStopType((OrderNonStopFlags)data);
+				if (data & ONSF_NO_STOP_AT_DESTINATION_STATION) order->SetRefit(CT_NO_REFIT);
 				break;
 
 			case MOF_STOP_LOCATION:
@@ -1365,6 +1397,7 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 
 			case MOF_LOAD:
 				order->SetLoadType((OrderLoadFlags)data);
+				if (data & OLFB_NO_LOAD) order->SetRefit(CT_NO_REFIT);
 				break;
 
 			case MOF_DEPOT_ACTION: {
@@ -1458,6 +1491,34 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 }
 
 /**
+ * Check if an aircraft has enough range for an order list.
+ * @param v Aircraft to check.
+ * @param first First order in the source order list.
+ * @return True if the aircraft has enough range for the orders, false otherwise.
+ */
+bool CheckAircraftOrderDistance(const Aircraft *v, const Order *first)
+{
+	if (first == NULL || v->acache.cached_max_range == 0) return true;
+
+	/* Iterate over all orders to check the distance between all
+	 * 'goto' orders and their respective next order (of any type). */
+	for (const Order *o = first; o != NULL; o = o->next) {
+		switch (o->GetType()) {
+			case OT_GOTO_STATION:
+			case OT_GOTO_DEPOT:
+			case OT_GOTO_WAYPOINT:
+				/* If we don't have a next order, we've reached the end and must check the first order instead. */
+				if (GetOrderDistance(o, o->next != NULL ? o->next : first, v) > v->acache.cached_max_range_sqr) return false;
+				break;
+
+			default: break;
+		}
+	}
+
+	return true;
+}
+
+/**
  * Clone/share/copy an order-list of another vehicle.
  * @param tile unused
  * @param flags operation to perform
@@ -1506,6 +1567,11 @@ CommandCost CmdCloneOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 				}
 			}
 
+			/* Check for aircraft range limits. */
+			if (dst->type == VEH_AIRCRAFT && !CheckAircraftOrderDistance(Aircraft::From(dst), src->GetFirstOrder())) {
+				return_cmd_error(STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE);
+			}
+
 			if (src->orders.list == NULL && !OrderList::CanAllocateItem()) {
 				return_cmd_error(STR_ERROR_NO_MORE_SPACE_FOR_ORDERS);
 			}
@@ -1546,6 +1612,11 @@ CommandCost CmdCloneOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 						!CanVehicleUseStation(dst, Station::Get(order->GetDestination()))) {
 					return_cmd_error(STR_ERROR_CAN_T_COPY_SHARE_ORDER);
 				}
+			}
+
+			/* Check for aircraft range limits. */
+			if (dst->type == VEH_AIRCRAFT && !CheckAircraftOrderDistance(Aircraft::From(dst), src->GetFirstOrder())) {
+				return_cmd_error(STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE);
 			}
 
 			/* make sure there are orders available */
@@ -1614,7 +1685,7 @@ CommandCost CmdOrderRefit(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 	CargoID cargo = GB(p2, 0, 8);
 	byte subtype  = GB(p2, 8, 8);
 
-	if (cargo >= NUM_CARGO && cargo != CT_NO_REFIT) return CMD_ERROR;
+	if (cargo >= NUM_CARGO && cargo != CT_NO_REFIT && cargo != CT_AUTO_REFIT) return CMD_ERROR;
 
 	const Vehicle *v = Vehicle::GetIfValid(veh);
 	if (v == NULL || !v->IsPrimaryVehicle()) return CMD_ERROR;
@@ -1624,6 +1695,9 @@ CommandCost CmdOrderRefit(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 
 	Order *order = v->GetOrder(order_number);
 	if (order == NULL) return CMD_ERROR;
+
+	/* Automatic refit cargo is only supported for goto station orders. */
+	if (cargo == CT_AUTO_REFIT && !order->IsType(OT_GOTO_STATION)) return CMD_ERROR;
 
 	if (flags & DC_EXEC) {
 		order->SetRefit(cargo, subtype);
@@ -1776,6 +1850,8 @@ restart:
 			}
 		}
 	}
+
+	OrderBackup::RemoveOrder(type, destination);
 }
 
 /**

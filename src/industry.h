@@ -78,12 +78,22 @@ struct Industry : IndustryPool::PoolItem<&_industry_pool> {
 	void RecomputeProductionMultipliers();
 
 	/**
+	 * Check if a given tile belongs to this industry.
+	 * @param tile The tile to check.
+	 * @return True if the tils is part of this industry.
+	 */
+	inline bool TileBelongsToIndustry(TileIndex tile) const
+	{
+		return IsTileType(tile, MP_INDUSTRY) && GetIndustryIndex(tile) == this->index;
+	}
+
+	/**
 	 * Get the industry of the given tile
 	 * @param tile the tile to get the industry from
 	 * @pre IsTileType(t, MP_INDUSTRY)
 	 * @return the industry
 	 */
-	static FORCEINLINE Industry *GetByTile(TileIndex tile)
+	static inline Industry *GetByTile(TileIndex tile)
 	{
 		return Industry::Get(GetIndustryIndex(tile));
 	}
@@ -137,6 +147,8 @@ protected:
 void PlantRandomFarmField(const Industry *i);
 
 void ReleaseDisastersTargetingIndustry(IndustryID);
+
+bool IsTileForestIndustry(TileIndex tile);
 
 #define FOR_ALL_INDUSTRIES_FROM(var, start) FOR_ALL_ITEMS_FROM(Industry, industry_index, var, start)
 #define FOR_ALL_INDUSTRIES(var) FOR_ALL_INDUSTRIES_FROM(var, 0)

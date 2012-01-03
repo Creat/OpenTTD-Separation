@@ -30,6 +30,15 @@
 #include <set>
 #include <stack>
 
+/**
+ * Version of the standard free that accepts const pointers.
+ * @param ptr The data to free.
+ */
+static inline void free(const void *ptr)
+{
+	free(const_cast<void *>(ptr));
+}
+
 #ifndef PATH_MAX
 /** The maximum length of paths, if we don't know it. */
 #	define PATH_MAX 260
@@ -140,13 +149,13 @@ enum Token {
 	TOKEN_ELSE,       ///< (#)else in code
 	TOKEN_ENDIF,      ///< (#)endif in code
 	TOKEN_UNDEF,      ///< (#)undef in code
-	TOKEN_OR,         ///< '||' within #if expression
-	TOKEN_AND,        ///< '&&' within #if expression
-	TOKEN_DEFINED,    ///< 'defined' within #if expression
-	TOKEN_OPEN,       ///< '(' within #if expression
-	TOKEN_CLOSE,      ///< ')' within #if expression
-	TOKEN_NOT,        ///< '!' within #if expression
-	TOKEN_ZERO,       ///< '0' within #if expression
+	TOKEN_OR,         ///< '||' within <tt>#if</tt> expression
+	TOKEN_AND,        ///< '&&' within <tt>#if</tt> expression
+	TOKEN_DEFINED,    ///< 'defined' within <tt>#if</tt> expression
+	TOKEN_OPEN,       ///< '(' within <tt>#if</tt> expression
+	TOKEN_CLOSE,      ///< ')' within <tt>#if</tt> expression
+	TOKEN_NOT,        ///< '!' within <tt>#if</tt> expression
+	TOKEN_ZERO,       ///< '0' within <tt>#if</tt> expression
 	TOKEN_INCLUDE,    ///< (#)include in code
 };
 
@@ -672,7 +681,7 @@ void ScanFile(const char *filename, const char *ext, bool header, bool verbose)
 										}
 									}
 									if (curfile->second->find(h) == curfile->second->end()) curfile->second->insert(strdup(h));
-									free((void*)h);
+									free(h);
 								}
 							}
 							/* FALL THROUGH */
@@ -705,7 +714,7 @@ void ScanFile(const char *filename, const char *ext, bool header, bool verbose)
 							}
 							StringSet::iterator it = defines.find(lexer.GetString());
 							if (it != defines.end()) {
-								free((void*)*it);
+								free(*it);
 								defines.erase(it);
 							}
 							lexer.Lex();
@@ -808,7 +817,7 @@ void ScanFile(const char *filename, const char *ext, bool header, bool verbose)
 
 	if (!header) {
 		for (StringSet::iterator it = defines.begin(); it != defines.end(); it++) {
-			free((void*)*it);
+			free(*it);
 		}
 		defines.clear();
 		while (!ignore.empty()) ignore.pop();
@@ -940,31 +949,31 @@ int main(int argc, char *argv[])
 
 	for (StringMap::iterator it = _files.begin(); it != _files.end(); it++) {
 		for (StringSet::iterator h = it->second->begin(); h != it->second->end(); h++) {
-			free((void*)*h);
+			free(*h);
 		}
 		it->second->clear();
 		delete it->second;
-		free((void*)it->first);
+		free(it->first);
 	}
 	_files.clear();
 
 	for (StringMap::iterator it = _headers.begin(); it != _headers.end(); it++) {
 		for (StringSet::iterator h = it->second->begin(); h != it->second->end(); h++) {
-			free((void*)*h);
+			free(*h);
 		}
 		it->second->clear();
 		delete it->second;
-		free((void*)it->first);
+		free(it->first);
 	}
 	_headers.clear();
 
 	for (StringSet::iterator it = _defines.begin(); it != _defines.end(); it++) {
-		free((void*)*it);
+		free(*it);
 	}
 	_defines.clear();
 
 	for (StringSet::iterator it = _include_dirs.begin(); it != _include_dirs.end(); it++) {
-		free((void*)*it);
+		free(*it);
 	}
 	_include_dirs.clear();
 

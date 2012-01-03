@@ -39,6 +39,7 @@
 #include "subsidy_func.h"
 #include "core/backup_type.hpp"
 #include "object_base.h"
+#include "game/game.hpp"
 
 #include "table/strings.h"
 #include "table/industry_land.h"
@@ -364,9 +365,9 @@ static void DrawTile_Industry(TileInfo *ti)
 	}
 }
 
-static uint GetSlopeZ_Industry(TileIndex tile, uint x, uint y)
+static int GetSlopePixelZ_Industry(TileIndex tile, uint x, uint y)
 {
-	return GetTileMaxZ(tile);
+	return GetTileMaxPixelZ(tile);
 }
 
 static Foundation GetFoundation_Industry(TileIndex tile, Slope tileh)
@@ -381,7 +382,7 @@ static Foundation GetFoundation_Industry(TileIndex tile, Slope tileh)
 		const IndustryTileSpec *indts = GetIndustryTileSpec(gfx);
 		if (indts->grf_prop.spritegroup[0] != NULL && HasBit(indts->callback_mask, CBM_INDT_DRAW_FOUNDATIONS)) {
 			uint32 callback_res = GetIndustryTileCallback(CBID_INDTILE_DRAW_FOUNDATIONS, 0, 0, gfx, Industry::GetByTile(tile), tile);
-			if (callback_res == 0) return FOUNDATION_NONE;
+			if (callback_res != CALLBACK_FAILED && !ConvertBooleanCallback(indts->grf_prop.grffile, CBID_INDTILE_DRAW_FOUNDATIONS, callback_res)) return FOUNDATION_NONE;
 		}
 	}
 	return FlatteningFoundation(tileh);
@@ -419,7 +420,7 @@ static void AddAcceptedCargo_Industry(TileIndex tile, CargoArray &acceptance, ui
 	const Industry *ind = Industry::GetByTile(tile);
 	for (byte i = 0; i < lengthof(itspec->accepts_cargo); i++) {
 		CargoID a = accepts_cargo[i];
-		if (a == CT_INVALID || cargo_acceptance[i] == 0) continue; // work only with valid cargos
+		if (a == CT_INVALID || cargo_acceptance[i] == 0) continue; // work only with valid cargoes
 
 		/* Add accepted cargo */
 		acceptance[a] += cargo_acceptance[i];
@@ -481,7 +482,8 @@ static CommandCost ClearTile_Industry(TileIndex tile, DoCommandFlag flags)
 	}
 
 	if (flags & DC_EXEC) {
-		AI::BroadcastNewEvent(new AIEventIndustryClose(i->index));
+		AI::BroadcastNewEvent(new ScriptEventIndustryClose(i->index));
+		Game::NewEvent(new ScriptEventIndustryClose(i->index));
 		delete i;
 	}
 	return CommandCost(EXPENSES_CONSTRUCTION, indspec->GetRemovalCost());
@@ -698,7 +700,7 @@ static void CreateChimneySmoke(TileIndex tile)
 {
 	uint x = TileX(tile) * TILE_SIZE;
 	uint y = TileY(tile) * TILE_SIZE;
-	uint z = GetTileMaxZ(tile);
+	int z = GetTileMaxPixelZ(tile);
 
 	CreateEffectVehicle(x + 15, y + 14, z + 59, EV_CHIMNEY_SMOKE);
 }
@@ -911,6 +913,30 @@ static void ChangeTileOwner_Industry(TileIndex tile, Owner old_owner, Owner new_
 	if (i->founder == old_owner) i->founder = (new_owner == INVALID_OWNER) ? OWNER_NONE : new_owner;
 }
 
+/**
+ * Check whether the tile is a forest.
+ * @param tile the tile to investigate.
+ * @return true if and only if the tile is a forest
+ */
+bool IsTileForestIndustry(TileIndex tile)
+{
+	/* Check for industry tile */
+	if (!IsTileType(tile, MP_INDUSTRY)) return false;
+
+	const Industry *ind = Industry::GetByTile(tile);
+
+	/* Check for organic industry (i.e. not processing or extractive) */
+	if ((GetIndustrySpec(ind->type)->life_type & INDUSTRYLIFE_ORGANIC) == 0) return false;
+
+	/* Check for wood production */
+	for (uint i = 0; i < lengthof(ind->produced_cargo); i++) {
+		/* The industry produces wood. */
+		if (ind->produced_cargo[i] != CT_INVALID && CargoSpec::Get(ind->produced_cargo[i])->label == 'WOOD') return true;
+	}
+
+	return false;
+}
+
 static const byte _plantfarmfield_type[] = {1, 1, 1, 1, 1, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6};
 
 static bool IsBadFarmFieldTile(TileIndex tile)
@@ -931,20 +957,28 @@ static bool IsBadFarmFieldTile2(TileIndex tile)
 	}
 }
 
-static void SetupFarmFieldFence(TileIndex tile, int size, byte type, Axis direction)
+static void SetupFarmFieldFence(TileIndex tile, int size, byte type, Axis direction, bool north)
 {
 	do {
 		tile = TILE_MASK(tile);
 
-		if (IsTileType(tile, MP_CLEAR) || IsTileType(tile, MP_TREES)) {
+		if (IsTileType(tile, MP_CLEAR) && IsClearGround(tile, CLEAR_FIELDS)) {
 			byte or_ = type;
 
 			if (or_ == 1 && Chance16(1, 7)) or_ = 2;
 
 			if (direction == AXIS_X) {
-				SetFenceSE(tile, or_);
+				if (north) {
+					SetFenceNW(tile, or_);
+				} else {
+					SetFenceSE(tile, or_);
+				}
 			} else {
-				SetFenceSW(tile, or_);
+				if (north) {
+					SetFenceNE(tile, or_);
+				} else {
+					SetFenceSW(tile, or_);
+				}
 			}
 		}
 
@@ -955,7 +989,7 @@ static void SetupFarmFieldFence(TileIndex tile, int size, byte type, Axis direct
 static void PlantFarmField(TileIndex tile, IndustryID industry)
 {
 	if (_settings_game.game_creation.landscape == LT_ARCTIC) {
-		if (GetTileZ(tile) + TILE_HEIGHT * 2 >= GetSnowLine()) return;
+		if (GetTileZ(tile) + 2 >= GetSnowLine()) return;
 	}
 
 	/* determine field size */
@@ -997,10 +1031,10 @@ static void PlantFarmField(TileIndex tile, IndustryID industry)
 		type = _plantfarmfield_type[Random() & 0xF];
 	}
 
-	SetupFarmFieldFence(ta.tile - TileDiffXY(1, 0), ta.h, type, AXIS_Y);
-	SetupFarmFieldFence(ta.tile - TileDiffXY(0, 1), ta.w, type, AXIS_X);
-	SetupFarmFieldFence(ta.tile + TileDiffXY(ta.w - 1, 0), ta.h, type, AXIS_Y);
-	SetupFarmFieldFence(ta.tile + TileDiffXY(0, ta.h - 1), ta.w, type, AXIS_X);
+	SetupFarmFieldFence(ta.tile, ta.h, type, AXIS_Y, true);
+	SetupFarmFieldFence(ta.tile, ta.w, type, AXIS_X, true);
+	SetupFarmFieldFence(ta.tile + TileDiffXY(ta.w - 1, 0), ta.h, type, AXIS_Y, false);
+	SetupFarmFieldFence(ta.tile + TileDiffXY(0, ta.h - 1), ta.w, type, AXIS_X, false);
 }
 
 void PlantRandomFarmField(const Industry *i)
@@ -1044,10 +1078,14 @@ static bool SearchLumberMillTrees(TileIndex tile, void *user_data)
  */
 static void ChopLumberMillTrees(Industry *i)
 {
+	/* We only want to cut trees if all tiles are completed. */
+	TILE_AREA_LOOP(tile_cur, i->location) {
+		if (i->TileBelongsToIndustry(tile_cur)) {
+			if (!IsIndustryCompleted(tile_cur)) return;
+		}
+	}
+
 	TileIndex tile = i->location.tile;
-
-	if (!IsIndustryCompleted(tile)) return;  // Can't proceed if not completed.
-
 	if (CircularTileSearch(&tile, 40, SearchLumberMillTrees, NULL)) { // 40x40 tiles  to search.
 		i->produced_cargo_waiting[0] = min(0xffff, i->produced_cargo_waiting[0] + 45); // Found a tree, add according value to waiting cargo.
 	}
@@ -1079,9 +1117,14 @@ static void ProduceIndustryGoods(Industry *i)
 		i->produced_cargo_waiting[1] = min(0xffff, i->produced_cargo_waiting[1] + i->production_rate[1]);
 
 		if ((indbehav & INDUSTRYBEH_PLANT_FIELDS) != 0) {
-			bool plant;
+			uint16 cb_res = CALLBACK_FAILED;
 			if (HasBit(indsp->callback_mask, CBM_IND_SPECIAL_EFFECT)) {
-				plant = (GetIndustryCallback(CBID_INDUSTRY_SPECIAL_EFFECT, Random(), 0, i, i->type, i->location.tile) != 0);
+				cb_res = GetIndustryCallback(CBID_INDUSTRY_SPECIAL_EFFECT, Random(), 0, i, i->type, i->location.tile);
+			}
+
+			bool plant;
+			if (cb_res != CALLBACK_FAILED) {
+				plant = ConvertBooleanCallback(indsp->grf_prop.grffile, CBID_INDUSTRY_SPECIAL_EFFECT, cb_res);
 			} else {
 				plant = Chance16(1, 8);
 			}
@@ -1089,9 +1132,16 @@ static void ProduceIndustryGoods(Industry *i)
 			if (plant) PlantRandomFarmField(i);
 		}
 		if ((indbehav & INDUSTRYBEH_CUT_TREES) != 0) {
-			bool cut = ((i->counter % INDUSTRY_CUT_TREE_TICKS) == 0);
+			uint16 cb_res = CALLBACK_FAILED;
 			if (HasBit(indsp->callback_mask, CBM_IND_SPECIAL_EFFECT)) {
-				cut = (GetIndustryCallback(CBID_INDUSTRY_SPECIAL_EFFECT, Random(), 1, i, i->type, i->location.tile) != 0);
+				cb_res = GetIndustryCallback(CBID_INDUSTRY_SPECIAL_EFFECT, Random(), 1, i, i->type, i->location.tile);
+			}
+
+			bool cut;
+			if (cb_res != CALLBACK_FAILED) {
+				cut = ConvertBooleanCallback(indsp->grf_prop.grffile, CBID_INDUSTRY_SPECIAL_EFFECT, cb_res);
+			} else {
+				cut = ((i->counter % INDUSTRY_CUT_TREE_TICKS) == 0);
 			}
 
 			if (cut) ChopLumberMillTrees(i);
@@ -1141,7 +1191,7 @@ static CommandCost CheckNewIndustry_NULL(TileIndex tile)
 static CommandCost CheckNewIndustry_Forest(TileIndex tile)
 {
 	if (_settings_game.game_creation.landscape == LT_ARCTIC) {
-		if (GetTileZ(tile) < HighestSnowLine() + TILE_HEIGHT * 2U) {
+		if (GetTileZ(tile) < HighestSnowLine() + 2) {
 			return_cmd_error(STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED);
 		}
 	}
@@ -1185,7 +1235,7 @@ static CommandCost CheckNewIndustry_OilRig(TileIndex tile)
 static CommandCost CheckNewIndustry_Farm(TileIndex tile)
 {
 	if (_settings_game.game_creation.landscape == LT_ARCTIC) {
-		if (GetTileZ(tile) + TILE_HEIGHT * 2 >= HighestSnowLine()) {
+		if (GetTileZ(tile) + 2 >= HighestSnowLine()) {
 			return_cmd_error(STR_ERROR_SITE_UNSUITABLE);
 		}
 	}
@@ -1238,7 +1288,7 @@ static CommandCost CheckNewIndustry_Lumbermill(TileIndex tile)
  */
 static CommandCost CheckNewIndustry_BubbleGen(TileIndex tile)
 {
-	if (GetTileZ(tile) > TILE_HEIGHT * 4) {
+	if (GetTileZ(tile) > 4) {
 		return_cmd_error(STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS);
 	}
 	return CommandCost();
@@ -1271,8 +1321,8 @@ static CheckNewIndustryProc * const _check_new_industry_procs[CHECK_END] = {
  * @param [out] town Pointer to return town for the new industry, \c NULL is written if no good town can be found.
  * @return Succeeded or failed command.
  *
- * @precond \c *t != NULL
- * @postcon \c *t points to a town on success, and \c NULL on failure.
+ * @pre \c *t != NULL
+ * @post \c *t points to a town on success, and \c NULL on failure.
  */
 static CommandCost FindTownForIndustry(TileIndex tile, int type, Town **t)
 {
@@ -1335,7 +1385,7 @@ static CommandCost CheckIfIndustryTilesAreFree(TileIndex tile, const IndustryTil
 
 		if (gfx == GFX_WATERTILE_SPECIALCHECK) {
 			if (!IsTileType(cur_tile, MP_WATER) ||
-					GetTileSlope(cur_tile, NULL) != SLOPE_FLAT) {
+					GetTileSlope(cur_tile) != SLOPE_FLAT) {
 				return_cmd_error(STR_ERROR_SITE_UNSUITABLE);
 			}
 		} else {
@@ -1355,7 +1405,7 @@ static CommandCost CheckIfIndustryTilesAreFree(TileIndex tile, const IndustryTil
 				CommandCost ret = PerformIndustryTileSlopeCheck(tile, cur_tile, its, type, gfx, itspec_index, initial_random_bits, founder, creation_type);
 				if (ret.Failed()) return ret;
 			} else {
-				Slope tileh = GetTileSlope(cur_tile, NULL);
+				Slope tileh = GetTileSlope(cur_tile);
 				refused_slope |= IsSlopeRefused(tileh, its->slopes_refused);
 			}
 
@@ -1608,7 +1658,10 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 
 	if (HasBit(indspec->callback_mask, CBM_IND_DECIDE_COLOUR)) {
 		uint16 res = GetIndustryCallback(CBID_INDUSTRY_DECIDE_COLOUR, 0, 0, i, type, INVALID_TILE);
-		if (res != CALLBACK_FAILED) i->random_colour = GB(res, 0, 4);
+		if (res != CALLBACK_FAILED) {
+			if (GB(res, 4, 11) != 0) ErrorUnknownCallbackResult(indspec->grf_prop.grffile->grfid, CBID_INDUSTRY_DECIDE_COLOUR, res);
+			i->random_colour = GB(res, 0, 4);
+		}
 	}
 
 	if (HasBit(indspec->callback_mask, CBM_IND_INPUT_CARGO_TYPES)) {
@@ -1616,6 +1669,10 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 		for (uint j = 0; j < lengthof(i->accepts_cargo); j++) {
 			uint16 res = GetIndustryCallback(CBID_INDUSTRY_INPUT_CARGO_TYPES, j, 0, i, type, INVALID_TILE);
 			if (res == CALLBACK_FAILED || GB(res, 0, 8) == CT_INVALID) break;
+			if (indspec->grf_prop.grffile->grf_version >= 8 && res >= 0x100) {
+				ErrorUnknownCallbackResult(indspec->grf_prop.grffile->grfid, CBID_INDUSTRY_INPUT_CARGO_TYPES, res);
+				break;
+			}
 			i->accepts_cargo[j] = GetCargoTranslation(GB(res, 0, 8), indspec->grf_prop.grffile);
 		}
 	}
@@ -1625,6 +1682,10 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 		for (uint j = 0; j < lengthof(i->produced_cargo); j++) {
 			uint16 res = GetIndustryCallback(CBID_INDUSTRY_OUTPUT_CARGO_TYPES, j, 0, i, type, INVALID_TILE);
 			if (res == CALLBACK_FAILED || GB(res, 0, 8) == CT_INVALID) break;
+			if (indspec->grf_prop.grffile->grf_version >= 8 && res >= 0x100) {
+				ErrorUnknownCallbackResult(indspec->grf_prop.grffile->grfid, CBID_INDUSTRY_OUTPUT_CARGO_TYPES, res);
+				break;
+			}
 			i->produced_cargo[j] = GetCargoTranslation(GB(res, 0, 8), indspec->grf_prop.grffile);
 		}
 	}
@@ -1753,7 +1814,7 @@ CommandCost CmdBuildIndustry(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
 		return CMD_ERROR;
 	}
 
-	if (_game_mode != GM_EDITOR && !CheckIfCallBackAllowsAvailability(it, IACT_USERCREATION)) {
+	if (_game_mode != GM_EDITOR && GetIndustryProbabilityCallback(it, IACT_USERCREATION, 1) == 0) {
 		return CMD_ERROR;
 	}
 
@@ -1816,7 +1877,8 @@ CommandCost CmdBuildIndustry(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
 			SetDParam(1, ind->town->index);
 		}
 		AddIndustryNewsItem(indspec->new_industry_text, NS_INDUSTRY_OPEN, ind->index);
-		AI::BroadcastNewEvent(new AIEventIndustryOpen(ind->index));
+		AI::BroadcastNewEvent(new ScriptEventIndustryOpen(ind->index));
+		Game::NewEvent(new ScriptEventIndustryOpen(ind->index));
 	}
 
 	return CommandCost(EXPENSES_OTHER, indspec->GetConstructionCost());
@@ -1852,9 +1914,9 @@ static uint32 GetScaledIndustryGenerationProbability(IndustryType it, bool *forc
 {
 	const IndustrySpec *ind_spc = GetIndustrySpec(it);
 	uint32 chance = ind_spc->appear_creation[_settings_game.game_creation.landscape] * 16; // * 16 to increase precision
-	if (!ind_spc->enabled || chance == 0 || ind_spc->num_table == 0 ||
-			!CheckIfCallBackAllowsAvailability(it, IACT_MAPGENERATION) ||
-			(_game_mode != GM_EDITOR && _settings_game.difficulty.industry_density == ID_FUND_ONLY)) {
+	if (!ind_spc->enabled || ind_spc->num_table == 0 ||
+			(_game_mode != GM_EDITOR && _settings_game.difficulty.industry_density == ID_FUND_ONLY) ||
+			(chance = GetIndustryProbabilityCallback(it, IACT_MAPGENERATION, chance)) == 0) {
 		*force_at_least_one = false;
 		return 0;
 	} else {
@@ -1882,10 +1944,10 @@ static uint16 GetIndustryGamePlayProbability(IndustryType it, byte *min_number)
 
 	const IndustrySpec *ind_spc = GetIndustrySpec(it);
 	byte chance = ind_spc->appear_ingame[_settings_game.game_creation.landscape];
-	if (!ind_spc->enabled || chance == 0 || ind_spc->num_table == 0 ||
+	if (!ind_spc->enabled || ind_spc->num_table == 0 ||
 			((ind_spc->behaviour & INDUSTRYBEH_BEFORE_1950) && _cur_year > 1950) ||
 			((ind_spc->behaviour & INDUSTRYBEH_AFTER_1960) && _cur_year < 1960) ||
-			!CheckIfCallBackAllowsAvailability(it, IACT_RANDOMCREATION)) {
+			(chance = GetIndustryProbabilityCallback(it, IACT_RANDOMCREATION, chance)) == 0) {
 		*min_number = 0;
 		return 0;
 	}
@@ -1929,7 +1991,8 @@ static void AdvertiseIndustryOpening(const Industry *ind)
 		SetDParam(1, ind->town->index);
 	}
 	AddIndustryNewsItem(ind_spc->new_industry_text, NS_INDUSTRY_OPEN, ind->index);
-	AI::BroadcastNewEvent(new AIEventIndustryOpen(ind->index));
+	AI::BroadcastNewEvent(new ScriptEventIndustryOpen(ind->index));
+	Game::NewEvent(new ScriptEventIndustryOpen(ind->index));
 }
 
 /**
@@ -2001,7 +2064,7 @@ void IndustryBuildData::Reset()
 void IndustryBuildData::MonthlyLoop()
 {
 	static const int NEWINDS_PER_MONTH = 0x38000 / (10 * 12); // lower 16 bits is a float fraction, 3.5 industries per decade, divided by 10 * 12 months.
-	if (_settings_game.difficulty.industry_density == ID_FUND_ONLY) return; // 'no industries' setting,
+	if (_settings_game.difficulty.industry_density == ID_FUND_ONLY) return; // 'no industries' setting.
 
 	/* To prevent running out of unused industries for the player to connect,
 	 * add a fraction of new industries each month, but only if the manager can keep up. */
@@ -2537,7 +2600,8 @@ static void ChangeIndustryProduction(Industry *i, bool monthly)
 		/* Compute news category */
 		if (closeit) {
 			ns = NS_INDUSTRY_CLOSE;
-			AI::BroadcastNewEvent(new AIEventIndustryClose(i->index));
+			AI::BroadcastNewEvent(new ScriptEventIndustryClose(i->index));
+			Game::NewEvent(new ScriptEventIndustryClose(i->index));
 		} else {
 			switch (WhoCanServiceIndustry(i)) {
 				case 0: ns = NS_INDUSTRY_NOBODY;  break;
@@ -2691,7 +2755,7 @@ bool IndustrySpec::UsesSmoothEconomy() const
 		!(HasBit(this->callback_mask, CBM_IND_MONTHLYPROD_CHANGE) || HasBit(this->callback_mask, CBM_IND_PRODUCTION_CHANGE));            // production change callbacks
 }
 
-static CommandCost TerraformTile_Industry(TileIndex tile, DoCommandFlag flags, uint z_new, Slope tileh_new)
+static CommandCost TerraformTile_Industry(TileIndex tile, DoCommandFlag flags, int z_new, Slope tileh_new)
 {
 	if (AutoslopeEnabled()) {
 		/* We imitate here TTDP's behaviour:
@@ -2700,7 +2764,7 @@ static CommandCost TerraformTile_Industry(TileIndex tile, DoCommandFlag flags, u
 		 *  - Allow autoslope by default.
 		 *  - Disallow autoslope if callback succeeds and returns non-zero.
 		 */
-		Slope tileh_old = GetTileSlope(tile, NULL);
+		Slope tileh_old = GetTileSlope(tile);
 		/* TileMaxZ must not be changed. Slopes must not be steep. */
 		if (!IsSteepSlope(tileh_old) && !IsSteepSlope(tileh_new) && (GetTileMaxZ(tile) == z_new + GetSlopeMaxZ(tileh_new))) {
 			const IndustryGfx gfx = GetIndustryGfx(tile);
@@ -2710,7 +2774,7 @@ static CommandCost TerraformTile_Industry(TileIndex tile, DoCommandFlag flags, u
 			if (HasBit(itspec->callback_mask, CBM_INDT_AUTOSLOPE)) {
 				/* If the callback fails, allow autoslope. */
 				uint16 res = GetIndustryTileCallback(CBID_INDTILE_AUTOSLOPE, 0, 0, gfx, Industry::GetByTile(tile), tile);
-				if ((res == 0) || (res == CALLBACK_FAILED)) return CommandCost(EXPENSES_CONSTRUCTION, _price[PR_BUILD_FOUNDATION]);
+				if (res == CALLBACK_FAILED || !ConvertBooleanCallback(itspec->grf_prop.grffile, CBID_INDTILE_AUTOSLOPE, res)) return CommandCost(EXPENSES_CONSTRUCTION, _price[PR_BUILD_FOUNDATION]);
 			} else {
 				/* allow autoslope */
 				return CommandCost(EXPENSES_CONSTRUCTION, _price[PR_BUILD_FOUNDATION]);
@@ -2722,7 +2786,7 @@ static CommandCost TerraformTile_Industry(TileIndex tile, DoCommandFlag flags, u
 
 extern const TileTypeProcs _tile_type_industry_procs = {
 	DrawTile_Industry,           // draw_tile_proc
-	GetSlopeZ_Industry,          // get_slope_z_proc
+	GetSlopePixelZ_Industry,     // get_slope_z_proc
 	ClearTile_Industry,          // clear_tile_proc
 	AddAcceptedCargo_Industry,   // add_accepted_cargo_proc
 	GetTileDesc_Industry,        // get_tile_desc_proc

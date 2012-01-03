@@ -24,7 +24,7 @@
  * @param caller_grffile #GRFFile of the entity asking for a town variable.
  * @return the value stored in the corresponding variable
  */
-uint32 TownGetVariable(byte variable, byte parameter, bool *available, Town *t, const GRFFile *caller_grffile)
+uint32 TownGetVariable(byte variable, uint32 parameter, bool *available, Town *t, const GRFFile *caller_grffile)
 {
 	switch (variable) {
 		/* Larger towns */
@@ -90,33 +90,33 @@ uint32 TownGetVariable(byte variable, byte parameter, bool *available, Town *t, 
 		case 0xAE: return t->have_ratings;
 		case 0xB2: return t->statues;
 		case 0xB6: return ClampToU16(t->num_houses);
-		case 0xB9: return t->growth_rate;
-		case 0xBA: return ClampToU16(t->new_max_pass);
-		case 0xBB: return GB(ClampToU16(t->new_max_pass), 8, 8);
-		case 0xBC: return ClampToU16(t->new_max_mail);
-		case 0xBD: return GB(ClampToU16(t->new_max_mail), 8, 8);
-		case 0xBE: return ClampToU16(t->new_act_pass);
-		case 0xBF: return GB(ClampToU16(t->new_act_pass), 8, 8);
-		case 0xC0: return ClampToU16(t->new_act_mail);
-		case 0xC1: return GB(ClampToU16(t->new_act_mail), 8, 8);
-		case 0xC2: return ClampToU16(t->max_pass);
-		case 0xC3: return GB(ClampToU16(t->max_pass), 8, 8);
-		case 0xC4: return ClampToU16(t->max_mail);
-		case 0xC5: return GB(ClampToU16(t->max_mail), 8, 8);
-		case 0xC6: return ClampToU16(t->act_pass);
-		case 0xC7: return GB(ClampToU16(t->act_pass), 8, 8);
-		case 0xC8: return ClampToU16(t->act_mail);
-		case 0xC9: return GB(ClampToU16(t->act_mail), 8, 8);
-		case 0xCA: return t->GetPercentPassTransported();
-		case 0xCB: return t->GetPercentMailTransported();
-		case 0xCC: return t->new_act_food;
-		case 0xCD: return GB(t->new_act_food, 8, 8);
-		case 0xCE: return t->new_act_water;
-		case 0xCF: return GB(t->new_act_water, 8, 8);
-		case 0xD0: return t->act_food;
-		case 0xD1: return GB(t->act_food, 8, 8);
-		case 0xD2: return t->act_water;
-		case 0xD3: return GB(t->act_water, 8, 8);
+		case 0xB9: return t->growth_rate & (~TOWN_GROW_RATE_CUSTOM);
+		case 0xBA: return ClampToU16(t->supplied[CT_PASSENGERS].new_max);
+		case 0xBB: return GB(ClampToU16(t->supplied[CT_PASSENGERS].new_max), 8, 8);
+		case 0xBC: return ClampToU16(t->supplied[CT_MAIL].new_max);
+		case 0xBD: return GB(ClampToU16(t->supplied[CT_MAIL].new_max), 8, 8);
+		case 0xBE: return ClampToU16(t->supplied[CT_PASSENGERS].new_act);
+		case 0xBF: return GB(ClampToU16(t->supplied[CT_PASSENGERS].new_act), 8, 8);
+		case 0xC0: return ClampToU16(t->supplied[CT_MAIL].new_act);
+		case 0xC1: return GB(ClampToU16(t->supplied[CT_MAIL].new_act), 8, 8);
+		case 0xC2: return ClampToU16(t->supplied[CT_PASSENGERS].old_max);
+		case 0xC3: return GB(ClampToU16(t->supplied[CT_PASSENGERS].old_max), 8, 8);
+		case 0xC4: return ClampToU16(t->supplied[CT_MAIL].old_max);
+		case 0xC5: return GB(ClampToU16(t->supplied[CT_MAIL].old_max), 8, 8);
+		case 0xC6: return ClampToU16(t->supplied[CT_PASSENGERS].old_act);
+		case 0xC7: return GB(ClampToU16(t->supplied[CT_PASSENGERS].old_act), 8, 8);
+		case 0xC8: return ClampToU16(t->supplied[CT_MAIL].old_act);
+		case 0xC9: return GB(ClampToU16(t->supplied[CT_MAIL].old_act), 8, 8);
+		case 0xCA: return t->GetPercentTransported(CT_PASSENGERS);
+		case 0xCB: return t->GetPercentTransported(CT_MAIL);
+		case 0xCC: return t->received[TE_FOOD].new_act;
+		case 0xCD: return GB(t->received[TE_FOOD].new_act, 8, 8);
+		case 0xCE: return t->received[TE_WATER].new_act;
+		case 0xCF: return GB(t->received[TE_WATER].new_act, 8, 8);
+		case 0xD0: return t->received[TE_FOOD].old_act;
+		case 0xD1: return GB(t->received[TE_FOOD].old_act, 8, 8);
+		case 0xD2: return t->received[TE_WATER].old_act;
+		case 0xD3: return GB(t->received[TE_WATER].old_act, 8, 8);
 		case 0xD4: return t->road_build_months;
 		case 0xD5: return t->fund_buildings_months;
 	}

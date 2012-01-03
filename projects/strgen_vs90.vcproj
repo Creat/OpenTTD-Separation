@@ -118,6 +118,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\strgen\strgen_base.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\strgen\strgen.cpp"
 				>
 			</File>
@@ -151,7 +155,7 @@
 			>
 		</File>
 		<File
-			RelativePath="..\src\string.h"
+			RelativePath="..\src\string_func.h"
 			>
 		</File>
 		<File

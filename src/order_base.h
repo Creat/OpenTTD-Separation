@@ -52,7 +52,7 @@ public:
 	uint16 travel_time;  ///< How long in ticks the journey to this destination should take.
 
 	Order() : refit_cargo(CT_NO_REFIT) {}
-	~Order() {}
+	~Order();
 
 	Order(uint32 packed);
 
@@ -81,6 +81,15 @@ public:
 	void MakeImplicit(StationID destination);
 
 	/**
+	 * Is this a 'goto' order with a real destination?
+	 * @return True if the type is either #OT_GOTO_WAYPOINT, #OT_GOTO_DEPOT or #OT_GOTO_STATION.
+	 */
+	inline bool IsGotoOrder() const
+	{
+		return IsType(OT_GOTO_WAYPOINT) || IsType(OT_GOTO_DEPOT) || IsType(OT_GOTO_STATION);
+	}
+
+	/**
 	 * Gets the destination of this order.
 	 * @pre IsType(OT_GOTO_WAYPOINT) || IsType(OT_GOTO_DEPOT) || IsType(OT_GOTO_STATION).
 	 * @return the destination of the order.
@@ -96,21 +105,28 @@ public:
 
 	/**
 	 * Is this order a refit order.
-	 * @pre IsType(OT_GOTO_DEPOT)
+	 * @pre IsType(OT_GOTO_DEPOT) || IsType(OT_GOTO_STATION)
 	 * @return true if a refit should happen.
 	 */
-	inline bool IsRefit() const { return this->refit_cargo < NUM_CARGO; }
+	inline bool IsRefit() const { return this->refit_cargo < NUM_CARGO || this->refit_cargo == CT_AUTO_REFIT; }
+
+	/**
+	 * Is this order a auto-refit order.
+	 * @pre IsType(OT_GOTO_DEPOT) || IsType(OT_GOTO_STATION)
+	 * @return true if a auto-refit should happen.
+	 */
+	inline bool IsAutoRefit() const { return this->refit_cargo == CT_AUTO_REFIT; }
 
 	/**
 	 * Get the cargo to to refit to.
-	 * @pre IsType(OT_GOTO_DEPOT)
+	 * @pre IsType(OT_GOTO_DEPOT) || IsType(OT_GOTO_STATION)
 	 * @return the cargo type.
 	 */
 	inline CargoID GetRefitCargo() const { return this->refit_cargo; }
 
 	/**
 	 * Get the cargo subtype to to refit to.
-	 * @pre IsType(OT_GOTO_DEPOT)
+	 * @pre IsType(OT_GOTO_DEPOT) || IsType(OT_GOTO_STATION)
 	 * @return the cargo subtype.
 	 */
 	inline byte GetRefitSubtype() const { return this->refit_subtype; }
@@ -160,7 +176,7 @@ public:
 	inline void SetConditionValue(uint16 value) { SB(this->dest, 0, 11, value); }
 
 	bool ShouldStopAtStation(const Vehicle *v, StationID station) const;
-	TileIndex GetLocation(const Vehicle *v) const;
+	TileIndex GetLocation(const Vehicle *v, bool airport = false) const;
 
 	/** Checks if this order has travel_time and if needed wait_time set. */
 	inline bool IsCompletelyTimetabled() const

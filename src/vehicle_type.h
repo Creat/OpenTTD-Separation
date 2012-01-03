@@ -19,14 +19,20 @@ typedef uint32 VehicleID;
 
 /** Available vehicle types. */
 enum VehicleType {
-	VEH_TRAIN,          ///< %Train vehicle type.
-	VEH_ROAD,           ///< Road vehicle type.
-	VEH_SHIP,           ///< %Ship vehicle type.
-	VEH_AIRCRAFT,       ///< %Aircraft vehicle type.
-	VEH_EFFECT,         ///< Effect vehicle type (smoke, explosions, sparks, bubbles)
-	VEH_DISASTER,       ///< Disaster vehicle type.
+	VEH_BEGIN,
+
+	VEH_TRAIN = VEH_BEGIN,        ///< %Train vehicle type.
+	VEH_ROAD,                     ///< Road vehicle type.
+	VEH_SHIP,                     ///< %Ship vehicle type.
+	VEH_AIRCRAFT,                 ///< %Aircraft vehicle type.
+
+	VEH_COMPANY_END,              ///< Last company-ownable type.
+
+	VEH_EFFECT = VEH_COMPANY_END, ///< Effect vehicle type (smoke, explosions, sparks, bubbles)
+	VEH_DISASTER,                 ///< Disaster vehicle type.
+
 	VEH_END,
-	VEH_INVALID = 0xFF, ///< Non-existing type of vehicle.
+	VEH_INVALID = 0xFF,           ///< Non-existing type of vehicle.
 };
 DECLARE_POSTFIX_INCREMENT(VehicleType)
 /** Helper information for extract tool. */
@@ -75,6 +81,16 @@ static const uint VEHICLE_LENGTH = 8;
 enum AccelerationModel {
 	AM_ORIGINAL,
 	AM_REALISTIC,
+};
+
+/** Visualisation contexts of vehicles and engines. */
+enum EngineImageType {
+	EIT_ON_MAP     = 0x00,  ///< Vehicle drawn in viewport.
+	EIT_IN_DEPOT   = 0x10,  ///< Vehicle drawn in depot.
+	EIT_IN_DETAILS = 0x11,  ///< Vehicle drawn in vehicle details, refit window, ...
+	EIT_IN_LIST    = 0x12,  ///< Vehicle drawn in vehicle list, group list, ...
+	EIT_PURCHASE   = 0x20,  ///< Vehicle drawn in purchase list, autoreplace gui, ...
+	EIT_PREVIEW    = 0x21,  ///< Vehicle drawn in preview window, news, ...
 };
 
 #endif /* VEHICLE_TYPE_H */

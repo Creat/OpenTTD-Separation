@@ -17,6 +17,7 @@
 #include "transport_type.h"
 #include "network/core/config.h"
 #include "company_type.h"
+#include "zoom_type.h"
 #include "openttd.h"
 
 /** Available industry map generation densities. */
@@ -79,6 +80,8 @@ struct GUISettings {
 	uint8  statusbar_pos;                    ///< position of statusbar, 0=left, 1=center, 2=right
 	uint8  window_snap_radius;               ///< windows snap at each other if closer than this
 	uint8  window_soft_limit;                ///< soft limit of maximum number of non-stickied non-vital windows (0 = no limit)
+	ZoomLevelByte zoom_min;                  ///< minimum zoom out level
+	ZoomLevelByte zoom_max;                  ///< maximum zoom out level
 	bool   disable_unsuitable_building;      ///< disable infrastructure building when no suitable vehicles are available
 	byte   autosave;                         ///< how often should we do autosaves?
 	bool   threaded_saves;                   ///< should we do threaded saves?
@@ -112,6 +115,7 @@ struct GUISettings {
 	bool   expenses_layout;                  ///< layout of expenses window
 	uint32 last_newgrf_count;                ///< the numbers of NewGRFs we found during the last scan
 	byte   missing_strings_threshold;        ///< the number of missing strings before showing the warning
+	uint8  graph_line_thickness;             ///< the thickness of the lines in the various graph guis
 
 	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
 	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
@@ -216,7 +220,6 @@ struct GameCreationSettings {
 	byte   se_flat_world_height;             ///< land height a flat world gets in SE
 	byte   town_name;                        ///< the town name generator used for town names
 	byte   landscape;                        ///< the landscape we're currently in
-	byte   snow_line;                        ///< the snowline level in this game
 	byte   water_borders;                    ///< bitset of the borders that are water
 	uint16 custom_town_number;               ///< manually entered number of towns
 	byte   variety;                          ///< variety level applied to TGP
@@ -255,7 +258,11 @@ struct AISettings {
 	bool   ai_disable_veh_roadveh;           ///< disable types for AI
 	bool   ai_disable_veh_aircraft;          ///< disable types for AI
 	bool   ai_disable_veh_ship;              ///< disable types for AI
-	uint32 ai_max_opcode_till_suspend;       ///< max opcode calls till AI will suspend
+};
+
+/** Settings related to scripts. */
+struct ScriptSettings {
+	uint32 script_max_opcode_till_suspend;   ///< max opcode calls till scripts will suspend
 };
 
 /** Settings related to the old pathfinder. */
@@ -397,6 +404,7 @@ struct EconomySettings {
 	uint8  feeder_payment_share;             ///< percentage of leg payment to virtually pay in feeder systems
 	byte   dist_local_authority;             ///< distance for town local authority, default 20
 	bool   exclusive_rights;                 ///< allow buying exclusive rights
+	bool   fund_buildings;                   ///< allow funding new buildings
 	bool   fund_roads;                       ///< allow funding local road reconstruction
 	bool   give_money;                       ///< allow giving other companies money
 	bool   mod_road_rebuild;                 ///< roadworks remove unneccesary RoadBits
@@ -410,6 +418,7 @@ struct EconomySettings {
 	bool   station_noise_level;              ///< build new airports when the town noise level is still within accepted limits
 	uint16 town_noise_population[3];         ///< population to base decision on noise evaluation (@see town_council_tolerance)
 	bool   allow_town_level_crossings;       ///< towns are allowed to build level crossings
+	bool   infrastructure_maintenance;       ///< enable monthly maintenance fee for owner infrastructure
 };
 
 /** Settings related to stations. */
@@ -445,7 +454,9 @@ struct GameSettings {
 	GameCreationSettings game_creation;      ///< settings used during the creation of a game (map)
 	ConstructionSettings construction;       ///< construction of things in-game
 	AISettings           ai;                 ///< what may the AI do?
+	ScriptSettings       script;             ///< settings for scripts
 	class AIConfig      *ai_config[MAX_COMPANIES]; ///< settings per company
+	class GameConfig    *game_config;        ///< settings for gamescript
 	PathfinderSettings   pf;                 ///< settings for all pathfinders
 	OrderSettings        order;              ///< settings related to orders
 	VehicleSettings      vehicle;            ///< options for vehicles

@@ -18,6 +18,7 @@
 #include <windows.h>
 #include <fcntl.h>
 #include <shlobj.h> /* SHGetFolderPath */
+#include <Shellapi.h>
 #include "win32.h"
 #include "../../core/alloc_func.hpp"
 #include "../../openttd.h"
@@ -28,14 +29,16 @@
 #include <sys/stat.h>
 
 static bool _has_console;
+static bool _cursor_disable = true;
+static bool _cursor_visible = true;
 
-static bool cursor_visible = true;
-
-bool MyShowCursor(bool show)
+bool MyShowCursor(bool show, bool toggle)
 {
-	if (cursor_visible == show) return show;
+	if (toggle) _cursor_disable = !_cursor_disable;
+	if (_cursor_disable) return show;
+	if (_cursor_visible == show) return show;
 
-	cursor_visible = show;
+	_cursor_visible = show;
 	ShowCursor(show);
 
 	return !show;
@@ -75,6 +78,11 @@ void ShowOSErrorBox(const char *buf, bool system)
 {
 	MyShowCursor(true);
 	MessageBox(GetActiveWindow(), MB_TO_WIDE(buf), _T("Error!"), MB_ICONSTOP);
+}
+
+void OSOpenBrowser(const char *url)
+{
+	ShellExecute(GetActiveWindow(), _T("open"), MB_TO_WIDE(url), NULL, NULL, SW_SHOWNORMAL);
 }
 
 /* Code below for windows version of opendir/readdir/closedir copied and
@@ -750,4 +758,12 @@ const char *GetCurrentLocale(const char *)
 	/* Format it as 'en_us'. */
 	static char retbuf[6] = {lang[0], lang[1], '_', country[0], country[1], 0};
 	return retbuf;
+}
+
+uint GetCPUCoreCount()
+{
+	SYSTEM_INFO info;
+
+	GetSystemInfo(&info);
+	return info.dwNumberOfProcessors;
 }

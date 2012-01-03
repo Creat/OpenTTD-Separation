@@ -53,7 +53,7 @@
 				FavorSizeOrSpeed="2"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_ZLIB;WITH_LZO;WITH_LZMA;LZMA_API_STATIC;WITH_PNG;WITH_FREETYPE;WITH_ICU;U_STATIC_IMPLEMENTATION;ENABLE_NETWORK;ENABLE_AI;WITH_PERSONAL_DIR;PERSONAL_DIR=\&quot;OpenTTD\&quot;;WITH_ASSERT"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_ZLIB;WITH_LZO;WITH_LZMA;LZMA_API_STATIC;WITH_PNG;WITH_FREETYPE;WITH_ICU;U_STATIC_IMPLEMENTATION;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR=\&quot;OpenTTD\&quot;;WITH_ASSERT"
 				StringPooling="true"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -155,7 +155,7 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_ZLIB;WITH_LZO;WITH_LZMA;LZMA_API_STATIC;WITH_PNG;WITH_FREETYPE;WITH_ICU;U_STATIC_IMPLEMENTATION;ENABLE_NETWORK;ENABLE_AI;WITH_PERSONAL_DIR;PERSONAL_DIR=\&quot;OpenTTD\&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;WIN32_ENABLE_DIRECTMUSIC_SUPPORT;WITH_ZLIB;WITH_LZO;WITH_LZMA;LZMA_API_STATIC;WITH_PNG;WITH_FREETYPE;WITH_ICU;U_STATIC_IMPLEMENTATION;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR=\&quot;OpenTTD\&quot;"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
@@ -255,7 +255,7 @@
 				FavorSizeOrSpeed="2"
 				OmitFramePointers="true"
 				AdditionalIncludeDirectories="..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;WITH_ZLIB;WITH_LZO;WITH_LZMA;LZMA_API_STATIC;WITH_PNG;WITH_FREETYPE;WITH_ICU;U_STATIC_IMPLEMENTATION;ENABLE_NETWORK;ENABLE_AI;WITH_PERSONAL_DIR;PERSONAL_DIR=\&quot;OpenTTD\&quot;;_SQ64;WITH_ASSERT"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;WITH_ZLIB;WITH_LZO;WITH_LZMA;LZMA_API_STATIC;WITH_PNG;WITH_FREETYPE;WITH_ICU;U_STATIC_IMPLEMENTATION;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR=\&quot;OpenTTD\&quot;;_SQ64;WITH_ASSERT"
 				StringPooling="true"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -359,7 +359,7 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\objs\langs;..\objs\settings;..\src\3rdparty\squirrel\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;WITH_ZLIB;WITH_LZO;WITH_LZMA;LZMA_API_STATIC;WITH_PNG;WITH_FREETYPE;WITH_ICU;U_STATIC_IMPLEMENTATION;ENABLE_NETWORK;ENABLE_AI;WITH_PERSONAL_DIR;PERSONAL_DIR=\&quot;OpenTTD\&quot;;_SQ64"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;WITH_ZLIB;WITH_LZO;WITH_LZMA;LZMA_API_STATIC;WITH_PNG;WITH_FREETYPE;WITH_ICU;U_STATIC_IMPLEMENTATION;ENABLE_NETWORK;WITH_PERSONAL_DIR;PERSONAL_DIR=\&quot;OpenTTD\&quot;;_SQ64"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
@@ -548,6 +548,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\goal.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\ground_vehicle.cpp"
 				>
 			</File>
@@ -693,6 +697,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\station.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\strgen\strgen_base.cpp"
 				>
 			</File>
 			<File
@@ -984,6 +992,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\error.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\fileio_func.h"
 				>
 			</File>
@@ -1021,6 +1033,14 @@
 			</File>
 			<File
 				RelativePath=".\..\src\gfxinit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\goal_base.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\goal_type.h"
 				>
 			</File>
 			<File
@@ -1129,6 +1149,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\network\network_content.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\network\network_content_gui.h"
 				>
 			</File>
 			<File
@@ -1492,6 +1516,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\strgen\strgen.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\string_func.h"
 				>
 			</File>
@@ -1557,6 +1585,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\tilehighlight_type.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\tilematrix_type.hpp"
 				>
 			</File>
 			<File
@@ -1816,6 +1848,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\bootstrap_gui.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\bridge_gui.cpp"
 				>
 			</File>
@@ -1852,11 +1888,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\error_gui.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\fios_gui.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\..\src\genworld_gui.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\goal_gui.cpp"
 				>
 			</File>
 			<File
@@ -2012,6 +2056,54 @@
 			Name="Widgets"
 			>
 			<File
+				RelativePath=".\..\src\widgets\airport_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\ai_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\autoreplace_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\bootstrap_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\bridge_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\build_vehicle_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\cheat_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\company_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\console_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\date_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\depot_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\dock_widget.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\widgets\dropdown.cpp"
 				>
 			</File>
@@ -2021,6 +2113,166 @@
 			</File>
 			<File
 				RelativePath=".\..\src\widgets\dropdown_type.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\dropdown_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\engine_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\error_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\fios_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\genworld_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\goal_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\graph_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\group_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\highscore_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\industry_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\intro_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\main_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\misc_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\music_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\network_chat_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\network_content_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\network_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\newgrf_debug_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\newgrf_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\news_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\object_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\order_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\osk_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\rail_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\road_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\settings_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\sign_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\smallmap_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\station_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\statusbar_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\subsidy_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\terraform_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\timetable_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\toolbar_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\town_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\transparency_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\tree_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\vehicle_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\viewport_widget.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\widgets\waypoint_widget.h"
 				>
 			</File>
 		</Filter>
@@ -2184,7 +2436,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\saveload\game_sl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\saveload\gamelog_sl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\saveload\goal_sl.cpp"
 				>
 			</File>
 			<File
@@ -2448,6 +2708,18 @@
 			Name="Script"
 			>
 			<File
+				RelativePath=".\..\src\script\script_config.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\script_config.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\script_fatalerror.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\script\script_info.cpp"
 				>
 			</File>
@@ -2456,11 +2728,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\script\script_info_dummy.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\script_instance.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\script_instance.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\script\script_scanner.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\..\src\script\script_scanner.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\script_storage.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\script_suspend.hpp"
 				>
 			</File>
 			<File
@@ -2692,10 +2984,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\ai_info_dummy.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\..\src\ai\ai_instance.cpp"
 				>
 			</File>
@@ -2711,428 +2999,560 @@
 				RelativePath=".\..\src\ai\ai_scanner.hpp"
 				>
 			</File>
-			<File
-				RelativePath=".\..\src\ai\ai_storage.hpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="AI API"
 			>
 			<File
-				RelativePath=".\..\src\ai\api\ai_accounting.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_airport.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_base.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_basestation.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_bridge.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_bridgelist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_cargo.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_cargolist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_changelog.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_company.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_controller.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_date.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_depotlist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_engine.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_enginelist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_error.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_event.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_event_types.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_execmode.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_gamesettings.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_group.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_grouplist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_industry.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_industrylist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_industrytype.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_industrytypelist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_info_docs.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_list.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_log.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_map.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_marine.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_object.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_order.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_rail.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_railtypelist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_road.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_sign.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_signlist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_station.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_stationlist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_subsidy.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_subsidylist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_testmode.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_tile.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_tilelist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_town.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_townlist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_tunnel.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_types.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_vehicle.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_vehiclelist.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_waypoint.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\ai\api\ai_waypointlist.hpp"
+				RelativePath=".\..\src\script\api\ai_changelog.hpp"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="AI API Implementation"
+			Name="Game API"
 			>
 			<File
-				RelativePath=".\..\src\ai\api\ai_accounting.cpp"
+				RelativePath=".\..\src\script\api\game_changelog.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Game Core"
+			>
+			<File
+				RelativePath=".\..\src\game\game.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_airport.cpp"
+				RelativePath=".\..\src\game\game_config.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_base.cpp"
+				RelativePath=".\..\src\game\game_config.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_basestation.cpp"
+				RelativePath=".\..\src\game\game_core.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_bridge.cpp"
+				RelativePath=".\..\src\game\game_info.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_bridgelist.cpp"
+				RelativePath=".\..\src\game\game_info.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_cargo.cpp"
+				RelativePath=".\..\src\game\game_instance.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_cargolist.cpp"
+				RelativePath=".\..\src\game\game_instance.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_company.cpp"
+				RelativePath=".\..\src\game\game_scanner.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_controller.cpp"
+				RelativePath=".\..\src\game\game_scanner.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_date.cpp"
+				RelativePath=".\..\src\game\game_text.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_depotlist.cpp"
+				RelativePath=".\..\src\game\game_text.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Script API"
+			>
+			<File
+				RelativePath=".\..\src\script\api\script_accounting.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_engine.cpp"
+				RelativePath=".\..\src\script\api\script_admin.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_enginelist.cpp"
+				RelativePath=".\..\src\script\api\script_airport.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_error.cpp"
+				RelativePath=".\..\src\script\api\script_base.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_event.cpp"
+				RelativePath=".\..\src\script\api\script_basestation.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_event_types.cpp"
+				RelativePath=".\..\src\script\api\script_bridge.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_execmode.cpp"
+				RelativePath=".\..\src\script\api\script_bridgelist.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_gamesettings.cpp"
+				RelativePath=".\..\src\script\api\script_cargo.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_group.cpp"
+				RelativePath=".\..\src\script\api\script_cargolist.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_grouplist.cpp"
+				RelativePath=".\..\src\script\api\script_company.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_industry.cpp"
+				RelativePath=".\..\src\script\api\script_companymode.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_industrylist.cpp"
+				RelativePath=".\..\src\script\api\script_controller.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_industrytype.cpp"
+				RelativePath=".\..\src\script\api\script_date.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_industrytypelist.cpp"
+				RelativePath=".\..\src\script\api\script_depotlist.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_list.cpp"
+				RelativePath=".\..\src\script\api\script_engine.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_log.cpp"
+				RelativePath=".\..\src\script\api\script_enginelist.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_map.cpp"
+				RelativePath=".\..\src\script\api\script_error.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_marine.cpp"
+				RelativePath=".\..\src\script\api\script_event.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_object.cpp"
+				RelativePath=".\..\src\script\api\script_event_types.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_order.cpp"
+				RelativePath=".\..\src\script\api\script_execmode.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_rail.cpp"
+				RelativePath=".\..\src\script\api\script_game.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_railtypelist.cpp"
+				RelativePath=".\..\src\script\api\script_gamesettings.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_road.cpp"
+				RelativePath=".\..\src\script\api\script_goal.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_sign.cpp"
+				RelativePath=".\..\src\script\api\script_group.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_signlist.cpp"
+				RelativePath=".\..\src\script\api\script_grouplist.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_station.cpp"
+				RelativePath=".\..\src\script\api\script_industry.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_stationlist.cpp"
+				RelativePath=".\..\src\script\api\script_industrylist.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_subsidy.cpp"
+				RelativePath=".\..\src\script\api\script_industrytype.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_subsidylist.cpp"
+				RelativePath=".\..\src\script\api\script_industrytypelist.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_testmode.cpp"
+				RelativePath=".\..\src\script\api\script_info_docs.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_tile.cpp"
+				RelativePath=".\..\src\script\api\script_infrastructure.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_tilelist.cpp"
+				RelativePath=".\..\src\script\api\script_list.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_town.cpp"
+				RelativePath=".\..\src\script\api\script_log.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_townlist.cpp"
+				RelativePath=".\..\src\script\api\script_map.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_tunnel.cpp"
+				RelativePath=".\..\src\script\api\script_marine.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_vehicle.cpp"
+				RelativePath=".\..\src\script\api\script_news.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_vehiclelist.cpp"
+				RelativePath=".\..\src\script\api\script_object.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_waypoint.cpp"
+				RelativePath=".\..\src\script\api\script_order.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\..\src\ai\api\ai_waypointlist.cpp"
+				RelativePath=".\..\src\script\api\script_rail.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_railtypelist.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_road.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_sign.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_signlist.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_station.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_stationlist.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_subsidy.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_subsidylist.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_testmode.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_text.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_tile.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_tilelist.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_town.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_townlist.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_tunnel.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_types.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_vehicle.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_vehiclelist.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_viewport.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_waypoint.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_waypointlist.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_window.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Script API Implementation"
+			>
+			<File
+				RelativePath=".\..\src\script\api\script_accounting.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_admin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_airport.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_base.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_basestation.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_bridge.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_bridgelist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_cargo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_cargolist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_company.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_companymode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_controller.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_date.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_depotlist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_engine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_enginelist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_error.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_event.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_event_types.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_execmode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_game.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_gamesettings.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_goal.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_group.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_grouplist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_industry.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_industrylist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_industrytype.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_industrytypelist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_infrastructure.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_list.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_log.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_marine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_news.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_object.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_order.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_rail.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_railtypelist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_road.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_sign.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_signlist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_station.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_stationlist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_subsidy.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_subsidylist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_testmode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_text.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_tile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_tilelist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_town.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_townlist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_tunnel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_vehicle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_vehiclelist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_viewport.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_waypoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_waypointlist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_window.cpp"
 				>
 			</File>
 		</Filter>
@@ -3177,14 +3597,6 @@
 			</File>
 			<File
 				RelativePath=".\..\src\blitter\8bpp_base.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\blitter\8bpp_debug.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\..\src\blitter\8bpp_debug.hpp"
 				>
 			</File>
 			<File

@@ -49,7 +49,7 @@ enum ScoreID {
 	SCORE_TOTAL      = 9,  ///< This must always be the last entry
 	SCORE_END        = 10, ///< How many scores are there..
 
-	SCORE_MAX = 1000       ///< The max score that can be in the performance history
+	SCORE_MAX = 1000,      ///< The max score that can be in the performance history
 	/* the scores together of score_info is allowed to be more! */
 };
 DECLARE_POSTFIX_INCREMENT(ScoreID)
@@ -132,6 +132,11 @@ enum Price {
 	PR_CLEAR_AQUEDUCT,
 	PR_BUILD_LOCK,
 	PR_CLEAR_LOCK,
+	PR_INFRASTRUCTURE_RAIL,
+	PR_INFRASTRUCTURE_ROAD,
+	PR_INFRASTRUCTURE_WATER,
+	PR_INFRASTRUCTURE_STATION,
+	PR_INFRASTRUCTURE_AIRPORT,
 
 	PR_END,
 	INVALID_PRICE = 0xFF
@@ -200,6 +205,13 @@ static const uint64 MAX_INFLATION = (1ull << (63 - 32)) - 1;
 static const int MIN_PRICE_MODIFIER = -8;
 static const int MAX_PRICE_MODIFIER = 16;
 static const int INVALID_PRICE_MODIFIER = MIN_PRICE_MODIFIER - 1;
+
+/** Multiplier for how many regular track bits a tunnel/bridge counts. */
+static const uint TUNNELBRIDGE_TRACKBIT_FACTOR = 4;
+/** Multiplier for how many regular track bits a level crossing counts. */
+static const uint LEVELCROSSING_TRACKBIT_FACTOR = 2;
+/** Multiplier for how many regular tiles a lock counts. */
+static const uint LOCK_DEPOT_TILE_FACTOR = 2;
 
 struct CargoPayment;
 typedef uint32 CargoPaymentID;

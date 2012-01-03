@@ -25,30 +25,12 @@
 #include "vehicle_gui.h"
 #include "settings_type.h"
 
+#include "widgets/timetable_widget.h"
+
 #include "table/sprites.h"
 #include "table/strings.h"
 #include "widgets/dropdown_func.h"
 
-enum TimetableViewWindowWidgets {
-	TTV_CAPTION,
-	TTV_ORDER_VIEW,
-	TTV_TIMETABLE_PANEL,
-	TTV_ARRIVAL_DEPARTURE_PANEL,      ///< Panel with the expected/scheduled arrivals
-	TTV_SCROLLBAR,
-	TTV_SUMMARY_PANEL,
-	TTV_START_DATE,
-	TTV_CHANGE_TIME,
-	TTV_CLEAR_TIME,
-	TTV_RESET_LATENESS,
-	TTV_AUTOFILL,
-	TTV_EXPECTED,                    ///< Toggle between expected and scheduled arrivals
-	TTV_SHARED_ORDER_LIST,           ///< Show the shared order list
-	TTV_ARRIVAL_DEPARTURE_SELECTION, ///< Disable/hide the arrival departure panel
-	TTV_EXPECTED_SELECTION,          ///< Disable/hide the expected selection button
-	TTV_TTSEP_MODE_DROPDOWN,         ///< Select separation mode dropdown
-	TTV_TTSEP_SET_PARAMETER,         ///< Set the separation parameter (time / number)
-	TTV_TTSEP_PANEL_TEXT             ///< Panel area for separation info text
-};
 
 /** Entries for mode selection dropdown list. Order must be identical to the one in #TTSepMode */
 static const StringID TimetableSeparationDropdownOptions[5] =
@@ -204,7 +186,7 @@ struct TimetableWindow : Window {
 	{
 		NewSettings = (vehicle->orders.list != NULL) ? vehicle->orders.list->GetSepSettings() : TTSepSettings();
 		this->CreateNestedTree(desc);
-		this->vscroll = this->GetScrollbar(TTV_SCROLLBAR);
+		this->vscroll = this->GetScrollbar(WID_VT_SCROLLBAR);
 		this->UpdateSelectionStates();
 		this->FinishInitNested(desc, window_number);
 
@@ -232,19 +214,19 @@ struct TimetableWindow : Window {
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 	{
 		switch (widget) {
-			case TTV_ARRIVAL_DEPARTURE_PANEL:
+			case WID_VT_ARRIVAL_DEPARTURE_PANEL:
 				SetDParam(0, MAX_YEAR * DAYS_IN_YEAR);
 				this->deparr_time_width = GetStringBoundingBox(STR_JUST_DATE_TINY).width;
 				this->deparr_abbr_width = max(GetStringBoundingBox(STR_TIMETABLE_ARRIVAL_ABBREVIATION).width, GetStringBoundingBox(STR_TIMETABLE_DEPARTURE_ABBREVIATION).width);
 				size->width = WD_FRAMERECT_LEFT + this->deparr_abbr_width + 10 + this->deparr_time_width + WD_FRAMERECT_RIGHT;
 				/* FALL THROUGH */
-			case TTV_ARRIVAL_DEPARTURE_SELECTION:
-			case TTV_TIMETABLE_PANEL:
+			case WID_VT_ARRIVAL_DEPARTURE_SELECTION:
+			case WID_VT_TIMETABLE_PANEL:
 				resize->height = FONT_HEIGHT_NORMAL;
 				size->height = WD_FRAMERECT_TOP + 8 * resize->height + WD_FRAMERECT_BOTTOM;
 				break;
 
-			case TTV_SUMMARY_PANEL:
+			case WID_VT_SUMMARY_PANEL:
 				size->height = WD_FRAMERECT_TOP + 2 * FONT_HEIGHT_NORMAL + WD_FRAMERECT_BOTTOM;
 				break;
 		}
@@ -252,7 +234,7 @@ struct TimetableWindow : Window {
 
 	int GetOrderFromTimetableWndPt(int y, const Vehicle *v)
 	{
-		int sel = (y - this->GetWidget<NWidgetBase>(TTV_TIMETABLE_PANEL)->pos_y - WD_FRAMERECT_TOP) / FONT_HEIGHT_NORMAL;
+		int sel = (y - this->GetWidget<NWidgetBase>(WID_VT_TIMETABLE_PANEL)->pos_y - WD_FRAMERECT_TOP) / FONT_HEIGHT_NORMAL;
 
 		if ((uint)sel >= this->vscroll->GetCapacity()) return INVALID_ORDER;
 
@@ -354,23 +336,23 @@ struct TimetableWindow : Window {
 				}
 			}
 
-			this->SetWidgetDisabledState(TTV_CHANGE_TIME, disable);
-			this->SetWidgetDisabledState(TTV_CLEAR_TIME, disable);
-			this->SetWidgetDisabledState(TTV_SHARED_ORDER_LIST, !v->IsOrderListShared());
+			this->SetWidgetDisabledState(WID_VT_CHANGE_TIME, disable);
+			this->SetWidgetDisabledState(WID_VT_CLEAR_TIME, disable);
+			this->SetWidgetDisabledState(WID_VT_SHARED_ORDER_LIST, !v->IsOrderListShared());
 
-			this->EnableWidget(TTV_START_DATE);
-			this->EnableWidget(TTV_RESET_LATENESS);
-			this->EnableWidget(TTV_AUTOFILL);
+			this->EnableWidget(WID_VT_START_DATE);
+			this->EnableWidget(WID_VT_RESET_LATENESS);
+			this->EnableWidget(WID_VT_AUTOFILL);
 		} else {
-			this->DisableWidget(TTV_START_DATE);
-			this->DisableWidget(TTV_CHANGE_TIME);
-			this->DisableWidget(TTV_CLEAR_TIME);
-			this->DisableWidget(TTV_RESET_LATENESS);
-			this->DisableWidget(TTV_AUTOFILL);
-			this->DisableWidget(TTV_SHARED_ORDER_LIST);
+			this->DisableWidget(WID_VT_START_DATE);
+			this->DisableWidget(WID_VT_CHANGE_TIME);
+			this->DisableWidget(WID_VT_CLEAR_TIME);
+			this->DisableWidget(WID_VT_RESET_LATENESS);
+			this->DisableWidget(WID_VT_AUTOFILL);
+			this->DisableWidget(WID_VT_SHARED_ORDER_LIST);
 		}
 
-		this->SetWidgetLoweredState(TTV_AUTOFILL, HasBit(v->vehicle_flags, VF_AUTOFILL_TIMETABLE));
+		this->SetWidgetLoweredState(WID_VT_AUTOFILL, HasBit(v->vehicle_flags, VF_AUTOFILL_TIMETABLE));
 
 		this->SetWidgetsDisabledState(!(_settings_game.order.automatic_timetable_separation
 			&& this->vehicle->orders.list->IsCompleteTimetable()), TTV_TTSEP_SET_PARAMETER, TTV_TTSEP_MODE_DROPDOWN, WIDGET_LIST_END);
@@ -384,8 +366,8 @@ struct TimetableWindow : Window {
 	virtual void SetStringParameters(int widget) const
 	{
 		switch (widget) {
-			case TTV_CAPTION: SetDParam(0, this->vehicle->index); break;
-			case TTV_EXPECTED: SetDParam(0, this->show_expected ? STR_TIMETABLE_EXPECTED : STR_TIMETABLE_SCHEDULED); break;
+			case WID_VT_CAPTION: SetDParam(0, this->vehicle->index); break;
+			case WID_VT_EXPECTED: SetDParam(0, this->show_expected ? STR_TIMETABLE_EXPECTED : STR_TIMETABLE_SCHEDULED); break;
 			case TTV_TTSEP_MODE_DROPDOWN: SetDParam(0, TimetableSeparationDropdownOptions[NewSettings.mode]); break;
 			case TTV_TTSEP_SET_PARAMETER: SetDParam(0, (NewSettings.mode == TTS_MODE_MAN_N) ? STR_TTSEPARATION_SET_NUM : STR_TTSEPARATION_SET_TIME); break;
 		}
@@ -397,7 +379,7 @@ struct TimetableWindow : Window {
 		int selected = this->sel_index;
 
 		switch (widget) {
-			case TTV_TIMETABLE_PANEL: {
+			case WID_VT_TIMETABLE_PANEL: {
 				int y = r.top + WD_FRAMERECT_TOP;
 				int i = this->vscroll->GetPosition();
 				VehicleOrderID order_id = (i + 1) / 2;
@@ -450,7 +432,7 @@ struct TimetableWindow : Window {
 				break;
 			}
 
-			case TTV_ARRIVAL_DEPARTURE_PANEL: {
+			case WID_VT_ARRIVAL_DEPARTURE_PANEL: {
 				/* Arrival and departure times are handled in an all-or-nothing approach,
 				 * i.e. are only shown if we can calculate all times.
 				 * Excluding order lists with only one order makes some things easier.
@@ -501,7 +483,7 @@ struct TimetableWindow : Window {
 				break;
 			}
 
-			case TTV_SUMMARY_PANEL: {
+			case WID_VT_SUMMARY_PANEL: {
 				int y = r.top + WD_FRAMERECT_TOP;
 
 				Ticks total_time = v->orders.list != NULL ? v->orders.list->GetTimetableDurationIncomplete() : 0;
@@ -599,22 +581,22 @@ struct TimetableWindow : Window {
 		const Vehicle *v = this->vehicle;
 
 		switch (widget) {
-			case TTV_ORDER_VIEW: // Order view button
+			case WID_VT_ORDER_VIEW: // Order view button
 				ShowOrdersWindow(v);
 				break;
 
-			case TTV_TIMETABLE_PANEL: { // Main panel.
+			case WID_VT_TIMETABLE_PANEL: { // Main panel.
 				int selected = GetOrderFromTimetableWndPt(pt.y, v);
 				this->DeleteChildWindows();
 				this->sel_index = (selected == INVALID_ORDER || selected == this->sel_index) ? -1 : selected;
 				break;
 			}
 
-			case TTV_START_DATE: // Change the date that the timetable starts.
+			case WID_VT_START_DATE: // Change the date that the timetable starts.
 				ShowSetDateWindow(this, v->index, _date, _cur_year, _cur_year + 15, ChangeTimetableStartCallback);
 				break;
 
-			case TTV_CHANGE_TIME: { // "Wait For" button.
+			case WID_VT_CHANGE_TIME: { // "Wait For" button.
 				int selected = this->sel_index;
 				VehicleOrderID real = (selected + 1) / 2;
 
@@ -638,17 +620,17 @@ struct TimetableWindow : Window {
 				break;
 			}
 
-			case TTV_CLEAR_TIME: { // Clear waiting time button.
+			case WID_VT_CLEAR_TIME: { // Clear waiting time button.
 				uint32 p1 = PackTimetableArgs(v, this->sel_index);
 				DoCommandP(0, p1, 0, CMD_CHANGE_TIMETABLE | CMD_MSG(STR_ERROR_CAN_T_TIMETABLE_VEHICLE));
 				break;
 			}
 
-			case TTV_RESET_LATENESS: // Reset the vehicle's late counter.
+			case WID_VT_RESET_LATENESS: // Reset the vehicle's late counter.
 				DoCommandP(0, v->index, 0, CMD_SET_VEHICLE_ON_TIME | CMD_MSG(STR_ERROR_CAN_T_TIMETABLE_VEHICLE));
 				break;
 
-			case TTV_AUTOFILL: { // Autofill the timetable.
+			case WID_VT_AUTOFILL: { // Autofill the timetable.
 				uint32 p2 = 0;
 				if (!HasBit(v->vehicle_flags, VF_AUTOFILL_TIMETABLE)) SetBit(p2, 0);
 				if (_ctrl_pressed) SetBit(p2, 1);
@@ -656,11 +638,11 @@ struct TimetableWindow : Window {
 				break;
 			}
 
-			case TTV_EXPECTED:
+			case WID_VT_EXPECTED:
 				this->show_expected = !this->show_expected;
 				break;
 
-			case TTV_SHARED_ORDER_LIST:
+			case WID_VT_SHARED_ORDER_LIST:
 				ShowVehicleListWindow(v);
 				break;
 
@@ -733,7 +715,7 @@ struct TimetableWindow : Window {
 	virtual void OnResize()
 	{
 		/* Update the scroll bar */
-		this->vscroll->SetCapacityFromWidget(this, TTV_TIMETABLE_PANEL, WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM);
+		this->vscroll->SetCapacityFromWidget(this, WID_VT_TIMETABLE_PANEL, WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM);
 	}
 
 	/**
@@ -741,30 +723,25 @@ struct TimetableWindow : Window {
 	 */
 	void UpdateSelectionStates()
 	{
-		this->GetWidget<NWidgetStacked>(TTV_ARRIVAL_DEPARTURE_SELECTION)->SetDisplayedPlane(_settings_client.gui.timetable_arrival_departure ? 0 : SZSP_NONE);
-		this->GetWidget<NWidgetStacked>(TTV_EXPECTED_SELECTION)->SetDisplayedPlane(_settings_client.gui.timetable_arrival_departure ? 0 : 1);
+		this->GetWidget<NWidgetStacked>(WID_VT_ARRIVAL_DEPARTURE_SELECTION)->SetDisplayedPlane(_settings_client.gui.timetable_arrival_departure ? 0 : SZSP_NONE);
+		this->GetWidget<NWidgetStacked>(WID_VT_EXPECTED_SELECTION)->SetDisplayedPlane(_settings_client.gui.timetable_arrival_departure ? 0 : 1);
 	}
 };
 
 static const NWidgetPart _nested_timetable_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
-		NWidget(WWT_CAPTION, COLOUR_GREY, TTV_CAPTION), SetDataTip(STR_TIMETABLE_TITLE, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
-		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TTV_ORDER_VIEW), SetMinimalSize(61, 14), SetDataTip( STR_TIMETABLE_ORDER_VIEW, STR_TIMETABLE_ORDER_VIEW_TOOLTIP),
+		NWidget(WWT_CAPTION, COLOUR_GREY, WID_VT_CAPTION), SetDataTip(STR_TIMETABLE_TITLE, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
+		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_ORDER_VIEW), SetMinimalSize(61, 14), SetDataTip( STR_TIMETABLE_ORDER_VIEW, STR_TIMETABLE_ORDER_VIEW_TOOLTIP),
 		NWidget(WWT_SHADEBOX, COLOUR_GREY),
 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL),
-		NWidget(NWID_VERTICAL),
-			NWidget(NWID_HORIZONTAL),
-				NWidget(WWT_PANEL, COLOUR_GREY, TTV_TIMETABLE_PANEL), SetMinimalSize(388, 82), SetResize(1, 10), SetDataTip(STR_NULL, STR_TIMETABLE_TOOLTIP), SetScrollbar(TTV_SCROLLBAR), EndContainer(),
-				NWidget(NWID_SELECTION, INVALID_COLOUR, TTV_ARRIVAL_DEPARTURE_SELECTION),
-					NWidget(WWT_PANEL, COLOUR_GREY, TTV_ARRIVAL_DEPARTURE_PANEL), SetMinimalSize(110, 0), SetFill(0, 1), SetDataTip(STR_NULL, STR_TIMETABLE_TOOLTIP), SetScrollbar(TTV_SCROLLBAR), EndContainer(),
-				EndContainer(),
-				NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TTV_SCROLLBAR),
-			EndContainer(),
-			NWidget(WWT_PANEL, COLOUR_GREY, TTV_SUMMARY_PANEL), SetMinimalSize(400, 22), SetResize(1, 0), EndContainer(),
+		NWidget(WWT_PANEL, COLOUR_GREY, WID_VT_TIMETABLE_PANEL), SetMinimalSize(388, 82), SetResize(1, 10), SetDataTip(STR_NULL, STR_TIMETABLE_TOOLTIP), SetScrollbar(WID_VT_SCROLLBAR), EndContainer(),
+		NWidget(NWID_SELECTION, INVALID_COLOUR, WID_VT_ARRIVAL_DEPARTURE_SELECTION),
+			NWidget(WWT_PANEL, COLOUR_GREY, WID_VT_ARRIVAL_DEPARTURE_PANEL), SetMinimalSize(110, 0), SetFill(0, 1), SetDataTip(STR_NULL, STR_TIMETABLE_TOOLTIP), SetScrollbar(WID_VT_SCROLLBAR), EndContainer(),
 		EndContainer(),
+		NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_VT_SCROLLBAR),
 		NWidget(WWT_PANEL, COLOUR_GREY),
 			NWidget(WWT_FRAME, COLOUR_GREY), SetDataTip(STR_TTSEPARATION_SETTINGS_DESC, STR_NULL), SetPadding(3),
 				NWidget(WWT_DROPDOWN, COLOUR_GREY, TTV_TTSEP_MODE_DROPDOWN), SetDataTip(STR_JUST_STRING, STR_TIMETABLE_TOOLTIP),
@@ -773,26 +750,27 @@ static const NWidgetPart _nested_timetable_widgets[] = {
 			EndContainer(),
 		EndContainer(),
 	EndContainer(),
+	NWidget(WWT_PANEL, COLOUR_GREY, WID_VT_SUMMARY_PANEL), SetMinimalSize(400, 22), SetResize(1, 0), EndContainer(),
 	NWidget(NWID_HORIZONTAL),
 		NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
 			NWidget(NWID_VERTICAL, NC_EQUALSIZE),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TTV_CHANGE_TIME), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_CHANGE_TIME, STR_TIMETABLE_WAIT_TIME_TOOLTIP),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TTV_CLEAR_TIME), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_CLEAR_TIME, STR_TIMETABLE_CLEAR_TIME_TOOLTIP),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_CHANGE_TIME), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_CHANGE_TIME, STR_TIMETABLE_WAIT_TIME_TOOLTIP),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_CLEAR_TIME), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_CLEAR_TIME, STR_TIMETABLE_CLEAR_TIME_TOOLTIP),
 			EndContainer(),
 			NWidget(NWID_VERTICAL, NC_EQUALSIZE),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TTV_START_DATE), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_STARTING_DATE, STR_TIMETABLE_STARTING_DATE_TOOLTIP),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TTV_RESET_LATENESS), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_RESET_LATENESS, STR_TIMETABLE_RESET_LATENESS_TOOLTIP),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_START_DATE), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_STARTING_DATE, STR_TIMETABLE_STARTING_DATE_TOOLTIP),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_RESET_LATENESS), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_RESET_LATENESS, STR_TIMETABLE_RESET_LATENESS_TOOLTIP),
 			EndContainer(),
 			NWidget(NWID_VERTICAL, NC_EQUALSIZE),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TTV_AUTOFILL), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_AUTOFILL, STR_TIMETABLE_AUTOFILL_TOOLTIP),
-				NWidget(NWID_SELECTION, INVALID_COLOUR, TTV_EXPECTED_SELECTION),
-					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TTV_EXPECTED), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_BLACK_STRING, STR_TIMETABLE_EXPECTED_TOOLTIP),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_AUTOFILL), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_AUTOFILL, STR_TIMETABLE_AUTOFILL_TOOLTIP),
+				NWidget(NWID_SELECTION, INVALID_COLOUR, WID_VT_EXPECTED_SELECTION),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_EXPECTED), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_BLACK_STRING, STR_TIMETABLE_EXPECTED_TOOLTIP),
 					NWidget(WWT_PANEL, COLOUR_GREY), SetResize(1, 0), SetFill(1, 1), EndContainer(),
 				EndContainer(),
 			EndContainer(),
 		EndContainer(),
 		NWidget(NWID_VERTICAL, NC_EQUALSIZE),
-			NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, TTV_SHARED_ORDER_LIST), SetFill(0, 1), SetDataTip(SPR_SHARED_ORDERS_ICON, STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP),
+			NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_VT_SHARED_ORDER_LIST), SetFill(0, 1), SetDataTip(SPR_SHARED_ORDERS_ICON, STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP),
 			NWidget(WWT_RESIZEBOX, COLOUR_GREY), SetFill(0, 1),
 		EndContainer(),
 	EndContainer(),

@@ -19,6 +19,7 @@ enum GameMode {
 	GM_MENU,
 	GM_NORMAL,
 	GM_EDITOR,
+	GM_BOOTSTRAP
 };
 
 /** Mode which defines what mode we're switching to. */
@@ -60,6 +61,7 @@ enum PauseMode {
 	PM_PAUSED_JOIN           = 1 << 2, ///< A game paused for 'pause_on_join'
 	PM_PAUSED_ERROR          = 1 << 3, ///< A game paused because a (critical) error
 	PM_PAUSED_ACTIVE_CLIENTS = 1 << 4, ///< A game paused for 'min_active_clients'
+	PM_PAUSED_GAME_SCRIPT    = 1 << 5, ///< A game paused by a game script
 
 	/** Pause mode bits when paused for network reasons. */
 	PMB_PAUSED_NETWORK = PM_PAUSED_ACTIVE_CLIENTS | PM_PAUSED_JOIN,
@@ -75,5 +77,7 @@ void AskExitToGameMenu();
 
 int ttd_main(int argc, char *argv[]);
 void HandleExitGameRequest();
+
+void SwitchToMode(SwitchMode new_mode);
 
 #endif /* OPENTTD_H */

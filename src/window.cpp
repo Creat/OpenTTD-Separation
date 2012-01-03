@@ -32,6 +32,8 @@
 #include "hotkeys.h"
 #include "toolbar_gui.h"
 #include "statusbar_gui.h"
+#include "error.h"
+#include "game/game.hpp"
 
 
 static Point _drag_delta; ///< delta between mouse cursor and upper left corner of dragged window
@@ -42,6 +44,9 @@ static Window *_last_scroll_window = NULL; ///< Window of the last scroll event.
 Window *_z_front_window = NULL;
 /** List of windows opened at the screen sorted from the back. */
 Window *_z_back_window  = NULL;
+
+/** If false, highlight is white, otherwise the by the widget defined colour. */
+bool _window_highlight_colour = false;
 
 /*
  * Window that currently has focus. - The main purpose is to generate
@@ -95,6 +100,72 @@ int Window::GetRowFromWidget(int clickpos, int widget, int padding, int line_hei
 	if (line_height < 0) line_height = wid->resize_y;
 	if (clickpos < (int)wid->pos_y + padding) return INT_MAX;
 	return (clickpos - (int)wid->pos_y - padding) / line_height;
+}
+
+/**
+ * Disable the highlighted status of all widgets.
+ */
+void Window::DisableAllWidgetHighlight()
+{
+	for (uint i = 0; i < this->nested_array_size; i++) {
+		NWidgetBase *nwid = this->GetWidget<NWidgetBase>(i);
+		if (nwid == NULL) continue;
+
+		if (nwid->IsHighlighted()) {
+			nwid->SetHighlighted(TC_INVALID);
+			this->SetWidgetDirty(i);
+		}
+	}
+
+	CLRBITS(this->flags, WF_HIGHLIGHTED);
+}
+
+/**
+ * Sets the highlighted status of a widget.
+ * @param widget_index index of this widget in the window
+ * @param highlighted_colour Colour of highlight, or TC_INVALID to disable.
+ */
+void Window::SetWidgetHighlight(byte widget_index, TextColour highlighted_colour)
+{
+	assert(widget_index < this->nested_array_size);
+
+	NWidgetBase *nwid = this->GetWidget<NWidgetBase>(widget_index);
+	if (nwid == NULL) return;
+
+	nwid->SetHighlighted(highlighted_colour);
+	this->SetWidgetDirty(widget_index);
+
+	if (highlighted_colour != TC_INVALID) {
+		/* If we set a highlight, the window has a highlight */
+		this->flags |= WF_HIGHLIGHTED;
+	} else {
+		/* If we disable a highlight, check all widgets if anyone still has a highlight */
+		bool valid = false;
+		for (uint i = 0; i < this->nested_array_size; i++) {
+			NWidgetBase *nwid = this->GetWidget<NWidgetBase>(i);
+			if (nwid == NULL) continue;
+			if (!nwid->IsHighlighted()) continue;
+
+			valid = true;
+		}
+		/* If nobody has a highlight, disable the flag on the window */
+		if (!valid) CLRBITS(this->flags, WF_HIGHLIGHTED);
+	}
+}
+
+/**
+ * Gets the highlighted status of a widget.
+ * @param widget_index index of this widget in the window
+ * @return status of the widget ie: highlighted = true, not highlighted = false
+ */
+bool Window::IsWidgetHighlighted(byte widget_index) const
+{
+	assert(widget_index < this->nested_array_size);
+
+	const NWidgetBase *nwid = this->GetWidget<NWidgetBase>(widget_index);
+	if (nwid == NULL) return false;
+
+	return nwid->IsHighlighted();
 }
 
 /**
@@ -263,7 +334,7 @@ void Window::SetWidgetDirty(byte widget_index) const
 void Window::HandleButtonClick(byte widget)
 {
 	this->LowerWidget(widget);
-	this->flags4 |= WF_TIMEOUT_BEGIN;
+	this->SetTimeout();
 	this->SetWidgetDirty(widget);
 }
 
@@ -372,7 +443,7 @@ static void DispatchLeftClickEvent(Window *w, int x, int y, int click_count)
 			return;
 
 		case WWT_STICKYBOX:
-			w->flags4 ^= WF_STICKY;
+			w->flags ^= WF_STICKY;
 			nw->SetDirty(w);
 			return;
 
@@ -382,6 +453,12 @@ static void DispatchLeftClickEvent(Window *w, int x, int y, int click_count)
 
 	/* Widget has no index, so the window is not interested in it. */
 	if (widget_index < 0) return;
+
+	/* Check if the widget is highlighted; if so, disable highlight and dispatch an event to the GameScript */
+	if (w->IsWidgetHighlighted(widget_index)) {
+		w->SetWidgetHighlight(widget_index, TC_INVALID);
+		Game::NewEvent(new ScriptEventWindowWidgetClick((ScriptWindow::WindowClass)w->window_class, w->window_number, widget_index));
+	}
 
 	Point pt = { x, y };
 	w->OnClick(pt, widget_index, click_count);
@@ -653,8 +730,8 @@ void Window::SetShaded(bool make_shaded)
 /**
  * Find the Window whose parent pointer points to this window
  * @param w parent Window to find child of
- * @param wc Window class of the window to remove; WC_INVALID if class does not matter
- * @return a Window pointer that is the child of w, or NULL otherwise
+ * @param wc Window class of the window to remove; #WC_INVALID if class does not matter
+ * @return a Window pointer that is the child of \a w, or \c NULL otherwise
  */
 static Window *FindChildWindow(const Window *w, WindowClass wc)
 {
@@ -668,7 +745,7 @@ static Window *FindChildWindow(const Window *w, WindowClass wc)
 
 /**
  * Delete all children a window might have in a head-recursive manner
- * @param wc Window class of the window to remove; WC_INVALID if class does not matter
+ * @param wc Window class of the window to remove; #WC_INVALID if class does not matter
  */
 void Window::DeleteChildWindows(WindowClass wc) const
 {
@@ -728,7 +805,7 @@ Window *FindWindowById(WindowClass cls, WindowNumber number)
 
 /**
  * Find any window by its class. Useful when searching for a window that uses
- * the window number as a WindowType, like WC_SEND_NETWORK_MSG.
+ * the window number as a #WindowType, like #WC_SEND_NETWORK_MSG.
  * @param cls Window class
  * @return Pointer to the found window, or \c NULL if not available
  */
@@ -752,7 +829,7 @@ void DeleteWindowById(WindowClass cls, WindowNumber number, bool force)
 {
 	Window *w = FindWindowById(cls, number);
 	if (force || w == NULL ||
-			(w->flags4 & WF_STICKY) == 0) {
+			(w->flags & WF_STICKY) == 0) {
 		delete w;
 	}
 }
@@ -825,6 +902,7 @@ void ChangeWindowOwner(Owner old_owner, Owner new_owner)
 			case WC_AIRCRAFT_LIST:
 			case WC_BUY_COMPANY:
 			case WC_COMPANY:
+			case WC_COMPANY_INFRASTRUCTURE:
 				continue;
 
 			default:
@@ -837,7 +915,7 @@ void ChangeWindowOwner(Owner old_owner, Owner new_owner)
 static void BringWindowToFront(Window *w);
 
 /**
- * Find a window and make it the top-window on the screen.
+ * Find a window and make it the relative top-window on the screen.
  * The window gets unshaded if it was shaded, and a white border is drawn at its edges for a brief period of time to visualize its "activation".
  * @param cls WindowClass of the window to activate
  * @param number WindowNumber of the window to activate
@@ -850,7 +928,7 @@ Window *BringWindowToFrontById(WindowClass cls, WindowNumber number)
 	if (w != NULL) {
 		if (w->IsShaded()) w->SetShaded(false); // Restore original window size if it was shaded.
 
-		w->flags4 |= WF_WHITE_BORDER_MASK;
+		w->SetWhiteBorder();
 		BringWindowToFront(w);
 		w->SetDirty();
 	}
@@ -873,42 +951,155 @@ static inline bool IsVitalWindow(const Window *w)
 }
 
 /**
- * On clicking on a window, make it the frontmost window of all. However
- * there are certain windows that always need to be on-top; these include
- * - Toolbar, Statusbar (always on)
- * - New window, Chatbar (only if open)
- * The window is marked dirty for a repaint if the window is actually moved
- * @param w window that is put into the foreground
- * @return pointer to the window, the same as the input pointer
+ * Get the z-priority for a given window. This is used in comparison with other z-priority values;
+ * a window with a given z-priority will appear above other windows with a lower value, and below
+ * those with a higher one (the ordering within z-priorities is arbitrary).
+ * @param w The window to get the z-priority for
+ * @pre w->window_class != WC_INVALID
+ * @return The window's z-priority
  */
-static void BringWindowToFront(Window *w)
+static uint GetWindowZPriority(const Window *w)
 {
-	Window *v = _z_front_window;
+	assert(w->window_class != WC_INVALID);
 
-	/* Bring the window just below the vital windows */
-	for (; v != NULL && v != w && IsVitalWindow(v); v = v->z_back) { }
+	uint z_priority = 0;
 
-	if (v == NULL || w == v) return; // window is already in the right position
+	switch (w->window_class) {
+		case WC_ENDSCREEN:
+			++z_priority;
 
-	/* w cannot be at the top already! */
-	assert(w != _z_front_window);
+		case WC_HIGHSCORE:
+			++z_priority;
+
+		case WC_TOOLTIPS:
+			++z_priority;
+
+		case WC_DROPDOWN_MENU:
+			++z_priority;
+
+		case WC_MAIN_TOOLBAR:
+		case WC_STATUS_BAR:
+			++z_priority;
+
+		case WC_OSK:
+			++z_priority;
+
+		case WC_QUERY_STRING:
+		case WC_SEND_NETWORK_MSG:
+			++z_priority;
+
+		case WC_ERRMSG:
+		case WC_CONFIRM_POPUP_QUERY:
+		case WC_MODAL_PROGRESS:
+		case WC_NETWORK_STATUS_WINDOW:
+			++z_priority;
+
+		case WC_GENERATE_LANDSCAPE:
+		case WC_SAVELOAD:
+		case WC_GAME_OPTIONS:
+		case WC_CUSTOM_CURRENCY:
+		case WC_NETWORK_WINDOW:
+		case WC_GRF_PARAMETERS:
+		case WC_NEWGRF_TEXTFILE:
+		case WC_AI_LIST:
+		case WC_AI_SETTINGS:
+			++z_priority;
+
+		case WC_CONSOLE:
+			++z_priority;
+
+		case WC_NEWS_WINDOW:
+			++z_priority;
+
+		default:
+			++z_priority;
+
+		case WC_MAIN_WINDOW:
+			return z_priority;
+	}
+}
+
+/**
+ * Adds a window to the z-ordering, according to its z-priority.
+ * @param w Window to add
+ */
+static void AddWindowToZOrdering(Window *w)
+{
+	assert(w->z_front == NULL && w->z_back == NULL);
+
+	if (_z_front_window == NULL) {
+		/* It's the only window. */
+		_z_front_window = _z_back_window = w;
+		w->z_front = w->z_back = NULL;
+	} else {
+		/* Search down the z-ordering for its location. */
+		Window *v = _z_front_window;
+		uint last_z_priority = UINT_MAX;
+		while (v != NULL && (v->window_class == WC_INVALID || GetWindowZPriority(v) > GetWindowZPriority(w))) {
+			if (v->window_class != WC_INVALID) {
+				/* Sanity check z-ordering, while we're at it. */
+				assert(last_z_priority >= GetWindowZPriority(v));
+				last_z_priority = GetWindowZPriority(v);
+			}
+
+			v = v->z_back;
+		}
+
+		if (v == NULL) {
+			/* It's the new back window. */
+			w->z_front = _z_back_window;
+			w->z_back = NULL;
+			_z_back_window->z_back = w;
+			_z_back_window = w;
+		} else if (v == _z_front_window) {
+			/* It's the new front window. */
+			w->z_front = NULL;
+			w->z_back = _z_front_window;
+			_z_front_window->z_front = w;
+			_z_front_window = w;
+		} else {
+			/* It's somewhere else in the z-ordering. */
+			w->z_front = v->z_front;
+			w->z_back = v;
+			v->z_front->z_back = w;
+			v->z_front = w;
+		}
+	}
+}
+
+
+/**
+ * Removes a window from the z-ordering.
+ * @param w Window to remove
+ */
+static void RemoveWindowFromZOrdering(Window *w)
+{
+	if (w->z_front == NULL) {
+		assert(_z_front_window == w);
+		_z_front_window = w->z_back;
+	} else {
+		w->z_front->z_back = w->z_back;
+	}
 
 	if (w->z_back == NULL) {
+		assert(_z_back_window == w);
 		_z_back_window = w->z_front;
 	} else {
 		w->z_back->z_front = w->z_front;
 	}
-	w->z_front->z_back = w->z_back;
 
-	w->z_front = v->z_front;
-	w->z_back = v;
+	w->z_front = w->z_back = NULL;
+}
 
-	if (v->z_front == NULL) {
-		_z_front_window = w;
-	} else {
-		v->z_front->z_back = w;
-	}
-	v->z_front = w;
+/**
+ * On clicking on a window, make it the frontmost window of all windows with an equal
+ * or lower z-priority. The window is marked dirty for a repaint
+ * @param w window that is put into the relative foreground
+ */
+static void BringWindowToFront(Window *w)
+{
+	RemoveWindowFromZOrdering(w);
+	AddWindowToZOrdering(w);
 
 	w->SetDirty();
 }
@@ -925,8 +1116,8 @@ void Window::InitializeData(const WindowDesc *desc, WindowNumber window_number)
 {
 	/* Set up window properties; some of them are needed to set up smallest size below */
 	this->window_class = desc->cls;
-	this->flags4 |= WF_WHITE_BORDER_MASK; // just opened windows have a white border
-	if (desc->default_pos == WDP_CENTER) this->flags4 |= WF_CENTERED;
+	this->SetWhiteBorder();
+	if (desc->default_pos == WDP_CENTER) this->flags |= WF_CENTERED;
 	this->owner = INVALID_OWNER;
 	this->nested_focus = NULL;
 	this->window_number = window_number;
@@ -953,45 +1144,8 @@ void Window::InitializeData(const WindowDesc *desc, WindowNumber window_number)
 	 * window has a text box, then take focus anyway. */
 	if (this->window_class != WC_OSK && (!EditBoxInGlobalFocus() || this->nested_root->GetWidgetOfType(WWT_EDITBOX) != NULL)) SetFocusedWindow(this);
 
-	/* Hacky way of specifying always-on-top windows. These windows are
-	 * always above other windows because they are moved below them.
-	 * status-bar is above news-window because it has been created earlier.
-	 * Also, as the chat-window is excluded from this, it will always be
-	 * the last window, thus always on top.
-	 * XXX - Yes, ugly, probably needs something like w->always_on_top flag
-	 * to implement correctly, but even then you need some kind of distinction
-	 * between on-top of chat/news and status windows, because these conflict */
-	Window *w = _z_front_window;
-	if (w != NULL && this->window_class != WC_SEND_NETWORK_MSG && this->window_class != WC_HIGHSCORE && this->window_class != WC_ENDSCREEN) {
-		if (FindWindowById(WC_MAIN_TOOLBAR, 0)     != NULL) w = w->z_back;
-		if (FindWindowById(WC_STATUS_BAR, 0)       != NULL) w = w->z_back;
-		if (FindWindowById(WC_NEWS_WINDOW, 0)      != NULL) w = w->z_back;
-		if (FindWindowByClass(WC_SEND_NETWORK_MSG) != NULL) w = w->z_back;
-
-		if (w == NULL) {
-			_z_back_window->z_front = this;
-			this->z_back = _z_back_window;
-			_z_back_window = this;
-		} else {
-			if (w->z_front == NULL) {
-				_z_front_window = this;
-			} else {
-				this->z_front = w->z_front;
-				w->z_front->z_back = this;
-			}
-
-			this->z_back = w;
-			w->z_front = this;
-		}
-	} else {
-		this->z_back = _z_front_window;
-		if (_z_front_window != NULL) {
-			_z_front_window->z_front = this;
-		} else {
-			_z_back_window = this;
-		}
-		_z_front_window = this;
-	}
+	/* Insert the window into the correct location in the z-ordering. */
+	AddWindowToZOrdering(this);
 }
 
 /**
@@ -1374,6 +1528,9 @@ void InitWindowSystem()
 	_mouse_hovering = false;
 
 	NWidgetLeaf::InvalidateDimensionCache(); // Reset cached sizes of several widgets.
+	NWidgetScrollbar::InvalidateDimensionCache();
+
+	ShowFirstError();
 }
 
 /**
@@ -1381,6 +1538,8 @@ void InitWindowSystem()
  */
 void UnInitWindowSystem()
 {
+	UnshowCriticalError();
+
 	Window *w;
 	FOR_ALL_WINDOWS_FROM_FRONT(w) delete w;
 
@@ -1426,7 +1585,9 @@ static void DecreaseWindowCounters()
 	}
 
 	FOR_ALL_WINDOWS_FROM_FRONT(w) {
-		if ((w->flags4 & WF_TIMEOUT_MASK) && !(--w->flags4 & WF_TIMEOUT_MASK)) {
+		if ((w->flags & WF_TIMEOUT) && --w->timeout_timer == 0) {
+			CLRBITS(w->flags, WF_TIMEOUT);
+
 			w->OnTimeout();
 			if (w->desc_flags & WDF_UNCLICK_BUTTONS) w->RaiseButtons(true);
 		}
@@ -1597,6 +1758,13 @@ static void EnsureVisibleCaption(Window *w, int nx, int ny)
 void ResizeWindow(Window *w, int delta_x, int delta_y)
 {
 	if (delta_x != 0 || delta_y != 0) {
+		/* Determine the new right/bottom position. If that is outside of the bounds of
+		 * the resolution clamp it in such a manner that it stays within the bounds. */
+		int new_right  = w->left + w->width  + delta_x;
+		int new_bottom = w->top  + w->height + delta_y;
+		if (new_right  >= (int)_cur_resolution.width)  delta_x -= Ceil(new_right  - _cur_resolution.width,  max(1U, w->nested_root->resize_x));
+		if (new_bottom >= (int)_cur_resolution.height) delta_y -= Ceil(new_bottom - _cur_resolution.height, max(1U, w->nested_root->resize_y));
+
 		w->SetDirty();
 
 		uint new_xinc = max(0, (w->nested_root->resize_x == 0) ? 0 : (int)(w->nested_root->current_x - w->nested_root->smallest_x) + delta_x);
@@ -1655,10 +1823,10 @@ static EventState HandleWindowDragging()
 	/* Otherwise find the window... */
 	Window *w;
 	FOR_ALL_WINDOWS_FROM_BACK(w) {
-		if (w->flags4 & WF_DRAGGING) {
+		if (w->flags & WF_DRAGGING) {
 			/* Stop the dragging if the left mouse button was released */
 			if (!_left_button_down) {
-				w->flags4 &= ~WF_DRAGGING;
+				w->flags &= ~WF_DRAGGING;
 				break;
 			}
 
@@ -1749,10 +1917,10 @@ static EventState HandleWindowDragging()
 
 			w->SetDirty();
 			return ES_HANDLED;
-		} else if (w->flags4 & WF_SIZING) {
+		} else if (w->flags & WF_SIZING) {
 			/* Stop the sizing if the left mouse button was released */
 			if (!_left_button_down) {
-				w->flags4 &= ~WF_SIZING;
+				w->flags &= ~WF_SIZING;
 				w->SetDirty();
 				break;
 			}
@@ -1761,7 +1929,7 @@ static EventState HandleWindowDragging()
 			 * If resizing the left edge of the window, moving to the left makes the window bigger not smaller.
 			 */
 			int x, y = _cursor.pos.y - _drag_delta.y;
-			if (w->flags4 & WF_SIZING_LEFT) {
+			if (w->flags & WF_SIZING_LEFT) {
 				x = _drag_delta.x - _cursor.pos.x;
 			} else {
 				x = _cursor.pos.x - _drag_delta.x;
@@ -1795,7 +1963,7 @@ static EventState HandleWindowDragging()
 
 			/* Now find the new cursor pos.. this is NOT _cursor, because we move in steps. */
 			_drag_delta.y += y;
-			if ((w->flags4 & WF_SIZING_LEFT) && x != 0) {
+			if ((w->flags & WF_SIZING_LEFT) && x != 0) {
 				_drag_delta.x -= x; // x > 0 -> window gets longer -> left-edge moves to left -> subtract x to get new position.
 				w->SetDirty();
 				w->left -= x;  // If dragging left edge, move left window edge in opposite direction by the same amount.
@@ -1820,8 +1988,8 @@ static EventState HandleWindowDragging()
  */
 static void StartWindowDrag(Window *w)
 {
-	w->flags4 |= WF_DRAGGING;
-	w->flags4 &= ~WF_CENTERED;
+	w->flags |= WF_DRAGGING;
+	w->flags &= ~WF_CENTERED;
 	_dragging_window = true;
 
 	_drag_delta.x = w->left - _cursor.pos.x;
@@ -1838,8 +2006,8 @@ static void StartWindowDrag(Window *w)
  */
 static void StartWindowSizing(Window *w, bool to_left)
 {
-	w->flags4 |= to_left ? WF_SIZING_LEFT : WF_SIZING_RIGHT;
-	w->flags4 &= ~WF_CENTERED;
+	w->flags |= to_left ? WF_SIZING_LEFT : WF_SIZING_RIGHT;
+	w->flags &= ~WF_CENTERED;
 	_dragging_window = true;
 
 	_drag_delta.x = _cursor.pos.x;
@@ -1954,13 +2122,13 @@ static EventState HandleViewportScroll()
 }
 
 /**
- * Check if a window can be made top-most window, and if so do
+ * Check if a window can be made relative top-most window, and if so do
  * it. If a window does not obscure any other windows, it will not
  * be brought to the foreground. Also if the only obscuring windows
  * are so-called system-windows, the window will not be moved.
  * The function will return false when a child window of this window is a
  * modal-popup; function returns a false and child window gets a white border
- * @param w Window to bring on-top
+ * @param w Window to bring relatively on-top
  * @return false if the window has an active modal child, true otherwise
  */
 static bool MaybeBringWindowToFront(Window *w)
@@ -1986,7 +2154,7 @@ static bool MaybeBringWindowToFront(Window *w)
 	FOR_ALL_WINDOWS_FROM_BACK_FROM(u, w->z_front) {
 		/* A modal child will prevent the activation of the parent window */
 		if (u->parent == w && (u->desc_flags & WDF_MODAL)) {
-			u->flags4 |= WF_WHITE_BORDER_MASK;
+			u->SetWhiteBorder();
 			u->SetDirty();
 			return false;
 		}
@@ -2091,7 +2259,7 @@ static void HandleAutoscroll()
 		int x = _cursor.pos.x;
 		int y = _cursor.pos.y;
 		Window *w = FindWindowFromPt(x, y);
-		if (w == NULL || w->flags4 & WF_DISABLE_VP_SCROLL) return;
+		if (w == NULL || w->flags & WF_DISABLE_VP_SCROLL) return;
 		ViewPort *vp = IsPtInWindowViewport(w, x, y);
 		if (vp != NULL) {
 			x -= vp->left;
@@ -2224,7 +2392,7 @@ static void MouseLoop(MouseClick click, int mousewheel)
 			case MC_LEFT:
 				DEBUG(misc, 2, "Cursor: 0x%X (%d)", _cursor.sprite, _cursor.sprite);
 				if (!HandleViewportClicked(vp, x, y) &&
-						!(w->flags4 & WF_DISABLE_VP_SCROLL) &&
+						!(w->flags & WF_DISABLE_VP_SCROLL) &&
 						_settings_client.gui.left_mouse_btn_scrolling) {
 					_scrolling_viewport = true;
 					_cursor.fix_at = false;
@@ -2232,7 +2400,7 @@ static void MouseLoop(MouseClick click, int mousewheel)
 				break;
 
 			case MC_RIGHT:
-				if (!(w->flags4 & WF_DISABLE_VP_SCROLL)) {
+				if (!(w->flags & WF_DISABLE_VP_SCROLL)) {
 					_scrolling_viewport = true;
 					_cursor.fix_at = true;
 
@@ -2358,13 +2526,13 @@ static void CheckSoftLimit()
 		uint deletable_count = 0;
 		Window *w, *last_deletable = NULL;
 		FOR_ALL_WINDOWS_FROM_FRONT(w) {
-			if (w->window_class == WC_MAIN_WINDOW || IsVitalWindow(w) || (w->flags4 & WF_STICKY)) continue;
+			if (w->window_class == WC_MAIN_WINDOW || IsVitalWindow(w) || (w->flags & WF_STICKY)) continue;
 
 			last_deletable = w;
 			deletable_count++;
 		}
 
-		/* We've ot reached the soft limit yet */
+		/* We've not reached the soft limit yet. */
 		if (deletable_count <= _settings_client.gui.window_soft_limit) break;
 
 		assert(last_deletable != NULL);
@@ -2391,20 +2559,7 @@ void InputLoop()
 
 		if (w->window_class != WC_INVALID) continue;
 
-		/* Find the window in the z-array, and effectively remove it
-		 * by moving all windows after it one to the left. This must be
-		 * done before removing the child so we cannot cause recursion
-		 * between the deletion of the parent and the child. */
-		if (w->z_front == NULL) {
-			_z_front_window = w->z_back;
-		} else {
-			w->z_front->z_back = w->z_back;
-		}
-		if (w->z_back == NULL) {
-			_z_back_window  = w->z_front;
-		} else {
-			w->z_back->z_front = w->z_front;
-		}
+		RemoveWindowFromZOrdering(w);
 		free(w);
 	}
 
@@ -2430,8 +2585,15 @@ void UpdateWindows()
 {
 	Window *w;
 
+	static int highlight_timer = 1;
+	if (--highlight_timer == 0) {
+		highlight_timer = 15;
+		_window_highlight_colour = !_window_highlight_colour;
+	}
+
 	FOR_ALL_WINDOWS_FROM_FRONT(w) {
 		w->ProcessScheduledInvalidations();
+		w->ProcessHighlightedInvalidations();
 	}
 
 	static int we4_timer = 0;
@@ -2446,10 +2608,9 @@ void UpdateWindows()
 	we4_timer = t;
 
 	FOR_ALL_WINDOWS_FROM_FRONT(w) {
-		if (w->flags4 & WF_WHITE_BORDER_MASK) {
-			w->flags4 -= WF_WHITE_BORDER_ONE;
-
-			if (!(w->flags4 & WF_WHITE_BORDER_MASK)) w->SetDirty();
+		if ((w->flags & WF_WHITE_BORDER) && --w->white_border_timer == 0) {
+			CLRBITS(w->flags, WF_WHITE_BORDER);
+			w->SetDirty();
 		}
 	}
 
@@ -2502,6 +2663,44 @@ void SetWindowClassesDirty(WindowClass cls)
 	Window *w;
 	FOR_ALL_WINDOWS_FROM_BACK(w) {
 		if (w->window_class == cls) w->SetDirty();
+	}
+}
+
+/**
+ * Mark this window's data as invalid (in need of re-computing)
+ * @param data The data to invalidate with
+ * @param gui_scope Whether the funtion is called from GUI scope.
+ */
+void Window::InvalidateData(int data, bool gui_scope)
+{
+	this->SetDirty();
+	if (!gui_scope) {
+		/* Schedule GUI-scope invalidation for next redraw. */
+		*this->scheduled_invalidation_data.Append() = data;
+	}
+	this->OnInvalidateData(data, gui_scope);
+}
+
+/**
+ * Process all scheduled invalidations.
+ */
+void Window::ProcessScheduledInvalidations()
+{
+	for (int *data = this->scheduled_invalidation_data.Begin(); this->window_class != WC_INVALID && data != this->scheduled_invalidation_data.End(); data++) {
+		this->OnInvalidateData(*data, true);
+	}
+	this->scheduled_invalidation_data.Clear();
+}
+
+/**
+ * Process all invalidation of highlighted widgets.
+ */
+void Window::ProcessHighlightedInvalidations()
+{
+	if ((this->flags & WF_HIGHLIGHTED) == 0) return;
+
+	for (uint i = 0; i < this->nested_array_size; i++) {
+		if (this->IsWidgetHighlighted(i)) this->SetWidgetDirty(i);
 	}
 }
 
@@ -2591,7 +2790,7 @@ restart_search:
 				w->window_class != WC_MAIN_TOOLBAR &&
 				w->window_class != WC_STATUS_BAR &&
 				w->window_class != WC_TOOLTIPS &&
-				(w->flags4 & WF_STICKY) == 0) { // do not delete windows which are 'pinned'
+				(w->flags & WF_STICKY) == 0) { // do not delete windows which are 'pinned'
 
 			delete w;
 			goto restart_search;
@@ -2618,7 +2817,7 @@ restart_search:
 	 * as deleting this window could cascade in deleting (many) others
 	 * anywhere in the z-array */
 	FOR_ALL_WINDOWS_FROM_BACK(w) {
-		if (w->flags4 & WF_STICKY) {
+		if (w->flags & WF_STICKY) {
 			delete w;
 			goto restart_search;
 		}
@@ -2658,6 +2857,7 @@ void HideVitalWindows()
 void ReInitAllWindows()
 {
 	NWidgetLeaf::InvalidateDimensionCache(); // Reset cached sizes of several widgets.
+	NWidgetScrollbar::InvalidateDimensionCache();
 
 	Window *w;
 	FOR_ALL_WINDOWS_FROM_BACK(w) {
@@ -2784,6 +2984,10 @@ void RelocateAllWindows(int neww, int newh)
 		/* XXX - this probably needs something more sane. For example specifying
 		 * in a 'backup'-desc that the window should always be centered. */
 		switch (w->window_class) {
+			case WC_BOOTSTRAP:
+				ResizeWindow(w, neww, newh);
+				continue;
+
 			case WC_MAIN_TOOLBAR:
 				ResizeWindow(w, min(neww, *_preferred_toolbar_size) - w->width, 0);
 
@@ -2814,7 +3018,7 @@ void RelocateAllWindows(int neww, int newh)
 				continue;
 
 			default: {
-				if (w->flags4 & WF_CENTERED) {
+				if (w->flags & WF_CENTERED) {
 					top = (newh - w->height) >> 1;
 					left = (neww - w->width) >> 1;
 					break;

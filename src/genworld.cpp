@@ -32,6 +32,9 @@
 #include "core/random_func.hpp"
 #include "core/backup_type.hpp"
 #include "progress.h"
+#include "error.h"
+#include "game/game.hpp"
+#include "game/game_instance.hpp"
 
 #include "table/sprites.h"
 
@@ -50,7 +53,7 @@ void InitializeGame(uint size_x, uint size_y, bool reset_date, bool reset_settin
  * Please only use this variable in genworld.h and genworld.cpp and
  *  nowhere else. For speed improvements we need it to be global, but
  *  in no way the meaning of it is to use it anywhere else besides
- *  in the genworld.h and genworld.cpp! -- TrueLight
+ *  in the genworld.h and genworld.cpp!
  */
 GenWorldInfo _gw;
 
@@ -82,7 +85,8 @@ static void CleanupGeneration()
 	_gw.abortp   = NULL;
 	_gw.threaded = false;
 
-	DeleteWindowById(WC_MODAL_PROGRESS, 0);
+	DeleteWindowByClass(WC_MODAL_PROGRESS);
+	ShowFirstError();
 	MarkWholeScreenDirty();
 }
 
@@ -159,6 +163,21 @@ static void _GenerateWorld(void *)
 			for (i = 0; i < 0x500; i++) {
 				RunTileLoop();
 				IncreaseGeneratingWorldProgress(GWP_RUNTILELOOP);
+			}
+
+			if (_game_mode != GM_EDITOR) {
+				Game::StartNew();
+
+				if (Game::GetInstance() != NULL) {
+					SetGeneratingWorldProgress(GWP_RUNSCRIPT, 2500);
+					_generating_world = true;
+					for (i = 0; i < 2500; i++) {
+						Game::GameLoop();
+						IncreaseGeneratingWorldProgress(GWP_RUNSCRIPT);
+						if (Game::GetInstance()->IsSleeping()) break;
+					}
+					_generating_world = false;
+				}
 			}
 		}
 
@@ -262,7 +281,6 @@ void HandleGeneratingWorldAbortion()
 
 	if (_gw.thread != NULL) _gw.thread->Exit();
 
-	extern void SwitchToMode(SwitchMode new_mode);
 	SwitchToMode(_switch_mode);
 }
 
@@ -318,6 +336,7 @@ void GenerateWorld(GenWorldMode mode, uint size_x, uint size_y, bool reset_setti
 		return;
 	}
 
+	UnshowCriticalError();
 	/* Remove any open window */
 	DeleteAllNonVitalWindows();
 	/* Hide vital windows, because we don't allow to use them */

@@ -1,6 +1,6 @@
 OpenTTD readme
-Last updated:    2011-09-15
-Release version: 1.1.3
+Last updated:    2011-12-24
+Release version: 1.2.0-beta1
 ------------------------------------------------------------------------
 
 
@@ -15,6 +15,7 @@ Table of contents
  * 4.1) (Required) 3rd party files
  * 4.2) OpenTTD directories
  * 4.3) Portable installations (portable media)
+ * 4.4) Files in tar (archives)
 5.0) OpenTTD features
  * 5.1) Logging of potentially dangerous actions
 6.0) Configuration file
@@ -189,7 +190,7 @@ an AI a message will be shown that the 'dummy' AI has been started.
 
 4.1) (Required) 3rd party files
 ---- --------------------------
-Before you run OpenTTD, you need to put the game's data files into a data/
+Before you run OpenTTD, you need to put the game's data files into a baseset/
 directory which can be located in various places addressed in the following
 section.
 
@@ -227,10 +228,11 @@ You need to copy the following files:
 
 4.1.3) Original Transport Tycoon Deluxe music
 ------ --------------------------------------
-If you want the Transport Tycoon Deluxe music, copy the gm/ folder from the
-Windows version of Transport Tycoon Deluxe to your OpenTTD folder (not your
-data folder - also explained in the following sections). The music from the
-DOS version as well as the original Transport Tycoon does not work.
+If you want the Transport Tycoon Deluxe music, copy the files from the gm/
+folder from the Windows version of Transport Tycoon Deluxe to the baseset
+folder in your OpenTTD folder (also explained in the following sections).
+The music from the DOS version as well as the original Transport Tycoon does
+not work.
 
 4.1.4) AIs
 ------ ---
@@ -283,13 +285,15 @@ Different types of data or extensions go into different subdirectories of the ch
 OpenTTD directory:
 	Config File:         (no subdirectory)
 	Screenshots:         (no subdirectory)
-	Base Graphics:       data                    (or a subdirectory thereof)
-	Sound Sets:          data                    (or a subdirectory thereof)
-	NewGRFs:             data                    (or a subdirectory thereof)
-	32bpp Sets:          data                    (or a subdirectory thereof)
-	Music Sets:          gm                      (or a subdirectory thereof)
+	Base Graphics:       baseset                 (or a subdirectory thereof)
+	Sound Sets:          baseset                 (or a subdirectory thereof)
+	NewGRFs:             newgrf                  (or a subdirectory thereof)
+	32bpp Sets:          newgrf                  (or a subdirectory thereof)
+	Music Sets:          baseset                 (or a subdirectory thereof)
 	AIs:                 ai                      (or a subdirectory thereof)
 	AI Libraries:        ai/libraries            (or a subdirectory thereof)
+	Game Scripts (GS):   game                    (or a subdirectory thereof)
+	GS Libraries:        game/libraries          (or a subdirectory thereof)
 	Savegames:           save
 	Automatic Savegames: save/autosave
 	Scenarios:           scenario
@@ -315,13 +319,37 @@ personal directory (where the game will then also place savegames and screenshot
 You can install OpenTTD on external media so you can take it with you, i.e.
 using a USB key, or a USB HDD, etc.
 Create a directory where you shall store the game in (i.e. OpenTTD/).
-Copy the binary (OpenTTD.exe, OpenTTD.app, openttd, etc), data/ and your
+Copy the binary (OpenTTD.exe, OpenTTD.app, openttd, etc), baseset/ and your
 openttd.cfg to this directory.
 You can copy binaries for any operating system into this directory, which will
 allow you to play the game on nearly any computer you can attach the external
 media to.
-As always - additional grf files are stored in the data/ dir (for details,
+As always - additional grf files are stored in the newgrf/ dir (for details,
 again, see section 4.1).
+
+4.4) Files in tar (archives)
+---- -----------------------
+OpenTTD can read files that are in an uncompressed tar (archive), which
+makes it easy to bundle files belonging to the same script, NewGRF or base
+set. Music sets are the only exception as they cannot be stored in a tar
+file due to being played by external applications.
+
+OpenTTD sees each tar archive as the 'root' of its search path. This means
+that having a file with the same path in two different tar files means that
+one cannot be opened, after all only one file will be found first. This is
+done to make it possible to have the large 32bpp zoomed graphics in a separate
+file to the (relatively small) unzoomed 8bpp NewGRF. As such it is advisable
+to put an uniquely named folder in the root of the tar and put all the
+content in that folder. For example, all downloaded content has a path that
+concatenates the name of the content and the version, which makes the path
+unique. For custom tar files it is advised to do this as well.
+
+The normal files are also referred to by their relative path from the search
+directory, this means that also normal files could hide files in a tar as
+long as the relative path from the search path of the normal file is the
+same as the path in the tar file. Again it is advised to have an unique path
+to the normal file so they do not collide with the files from other tar
+files.
 
 
 5.0) OpenTTD features
@@ -583,7 +611,7 @@ can be viewed in the NewGRF window accessible from the file load dialogue window
 You can try to obtain the missing files from that NewGRF dialogue or - if they
 are not available online - you can search manually through our forum's graphics
 development section (http://www.tt-forums.net/viewforum.php?f=66) or GrfCrawler
-(http://grfcrawler.tt-forums.net/). Put the NewGRF files in OpenTTD's data folder
+(http://grfcrawler.tt-forums.net/). Put the NewGRF files in OpenTTD's newgrf folder
 (see section 4.2 "OpenTTD directories") and rescan the list of available NewGRFs.
 Once you have all missing files, you are set to go.
 
@@ -619,7 +647,7 @@ Retired Developers:
   Serge Paquet (vurlix)           - Assistant project manager, coder (0.1 - 0.3.3)
   Dominik Scherer (dominik81)     - Lead programmer, GUI expert (0.3.0 - 0.3.6)
   Benedikt Brüggemeier (skidd13)  - Bug fixer and code reworker
-  Patric Stout (TrueLight)        - Programmer (0.3 - pre0.7), sys op (active)
+  Patric Stout (TrueBrain)        - Programmer (0.3 - pre0.7), sys op (active)
 
 Thanks to:
   Josef Drexler                   - For his great work on TTDPatch.

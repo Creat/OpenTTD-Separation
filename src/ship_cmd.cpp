@@ -33,6 +33,7 @@
 #include "engine_base.h"
 #include "company_base.h"
 #include "tunnelbridge_map.h"
+#include "zoom_func.h"
 
 #include "table/strings.h"
 
@@ -62,13 +63,13 @@ static inline TrackBits GetTileShipTrackStatus(TileIndex tile)
 	return TrackStatusToTrackBits(GetTileTrackStatus(tile, TRANSPORT_WATER, 0));
 }
 
-static SpriteID GetShipIcon(EngineID engine)
+static SpriteID GetShipIcon(EngineID engine, EngineImageType image_type)
 {
 	const Engine *e = Engine::Get(engine);
 	uint8 spritenum = e->u.ship.image_index;
 
 	if (is_custom_sprite(spritenum)) {
-		SpriteID sprite = GetCustomVehicleIcon(engine, DIR_W);
+		SpriteID sprite = GetCustomVehicleIcon(engine, DIR_W, image_type);
 		if (sprite != 0) return sprite;
 
 		spritenum = e->original_image_index;
@@ -77,11 +78,11 @@ static SpriteID GetShipIcon(EngineID engine)
 	return DIR_W + _ship_sprites[spritenum];
 }
 
-void DrawShipEngine(int left, int right, int preferred_x, int y, EngineID engine, PaletteID pal)
+void DrawShipEngine(int left, int right, int preferred_x, int y, EngineID engine, PaletteID pal, EngineImageType image_type)
 {
-	SpriteID sprite = GetShipIcon(engine);
+	SpriteID sprite = GetShipIcon(engine, image_type);
 	const Sprite *real_sprite = GetSprite(sprite, ST_NORMAL);
-	preferred_x = Clamp(preferred_x, left - real_sprite->x_offs, right - real_sprite->width - real_sprite->x_offs);
+	preferred_x = Clamp(preferred_x, left - UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI), right - UnScaleByZoom(real_sprite->width, ZOOM_LVL_GUI) - UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI));
 	DrawSprite(sprite, pal, preferred_x, y);
 }
 
@@ -91,23 +92,23 @@ void DrawShipEngine(int left, int right, int preferred_x, int y, EngineID engine
  * @param width The width of the sprite
  * @param height The height of the sprite
  */
-void GetShipSpriteSize(EngineID engine, uint &width, uint &height)
+void GetShipSpriteSize(EngineID engine, uint &width, uint &height, EngineImageType image_type)
 {
-	const Sprite *spr = GetSprite(GetShipIcon(engine), ST_NORMAL);
+	const Sprite *spr = GetSprite(GetShipIcon(engine, image_type), ST_NORMAL);
 
-	width  = spr->width;
-	height = spr->height;
+	width  = UnScaleByZoom(spr->width, ZOOM_LVL_GUI);
+	height = UnScaleByZoom(spr->height, ZOOM_LVL_GUI);
 }
 
-SpriteID Ship::GetImage(Direction direction) const
+SpriteID Ship::GetImage(Direction direction, EngineImageType image_type) const
 {
 	uint8 spritenum = this->spritenum;
 
 	if (is_custom_sprite(spritenum)) {
-		SpriteID sprite = GetCustomVehicleSprite(this, direction);
+		SpriteID sprite = GetCustomVehicleSprite(this, direction, image_type);
 		if (sprite != 0) return sprite;
 
-		spritenum = Engine::Get(this->engine_type)->original_image_index;
+		spritenum = this->GetEngine()->original_image_index;
 	}
 
 	return _ship_sprites[spritenum] + direction;
@@ -160,14 +161,14 @@ static void CheckIfShipNeedsService(Vehicle *v)
 	if (depot == NULL) {
 		if (v->current_order.IsType(OT_GOTO_DEPOT)) {
 			v->current_order.MakeDummy();
-			SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
+			SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, WID_VV_START_STOP);
 		}
 		return;
 	}
 
 	v->current_order.MakeGoToDepot(depot->index, ODTFB_SERVICE);
 	v->dest_tile = depot->xy;
-	SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
+	SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, WID_VV_START_STOP);
 }
 
 /**
@@ -190,9 +191,9 @@ void Ship::UpdateCache()
 
 Money Ship::GetRunningCost() const
 {
-	const Engine *e = Engine::Get(this->engine_type);
+	const Engine *e = this->GetEngine();
 	uint cost_factor = GetVehicleProperty(this, PROP_SHIP_RUNNING_COST_FACTOR, e->u.ship.running_cost);
-	return GetPrice(PR_RUNNING_SHIP, cost_factor, e->grf_prop.grffile);
+	return GetPrice(PR_RUNNING_SHIP, cost_factor, e->GetGRF());
 }
 
 void Ship::OnNewDay()
@@ -325,7 +326,7 @@ static bool CheckShipLeaveDepot(Ship *v)
 	v->vehstatus &= ~VS_HIDDEN;
 
 	v->cur_speed = 0;
-	v->UpdateViewport(false, true);
+	v->UpdateViewport(true, true);
 	SetWindowDirty(WC_VEHICLE_DEPOT, v->tile);
 
 	PlayShipSound(v);
@@ -346,7 +347,7 @@ static bool ShipAccelerate(Vehicle *v)
 	/* updates statusbar only if speed have changed to save CPU time */
 	if (spd != v->cur_speed) {
 		v->cur_speed = spd;
-		SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
+		SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, WID_VV_START_STOP);
 	}
 
 	/* Convert direction-indepenent speed into direction-dependent speed. (old movement method) */
@@ -378,7 +379,7 @@ static void ShipArrivesAt(const Vehicle *v, Station *st)
 			v->index,
 			st->index
 		);
-		AI::NewEvent(v->owner, new AIEventStationFirstVehicle(st->index, v->index));
+		AI::NewEvent(v->owner, new ScriptEventStationFirstVehicle(st->index, v->index));
 	}
 }
 
@@ -509,7 +510,7 @@ static void ShipController(Ship *v)
 				 * always skip ahead. */
 				if (v->current_order.IsType(OT_LEAVESTATION)) {
 					v->current_order.Free();
-					SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
+					SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, WID_VV_START_STOP);
 				} else if (v->dest_tile != 0) {
 					/* We have a target, let's see if we reached it... */
 					if (v->current_order.IsType(OT_GOTO_WAYPOINT) &&
@@ -587,7 +588,8 @@ static void ShipController(Ship *v)
 		if (!IsTileType(gp.new_tile, MP_TUNNELBRIDGE) || !HasBit(VehicleEnterTile(v, gp.new_tile, gp.x, gp.y), VETS_ENTERED_WORMHOLE)) {
 			v->x_pos = gp.x;
 			v->y_pos = gp.y;
-			VehicleMove(v, !(v->vehstatus & VS_HIDDEN));
+			VehicleUpdatePosition(v);
+			if ((v->vehstatus & VS_HIDDEN) == 0) VehicleUpdateViewport(v, true);
 			return;
 		}
 	}
@@ -596,9 +598,10 @@ static void ShipController(Ship *v)
 	dir = ShipGetNewDirection(v, gp.x, gp.y);
 	v->x_pos = gp.x;
 	v->y_pos = gp.y;
-	v->z_pos = GetSlopeZ(gp.x, gp.y);
+	v->z_pos = GetSlopePixelZ(gp.x, gp.y);
 
 getout:
+	VehicleUpdatePosition(v);
 	v->UpdateViewport(true, true);
 	return;
 
@@ -644,7 +647,7 @@ CommandCost CmdBuildShip(TileIndex tile, DoCommandFlag flags, const Engine *e, u
 		y = TileY(tile) * TILE_SIZE + TILE_SIZE / 2;
 		v->x_pos = x;
 		v->y_pos = y;
-		v->z_pos = GetSlopeZ(x, y);
+		v->z_pos = GetSlopePixelZ(x, y);
 
 		v->UpdateDeltaXY(v->direction);
 		v->vehstatus = VS_HIDDEN | VS_STOPPED | VS_DEFPAL;
@@ -675,11 +678,11 @@ CommandCost CmdBuildShip(TileIndex tile, DoCommandFlag flags, const Engine *e, u
 
 		v->InvalidateNewGRFCacheOfChain();
 
-		v->cargo_cap = GetVehicleCapacity(v);
+		v->cargo_cap = e->DetermineCapacity(v);
 
 		v->InvalidateNewGRFCacheOfChain();
 
-		VehicleMove(v, false);
+		VehicleUpdatePosition(v);
 	}
 
 	return CommandCost();

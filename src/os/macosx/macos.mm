@@ -24,9 +24,6 @@
 /*
  * This file contains objective C
  * Apple uses objective C instead of plain C to interact with OS specific/native functions
- *
- * Note: TrueLight's crosscompiler can handle this, but it likely needs a manual modification for each change in this file.
- * To insure that the crosscompiler still works, let him try any changes before they are committed
  */
 
 
@@ -121,6 +118,10 @@ void ShowOSErrorBox(const char *buf, bool system)
 	}
 }
 
+void OSOpenBrowser(const char *url)
+{
+	[ [ NSWorkspace sharedWorkspace ] openURL:[ NSURL URLWithString:[ NSString stringWithUTF8String:url ] ] ];
+}
 
 /**
  * Determine and return the current user's locale.
@@ -175,3 +176,20 @@ bool GetClipboardContents(char *buffer, size_t buff_len)
 	return true;
 }
 #endif
+
+uint GetCPUCoreCount()
+{
+	uint count = 1;
+#if (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_5)
+	if (MacOSVersionIsAtLeast(10, 5, 0)) {
+		count = [ [ NSProcessInfo processInfo ] activeProcessorCount ];
+	} else
+#endif
+	{
+#if (MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_5)
+		count = MPProcessorsScheduled();
+#endif
+	}
+
+	return count;
+}

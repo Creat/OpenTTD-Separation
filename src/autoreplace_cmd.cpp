@@ -36,9 +36,9 @@ extern void ChangeVehicleViewWindow(VehicleID from_index, VehicleID to_index);
  */
 static bool EnginesHaveCargoInCommon(EngineID engine_a, EngineID engine_b)
 {
-	uint32 available_cargos_a = GetUnionOfArticulatedRefitMasks(engine_a, true);
-	uint32 available_cargos_b = GetUnionOfArticulatedRefitMasks(engine_b, true);
-	return (available_cargos_a == 0 || available_cargos_b == 0 || (available_cargos_a & available_cargos_b) != 0);
+	uint32 available_cargoes_a = GetUnionOfArticulatedRefitMasks(engine_a, true);
+	uint32 available_cargoes_b = GetUnionOfArticulatedRefitMasks(engine_b, true);
+	return (available_cargoes_a == 0 || available_cargoes_b == 0 || (available_cargoes_a & available_cargoes_b) != 0);
 }
 
 /**
@@ -87,6 +87,33 @@ bool CheckAutoreplaceValidity(EngineID from, EngineID to, CompanyID company)
 
 	/* the engines needs to be able to carry the same cargo */
 	return EnginesHaveCargoInCommon(from, to);
+}
+
+/**
+ * Check the capacity of all vehicles in a chain and spread cargo if needed.
+ * @param v The vehicle to check.
+ */
+void CheckCargoCapacity(Vehicle *v)
+{
+	assert(v == NULL || v->First() == v);
+
+	for (Vehicle *src = v; src != NULL; src = src->Next()) {
+		/* Do we need to more cargo away? */
+		if (src->cargo.Count() <= src->cargo_cap) continue;
+
+		/* We need to move a particular amount. Try that on the other vehicles. */
+		uint to_spread = src->cargo.Count() - src->cargo_cap;
+		for (Vehicle *dest = v; dest != NULL && to_spread != 0; dest = dest->Next()) {
+			if (dest->cargo.Count() >= dest->cargo_cap || dest->cargo_type != src->cargo_type) continue;
+
+			uint amount = min(to_spread, dest->cargo_cap - dest->cargo.Count());
+			src->cargo.MoveTo(&dest->cargo, amount, VehicleCargoList::MTA_UNLOAD, NULL);
+			to_spread -= amount;
+		}
+
+		/* Any left-overs will be thrown away, but not their feeder share. */
+		src->cargo.Truncate(src->cargo_cap);
+	}
 }
 
 /**
@@ -142,7 +169,7 @@ static bool VerifyAutoreplaceRefitForOrders(const Vehicle *v, EngineID engine_ty
 	const Order *o;
 	const Vehicle *u = (v->type == VEH_TRAIN) ? v->First() : v;
 	FOR_VEHICLE_ORDERS(u, o) {
-		if (!o->IsRefit()) continue;
+		if (!o->IsRefit() || o->IsAutoRefit()) continue;
 		CargoID cargo_type = o->GetRefitCargo();
 
 		if (!HasBit(union_refit_mask_a, cargo_type)) continue;
@@ -169,7 +196,7 @@ static CargoID GetNewCargoTypeForReplace(Vehicle *v, EngineID engine_type, bool 
 	if (union_mask == 0) return CT_NO_REFIT; // Don't try to refit an engine with no cargo capacity
 
 	CargoID cargo_type;
-	if (IsArticulatedVehicleCarryingDifferentCargos(v, &cargo_type)) return CT_INVALID; // We cannot refit to mixed cargos in an automated way
+	if (IsArticulatedVehicleCarryingDifferentCargoes(v, &cargo_type)) return CT_INVALID; // We cannot refit to mixed cargoes in an automated way
 
 	if (cargo_type == CT_INVALID) {
 		if (v->type != VEH_TRAIN) return CT_NO_REFIT; // If the vehicle does not carry anything at all, every replacement is fine.
@@ -182,15 +209,7 @@ static CargoID GetNewCargoTypeForReplace(Vehicle *v, EngineID engine_type, bool 
 		for (v = v->First(); v != NULL; v = v->Next()) {
 			if (v->cargo_cap == 0) continue;
 			/* Now we found a cargo type being carried on the train and we will see if it is possible to carry to this one */
-			if (HasBit(available_cargo_types, v->cargo_type)) {
-				/* Do we have to refit the vehicle, or is it already carrying the right cargo? */
-				CargoArray default_capacity = GetCapacityOfArticulatedParts(engine_type);
-				for (CargoID cid = 0; cid < NUM_CARGO; cid++) {
-					if (cid != v->cargo_type && default_capacity[cid] > 0) return v->cargo_type;
-				}
-
-				return CT_NO_REFIT;
-			}
+			if (HasBit(available_cargo_types, v->cargo_type)) return v->cargo_type;
 		}
 
 		return CT_NO_REFIT; // We failed to find a cargo type on the old vehicle and we will not refit the new one
@@ -199,13 +218,7 @@ static CargoID GetNewCargoTypeForReplace(Vehicle *v, EngineID engine_type, bool 
 
 		if (part_of_chain && !VerifyAutoreplaceRefitForOrders(v, engine_type)) return CT_INVALID; // Some refit orders lose their effect
 
-		/* Do we have to refit the vehicle, or is it already carrying the right cargo? */
-		CargoArray default_capacity = GetCapacityOfArticulatedParts(engine_type);
-		for (CargoID cid = 0; cid < NUM_CARGO; cid++) {
-			if (cid != cargo_type && default_capacity[cid] > 0) return cargo_type;
-		}
-
-		return CT_NO_REFIT;
+		return cargo_type;
 	}
 }
 
@@ -265,7 +278,7 @@ static CommandCost BuildReplacementVehicle(Vehicle *old_veh, Vehicle **new_vehic
 
 	/* Does it need to be refitted */
 	CargoID refit_cargo = GetNewCargoTypeForReplace(old_veh, e, part_of_chain);
-	if (refit_cargo == CT_INVALID) return CommandCost(); // incompatible cargos
+	if (refit_cargo == CT_INVALID) return CommandCost(); // incompatible cargoes
 
 	/* Build the new vehicle */
 	cost = DoCommand(old_veh->tile, e, 0, DC_EXEC | DC_AUTOREPLACE, GetCmdBuildVeh(old_veh));
@@ -275,12 +288,9 @@ static CommandCost BuildReplacementVehicle(Vehicle *old_veh, Vehicle **new_vehic
 	*new_vehicle = new_veh;
 
 	/* Refit the vehicle if needed */
-	byte subtype = GetBestFittingSubType(old_veh, new_veh);
-	/* If the subtype isn't zero and the refit cargo is not set,
-	 * we're better off setting the refit cargo too. */
-	if (subtype != 0 && refit_cargo == CT_NO_REFIT) refit_cargo = old_veh->cargo_type;
-
 	if (refit_cargo != CT_NO_REFIT) {
+		byte subtype = GetBestFittingSubType(old_veh, new_veh, refit_cargo);
+
 		cost.AddCost(DoCommand(0, new_veh->index, refit_cargo | (subtype << 8), DC_EXEC, GetCmdRefitVeh(new_veh)));
 		assert(cost.Succeeded()); // This should be ensured by GetNewCargoTypeForReplace()
 	}
@@ -314,7 +324,7 @@ static inline CommandCost CmdStartStopVehicle(const Vehicle *v, bool evaluate_ca
  */
 static inline CommandCost CmdMoveVehicle(const Vehicle *v, const Vehicle *after, DoCommandFlag flags, bool whole_chain)
 {
-	return DoCommand(0, v->index | (whole_chain ? 1 : 0) << 20, after != NULL ? after->index : INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+	return DoCommand(0, v->index | (whole_chain ? 1 : 0) << 20, after != NULL ? after->index : INVALID_VEHICLE, flags | DC_NO_CARGO_CAP_CHECK, CMD_MOVE_RAIL_VEHICLE);
 }
 
 /**
@@ -568,6 +578,8 @@ static CommandCost ReplaceChain(Vehicle **chain, DoCommandFlag flags, bool wagon
 						if (i == 0) old_head = NULL;
 					}
 				}
+
+				if ((flags & DC_EXEC) != 0) CheckCargoCapacity(new_head);
 			}
 
 			/* If we are not in DC_EXEC undo everything, i.e. rearrange old vehicles.
@@ -754,6 +766,7 @@ CommandCost CmdSetAutoReplace(TileIndex tile, DoCommandFlag flags, uint32 p1, ui
 		cost = RemoveEngineReplacementForCompany(c, old_engine_type, id_g, flags);
 	}
 
+	if (flags & DC_EXEC) GroupStatistics::UpdateAutoreplace(_current_company);
 	if ((flags & DC_EXEC) && IsLocalCompany()) InvalidateAutoreplaceWindow(old_engine_type, id_g);
 
 	return cost;

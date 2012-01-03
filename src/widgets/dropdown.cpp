@@ -16,6 +16,8 @@
 #include "../window_func.h"
 #include "dropdown_type.h"
 
+#include "dropdown_widget.h"
+
 
 void DropDownListItem::Draw(int left, int right, int top, int bottom, bool sel, int bg_colour) const
 {
@@ -79,18 +81,11 @@ static void DeleteDropDownList(DropDownList *list)
 	delete list;
 }
 
-/** Widget numbers of the dropdown menu. */
-enum DropdownMenuWidgets {
-	DDM_ITEMS,        ///< Panel showing the dropdown items.
-	DDM_SHOW_SCROLL,  ///< Hide scrollbar if too few items.
-	DDM_SCROLL,       ///< Scrollbar.
-};
-
 static const NWidgetPart _nested_dropdown_menu_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
-		NWidget(WWT_PANEL, COLOUR_END, DDM_ITEMS), SetMinimalSize(1, 1), SetScrollbar(DDM_SCROLL), EndContainer(),
-		NWidget(NWID_SELECTION, INVALID_COLOUR, DDM_SHOW_SCROLL),
-			NWidget(NWID_VSCROLLBAR, COLOUR_END, DDM_SCROLL),
+		NWidget(WWT_PANEL, COLOUR_END, WID_DM_ITEMS), SetMinimalSize(1, 1), SetScrollbar(WID_DM_SCROLL), EndContainer(),
+		NWidget(NWID_SELECTION, INVALID_COLOUR, WID_DM_SHOW_SCROLL),
+			NWidget(NWID_VSCROLLBAR, COLOUR_END, WID_DM_SCROLL),
 		EndContainer(),
 	EndContainer(),
 };
@@ -135,20 +130,20 @@ struct DropdownWindow : Window {
 
 		this->CreateNestedTree(&_dropdown_desc);
 
-		this->vscroll = this->GetScrollbar(DDM_SCROLL);
+		this->vscroll = this->GetScrollbar(WID_DM_SCROLL);
 
-		uint items_width = size.width - (scroll ? WD_VSCROLLBAR_WIDTH : 0);
-		NWidgetCore *nwi = this->GetWidget<NWidgetCore>(DDM_ITEMS);
+		uint items_width = size.width - (scroll ? NWidgetScrollbar::GetVerticalDimension().width : 0);
+		NWidgetCore *nwi = this->GetWidget<NWidgetCore>(WID_DM_ITEMS);
 		nwi->SetMinimalSize(items_width, size.height + 4);
 		nwi->colour = wi_colour;
 
-		nwi = this->GetWidget<NWidgetCore>(DDM_SCROLL);
+		nwi = this->GetWidget<NWidgetCore>(WID_DM_SCROLL);
 		nwi->colour = wi_colour;
 
-		this->GetWidget<NWidgetStacked>(DDM_SHOW_SCROLL)->SetDisplayedPlane(scroll ? 0 : SZSP_NONE);
+		this->GetWidget<NWidgetStacked>(WID_DM_SHOW_SCROLL)->SetDisplayedPlane(scroll ? 0 : SZSP_NONE);
 
 		this->FinishInitNested(&_dropdown_desc, 0);
-		CLRBITS(this->flags4, WF_WHITE_BORDER_MASK);
+		CLRBITS(this->flags, WF_WHITE_BORDER);
 
 		/* Total length of list */
 		int list_height = 0;
@@ -205,7 +200,7 @@ struct DropdownWindow : Window {
 	{
 		if (GetWidgetFromPos(this, _cursor.pos.x - this->left, _cursor.pos.y - this->top) < 0) return false;
 
-		NWidgetBase *nwi = this->GetWidget<NWidgetBase>(DDM_ITEMS);
+		NWidgetBase *nwi = this->GetWidget<NWidgetBase>(WID_DM_ITEMS);
 		int y     = _cursor.pos.y - this->top - nwi->pos_y - 2;
 		int width = nwi->current_x - 4;
 		int pos   = this->vscroll->GetPosition();
@@ -233,7 +228,7 @@ struct DropdownWindow : Window {
 
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
-		if (widget != DDM_ITEMS) return;
+		if (widget != WID_DM_ITEMS) return;
 
 		TextColour colour = (TextColour)this->GetWidget<NWidgetCore>(widget)->colour;
 
@@ -250,7 +245,7 @@ struct DropdownWindow : Window {
 				bool selected = (this->selected_index == item->result);
 				if (selected) GfxFillRect(r.left + 2, y, r.right - 1, y + item_height - 1, PC_BLACK);
 
-				item->Draw(r.left, r.right, y, r.bottom, selected, colour);
+				item->Draw(r.left, r.right, y, y + item_height, selected, colour);
 
 				if (item->masked) {
 					GfxFillRect(r.left + 1, y, r.right - 1, y + item_height - 1, _colour_gradient[colour][5], FILLRECT_CHECKER);
@@ -262,7 +257,7 @@ struct DropdownWindow : Window {
 
 	virtual void OnClick(Point pt, int widget, int click_count)
 	{
-		if (widget != DDM_ITEMS) return;
+		if (widget != WID_DM_ITEMS) return;
 		int item;
 		if (this->GetDropDownItem(item)) {
 			this->click_delay = 4;
@@ -414,7 +409,7 @@ void ShowDropDownList(Window *w, DropDownList *list, int selected, int button, u
 			scroll = true;
 			/* Add space for the scroll bar if we automatically determined
 			 * the width of the list. */
-			max_item_width += WD_VSCROLLBAR_WIDTH;
+			max_item_width += NWidgetScrollbar::GetVerticalDimension().width;
 		}
 	}
 
@@ -427,14 +422,14 @@ void ShowDropDownList(Window *w, DropDownList *list, int selected, int button, u
 
 /**
  * Show a dropdown menu window near a widget of the parent window.
- * The result code of the items is their index in the #strings list.
+ * The result code of the items is their index in the \a strings list.
  * @param w             Parent window that wants the dropdown menu.
  * @param strings       Menu list, end with #INVALID_STRING_ID
  * @param selected      Index of initial selected item.
- * @param button        Button widget number of the parent window #w that wants the dropdown menu.
+ * @param button        Button widget number of the parent window \a w that wants the dropdown menu.
  * @param disabled_mask Bitmask for diabled items (items with their bit set are not copied to the dropdown list).
  * @param hidden_mask   Bitmask for hidden items (items with their bit set are displayed, but not selectable in the dropdown list).
- * @param width         Width of the dropdown menu. If \c 0, use the width of parent widget #button.
+ * @param width         Width of the dropdown menu. If \c 0, use the width of parent widget \a button.
  */
 void ShowDropDownMenu(Window *w, const StringID *strings, int selected, int button, uint32 disabled_mask, uint32 hidden_mask, uint width)
 {

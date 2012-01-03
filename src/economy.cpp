@@ -46,6 +46,8 @@
 #include "core/pool_func.hpp"
 #include "newgrf.h"
 #include "core/backup_type.hpp"
+#include "water.h"
+#include "game/game.hpp"
 
 #include "table/strings.h"
 #include "table/pricebase.h"
@@ -389,6 +391,33 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 	}
 
 	{
+		Vehicle *v;
+		FOR_ALL_VEHICLES(v) {
+			if (v->owner == old_owner && IsCompanyBuildableVehicleType(v->type)) {
+				if (new_owner == INVALID_OWNER) {
+					if (v->Previous() == NULL) delete v;
+				} else {
+					if (v->IsEngineCountable()) GroupStatistics::CountEngine(v, -1);
+					if (v->IsPrimaryVehicle()) GroupStatistics::CountVehicle(v, -1);
+				}
+			}
+		}
+	}
+
+	/* In all cases clear replace engine rules.
+	 * Even if it was copied, it could interfere with new owner's rules */
+	RemoveAllEngineReplacementForCompany(Company::Get(old_owner));
+
+	if (new_owner == INVALID_OWNER) {
+		RemoveAllGroupsForCompany(old_owner);
+	} else {
+		Group *g;
+		FOR_ALL_GROUPS(g) {
+			if (g->owner == old_owner) g->owner = new_owner;
+		}
+	}
+
+	{
 		FreeUnitIDGenerator unitidgen[] = {
 			FreeUnitIDGenerator(VEH_TRAIN, new_owner), FreeUnitIDGenerator(VEH_ROAD,     new_owner),
 			FreeUnitIDGenerator(VEH_SHIP,  new_owner), FreeUnitIDGenerator(VEH_AIRCRAFT, new_owner)
@@ -397,19 +426,25 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 		Vehicle *v;
 		FOR_ALL_VEHICLES(v) {
 			if (v->owner == old_owner && IsCompanyBuildableVehicleType(v->type)) {
-				if (new_owner == INVALID_OWNER) {
-					if (v->Previous() == NULL) delete v;
-				} else {
-					v->owner = new_owner;
-					v->colourmap = PAL_NONE;
-					if (v->IsEngineCountable()) Company::Get(new_owner)->num_engines[v->engine_type]++;
-					if (v->IsPrimaryVehicle()) v->unitnumber = unitidgen[v->type].NextID();
+				assert(new_owner != INVALID_OWNER);
 
-					/* Invalidate the vehicle's cargo payment "owner cache". */
-					if (v->cargo_payment != NULL) v->cargo_payment->owner = NULL;
+				v->owner = new_owner;
+				v->colourmap = PAL_NONE;
+
+				if (v->IsEngineCountable()) {
+					GroupStatistics::CountEngine(v, 1);
 				}
+				if (v->IsPrimaryVehicle()) {
+					GroupStatistics::CountVehicle(v, 1);
+					v->unitnumber = unitidgen[v->type].NextID();
+				}
+
+				/* Invalidate the vehicle's cargo payment "owner cache". */
+				if (v->cargo_payment != NULL) v->cargo_payment->owner = NULL;
 			}
 		}
+
+		if (new_owner != INVALID_OWNER) GroupStatistics::UpdateAutoreplace(new_owner);
 	}
 
 	/*  Change ownership of tiles */
@@ -461,19 +496,6 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 		}
 	}
 
-	/* In all cases clear replace engine rules.
-	 * Even if it was copied, it could interfere with new owner's rules */
-	RemoveAllEngineReplacementForCompany(Company::Get(old_owner));
-
-	if (new_owner == INVALID_OWNER) {
-		RemoveAllGroupsForCompany(old_owner);
-	} else {
-		Group *g;
-		FOR_ALL_GROUPS(g) {
-			if (g->owner == old_owner) g->owner = new_owner;
-		}
-	}
-
 	Sign *si;
 	FOR_ALL_SIGNS(si) {
 		if (si->owner == old_owner) si->owner = new_owner == INVALID_OWNER ? OWNER_NONE : new_owner;
@@ -514,7 +536,8 @@ static void CompanyCheckBankrupt(Company *c)
 			SetDParam(1, STR_NEWS_COMPANY_IN_TROUBLE_DESCRIPTION);
 			SetDParamStr(2, cni->company_name);
 			AddCompanyNewsItem(STR_MESSAGE_NEWS_FORMAT, NS_COMPANY_TROUBLE, cni);
-			AI::BroadcastNewEvent(new AIEventCompanyInTrouble(c->index));
+			AI::BroadcastNewEvent(new ScriptEventCompanyInTrouble(c->index));
+			Game::NewEvent(new ScriptEventCompanyInTrouble(c->index));
 			break;
 		}
 
@@ -550,7 +573,7 @@ static void CompanyCheckBankrupt(Company *c)
 			 * that changing the current company is okay. In case of single
 			 * player we are sure (the above check) that we are not the local
 			 * company and thus we won't be moved. */
-			if (!_networking || _network_server) DoCommandP(0, 2 | (c->index << 16), 0, CMD_COMPANY_CTRL);
+			if (!_networking || _network_server) DoCommandP(0, 2 | (c->index << 16), CRR_BANKRUPT, CMD_COMPANY_CTRL);
 			break;
 	}
 }
@@ -564,17 +587,39 @@ static void CompaniesGenStatistics()
 	Station *st;
 
 	Backup<CompanyByte> cur_company(_current_company, FILE_LINE);
-	FOR_ALL_STATIONS(st) {
-		cur_company.Change(st->owner);
-		CommandCost cost(EXPENSES_PROPERTY, _price[PR_STATION_VALUE] >> 1);
-		SubtractMoneyFromCompany(cost);
+	Company *c;
+
+	if (!_settings_game.economy.infrastructure_maintenance) {
+		FOR_ALL_STATIONS(st) {
+			cur_company.Change(st->owner);
+			CommandCost cost(EXPENSES_PROPERTY, _price[PR_STATION_VALUE] >> 1);
+			SubtractMoneyFromCompany(cost);
+		}
+	} else {
+		/* Improved monthly infrastructure costs. */
+		FOR_ALL_COMPANIES(c) {
+			cur_company.Change(c->index);
+
+			CommandCost cost(EXPENSES_PROPERTY);
+			for (RailType rt = RAILTYPE_BEGIN; rt < RAILTYPE_END; rt++) {
+				if (c->infrastructure.rail[rt] != 0) cost.AddCost(RailMaintenanceCost(rt, c->infrastructure.rail[rt]));
+			}
+			cost.AddCost(SignalMaintenanceCost(c->infrastructure.signal));
+			for (RoadType rt = ROADTYPE_BEGIN; rt < ROADTYPE_END; rt++) {
+				if (c->infrastructure.road[rt] != 0) cost.AddCost(RoadMaintenanceCost(rt, c->infrastructure.road[rt]));
+			}
+			cost.AddCost(CanalMaintenanceCost(c->infrastructure.water));
+			cost.AddCost(StationMaintenanceCost(c->infrastructure.station));
+			cost.AddCost(AirportMaintenanceCost(c->index));
+
+			SubtractMoneyFromCompany(cost);
+		}
 	}
 	cur_company.Restore();
 
 	/* Only run the economic statics and update company stats every 3rd month (1st of quarter). */
 	if (!HasBit(1 << 0 | 1 << 3 | 1 << 6 | 1 << 9, _cur_month)) return;
 
-	Company *c;
 	FOR_ALL_COMPANIES(c) {
 		memmove(&c->old_economy[1], &c->old_economy[0], sizeof(c->old_economy) - sizeof(c->old_economy[0]));
 		c->old_economy[0] = c->cur_economy;
@@ -693,6 +738,7 @@ void RecomputePrices()
 	SetWindowClassesDirty(WC_BUILD_VEHICLE);
 	SetWindowClassesDirty(WC_REPLACE_VEHICLE);
 	SetWindowClassesDirty(WC_VEHICLE_DETAILS);
+	SetWindowClassesDirty(WC_COMPANY_INFRASTRUCTURE);
 	InvalidateWindowData(WC_PAYMENT_RATES, 0);
 }
 
@@ -968,10 +1014,9 @@ static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, Ti
 	company->cur_economy.delivered_cargo += accepted;
 	if (accepted > 0) SetBit(company->cargo_types, cargo_type);
 
-	/* Increase town's counter for some special goods types */
+	/* Increase town's counter for town effects */
 	const CargoSpec *cs = CargoSpec::Get(cargo_type);
-	if (cs->town_effect == TE_FOOD) st->town->new_act_food += accepted;
-	if (cs->town_effect == TE_WATER) st->town->new_act_water += accepted;
+	st->town->received[cs->town_effect].new_act += accepted;
 
 	/* Determine profit */
 	Money profit = GetTransportedGoodsIncome(accepted, DistanceManhattan(source_tile, st->xy), days_in_transit, cargo_type);
@@ -1129,6 +1174,22 @@ void PrepareUnload(Vehicle *front_v)
 }
 
 /**
+ * Checks whether an articulated vehicle is empty.
+ * @param v Vehicle
+ * @return true if all parts are empty.
+ */
+static bool IsArticulatedVehicleEmpty(Vehicle *v)
+{
+	v = v->GetFirstEnginePart();
+
+	for (; v != NULL; v = v->HasArticulatedPart() ? v->GetNextArticulatedPart() : NULL) {
+		if (v->cargo.Count() != 0) return false;
+	}
+
+	return true;
+}
+
+/**
  * Loads/unload the vehicle if possible.
  * @param front the vehicle to be (un)loaded
  * @param cargo_left the amount of each cargo type that is
@@ -1178,18 +1239,35 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 
 	CargoPayment *payment = front->cargo_payment;
 
+	uint artic_part = 0; // Articulated part we are currently trying to load. (not counting parts without capacity)
 	for (Vehicle *v = front; v != NULL; v = v->Next()) {
+		if (v == front || !v->Previous()->HasArticulatedPart()) artic_part = 0;
 		if (v->cargo_cap == 0) continue;
+		artic_part++;
 
-		const Engine *e = Engine::Get(v->engine_type);
+		const Engine *e = v->GetEngine();
 		byte load_amount = e->info.load_amount;
 
 		/* The default loadamount for mail is 1/4 of the load amount for passengers */
 		if (v->type == VEH_AIRCRAFT && !Aircraft::From(v)->IsNormalAircraft()) load_amount = CeilDiv(load_amount, 4);
 
-		if (_settings_game.order.gradual_loading && HasBit(e->info.callback_mask, CBM_VEHICLE_LOAD_AMOUNT)) {
-			uint16 cb_load_amount = GetVehicleCallback(CBID_VEHICLE_LOAD_AMOUNT, 0, 0, v->engine_type, v);
-			if (cb_load_amount != CALLBACK_FAILED && GB(cb_load_amount, 0, 8) != 0) load_amount = GB(cb_load_amount, 0, 8);
+		if (_settings_game.order.gradual_loading) {
+			uint16 cb_load_amount = CALLBACK_FAILED;
+			if (e->GetGRF() != NULL && e->GetGRF()->grf_version >= 8) {
+				/* Use callback 36 */
+				cb_load_amount = GetVehicleProperty(v, PROP_VEHICLE_LOAD_AMOUNT, CALLBACK_FAILED);
+			} else if (HasBit(e->info.callback_mask, CBM_VEHICLE_LOAD_AMOUNT)) {
+				/* Use callback 12 */
+				cb_load_amount = GetVehicleCallback(CBID_VEHICLE_LOAD_AMOUNT, 0, 0, v->engine_type, v);
+			}
+			if (cb_load_amount != CALLBACK_FAILED) {
+				if (e->GetGRF()->grf_version < 8) cb_load_amount = GB(cb_load_amount, 0, 8);
+				if (cb_load_amount >= 0x100) {
+					ErrorUnknownCallbackResult(e->GetGRFID(), CBID_VEHICLE_LOAD_AMOUNT, cb_load_amount);
+				} else if (cb_load_amount != 0) {
+					load_amount = cb_load_amount;
+				}
+			}
 		}
 
 		GoodsEntry *ge = &st->goods[v->cargo_type];
@@ -1254,6 +1332,52 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 
 		/* Do not pick up goods when we have no-load set or loading is stopped. */
 		if (front->current_order.GetLoadType() & OLFB_NO_LOAD || HasBit(front->vehicle_flags, VF_STOP_LOADING)) continue;
+
+		/* This order has a refit, if this is the first vehicle part carrying cargo and the whole vehicle is empty, try refitting. */
+		if (front->current_order.IsRefit() && artic_part == 1 && IsArticulatedVehicleEmpty(v) &&
+				(v->type != VEH_AIRCRAFT || (Aircraft::From(v)->IsNormalAircraft() && v->Next()->cargo.Count() == 0))) {
+			Vehicle *v_start = v->GetFirstEnginePart();
+			CargoID new_cid = front->current_order.GetRefitCargo();
+			byte new_subtype = front->current_order.GetRefitSubtype();
+
+			Backup<CompanyByte> cur_company(_current_company, front->owner, FILE_LINE);
+
+			/* Check if all articulated parts are empty and collect refit mask. */
+			uint32 refit_mask = e->info.refit_mask;
+			Vehicle *w = v_start;
+			while (w->HasArticulatedPart()) {
+				w = w->GetNextArticulatedPart();
+				if (w->cargo.Count() > 0) new_cid = CT_NO_REFIT;
+				refit_mask |= EngInfo(w->engine_type)->refit_mask;
+			}
+
+			if (new_cid == CT_AUTO_REFIT) {
+				/* Get refittable cargo type with the most waiting cargo. */
+				int amount = 0;
+				CargoID cid;
+				FOR_EACH_SET_CARGO_ID(cid, refit_mask) {
+					if (cargo_left[cid] > amount) {
+						/* Try to find out if auto-refitting would succeed. In case the refit is allowed,
+						 * the returned refit capacity will be greater than zero. */
+						new_subtype = GetBestFittingSubType(v, v, cid);
+						DoCommand(v_start->tile, v_start->index, cid | 1U << 6 | new_subtype << 8 | 1U << 16, DC_QUERY_COST, GetCmdRefitVeh(v_start)); // Auto-refit and only this vehicle including artic parts.
+						if (_returned_refit_capacity > 0) {
+							amount = cargo_left[cid];
+							new_cid = cid;
+						}
+					}
+				}
+			}
+
+			/* Refit if given a valid cargo. */
+			if (new_cid < NUM_CARGO) {
+				CommandCost cost = DoCommand(v_start->tile, v_start->index, new_cid | 1U << 6 | new_subtype << 8 | 1U << 16, DC_EXEC, GetCmdRefitVeh(v_start)); // Auto-refit and only this vehicle including artic parts.
+				if (cost.Succeeded()) front->profit_this_year -= cost.GetCost() << 8;
+				ge = &st->goods[v->cargo_type];
+			}
+
+			cur_company.Restore();
+		}
 
 		/* update stats */
 		int t;
@@ -1521,7 +1645,8 @@ static void DoAcquireCompany(Company *c)
 	SetDParamStr(3, cni->other_company_name);
 	SetDParam(4, c->bankrupt_value);
 	AddCompanyNewsItem(STR_MESSAGE_NEWS_FORMAT, NS_COMPANY_MERGER, cni);
-	AI::BroadcastNewEvent(new AIEventCompanyMerger(ci, _current_company));
+	AI::BroadcastNewEvent(new ScriptEventCompanyMerger(ci, _current_company));
+	Game::NewEvent(new ScriptEventCompanyMerger(ci, _current_company));
 
 	ChangeOwnershipOfCompanyItems(ci, _current_company);
 

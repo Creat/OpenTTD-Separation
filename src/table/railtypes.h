@@ -49,6 +49,7 @@ static const RailtypeInfo _original_railtypes[] = {
 
 		/* strings */
 		{
+			STR_RAIL_NAME_RAILROAD,
 			STR_RAIL_TOOLBAR_RAILROAD_CONSTRUCTION_CAPTION,
 			STR_RAIL_MENU_RAILROAD_CONSTRUCTION,
 			STR_BUY_VEHICLE_TRAIN_RAIL_CAPTION,
@@ -78,6 +79,9 @@ static const RailtypeInfo _original_railtypes[] = {
 		RTFB_NONE,
 
 		/* cost multiplier */
+		8,
+
+		/* maintenance cost multiplier */
 		8,
 
 		/* acceleration type */
@@ -142,6 +146,7 @@ static const RailtypeInfo _original_railtypes[] = {
 
 		/* strings */
 		{
+			STR_RAIL_NAME_ELRAIL,
 			STR_RAIL_TOOLBAR_ELRAIL_CONSTRUCTION_CAPTION,
 			STR_RAIL_MENU_ELRAIL_CONSTRUCTION,
 			STR_BUY_VEHICLE_TRAIN_ELRAIL_CAPTION,
@@ -171,6 +176,9 @@ static const RailtypeInfo _original_railtypes[] = {
 		RTFB_CATENARY,
 
 		/* cost multiplier */
+		12,
+
+		/* maintenance cost multiplier */
 		12,
 
 		/* acceleration type */
@@ -231,6 +239,7 @@ static const RailtypeInfo _original_railtypes[] = {
 
 		/* strings */
 		{
+			STR_RAIL_NAME_MONORAIL,
 			STR_RAIL_TOOLBAR_MONORAIL_CONSTRUCTION_CAPTION,
 			STR_RAIL_MENU_MONORAIL_CONSTRUCTION,
 			STR_BUY_VEHICLE_TRAIN_MONORAIL_CAPTION,
@@ -260,6 +269,9 @@ static const RailtypeInfo _original_railtypes[] = {
 		RTFB_NONE,
 
 		/* cost multiplier */
+		16,
+
+		/* maintenance cost multiplier */
 		16,
 
 		/* acceleration type */
@@ -320,6 +332,7 @@ static const RailtypeInfo _original_railtypes[] = {
 
 		/* strings */
 		{
+			STR_RAIL_NAME_MAGLEV,
 			STR_RAIL_TOOLBAR_MAGLEV_CONSTRUCTION_CAPTION,
 			STR_RAIL_MENU_MAGLEV_CONSTRUCTION,
 			STR_BUY_VEHICLE_TRAIN_MAGLEV_CAPTION,
@@ -349,6 +362,9 @@ static const RailtypeInfo _original_railtypes[] = {
 		RTFB_NONE,
 
 		/* cost multiplier */
+		24,
+
+		/* maintenance cost multiplier */
 		24,
 
 		/* acceleration type */

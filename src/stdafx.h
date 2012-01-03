@@ -121,21 +121,25 @@
 /* Stuff for GCC */
 #if defined(__GNUC__)
 	#define NORETURN __attribute__ ((noreturn))
-	#define FORCEINLINE inline
 	#define CDECL
 	#define __int64 long long
 	#define GCC_PACK __attribute__((packed))
 	/* Warn about functions using 'printf' format syntax. First argument determines which parameter
 	 * is the format string, second argument is start of values passed to printf. */
 	#define WARN_FORMAT(string, args) __attribute__ ((format (printf, string, args)))
+	#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
+		#define FINAL final
+	#else
+		#define FINAL
+	#endif
 #endif /* __GNUC__ */
 
 #if defined(__WATCOMC__)
 	#define NORETURN
-	#define FORCEINLINE inline
 	#define CDECL
 	#define GCC_PACK
 	#define WARN_FORMAT(string, args)
+	#define FINAL
 	#include <malloc.h>
 #endif /* __WATCOMC__ */
 
@@ -176,18 +180,18 @@
 	#pragma warning(disable: 6031)   // code analyzer: Return value ignored: 'ReadFile'
 	#pragma warning(disable: 6255)   // code analyzer: _alloca indicates failure by raising a stack overflow exception. Consider using _malloca instead
 	#pragma warning(disable: 6246)   // code analyzer: Local declaration of 'statspec' hides declaration of the same name in outer scope. For additional information, see previous declaration at ...
-	#define WARN_FORMAT(string, args)
 
 	#include <malloc.h> // alloca()
 	#define NORETURN __declspec(noreturn)
-	#define FORCEINLINE __forceinline
-	#define inline _inline
+	#define inline __forceinline
 
 	#if !defined(WINCE)
 		#define CDECL _cdecl
 	#endif
 
 	#define GCC_PACK
+	#define WARN_FORMAT(string, args)
+	#define FINAL sealed
 
 	int CDECL snprintf(char *str, size_t size, const char *format, ...) WARN_FORMAT(3, 4);
 	#if defined(WINCE)
@@ -436,6 +440,15 @@ void NORETURN CDECL error(const char *str, ...) WARN_FORMAT(1, 2);
 	/* If all else fails, hardcode something :( */
 	#define MAX_PATH 260
 #endif
+
+/**
+ * Version of the standard free that accepts const pointers.
+ * @param ptr The data to free.
+ */
+static inline void free(const void *ptr)
+{
+	free(const_cast<void *>(ptr));
+}
 
 /**
  * The largest value that can be entered in a variable

@@ -19,6 +19,7 @@
 #include "window_func.h"
 #include "progress.h"
 #include "video/video_driver.hpp"
+#include "strings_func.h"
 
 #include "fileio_func.h"
 #include "fios.h"
@@ -43,11 +44,13 @@ GRFTextWrapper::~GRFTextWrapper()
 GRFConfig::GRFConfig(const char *filename) :
 	name(new GRFTextWrapper()),
 	info(new GRFTextWrapper()),
+	url(new GRFTextWrapper()),
 	num_valid_params(lengthof(param))
 {
 	if (filename != NULL) this->filename = strdup(filename);
 	this->name->AddRef();
 	this->info->AddRef();
+	this->url->AddRef();
 }
 
 /**
@@ -59,6 +62,7 @@ GRFConfig::GRFConfig(const GRFConfig &config) :
 	ident(config.ident),
 	name(config.name),
 	info(config.info),
+	url(config.url),
 	version(config.version),
 	min_loadable_version(config.min_loadable_version),
 	flags(config.flags & ~(1 << GCF_COPY)),
@@ -74,6 +78,7 @@ GRFConfig::GRFConfig(const GRFConfig &config) :
 	if (config.filename != NULL) this->filename = strdup(config.filename);
 	this->name->AddRef();
 	this->info->AddRef();
+	this->url->AddRef();
 	if (config.error    != NULL) this->error    = new GRFError(*config.error);
 	for (uint i = 0; i < config.param_info.Length(); i++) {
 		if (config.param_info[i] == NULL) {
@@ -94,6 +99,7 @@ GRFConfig::~GRFConfig()
 	}
 	this->name->Release();
 	this->info->Release();
+	this->url->Release();
 
 	for (uint i = 0; i < this->param_info.Length(); i++) delete this->param_info[i];
 }
@@ -116,6 +122,15 @@ const char *GRFConfig::GetName() const
 const char *GRFConfig::GetDescription() const
 {
 	return GetGRFStringFromGRFText(this->info->text);
+}
+
+/**
+ * Get the grf url.
+ * @return A string with an url of this grf.
+ */
+const char *GRFConfig::GetURL() const
+{
+	return GetGRFStringFromGRFText(this->url->text);
 }
 
 /** Set the default value for all parameters as specified by action14. */
@@ -262,7 +277,7 @@ void GRFParameterInfo::SetValue(struct GRFConfig *config, uint32 value)
 		SB(config->param[this->param_nr], this->first_bit, this->num_bit, value);
 	}
 	config->num_params = max<uint>(config->num_params, this->param_nr + 1);
-	SetWindowClassesDirty(WC_GAME_OPTIONS); // Is always the newgrf window
+	SetWindowDirty(WC_GAME_OPTIONS, WN_GAME_OPTIONS_NEWGRF_STATE);
 }
 
 /**
@@ -634,8 +649,7 @@ void DoScanNewGRFFiles(void *callback)
 	_modal_progress_work_mutex->BeginCritical();
 
 	ClearGRFConfigList(&_all_grfs);
-
-	TarScanner::DoScan();
+	TarScanner::DoScan(TarScanner::NEWGRF);
 
 	DEBUG(grf, 1, "Scanning for NewGRFs");
 	uint num = GRFFileScanner::DoScan();
@@ -674,7 +688,7 @@ void DoScanNewGRFFiles(void *callback)
 
 	/* Yes... these are the NewGRF windows */
 	InvalidateWindowClassesData(WC_SAVELOAD, 0, true);
-	InvalidateWindowData(WC_GAME_OPTIONS, 0, GOID_NEWGRF_RESCANNED, true);
+	InvalidateWindowData(WC_GAME_OPTIONS, WN_GAME_OPTIONS_NEWGRF_STATE, GOID_NEWGRF_RESCANNED, true);
 	if (callback != NULL) ((NewGRFScanCallback*)callback)->OnNewGRFsScanned();
 
 	DeleteWindowByClass(WC_MODAL_PROGRESS);
@@ -830,4 +844,38 @@ static const uint32 OPENTTD_GRAPHICS_BASE_GRF_ID = BSWAP32(0xFF4F5400);
 bool GRFConfig::IsOpenTTDBaseGRF() const
 {
 	return (this->ident.grfid & 0x00FFFFFF) == OPENTTD_GRAPHICS_BASE_GRF_ID;
+}
+
+/**
+ * Search a textfile file next to this NewGRF.
+ * @param type The type of the textfile to search for.
+ * @return The filename for the textfile, \c NULL otherwise.
+ */
+const char *GRFConfig::GetTextfile(TextfileType type) const
+{
+	static const char * const prefixes[] = {
+		"readme",
+		"changelog",
+		"license",
+	};
+	assert_compile(lengthof(prefixes) == TFT_END);
+
+	const char *prefix = prefixes[type];
+
+	if (this->filename == NULL) return NULL;
+
+	static char file_path[MAX_PATH];
+	strecpy(file_path, this->filename, lastof(file_path));
+
+	char *slash = strrchr(file_path, PATHSEPCHAR);
+	if (slash == NULL) return NULL;
+
+	seprintf(slash + 1, lastof(file_path), "%s_%s.txt", prefix, GetCurrentLanguageIsoCode());
+	if (FioCheckFileExists(file_path, NEWGRF_DIR)) return file_path;
+
+	seprintf(slash + 1, lastof(file_path), "%s_%.2s.txt", prefix, GetCurrentLanguageIsoCode());
+	if (FioCheckFileExists(file_path, NEWGRF_DIR)) return file_path;
+
+	seprintf(slash + 1, lastof(file_path), "%s.txt", prefix);
+	return FioCheckFileExists(file_path, NEWGRF_DIR) ? file_path : NULL;
 }

@@ -32,7 +32,7 @@ static bool IsPossibleCrossing(const TileIndex tile, Axis ax)
 	return (IsTileType(tile, MP_RAILWAY) &&
 		GetRailTileType(tile) == RAIL_TILE_NORMAL &&
 		GetTrackBits(tile) == (ax == AXIS_X ? TRACK_BIT_Y : TRACK_BIT_X) &&
-		GetFoundationSlope(tile, NULL) == SLOPE_FLAT);
+		GetFoundationSlope(tile) == SLOPE_FLAT);
 }
 
 /**
@@ -106,7 +106,7 @@ bool HasRoadTypesAvail(const CompanyID company, const RoadTypes rts)
 {
 	RoadTypes avail_roadtypes;
 
-	if (company == OWNER_TOWN || _game_mode == GM_EDITOR || _generating_world) {
+	if (company == OWNER_DEITY || company == OWNER_TOWN || _game_mode == GM_EDITOR || _generating_world) {
 		avail_roadtypes = ROADTYPES_ROAD;
 	} else {
 		Company *c = Company::GetIfValid(company);

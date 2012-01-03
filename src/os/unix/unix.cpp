@@ -14,6 +14,7 @@
 #include "../../openttd.h"
 #include "../../crashlog.h"
 #include "../../core/random_func.hpp"
+#include "../../debug.h"
 
 
 #include <dirent.h>
@@ -28,8 +29,16 @@
 	#define HAS_STATVFS
 #endif
 
+#if defined(OPENBSD) || defined(__NetBSD__) || defined(__FreeBSD__)
+	#define HAS_SYSCTL
+#endif
+
 #ifdef HAS_STATVFS
 #include <sys/statvfs.h>
+#endif
+
+#ifdef HAS_SYSCTL
+#include <sys/sysctl.h>
 #endif
 
 
@@ -318,3 +327,40 @@ void CSleep(int milliseconds)
 		usleep(milliseconds * 1000);
 	#endif
 }
+
+
+#ifndef __APPLE__
+uint GetCPUCoreCount()
+{
+	uint count = 1;
+#ifdef HAS_SYSCTL
+	int ncpu = 0;
+	size_t len = sizeof(ncpu);
+
+	if (sysctlbyname("hw.availcpu", &ncpu, &len, NULL, 0) < 0) {
+		sysctlbyname("hw.ncpu", &ncpu, &len, NULL, 0);
+	}
+
+	if (ncpu > 0) count = ncpu;
+#elif defined(_SC_NPROCESSORS_ONLN)
+	long res = sysconf(_SC_NPROCESSORS_ONLN);
+	if (res > 0) count = res;
+#endif
+
+	return count;
+}
+
+void OSOpenBrowser(const char *url)
+{
+	pid_t child_pid = fork();
+	if (child_pid != 0) return;
+
+	const char *args[3];
+	args[0] = "/usr/bin/xdg-open";
+	args[1] = url;
+	args[2] = NULL;
+	execv(args[0], const_cast<char * const *>(args));
+	DEBUG(misc, 0, "Failed to open url: %s", url);
+	exit(0);
+}
+#endif

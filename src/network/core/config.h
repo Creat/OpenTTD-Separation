@@ -30,7 +30,7 @@ static const uint16 NETWORK_CONTENT_SERVER_PORT   = 3978; ///< The default port 
 static const uint16 NETWORK_CONTENT_MIRROR_PORT   =   80; ///< The default port of the content mirror (TCP)
 static const uint16 NETWORK_DEFAULT_PORT          = 3979; ///< The default port of the game server (TCP & UDP)
 static const uint16 NETWORK_ADMIN_PORT            = 3977; ///< The default port for admin network
-static const uint16 NETWORK_DEFAULT_DEBUGLOG_PORT = 3982; ///< The default port debug-log is sent too (TCP)
+static const uint16 NETWORK_DEFAULT_DEBUGLOG_PORT = 3982; ///< The default port debug-log is sent to (TCP)
 
 static const uint16 SEND_MTU                      = 1460; ///< Number of bytes we can pack in a single packet
 
@@ -48,6 +48,7 @@ static const uint NETWORK_PASSWORD_LENGTH         =   33; ///< The maximum lengt
 static const uint NETWORK_CLIENTS_LENGTH          =  200; ///< The maximum length for the list of clients that controls a company, in bytes including '\0'
 static const uint NETWORK_CLIENT_NAME_LENGTH      =   25; ///< The maximum length of a client's name, in bytes including '\0'
 static const uint NETWORK_RCONCOMMAND_LENGTH      =  500; ///< The maximum length of a rconsole command, in bytes including '\0'
+static const uint NETWORK_GAMESCRIPT_JSON_LENGTH  = 1450; ///< The maximum length of a gamescript json string, in bytes including '\0'
 static const uint NETWORK_CHAT_LENGTH             =  900; ///< The maximum length of a chat message, in bytes including '\0'
 
 static const uint NETWORK_GRF_NAME_LENGTH         =   80; ///< Maximum length of the name of a GRF

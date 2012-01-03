@@ -13,7 +13,7 @@
 #include "heightmap.h"
 #include "clear_map.h"
 #include "void_map.h"
-#include "gui.h"
+#include "error.h"
 #include "saveload/saveload.h"
 #include "bmp.h"
 #include "gfx_func.h"
@@ -24,12 +24,11 @@
 
 /**
  * Convert RGB colours to Grayscale using 29.9% Red, 58.7% Green, 11.4% Blue
- *  (average luminosity formula) -- Dalestan
- * This in fact is the NTSC Colour Space -- TrueLight
+ *  (average luminosity formula, NTSC Colour Space)
  */
 static inline byte RGBToGrayscale(byte red, byte green, byte blue)
 {
-	/* To avoid doubles and stuff, multiple it with a total of 65536 (16bits), then
+	/* To avoid doubles and stuff, multiply it with a total of 65536 (16bits), then
 	 *  divide by it to normalize the value to a byte again. */
 	return ((red * 19595) + (green * 38470) + (blue * 7471)) / 65536;
 }

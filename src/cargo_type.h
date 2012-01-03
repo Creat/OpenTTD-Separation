@@ -7,7 +7,7 @@
  * See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with OpenTTD. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file cargo_type.h Types related to cargos... */
+/** @file cargo_type.h Types related to cargoes... */
 
 #ifndef CARGO_TYPE_H
 #define CARGO_TYPE_H
@@ -65,6 +65,7 @@ enum CargoTypes {
 
 	NUM_CARGO       = 32,   ///< Maximal number of cargo types in a game.
 
+	CT_AUTO_REFIT   = 0xFD, ///< Automatically choose cargo type when doing auto refitting.
 	CT_NO_REFIT     = 0xFE, ///< Do not refit cargo of a vehicle (used in vehicle orders and auto-replace/auto-new).
 	CT_INVALID      = 0xFF, ///< Invalid cargo type.
 };
@@ -76,13 +77,13 @@ private:
 
 public:
 	/** Default constructor. */
-	FORCEINLINE CargoArray()
+	inline CargoArray()
 	{
 		this->Clear();
 	}
 
 	/** Reset all entries. */
-	FORCEINLINE void Clear()
+	inline void Clear()
 	{
 		memset(this->amount, 0, sizeof(this->amount));
 	}
@@ -91,7 +92,7 @@ public:
 	 * Read/write access to an amount of a specific cargo type.
 	 * @param cargo Cargo type to access.
 	 */
-	FORCEINLINE uint &operator[](CargoID cargo)
+	inline uint &operator[](CargoID cargo)
 	{
 		return this->amount[cargo];
 	}
@@ -100,7 +101,7 @@ public:
 	 * Read-only access to an amount of a specific cargo type.
 	 * @param cargo Cargo type to access.
 	 */
-	FORCEINLINE const uint &operator[](CargoID cargo) const
+	inline const uint &operator[](CargoID cargo) const
 	{
 		return this->amount[cargo];
 	}

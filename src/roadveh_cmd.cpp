@@ -27,6 +27,7 @@
 #include "vehicle_func.h"
 #include "sound_func.h"
 #include "ai/ai.hpp"
+#include "game/game.hpp"
 #include "depot_map.h"
 #include "effectvehicle_func.h"
 #include "roadstop_base.h"
@@ -34,6 +35,8 @@
 #include "core/random_func.hpp"
 #include "company_base.h"
 #include "core/backup_type.hpp"
+#include "newgrf.h"
+#include "zoom_func.h"
 
 #include "table/strings.h"
 
@@ -103,13 +106,13 @@ int RoadVehicle::GetDisplayImageWidth(Point *offset) const
 	return this->gcache.cached_veh_length * reference_width / VEHICLE_LENGTH;
 }
 
-static SpriteID GetRoadVehIcon(EngineID engine)
+static SpriteID GetRoadVehIcon(EngineID engine, EngineImageType image_type)
 {
 	const Engine *e = Engine::Get(engine);
 	uint8 spritenum = e->u.road.image_index;
 
 	if (is_custom_sprite(spritenum)) {
-		SpriteID sprite = GetCustomVehicleIcon(engine, DIR_W);
+		SpriteID sprite = GetCustomVehicleIcon(engine, DIR_W, image_type);
 		if (sprite != 0) return sprite;
 
 		spritenum = e->original_image_index;
@@ -118,16 +121,16 @@ static SpriteID GetRoadVehIcon(EngineID engine)
 	return DIR_W + _roadveh_images[spritenum];
 }
 
-SpriteID RoadVehicle::GetImage(Direction direction) const
+SpriteID RoadVehicle::GetImage(Direction direction, EngineImageType image_type) const
 {
 	uint8 spritenum = this->spritenum;
 	SpriteID sprite;
 
 	if (is_custom_sprite(spritenum)) {
-		sprite = GetCustomVehicleSprite(this, (Direction)(direction + 4 * IS_CUSTOM_SECONDHEAD_SPRITE(spritenum)));
+		sprite = GetCustomVehicleSprite(this, (Direction)(direction + 4 * IS_CUSTOM_SECONDHEAD_SPRITE(spritenum)), image_type);
 		if (sprite != 0) return sprite;
 
-		spritenum = Engine::Get(this->engine_type)->original_image_index;
+		spritenum = this->GetEngine()->original_image_index;
 	}
 
 	sprite = direction + _roadveh_images[spritenum];
@@ -146,11 +149,11 @@ SpriteID RoadVehicle::GetImage(Direction direction) const
  * @param engine Engine to draw
  * @param pal Palette to use.
  */
-void DrawRoadVehEngine(int left, int right, int preferred_x, int y, EngineID engine, PaletteID pal)
+void DrawRoadVehEngine(int left, int right, int preferred_x, int y, EngineID engine, PaletteID pal, EngineImageType image_type)
 {
-	SpriteID sprite = GetRoadVehIcon(engine);
+	SpriteID sprite = GetRoadVehIcon(engine, image_type);
 	const Sprite *real_sprite = GetSprite(sprite, ST_NORMAL);
-	preferred_x = Clamp(preferred_x, left - real_sprite->x_offs, right - real_sprite->width - real_sprite->x_offs);
+	preferred_x = Clamp(preferred_x, left - UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI), right - UnScaleByZoom(real_sprite->width, ZOOM_LVL_GUI) - UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI));
 	DrawSprite(sprite, pal, preferred_x, y);
 }
 
@@ -161,10 +164,20 @@ void DrawRoadVehEngine(int left, int right, int preferred_x, int y, EngineID eng
  */
 static uint GetRoadVehLength(const RoadVehicle *v)
 {
+	const Engine *e = v->GetEngine();
 	uint length = VEHICLE_LENGTH;
 
-	uint16 veh_len = GetVehicleCallback(CBID_VEHICLE_LENGTH, 0, 0, v->engine_type, v);
-	if (veh_len != CALLBACK_FAILED) {
+	uint16 veh_len = CALLBACK_FAILED;
+	if (e->GetGRF() != NULL && e->GetGRF()->grf_version >= 8) {
+		/* Use callback 36 */
+		veh_len = GetVehicleProperty(v, PROP_ROADVEH_SHORTEN_FACTOR, CALLBACK_FAILED);
+	} else {
+		/* Use callback 11 */
+		veh_len = GetVehicleCallback(CBID_VEHICLE_LENGTH, 0, 0, v->engine_type, v);
+	}
+	if (veh_len == CALLBACK_FAILED) veh_len = e->u.road.shorten_factor;
+	if (veh_len != 0) {
+		if (veh_len >= VEHICLE_LENGTH) ErrorUnknownCallbackResult(e->GetGRFID(), CBID_VEHICLE_LENGTH, veh_len);
 		length -= Clamp(veh_len, 0, VEHICLE_LENGTH - 1);
 	}
 
@@ -174,9 +187,10 @@ static uint GetRoadVehLength(const RoadVehicle *v)
 /**
  * Update the cache of a road vehicle.
  * @param v Road vehicle needing an update of its cache.
+ * @param same_length should length of vehicles stay the same?
  * @pre \a v must be first road vehicle.
  */
-void RoadVehUpdateCache(RoadVehicle *v)
+void RoadVehUpdateCache(RoadVehicle *v, bool same_length)
 {
 	assert(v->type == VEH_ROAD);
 	assert(v->IsFrontEngine());
@@ -193,7 +207,11 @@ void RoadVehUpdateCache(RoadVehicle *v)
 		u->gcache.first_engine = (v == u) ? INVALID_ENGINE : v->engine_type;
 
 		/* Update the length of the vehicle. */
-		u->gcache.cached_veh_length = GetRoadVehLength(u);
+		uint veh_len = GetRoadVehLength(u);
+		/* Verify length hasn't changed. */
+		if (same_length && veh_len != u->gcache.cached_veh_length) VehicleLengthChanged(u);
+
+		u->gcache.cached_veh_length = veh_len;
 		v->gcache.cached_total_length += u->gcache.cached_veh_length;
 
 		/* Update visual effect */
@@ -236,7 +254,7 @@ CommandCost CmdBuildRoadVehicle(TileIndex tile, DoCommandFlag flags, const Engin
 		int y = TileY(tile) * TILE_SIZE + TILE_SIZE / 2;
 		v->x_pos = x;
 		v->y_pos = y;
-		v->z_pos = GetSlopeZ(x, y);
+		v->z_pos = GetSlopePixelZ(x, y);
 
 		v->state = RVSB_IN_DEPOT;
 		v->vehstatus = VS_HIDDEN | VS_STOPPED | VS_DEFPAL;
@@ -274,7 +292,7 @@ CommandCost CmdBuildRoadVehicle(TileIndex tile, DoCommandFlag flags, const Engin
 
 		/* Call various callbacks after the whole consist has been constructed */
 		for (RoadVehicle *u = v; u != NULL; u = u->Next()) {
-			u->cargo_cap = GetVehicleCapacity(u);
+			u->cargo_cap = u->GetEngine()->DetermineCapacity(u);
 			v->InvalidateNewGRFCache();
 			u->InvalidateNewGRFCache();
 		}
@@ -282,7 +300,7 @@ CommandCost CmdBuildRoadVehicle(TileIndex tile, DoCommandFlag flags, const Engin
 		/* Initialize cached values for realistic acceleration. */
 		if (_settings_game.vehicle.roadveh_acceleration_model != AM_ORIGINAL) v->CargoChanged();
 
-		VehicleMove(v, false);
+		VehicleUpdatePosition(v);
 
 		CheckConsistencyOfArticulatedVehicle(v);
 	}
@@ -398,7 +416,7 @@ void RoadVehicle::UpdateDeltaXY(Direction direction)
  * Calculates the maximum speed of the vehicle under its current conditions.
  * @return Maximum speed of the vehicle.
  */
-FORCEINLINE int RoadVehicle::GetCurrentMaxSpeed() const
+inline int RoadVehicle::GetCurrentMaxSpeed() const
 {
 	if (_settings_game.vehicle.roadveh_acceleration_model == AM_ORIGINAL) return this->vcache.cached_max_speed;
 
@@ -503,7 +521,8 @@ static void RoadVehCrash(RoadVehicle *v)
 {
 	uint pass = v->Crash();
 
-	AI::NewEvent(v->owner, new AIEventVehicleCrashed(v->index, v->tile, AIEventVehicleCrashed::CRASH_RV_LEVEL_CROSSING));
+	AI::NewEvent(v->owner, new ScriptEventVehicleCrashed(v->index, v->tile, ScriptEventVehicleCrashed::CRASH_RV_LEVEL_CROSSING));
+	Game::NewEvent(new ScriptEventVehicleCrashed(v->index, v->tile, ScriptEventVehicleCrashed::CRASH_RV_LEVEL_CROSSING));
 
 	SetDParam(0, pass);
 	AddVehicleNewsItem(
@@ -651,7 +670,8 @@ static void RoadVehArrivesAt(const RoadVehicle *v, Station *st)
 				v->index,
 				st->index
 			);
-			AI::NewEvent(v->owner, new AIEventStationFirstVehicle(st->index, v->index));
+			AI::NewEvent(v->owner, new ScriptEventStationFirstVehicle(st->index, v->index));
+			Game::NewEvent(new ScriptEventStationFirstVehicle(st->index, v->index));
 		}
 	} else {
 		/* Check if station was ever visited before */
@@ -664,7 +684,8 @@ static void RoadVehArrivesAt(const RoadVehicle *v, Station *st)
 				v->index,
 				st->index
 			);
-			AI::NewEvent(v->owner, new AIEventStationFirstVehicle(st->index, v->index));
+			AI::NewEvent(v->owner, new ScriptEventStationFirstVehicle(st->index, v->index));
+			Game::NewEvent(new ScriptEventStationFirstVehicle(st->index, v->index));
 		}
 	}
 }
@@ -966,6 +987,7 @@ static bool RoadVehLeaveDepot(RoadVehicle *v, bool first)
 
 	v->x_pos = x;
 	v->y_pos = y;
+	VehicleUpdatePosition(v);
 	v->UpdateInclination(true, true);
 
 	InvalidateWindowData(WC_VEHICLE_DEPOT, v->tile);
@@ -1100,13 +1122,15 @@ static bool IndividualRoadVehicleController(RoadVehicle *v, const RoadVehicle *p
 			/* Vehicle has just entered a bridge or tunnel */
 			v->x_pos = gp.x;
 			v->y_pos = gp.y;
+			VehicleUpdatePosition(v);
 			v->UpdateInclination(true, true);
 			return true;
 		}
 
 		v->x_pos = gp.x;
 		v->y_pos = gp.y;
-		VehicleMove(v, !(v->vehstatus & VS_HIDDEN));
+		VehicleUpdatePosition(v);
+		if ((v->vehstatus & VS_HIDDEN) == 0) VehicleUpdateViewport(v, true);
 		return true;
 	}
 
@@ -1255,6 +1279,7 @@ again:
 		}
 		v->x_pos = x;
 		v->y_pos = y;
+		VehicleUpdatePosition(v);
 		RoadZPosAffectSpeed(v, v->UpdateInclination(true, true));
 		return true;
 	}
@@ -1320,6 +1345,7 @@ again:
 
 		v->x_pos = x;
 		v->y_pos = y;
+		VehicleUpdatePosition(v);
 		RoadZPosAffectSpeed(v, v->UpdateInclination(true, true));
 		return true;
 	}
@@ -1408,6 +1434,7 @@ again:
 					v->frame++;
 					v->x_pos = x;
 					v->y_pos = y;
+					VehicleUpdatePosition(v);
 					RoadZPosAffectSpeed(v, v->UpdateInclination(true, false));
 					return true;
 				}
@@ -1436,7 +1463,7 @@ again:
 		if (IsStandardRoadStopTile(v->tile)) rs->SetEntranceBusy(true);
 
 		StartRoadVehSound(v);
-		SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
+		SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, WID_VV_START_STOP);
 	}
 
 	/* Check tile position conditions - i.e. stop position in depot,
@@ -1456,6 +1483,7 @@ again:
 	if (!HasBit(r, VETS_ENTERED_WORMHOLE)) v->frame++;
 	v->x_pos = x;
 	v->y_pos = y;
+	VehicleUpdatePosition(v);
 	RoadZPosAffectSpeed(v, v->UpdateInclination(false, true));
 	return true;
 }
@@ -1527,13 +1555,13 @@ static bool RoadVehController(RoadVehicle *v)
 
 Money RoadVehicle::GetRunningCost() const
 {
-	const Engine *e = Engine::Get(this->engine_type);
+	const Engine *e = this->GetEngine();
 	if (e->u.road.running_cost_class == INVALID_PRICE) return 0;
 
 	uint cost_factor = GetVehicleProperty(this, PROP_ROADVEH_RUNNING_COST_FACTOR, e->u.road.running_cost);
 	if (cost_factor == 0) return 0;
 
-	return GetPrice(e->u.road.running_cost_class, cost_factor, e->grf_prop.grffile);
+	return GetPrice(e->u.road.running_cost_class, cost_factor, e->GetGRF());
 }
 
 bool RoadVehicle::Tick()
@@ -1570,7 +1598,7 @@ static void CheckIfRoadVehNeedsService(RoadVehicle *v)
 			 * suddenly moved farther away, we continue our normal
 			 * schedule? */
 			v->current_order.MakeDummy();
-			SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
+			SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, WID_VV_START_STOP);
 		}
 		return;
 	}
@@ -1586,7 +1614,7 @@ static void CheckIfRoadVehNeedsService(RoadVehicle *v)
 	SetBit(v->gv_flags, GVF_SUPPRESS_IMPLICIT_ORDERS);
 	v->current_order.MakeGoToDepot(depot, ODTFB_SERVICE);
 	v->dest_tile = rfdd.tile;
-	SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, VVW_WIDGET_START_STOP_VEH);
+	SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, WID_VV_START_STOP);
 }
 
 void RoadVehicle::OnNewDay()

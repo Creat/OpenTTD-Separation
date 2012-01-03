@@ -702,6 +702,8 @@ NetworkRecvStatus ServerNetworkGameSocketHandler::SendCommand(const CommandPacke
  */
 NetworkRecvStatus ServerNetworkGameSocketHandler::SendChat(NetworkAction action, ClientID client_id, bool self_send, const char *msg, int64 data)
 {
+	if (this->status != STATUS_ACTIVE) return NETWORK_RECV_STATUS_OKAY;
+
 	Packet *p = new Packet(PACKET_SERVER_CHAT);
 
 	p->Send_uint8 (action);
@@ -1643,8 +1645,7 @@ static void NetworkAutoCleanCompanies()
 			/* Is the company empty for autoclean_unprotected-months, and is there no protection? */
 			if (_settings_client.network.autoclean_unprotected != 0 && _network_company_states[c->index].months_empty > _settings_client.network.autoclean_unprotected && StrEmpty(_network_company_states[c->index].password)) {
 				/* Shut the company down */
-				DoCommandP(0, 2 | c->index << 16, 0, CMD_COMPANY_CTRL);
-				NetworkAdminCompanyRemove(c->index, ADMIN_CRR_AUTOCLEAN);
+				DoCommandP(0, 2 | c->index << 16, CRR_AUTOCLEAN, CMD_COMPANY_CTRL);
 				IConsolePrintF(CC_DEFAULT, "Auto-cleaned company #%d with no password", c->index + 1);
 			}
 			/* Is the company empty for autoclean_protected-months, and there is a protection? */
@@ -1658,8 +1659,7 @@ static void NetworkAutoCleanCompanies()
 			/* Is the company empty for autoclean_novehicles-months, and has no vehicles? */
 			if (_settings_client.network.autoclean_novehicles != 0 && _network_company_states[c->index].months_empty > _settings_client.network.autoclean_novehicles && vehicles_in_company[c->index] == 0) {
 				/* Shut the company down */
-				DoCommandP(0, 2 | c->index << 16, 0, CMD_COMPANY_CTRL);
-				NetworkAdminCompanyRemove(c->index, ADMIN_CRR_AUTOCLEAN);
+				DoCommandP(0, 2 | c->index << 16, CRR_AUTOCLEAN, CMD_COMPANY_CTRL);
 				IConsolePrintF(CC_DEFAULT, "Auto-cleaned company #%d with no vehicles", c->index + 1);
 			}
 		} else {

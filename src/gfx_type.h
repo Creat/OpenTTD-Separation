@@ -165,6 +165,7 @@ enum FontSize {
 	FS_NORMAL, ///< Index of the normal font in the font tables.
 	FS_SMALL,  ///< Index of the small font in the font tables.
 	FS_LARGE,  ///< Index of the large font in the font tables.
+	FS_MONO,   ///< Index of the monospaced font in the font tables.
 	FS_END,
 
 	FS_BEGIN = FS_NORMAL, ///< First font.
@@ -264,5 +265,12 @@ enum SpriteType {
 
 /** The number of milliseconds per game tick. */
 static const uint MILLISECONDS_PER_TICK = 30;
+
+/** Information about the currently used palette. */
+struct Palette {
+	Colour palette[256]; ///< Current palette. Entry 0 has to be always fully transparent!
+	int first_dirty;     ///< The first dirty element.
+	int count_dirty;     ///< The number of dirty elements.
+};
 
 #endif /* GFX_TYPE_H */

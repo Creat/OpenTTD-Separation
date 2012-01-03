@@ -20,7 +20,7 @@
 #include "saveload/saveload.h"
 #include "company_func.h"
 #include "strings_func.h"
-#include "gui.h"
+#include "error.h"
 #include "window_gui.h"
 #include "window_func.h"
 #include "tile_map.h"
@@ -275,7 +275,7 @@ static bool MakePNGImage(const char *name, ScreenshotCallback *callb, void *user
 	f = fopen(name, "wb");
 	if (f == NULL) return false;
 
-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, (void *)name, png_my_error, png_my_warning);
+	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, const_cast<char *>(name), png_my_error, png_my_warning);
 
 	if (png_ptr == NULL) {
 		fclose(f);
@@ -327,9 +327,7 @@ static bool MakePNGImage(const char *name, ScreenshotCallback *callb, void *user
 		if (c->ai_info == NULL) {
 			p += seprintf(p, lastof(buf), "%2i: Human\n", (int)c->index);
 		} else {
-#ifdef ENABLE_AI
 			p += seprintf(p, lastof(buf), "%2i: %s (v%d)\n", (int)c->index, c->ai_info->GetName(), c->ai_info->GetVersion());
-#endif /* ENABLE_AI */
 		}
 	}
 	text[1].key = const_cast<char *>("Description");
@@ -727,28 +725,28 @@ static bool MakeSmallScreenshot()
 {
 	const ScreenshotFormat *sf = _screenshot_formats + _cur_screenshot_format;
 	return sf->proc(MakeScreenshotName(SCREENSHOT_NAME, sf->extension), CurrentScreenCallback, NULL, _screen.width, _screen.height,
-			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
+			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette.palette);
 }
 
 /** Make a zoomed-in screenshot of the currently visible area. */
-static bool MakeZoomedInScreenshot()
+static bool MakeZoomedInScreenshot(ZoomLevel zl)
 {
 	Window *w = FindWindowById(WC_MAIN_WINDOW, 0);
 	ViewPort vp;
 
-	vp.zoom = ZOOM_LVL_WORLD_SCREENSHOT;
+	vp.zoom = zl;
 	vp.left = w->viewport->left;
 	vp.top = w->viewport->top;
 	vp.virtual_left = w->viewport->virtual_left;
 	vp.virtual_top = w->viewport->virtual_top;
 	vp.virtual_width = w->viewport->virtual_width;
-	vp.width = vp.virtual_width;
+	vp.width = UnScaleByZoom(vp.virtual_width, vp.zoom);
 	vp.virtual_height = w->viewport->virtual_height;
-	vp.height = vp.virtual_height;
+	vp.height = UnScaleByZoom(vp.virtual_height, vp.zoom);
 
 	const ScreenshotFormat *sf = _screenshot_formats + _cur_screenshot_format;
 	return sf->proc(MakeScreenshotName(SCREENSHOT_NAME, sf->extension), LargeWorldCallback, &vp, vp.width, vp.height,
-			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
+			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette.palette);
 }
 
 /** Make a screenshot of the whole map. */
@@ -758,15 +756,15 @@ static bool MakeWorldScreenshot()
 	const ScreenshotFormat *sf;
 
 	/* We need to account for a hill or high building at tile 0,0. */
-	int extra_height_top = TileHeight(0) * TILE_HEIGHT + 150;
+	int extra_height_top = TilePixelHeight(0) + 150;
 	/* If there is a hill at the bottom don't create a large black area. */
-	int reclaim_height_bottom = TileHeight(MapSize() - 1) * TILE_HEIGHT;
+	int reclaim_height_bottom = TilePixelHeight(MapSize() - 1);
 
 	vp.zoom = ZOOM_LVL_WORLD_SCREENSHOT;
 	vp.left = 0;
 	vp.top = 0;
-	vp.virtual_left = -(int)MapMaxX() * TILE_PIXELS;
-	vp.virtual_top = -extra_height_top;
+	vp.virtual_left = -(int)MapMaxX() * TILE_PIXELS * ZOOM_LVL_BASE;
+	vp.virtual_top = -extra_height_top * ZOOM_LVL_BASE;
 	vp.virtual_width = (MapMaxX() + MapMaxY()) * TILE_PIXELS;
 	vp.width = vp.virtual_width;
 	vp.virtual_height = ((MapMaxX() + MapMaxY()) * TILE_PIXELS >> 1) + extra_height_top - reclaim_height_bottom;
@@ -774,7 +772,7 @@ static bool MakeWorldScreenshot()
 
 	sf = _screenshot_formats + _cur_screenshot_format;
 	return sf->proc(MakeScreenshotName(SCREENSHOT_NAME, sf->extension), LargeWorldCallback, &vp, vp.width, vp.height,
-			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette);
+			BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth(), _cur_palette.palette);
 }
 
 /**
@@ -847,7 +845,11 @@ bool MakeScreenshot(ScreenshotType t, const char *name)
 			break;
 
 		case SC_ZOOMEDIN:
-			ret = MakeZoomedInScreenshot();
+			ret = MakeZoomedInScreenshot(_settings_client.gui.zoom_min);
+			break;
+
+		case SC_DEFAULTZOOM:
+			ret = MakeZoomedInScreenshot(ZOOM_LVL_VIEWPORT);
 			break;
 
 		case SC_WORLD:

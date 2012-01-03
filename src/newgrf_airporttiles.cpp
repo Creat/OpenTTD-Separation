@@ -112,14 +112,15 @@ static const SpriteGroup *AirportTileResolveReal(const ResolverObject *object, c
  * @param parameter from callback. It's in fact a pair of coordinates
  * @param tile TileIndex from which the callback was initiated
  * @param index of the industry been queried for
+ * @param grf_version8 True, if we are dealing with a new NewGRF which uses GRF version >= 8.
  * @return a construction of bits obeying the newgrf format
  */
-uint32 GetNearbyAirportTileInformation(byte parameter, TileIndex tile, StationID index)
+static uint32 GetNearbyAirportTileInformation(byte parameter, TileIndex tile, StationID index, bool grf_version8)
 {
 	if (parameter != 0) tile = GetNearbyTile(parameter, tile); // only perform if it is required
 	bool is_same_airport = (IsTileType(tile, MP_STATION) && IsAirport(tile) && GetStationIndex(tile) == index);
 
-	return GetNearbyTileInformation(tile) | (is_same_airport ? 1 : 0) << 8;
+	return GetNearbyTileInformation(tile, grf_version8) | (is_same_airport ? 1 : 0) << 8;
 }
 
 
@@ -166,7 +167,7 @@ static uint32 GetAirportTileIDAtOffset(TileIndex tile, const Station *st, uint32
 	return 0xFF << 8 | ats->grf_prop.subst_id; // so just give him the substitute
 }
 
-static uint32 AirportTileGetVariable(const ResolverObject *object, byte variable, byte parameter, bool *available)
+static uint32 AirportTileGetVariable(const ResolverObject *object, byte variable, uint32 parameter, bool *available)
 {
 	const Station *st = object->u.airport.st;
 	TileIndex tile    = object->u.airport.tile;
@@ -194,7 +195,7 @@ static uint32 AirportTileGetVariable(const ResolverObject *object, byte variable
 		case 0x44: return GetAnimationFrame(tile);
 
 		/* Land info of nearby tiles */
-		case 0x60: return GetNearbyAirportTileInformation(parameter, tile, st->index);
+		case 0x60: return GetNearbyAirportTileInformation(parameter, tile, st->index, object->grffile->grf_version >= 8);
 
 		/* Animation stage of nearby tiles */
 		case 0x61:
@@ -243,7 +244,7 @@ static void AirportTileResolver(ResolverObject *res, const AirportTileSpec *ats,
 	res->grffile         = ats->grf_prop.grffile;
 }
 
-uint16 GetAirportTileCallback(CallbackID callback, uint32 param1, uint32 param2, const AirportTileSpec *ats, Station *st, TileIndex tile)
+uint16 GetAirportTileCallback(CallbackID callback, uint32 param1, uint32 param2, const AirportTileSpec *ats, Station *st, TileIndex tile, int extra_data = 0)
 {
 	ResolverObject object;
 	const SpriteGroup *group;
@@ -287,7 +288,7 @@ bool DrawNewAirportTile(TileInfo *ti, Station *st, StationGfx gfx, const Airport
 		if (HasBit(airts->callback_mask, CBM_AIRT_DRAW_FOUNDATIONS)) {
 			/* Called to determine the type (if any) of foundation to draw */
 			uint32 callback_res = GetAirportTileCallback(CBID_AIRPTILE_DRAW_FOUNDATIONS, 0, 0, airts, st, ti->tile);
-			draw_old_one = (callback_res != 0);
+			if (callback_res != CALLBACK_FAILED) draw_old_one = ConvertBooleanCallback(airts->grf_prop.grffile, CBID_AIRPTILE_DRAW_FOUNDATIONS, callback_res);
 		}
 
 		if (draw_old_one) DrawFoundation(ti, FOUNDATION_LEVELED);
@@ -306,7 +307,7 @@ bool DrawNewAirportTile(TileInfo *ti, Station *st, StationGfx gfx, const Airport
 }
 
 /** Helper class for animation control. */
-struct AirportTileAnimationBase : public AnimationBase<AirportTileAnimationBase, AirportTileSpec, Station, GetAirportTileCallback> {
+struct AirportTileAnimationBase : public AnimationBase<AirportTileAnimationBase, AirportTileSpec, Station, int, GetAirportTileCallback> {
 	static const CallbackID cb_animation_speed      = CBID_AIRPTILE_ANIMATION_SPEED;
 	static const CallbackID cb_animation_next_frame = CBID_AIRPTILE_ANIM_NEXT_FRAME;
 

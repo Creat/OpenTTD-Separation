@@ -12,8 +12,6 @@
 #ifndef VIDEO_COCOA_H
 #define VIDEO_COCOA_H
 
-#include <AvailabilityMacros.h>
-
 #include "../video_driver.hpp"
 
 class VideoDriver_Cocoa: public VideoDriver {
@@ -46,6 +44,11 @@ public:
 	 * @return Whether changing the screen mode was successful
 	 */
 	/* virtual */ bool ToggleFullscreen(bool fullscreen);
+
+	/** Callback invoked after the blitter was changed.
+	 * @return True if no error.
+	 */
+	/* virtual */ bool AfterBlitterChange();
 
 	/** Return driver name
 	 * @return driver name
@@ -123,7 +126,7 @@ public:
 	 * @param h New window height
 	 * @return Whether change was successful
 	 */
-	virtual bool ChangeResolution(int w, int h) = 0;
+	virtual bool ChangeResolution(int w, int h, int bpp) = 0;
 
 	/** Are we in fullscreen mode
 	 * @return whether fullscreen mode is currently used

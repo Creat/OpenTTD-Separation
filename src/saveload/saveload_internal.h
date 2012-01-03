@@ -27,9 +27,11 @@ void MoveWaypointsToBaseStations();
 const SaveLoad *GetBaseStationDescription();
 
 void AfterLoadVehicles(bool part_of_load);
+void FixupTrainLengths();
 void AfterLoadStations();
 void AfterLoadRoadStops();
 void AfterLoadLabelMaps();
+void AfterLoadCompanyStats();
 void UpdateHousesAndTowns();
 
 void UpdateOldAircraft();

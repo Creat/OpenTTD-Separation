@@ -99,8 +99,12 @@ Station::~Station()
 	/* Clear the persistent storage. */
 	delete this->airport.psa;
 
-
-	InvalidateWindowData(WC_STATION_LIST, this->owner, 0);
+	if (this->owner == OWNER_NONE) {
+		/* Invalidate all in case of oil rigs. */
+		InvalidateWindowClassesData(WC_STATION_LIST, 0);
+	} else {
+		InvalidateWindowData(WC_STATION_LIST, this->owner, 0);
+	}
 
 	DeleteWindowById(WC_STATION_VIEW, index);
 
@@ -518,4 +522,23 @@ StationRect& StationRect::operator = (const Rect &src)
 	this->right = src.right;
 	this->bottom = src.bottom;
 	return *this;
+}
+
+/**
+ * Calculates the maintenance cost of all airports of a company.
+ * @param owner Company.
+ * @return Total cost.
+ */
+Money AirportMaintenanceCost(Owner owner)
+{
+	Money total_cost = 0;
+
+	const Station *st;
+	FOR_ALL_STATIONS(st) {
+		if (st->owner == owner && (st->facilities & FACIL_AIRPORT)) {
+			total_cost += _price[PR_INFRASTRUCTURE_AIRPORT] * st->airport.GetSpec()->maintenance_cost;
+		}
+	}
+	/* 3 bits fraction for the maintenance cost factor. */
+	return total_cost >> 3;
 }

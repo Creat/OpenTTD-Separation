@@ -17,6 +17,7 @@
 #include "video/video_driver.hpp"
 
 #include "fontcache.h"
+#include "error.h"
 #include "gui.h"
 #include "sound_func.h"
 #include "window_func.h"
@@ -61,6 +62,8 @@
 #include "hotkeys.h"
 #include "newgrf.h"
 #include "misc/getoptdata.h"
+#include "game/game.hpp"
+#include "game/game_config.hpp"
 
 
 #include "town.h"
@@ -70,15 +73,13 @@
 
 #include "table/strings.h"
 
-/** Error message to show when switching modes. */
-StringID _switch_mode_errorstr;
-
 void CallLandscapeTick();
 void IncreaseDate();
 void DoPaletteAnimations();
 void MusicLoop();
 void ResetMusic();
 void CallWindowTickEvent();
+bool HandleBootstrap();
 
 extern void SetDifficultyLevel(int mode, DifficultySettings *gm_opt);
 extern Company *DoStartupNewCompany(bool is_ai, CompanyID company = INVALID_COMPANY);
@@ -179,6 +180,7 @@ static void ShowHelp()
 		"  -M music_set        = Force the music set (see below)\n"
 		"  -c config_file      = Use 'config_file' instead of 'openttd.cfg'\n"
 		"  -x                  = Do not automatically save to config file on exit\n"
+		"  -q savegame         = Write some information about the savegame and exit\n"
 		"\n",
 		lastof(buf)
 	);
@@ -199,10 +201,52 @@ static void ShowHelp()
 	p = BlitterFactoryBase::GetBlittersInfo(p, lastof(buf));
 
 	/* We need to initialize the AI, so it finds the AIs */
-	TarScanner::DoScan();
 	AI::Initialize();
 	p = AI::GetConsoleList(p, lastof(buf), true);
 	AI::Uninitialize(true);
+
+	/* We need to initialize the GameScript, so it finds the GSs */
+	Game::Initialize();
+	p = Game::GetConsoleList(p, lastof(buf), true);
+	Game::Uninitialize(true);
+
+	/* ShowInfo put output to stderr, but version information should go
+	 * to stdout; this is the only exception */
+#if !defined(WIN32) && !defined(WIN64)
+	printf("%s\n", buf);
+#else
+	ShowInfo(buf);
+#endif
+}
+
+static void WriteSavegameInfo(const char *name)
+{
+	extern uint16 _sl_version;
+	uint32 last_ottd_rev = 0;
+	byte ever_modified = 0;
+	bool removed_newgrfs = false;
+
+	GamelogInfo(_load_check_data.gamelog_action, _load_check_data.gamelog_actions, &last_ottd_rev, &ever_modified, &removed_newgrfs);
+
+	char buf[8192];
+	char *p = buf;
+	p += seprintf(p, lastof(buf), "Name:         %s\n", name);
+	p += seprintf(p, lastof(buf), "Savegame ver: %d\n", _sl_version);
+	p += seprintf(p, lastof(buf), "NewGRF ver:   0x%08X\n", last_ottd_rev);
+	p += seprintf(p, lastof(buf), "Modified:     %d\n", ever_modified);
+
+	if (removed_newgrfs) {
+		p += seprintf(p, lastof(buf), "NewGRFs have been removed\n");
+	}
+
+	p = strecpy(p, "NewGRFs:\n", lastof(buf));
+	if (_load_check_data.HasNewGrfs()) {
+		for (GRFConfig *c = _load_check_data.grfconfig; c != NULL; c = c->next) {
+			char md5sum[33];
+			md5sumToString(md5sum, lastof(md5sum), HasBit(c->flags, GCF_COMPATIBLE) ? c->original_md5sum : c->ident.md5sum);
+			p += seprintf(p, lastof(buf), "%08X %s %s\n", c->ident.grfid, md5sum, c->filename);
+		}
+	}
 
 	/* ShowInfo put output to stderr, but version information should go
 	 * to stdout; this is the only exception */
@@ -247,8 +291,9 @@ static void ShutdownGame()
 
 	UnInitWindowSystem();
 
-	/* stop the AI */
+	/* stop the scripts */
 	AI::Uninitialize(false);
+	Game::Uninitialize(false);
 
 	/* Uninitialize variables that are allocated dynamically */
 	GamelogReset();
@@ -259,10 +304,13 @@ static void ShutdownGame()
 
 	PoolBase::Clean(PT_ALL);
 
-	ResetNewGRFData();
+	/* No NewGRFs were loaded when it was still bootstrapping. */
+	if (_game_mode != GM_BOOTSTRAP) ResetNewGRFData();
 
 	/* Close all and any open filehandles */
 	FioCloseAll();
+
+	UninitFreeType();
 }
 
 /**
@@ -292,7 +340,7 @@ static void LoadIntroGame(bool load_newgrfs = true)
 	_cursor.fix_at = false;
 
 	CheckForMissingSprites();
-	CheckForMissingGlyphsInLoadedLanguagePack();
+	CheckForMissingGlyphs();
 
 	/* Play main theme */
 	if (_music_driver->IsSongPlaying()) ResetMusic();
@@ -300,27 +348,39 @@ static void LoadIntroGame(bool load_newgrfs = true)
 
 void MakeNewgameSettingsLive()
 {
-#ifdef ENABLE_AI
 	for (CompanyID c = COMPANY_FIRST; c < MAX_COMPANIES; c++) {
 		if (_settings_game.ai_config[c] != NULL) {
 			delete _settings_game.ai_config[c];
 		}
 	}
-#endif /* ENABLE_AI */
+	if (_settings_game.game_config != NULL) {
+		delete _settings_game.game_config;
+	}
 
 	/* Copy newgame settings to active settings.
 	 * Also initialise old settings needed for savegame conversion. */
 	_settings_game = _settings_newgame;
 	_old_vds = _settings_client.company.vehicle;
 
-#ifdef ENABLE_AI
 	for (CompanyID c = COMPANY_FIRST; c < MAX_COMPANIES; c++) {
 		_settings_game.ai_config[c] = NULL;
 		if (_settings_newgame.ai_config[c] != NULL) {
 			_settings_game.ai_config[c] = new AIConfig(_settings_newgame.ai_config[c]);
 		}
 	}
-#endif /* ENABLE_AI */
+	_settings_game.game_config = NULL;
+	if (_settings_newgame.game_config != NULL) {
+		_settings_game.game_config = new GameConfig(_settings_newgame.game_config);
+	}
+}
+
+void OpenBrowser(const char *url)
+{
+	/* Make sure we only accept urls that are sure to open a browser. */
+	if (strstr(url, "http://") != url && strstr(url, "https://") != url) return;
+
+	extern void OSOpenBrowser(const char *url);
+	OSOpenBrowser(url);
 }
 
 /** Callback structure of statements to be executed after the NewGRF scan. */
@@ -332,11 +392,19 @@ struct AfterNewGRFScan : NewGRFScanCallback {
 	char *network_conn;                ///< Information about the server to connect to, or NULL.
 	const char *join_server_password;  ///< The password to join the server with.
 	const char *join_company_password; ///< The password to join the company with.
+	bool *save_config_ptr;             ///< The pointer to the save config setting.
+	bool save_config;                  ///< The save config setting.
 
-	AfterNewGRFScan() :
+	/**
+	 * Create a new callback.
+	 * @param save_config_ptr Pointer to the save_config local variable which
+	 *                        decides whether to save of exit or not.
+	 */
+	AfterNewGRFScan(bool *save_config_ptr) :
 			startyear(INVALID_YEAR), generation_seed(GENERATE_NEW_SEED),
 			dedicated_host(NULL), dedicated_port(0), network_conn(NULL),
-			join_server_password(NULL), join_company_password(NULL)
+			join_server_password(NULL), join_company_password(NULL),
+			save_config_ptr(save_config_ptr), save_config(true)
 	{
 	}
 
@@ -344,9 +412,28 @@ struct AfterNewGRFScan : NewGRFScanCallback {
 	{
 		ResetGRFConfig(false);
 
+		TarScanner::DoScan(TarScanner::SCENARIO);
+
+		AI::Initialize();
+		Game::Initialize();
+
+		/* We want the new (correct) NewGRF count to survive the loading. */
+		uint last_newgrf_count = _settings_client.gui.last_newgrf_count;
+		LoadFromConfig();
+		_settings_client.gui.last_newgrf_count = last_newgrf_count;
+		/* Since the default for the palette might have changed due to
+		 * reading the configuration file, recalculate that now. */
+		UpdateNewGRFConfigPalette();
+
+		Game::Uninitialize(true);
+		AI::Uninitialize(true);
 		CheckConfig();
 		LoadFromHighScore();
 		LoadHotkeysFromConfig();
+
+		/* We have loaded the config, so we may possibly save it. */
+		*save_config_ptr = save_config;
+
 
 		if (startyear != INVALID_YEAR) _settings_newgame.game_creation.starting_year = startyear;
 		if (generation_seed != GENERATE_NEW_SEED) _settings_newgame.game_creation.generation_seed = generation_seed;
@@ -361,7 +448,6 @@ struct AfterNewGRFScan : NewGRFScanCallback {
 
 		/* initialize the ingame console */
 		IConsoleInit();
-		_cursor.in_window = true;
 		InitializeGUI();
 		IConsoleCmdExec("exec scripts/autoexec.scr 0");
 
@@ -432,6 +518,7 @@ static const OptionData _options[] = {
 	 GETOPT_SHORT_VALUE('G'),
 	 GETOPT_SHORT_VALUE('c'),
 	 GETOPT_SHORT_NOVAL('x'),
+	 GETOPT_SHORT_VALUE('q'),
 	 GETOPT_SHORT_NOVAL('h'),
 	GETOPT_END()
 };
@@ -447,8 +534,9 @@ int ttd_main(int argc, char *argv[])
 	char *sounds_set = NULL;
 	char *music_set = NULL;
 	Dimension resolution = {0, 0};
-	bool save_config = true;
-	AfterNewGRFScan *scanner = new AfterNewGRFScan();
+	/* AfterNewGRFScan sets save_config to true after scanning completed. */
+	bool save_config = false;
+	AfterNewGRFScan *scanner = new AfterNewGRFScan(&save_config);
 #if defined(ENABLE_NETWORK)
 	bool dedicated = false;
 	char *debuglog_conn = NULL;
@@ -459,7 +547,6 @@ int ttd_main(int argc, char *argv[])
 
 	_game_mode = GM_MENU;
 	_switch_mode = SM_MENU;
-	_switch_mode_errorstr = INVALID_STRING_ID;
 	_config_file = NULL;
 
 	GetOptData mgo(argc - 1, argv + 1, _options);
@@ -542,9 +629,33 @@ int ttd_main(int argc, char *argv[])
 				scanner->generation_seed = InteractiveRandom();
 			}
 			break;
+		case 'q': {
+			DeterminePaths(argv[0]);
+			if (StrEmpty(mgo.opt)) return 1;
+			char title[80];
+			title[0] = '\0';
+			FiosGetSavegameListCallback(SLD_LOAD_GAME, mgo.opt, strrchr(mgo.opt, '.'), title, lastof(title));
+
+			_load_check_data.Clear();
+			SaveOrLoadResult res = SaveOrLoad(mgo.opt, SL_LOAD_CHECK, SAVE_DIR, false);
+			if (res != SL_OK || _load_check_data.HasErrors()) {
+				fprintf(stderr, "Failed to open savegame\n");
+				if (_load_check_data.HasErrors()) {
+					char buf[256];
+					SetDParamStr(0, _load_check_data.error_data);
+					GetString(buf, _load_check_data.error, lastof(buf));
+					fprintf(stderr, "%s\n", buf);
+				}
+				return 1;
+			}
+
+			WriteSavegameInfo(title);
+
+			return 0;
+		}
 		case 'G': scanner->generation_seed = atoi(mgo.opt); break;
 		case 'c': _config_file = strdup(mgo.opt); break;
-		case 'x': save_config = false; break;
+		case 'x': scanner->save_config = false; break;
 		case 'h':
 			i = -2; // Force printing of help.
 			break;
@@ -559,6 +670,7 @@ int ttd_main(int argc, char *argv[])
 		 * The next two functions are needed to list the graphics sets. We can't do them earlier
 		 * because then we cannot show it on the debug console as that hasn't been configured yet. */
 		DeterminePaths(argv[0]);
+		TarScanner::DoScan(TarScanner::BASESET);
 		BaseGraphics::FindSets();
 		BaseSounds::FindSets();
 		BaseMusic::FindSets();
@@ -573,9 +685,7 @@ int ttd_main(int argc, char *argv[])
 #endif
 
 	DeterminePaths(argv[0]);
-	BaseGraphics::FindSets();
-	BaseSounds::FindSets();
-	BaseMusic::FindSets();
+	TarScanner::DoScan(TarScanner::BASESET);
 
 #if defined(ENABLE_NETWORK)
 	if (dedicated) DEBUG(net, 0, "Starting dedicated version %s", _openttd_revision);
@@ -587,12 +697,9 @@ int ttd_main(int argc, char *argv[])
 #endif
 #endif
 
-	TarScanner::DoScan();
-	AI::Initialize();
-	LoadFromConfig();
-	AI::Uninitialize(true);
+	LoadFromConfig(true);
 
-	if (resolution.width != 0) { _cur_resolution = resolution; }
+	if (resolution.width != 0) _cur_resolution = resolution;
 
 	/*
 	 * The width and height must be at least 1 pixel and width times
@@ -603,67 +710,43 @@ int ttd_main(int argc, char *argv[])
 	_cur_resolution.width  = ClampU(_cur_resolution.width,  1, UINT16_MAX / 2);
 	_cur_resolution.height = ClampU(_cur_resolution.height, 1, UINT16_MAX / 2);
 
+	/* Assume the cursor starts within the game as not all video drivers
+	 * get an event that the cursor is within the window when it is opened.
+	 * Saying the cursor is there makes no visible difference as it would
+	 * just be out of the bounds of the window. */
+	_cursor.in_window = true;
+
 	/* enumerate language files */
 	InitializeLanguagePacks();
 
-	/* initialize screenshot formats */
-	InitializeScreenshotFormats();
-
-	/* Initialize FreeType */
-	InitFreeType();
+	/* Initialize the regular font for FreeType */
+	InitFreeType(false);
 
 	/* This must be done early, since functions use the SetWindowDirty* calls */
 	InitWindowSystem();
 
-	/* Look for the sounds before the graphics. Otherwise none would be set and
-	 * the first initialisation of the video happens on the wrong data. Now it
-	 * can do the first initialisation right. */
-	if (sounds_set == NULL && BaseSounds::ini_set != NULL) sounds_set = strdup(BaseSounds::ini_set);
-	if (!BaseSounds::SetSet(sounds_set)) {
-		StrEmpty(sounds_set) ?
-			usererror("Failed to find a sounds set. Please acquire a sounds set for OpenTTD. See section 4.1 of readme.txt.") :
-			usererror("Failed to select requested sounds set '%s'", sounds_set);
-	}
-	free(sounds_set);
-
+	BaseGraphics::FindSets();
 	if (graphics_set == NULL && BaseGraphics::ini_set != NULL) graphics_set = strdup(BaseGraphics::ini_set);
-	if (!BaseGraphics::SetSet(graphics_set)) {
-		StrEmpty(graphics_set) ?
-			usererror("Failed to find a graphics set. Please acquire a graphics set for OpenTTD. See section 4.1 of readme.txt.") :
-			usererror("Failed to select requested graphics set '%s'", graphics_set);
+	if (!BaseGraphics::SetSet(graphics_set) && !StrEmpty(graphics_set)) {
+		usererror("Failed to select requested graphics set '%s'", graphics_set);
 	}
 	free(graphics_set);
-
-	if (music_set == NULL && BaseMusic::ini_set != NULL) music_set = strdup(BaseMusic::ini_set);
-	if (!BaseMusic::SetSet(music_set)) {
-		StrEmpty(music_set) ?
-			usererror("Failed to find a music set. Please acquire a music set for OpenTTD. See section 4.1 of readme.txt.") :
-			usererror("Failed to select requested music set '%s'", music_set);
-	}
-	free(music_set);
 
 	/* Initialize game palette */
 	GfxInitPalettes();
 
 	DEBUG(misc, 1, "Loading blitter...");
 	if (blitter == NULL && _ini_blitter != NULL) blitter = strdup(_ini_blitter);
-	if (BlitterFactoryBase::SelectBlitter(blitter) == NULL) {
-		StrEmpty(blitter) ?
-			usererror("Failed to autoprobe blitter") :
-			usererror("Failed to select requested blitter '%s'; does it exist?", blitter);
+	_blitter_autodetected = StrEmpty(blitter);
+	/* If we have a 32 bpp base set, try to select the 32 bpp blitter first, but only if we autoprobe the blitter. */
+	if (!_blitter_autodetected || BaseGraphics::GetUsedSet() == NULL || BaseGraphics::GetUsedSet()->blitter == BLT_8BPP || BlitterFactoryBase::SelectBlitter("32bpp-anim") == NULL) {
+		if (BlitterFactoryBase::SelectBlitter(blitter) == NULL) {
+			StrEmpty(blitter) ?
+				usererror("Failed to autoprobe blitter") :
+				usererror("Failed to select requested blitter '%s'; does it exist?", blitter);
+		}
 	}
 	free(blitter);
-
-	DEBUG(driver, 1, "Loading drivers...");
-
-	if (sounddriver == NULL && _ini_sounddriver != NULL) sounddriver = strdup(_ini_sounddriver);
-	_sound_driver = (SoundDriver*)SoundDriverFactoryBase::SelectDriver(sounddriver, Driver::DT_SOUND);
-	if (_sound_driver == NULL) {
-		StrEmpty(sounddriver) ?
-			usererror("Failed to autoprobe sound driver") :
-			usererror("Failed to select requested sound driver '%s'", sounddriver);
-	}
-	free(sounddriver);
 
 	if (videodriver == NULL && _ini_videodriver != NULL) videodriver = strdup(_ini_videodriver);
 	_video_driver = (VideoDriver*)VideoDriverFactoryBase::SelectDriver(videodriver, Driver::DT_VIDEO);
@@ -674,20 +757,8 @@ int ttd_main(int argc, char *argv[])
 	}
 	free(videodriver);
 
-	if (musicdriver == NULL && _ini_musicdriver != NULL) musicdriver = strdup(_ini_musicdriver);
-	_music_driver = (MusicDriver*)MusicDriverFactoryBase::SelectDriver(musicdriver, Driver::DT_MUSIC);
-	if (_music_driver == NULL) {
-		StrEmpty(musicdriver) ?
-			usererror("Failed to autoprobe music driver") :
-			usererror("Failed to select requested music driver '%s'", musicdriver);
-	}
-	free(musicdriver);
-
 	/* Initialize the zoom level of the screen to normal */
 	_screen.zoom = ZOOM_LVL_NORMAL;
-
-	/* restore saved music volume */
-	_music_driver->SetVolume(_settings_client.music.music_vol);
 
 	NetworkStartUp(); // initialize network-core
 
@@ -706,6 +777,52 @@ int ttd_main(int argc, char *argv[])
 	}
 #endif /* ENABLE_NETWORK */
 
+	if (!HandleBootstrap()) goto exit;
+
+	_video_driver->ClaimMousePointer();
+
+	/* initialize screenshot formats */
+	InitializeScreenshotFormats();
+
+	BaseSounds::FindSets();
+	if (sounds_set == NULL && BaseSounds::ini_set != NULL) sounds_set = strdup(BaseSounds::ini_set);
+	if (!BaseSounds::SetSet(sounds_set)) {
+		StrEmpty(sounds_set) ?
+			usererror("Failed to find a sounds set. Please acquire a sounds set for OpenTTD. See section 4.1 of readme.txt.") :
+			usererror("Failed to select requested sounds set '%s'", sounds_set);
+	}
+	free(sounds_set);
+
+	BaseMusic::FindSets();
+	if (music_set == NULL && BaseMusic::ini_set != NULL) music_set = strdup(BaseMusic::ini_set);
+	if (!BaseMusic::SetSet(music_set)) {
+		StrEmpty(music_set) ?
+			usererror("Failed to find a music set. Please acquire a music set for OpenTTD. See section 4.1 of readme.txt.") :
+			usererror("Failed to select requested music set '%s'", music_set);
+	}
+	free(music_set);
+
+	if (sounddriver == NULL && _ini_sounddriver != NULL) sounddriver = strdup(_ini_sounddriver);
+	_sound_driver = (SoundDriver*)SoundDriverFactoryBase::SelectDriver(sounddriver, Driver::DT_SOUND);
+	if (_sound_driver == NULL) {
+		StrEmpty(sounddriver) ?
+			usererror("Failed to autoprobe sound driver") :
+			usererror("Failed to select requested sound driver '%s'", sounddriver);
+	}
+	free(sounddriver);
+
+	if (musicdriver == NULL && _ini_musicdriver != NULL) musicdriver = strdup(_ini_musicdriver);
+	_music_driver = (MusicDriver*)MusicDriverFactoryBase::SelectDriver(musicdriver, Driver::DT_MUSIC);
+	if (_music_driver == NULL) {
+		StrEmpty(musicdriver) ?
+			usererror("Failed to autoprobe music driver") :
+			usererror("Failed to select requested music driver '%s'", musicdriver);
+	}
+	free(musicdriver);
+
+	/* restore saved music volume */
+	_music_driver->SetVolume(_settings_client.music.music_vol);
+
 	/* Take our initial lock on whatever we might want to do! */
 	_modal_progress_paint_mutex->BeginCritical();
 	_modal_progress_work_mutex->BeginCritical();
@@ -715,7 +832,7 @@ int ttd_main(int argc, char *argv[])
 
 	LoadIntroGame(false);
 
-	CheckForMissingGlyphsInLoadedLanguagePack();
+	CheckForMissingGlyphs();
 
 	ScanNewGRFFiles(scanner);
 
@@ -730,12 +847,13 @@ int ttd_main(int argc, char *argv[])
 		SaveToHighScore();
 	}
 
+exit:
 	/* Reset windowing system, stop drivers, free used memory, ... */
 	ShutdownGame();
 
-	free(const_cast<char *>(BaseGraphics::ini_set));
-	free(const_cast<char *>(BaseSounds::ini_set));
-	free(const_cast<char *>(BaseMusic::ini_set));
+	free(BaseGraphics::ini_set);
+	free(BaseSounds::ini_set);
+	free(BaseMusic::ini_set);
 	free(_ini_musicdriver);
 	free(_ini_sounddriver);
 	free(_ini_videodriver);
@@ -746,7 +864,7 @@ int ttd_main(int argc, char *argv[])
 
 void HandleExitGameRequest()
 {
-	if (_game_mode == GM_MENU) { // do not ask to quit on the main screen
+	if (_game_mode == GM_MENU || _game_mode == GM_BOOTSTRAP) { // do not ask to quit on the main screen
 		_exit_game = true;
 	} else if (_settings_client.gui.autosave_on_exit) {
 		DoExitSave();
@@ -1007,11 +1125,6 @@ void SwitchToMode(SwitchMode new_mode)
 
 		default: NOT_REACHED();
 	}
-
-	if (_switch_mode_errorstr != INVALID_STRING_ID) {
-		ShowErrorMessage(_switch_mode_errorstr, INVALID_STRING_ID, WL_CRITICAL);
-		_switch_mode_errorstr = INVALID_STRING_ID;
-	}
 }
 
 
@@ -1026,6 +1139,22 @@ static void CheckCaches()
 	/* Return here so it is easy to add checks that are run
 	 * always to aid testing of caches. */
 	if (_debug_desync_level <= 1) return;
+
+	/* Check company infrastructure cache. */
+	SmallVector<CompanyInfrastructure, 4> old_infrastructure;
+	Company *c;
+	FOR_ALL_COMPANIES(c) MemCpyT(old_infrastructure.Append(), &c->infrastructure);
+
+	extern void AfterLoadCompanyStats();
+	AfterLoadCompanyStats();
+
+	uint i = 0;
+	FOR_ALL_COMPANIES(c) {
+		if (MemCmpT(old_infrastructure.Get(i), &c->infrastructure) != 0) {
+			DEBUG(desync, 2, "infrastructure cache mismatch: company %i", (int)c->index);
+		}
+		i++;
+	}
 
 	/* Strict checking of the road stop cache entries */
 	const RoadStop *rs;
@@ -1141,6 +1270,7 @@ void StateGameLoop()
 	/* dont execute the state loop during pause */
 	if (_pause_mode != PM_UNPAUSED) {
 		UpdateLandscapingLimits();
+		Game::GameLoop();
 		CallWindowTickEvent();
 		return;
 	}
@@ -1179,6 +1309,7 @@ void StateGameLoop()
 		ClearStorageChanges(true);
 
 		AI::GameLoop();
+		Game::GameLoop();
 		UpdateLandscapingLimits();
 
 		CallWindowTickEvent();
@@ -1222,6 +1353,15 @@ static void DoAutosave()
 
 void GameLoop()
 {
+	if (_game_mode == GM_BOOTSTRAP) {
+#ifdef ENABLE_NETWORK
+		/* Check for UDP stuff */
+		if (_network_available) NetworkUDPGameLoop();
+#endif
+		InputLoop();
+		return;
+	}
+
 	ProcessAsyncSaveFinish();
 
 	/* autosave game? */

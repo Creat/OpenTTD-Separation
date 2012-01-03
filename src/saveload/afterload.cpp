@@ -52,6 +52,8 @@
 #include "../core/backup_type.hpp"
 #include "../smallmap_gui.h"
 #include "../news_func.h"
+#include "../group.h"
+#include "../error.h"
 
 #include "table/strings.h"
 
@@ -59,7 +61,6 @@
 
 #include <signal.h>
 
-extern StringID _switch_mode_errorstr;
 extern Company *DoStartupNewCompany(bool is_ai, CompanyID company = INVALID_COMPANY);
 
 /**
@@ -76,7 +77,7 @@ void SetWaterClassDependingOnSurroundings(TileIndex t, bool include_invalid_wate
 {
 	/* If the slope is not flat, we always assume 'land' (if allowed). Also for one-corner-raised-shores.
 	 * Note: Wrt. autosloping under industry tiles this is the most fool-proof behaviour. */
-	if (GetTileSlope(t, NULL) != SLOPE_FLAT) {
+	if (GetTileSlope(t) != SLOPE_FLAT) {
 		if (include_invalid_water_class) {
 			SetWaterClass(t, WATER_CLASS_INVALID);
 			return;
@@ -252,7 +253,7 @@ static void InitializeWindowsAndCaches()
 
 	RecomputePrices();
 
-	SetCachedEngineCounts();
+	GroupStatistics::UpdateAfterLoad();
 
 	Station::RecomputeIndustriesNearForAll();
 	RebuildSubsidisedSourceAndDestinationCache();
@@ -457,12 +458,12 @@ static uint FixVehicleInclination(Vehicle *v, Direction dir)
 		case INVALID_DIR: break;
 		default: NOT_REACHED();
 	}
-	byte entry_z = GetSlopeZ(entry_x, entry_y);
+	byte entry_z = GetSlopePixelZ(entry_x, entry_y);
 
 	/* Compute middle of the tile. */
 	int middle_x = (v->x_pos & ~TILE_UNIT_MASK) + HALF_TILE_SIZE;
 	int middle_y = (v->y_pos & ~TILE_UNIT_MASK) + HALF_TILE_SIZE;
-	byte middle_z = GetSlopeZ(middle_x, middle_y);
+	byte middle_z = GetSlopePixelZ(middle_x, middle_y);
 
 	/* middle_z == entry_z, no height change. */
 	if (middle_z == entry_z) return 0;
@@ -621,8 +622,8 @@ bool AfterLoadGame()
 	}
 
 	switch (gcf_res) {
-		case GLC_COMPATIBLE: _switch_mode_errorstr = STR_NEWGRF_COMPATIBLE_LOAD_WARNING; break;
-		case GLC_NOT_FOUND:  _switch_mode_errorstr = STR_NEWGRF_DISABLED_WARNING; _pause_mode = PM_PAUSED_ERROR; break;
+		case GLC_COMPATIBLE: ShowErrorMessage(STR_NEWGRF_COMPATIBLE_LOAD_WARNING, INVALID_STRING_ID, WL_CRITICAL); break;
+		case GLC_NOT_FOUND:  ShowErrorMessage(STR_NEWGRF_DISABLED_WARNING, INVALID_STRING_ID, WL_CRITICAL); _pause_mode = PM_PAUSED_ERROR; break;
 		default: break;
 	}
 
@@ -633,8 +634,22 @@ bool AfterLoadGame()
 	 * must be done before loading sprites as some newgrfs check it */
 	SetDate(_date, _date_fract);
 
-	/* Force dynamic engines off when loading older savegames */
-	if (IsSavegameVersionBefore(95)) _settings_game.vehicle.dynamic_engines = 0;
+	/*
+	 * Force the old behaviour for compatability reasons with old savegames.
+	 *
+	 * Note that there is no non-stop in here. This is because the setting could have
+	 * either value in TTDPatch. To convert it properly the user has to make sure the
+	 * right value has been chosen in the settings. Otherwise we will be converting
+	 * it incorrectly in half of the times without a means to correct that.
+	 */
+	if (IsSavegameVersionBefore(4, 2)) _settings_game.station.modified_catchment = false;
+	if (IsSavegameVersionBefore(6, 1)) _settings_game.pf.forbid_90_deg = false;
+	if (IsSavegameVersionBefore(21))   _settings_game.vehicle.train_acceleration_model = 0;
+	if (IsSavegameVersionBefore(90))   _settings_game.vehicle.plane_speed = 4;
+	if (IsSavegameVersionBefore(95))   _settings_game.vehicle.dynamic_engines = 0;
+	if (IsSavegameVersionBefore(133))  _settings_game.vehicle.roadveh_acceleration_model = 0;
+	if (IsSavegameVersionBefore(159))  _settings_game.vehicle.max_train_length = 50;
+	if (IsSavegameVersionBefore(166))  _settings_game.economy.infrastructure_maintenance = false;
 
 	/* Load the sprites */
 	GfxLoadSprites();
@@ -1059,7 +1074,7 @@ bool AfterLoadGame()
 						if (GB(_m[t].m5, 3, 2) == 0) {
 							MakeClear(t, CLEAR_GRASS, 3);
 						} else {
-							if (GetTileSlope(t, NULL) != SLOPE_FLAT) {
+							if (GetTileSlope(t) != SLOPE_FLAT) {
 								MakeShore(t);
 							} else {
 								if (GetTileOwner(t) == OWNER_WATER) {
@@ -1095,7 +1110,7 @@ bool AfterLoadGame()
 					case DIAGDIR_SW: if ((v->x_pos & 0xF) != TILE_SIZE - 1) continue; break;
 					case DIAGDIR_NW: if ((v->y_pos & 0xF) !=  0)            continue; break;
 				}
-			} else if (v->z_pos > GetSlopeZ(v->x_pos, v->y_pos)) {
+			} else if (v->z_pos > GetSlopePixelZ(v->x_pos, v->y_pos)) {
 				v->tile = GetNorthernBridgeEnd(v->tile);
 			} else {
 				continue;
@@ -1266,10 +1281,6 @@ bool AfterLoadGame()
 			if (IsTileType(t, MP_CLEAR) && IsClearGround(t, CLEAR_FIELDS)) {
 				/* remove fields */
 				MakeClear(t, CLEAR_GRASS, 3);
-			} else if (IsTileType(t, MP_CLEAR) || IsTileType(t, MP_TREES)) {
-				/* remove fences around fields */
-				SetFenceSE(t, 0);
-				SetFenceSW(t, 0);
 			}
 		}
 
@@ -1669,7 +1680,7 @@ bool AfterLoadGame()
 		 * on its neighbouring tiles. Done after river and canal updates to
 		 * ensure neighbours are correct. */
 		for (TileIndex t = 0; t < map_size; t++) {
-			if (GetTileSlope(t, NULL) != SLOPE_FLAT) continue;
+			if (GetTileSlope(t) != SLOPE_FLAT) continue;
 
 			if (IsTileType(t, MP_WATER) && IsLock(t)) SetWaterClassDependingOnSurroundings(t, false);
 			if (IsTileType(t, MP_STATION) && (IsDock(t) || IsBuoy(t))) SetWaterClassDependingOnSurroundings(t, false);
@@ -1759,9 +1770,7 @@ bool AfterLoadGame()
 		RoadVehicle *v;
 		FOR_ALL_ROADVEHICLES(v) {
 			if (v->First() == v && HasBit(EngInfo(v->engine_type)->misc_flags, EF_ROAD_TRAM)) {
-				if (_switch_mode_errorstr == INVALID_STRING_ID || _switch_mode_errorstr == STR_NEWGRF_COMPATIBLE_LOAD_WARNING) {
-					_switch_mode_errorstr = STR_WARNING_LOADGAME_REMOVED_TRAMS;
-				}
+				ShowErrorMessage(STR_WARNING_LOADGAME_REMOVED_TRAMS, INVALID_STRING_ID, WL_CRITICAL);
 				delete v;
 			}
 		}
@@ -2354,7 +2363,7 @@ bool AfterLoadGame()
 	if (IsSavegameVersionBefore(149)) {
 		for (TileIndex t = 0; t < map_size; t++) {
 			if (!IsTileType(t, MP_STATION)) continue;
-			if (!IsBuoy(t) && !IsOilRig(t) && !(IsDock(t) && GetTileSlope(t, NULL) == SLOPE_FLAT)) {
+			if (!IsBuoy(t) && !IsOilRig(t) && !(IsDock(t) && GetTileSlope(t) == SLOPE_FLAT)) {
 				SetWaterClass(t, WATER_CLASS_INVALID);
 			}
 		}
@@ -2393,7 +2402,7 @@ bool AfterLoadGame()
 			if (!IsTunnelTile(vtile)) continue;
 
 			/* Are we actually in this tunnel? Or maybe a lower tunnel? */
-			if (GetSlopeZ(v->x_pos, v->y_pos) != v->z_pos) continue;
+			if (GetSlopePixelZ(v->x_pos, v->y_pos) != v->z_pos) continue;
 
 			/* What way are we going? */
 			const DiagDirection dir = GetTunnelBridgeDirection(vtile);
@@ -2543,7 +2552,7 @@ bool AfterLoadGame()
 				/* In old versions, z_pos was 1 unit lower on bridge heads.
 				 * However, this invalid state could be converted to new savegames
 				 * by loading and saving the game in a new version. */
-				v->z_pos = GetSlopeZ(v->x_pos, v->y_pos);
+				v->z_pos = GetSlopePixelZ(v->x_pos, v->y_pos);
 				DiagDirection dir = GetTunnelBridgeDirection(v->tile);
 				if (v->type == VEH_TRAIN && !(v->vehstatus & VS_CRASHED) &&
 						v->direction != DiagDirToDir(dir)) {
@@ -2557,7 +2566,7 @@ bool AfterLoadGame()
 
 			/* If the vehicle is really above v->tile (not in a wormhole),
 			 * it should have set v->z_pos correctly. */
-			assert(v->tile != TileVirtXY(v->x_pos, v->y_pos) || v->z_pos == GetSlopeZ(v->x_pos, v->y_pos));
+			assert(v->tile != TileVirtXY(v->x_pos, v->y_pos) || v->z_pos == GetSlopePixelZ(v->x_pos, v->y_pos));
 		}
 
 		/* Fill Vehicle::cur_real_order_index */
@@ -2647,9 +2656,79 @@ bool AfterLoadGame()
 		}
 	}
 
+	/* This triggers only when old snow_lines were copied into the snow_line_height. */
+	if (IsSavegameVersionBefore(164) && _settings_game.game_creation.snow_line_height >= MIN_SNOWLINE_HEIGHT * TILE_HEIGHT) {
+		_settings_game.game_creation.snow_line_height /= TILE_HEIGHT;
+	}
+
+	if (IsSavegameVersionBefore(164) && !IsSavegameVersionBefore(32)) {
+		/* We store 4 fences in the field tiles instead of only SE and SW. */
+		for (TileIndex t = 0; t < map_size; t++) {
+			if (!IsTileType(t, MP_CLEAR) && !IsTileType(t, MP_TREES)) continue;
+			if (IsTileType(t, MP_CLEAR) && IsClearGround(t, CLEAR_FIELDS)) continue;
+			uint fence = GB(_m[t].m4, 5, 3);
+			if (fence != 0 && IsTileType(TILE_ADDXY(t, 1, 0), MP_CLEAR) && IsClearGround(TILE_ADDXY(t, 1, 0), CLEAR_FIELDS)) {
+				SetFenceNE(TILE_ADDXY(t, 1, 0), fence);
+			}
+			fence = GB(_m[t].m4, 2, 3);
+			if (fence != 0 && IsTileType(TILE_ADDXY(t, 0, 1), MP_CLEAR) && IsClearGround(TILE_ADDXY(t, 0, 1), CLEAR_FIELDS)) {
+				SetFenceNW(TILE_ADDXY(t, 0, 1), fence);
+			}
+			SB(_m[t].m4, 2, 3, 0);
+			SB(_m[t].m4, 5, 3, 0);
+		}
+	}
+
+	/* The center of train vehicles was changed, fix up spacing. */
+	if (IsSavegameVersionBefore(164)) FixupTrainLengths();
+
+	if (IsSavegameVersionBefore(165)) {
+		Town *t;
+
+		FOR_ALL_TOWNS(t) {
+			/* Set the default cargo requirement for town growth */
+			switch (_settings_game.game_creation.landscape) {
+				case LT_ARCTIC:
+					if (FindFirstCargoWithTownEffect(TE_FOOD) != NULL) t->goal[TE_FOOD] = TOWN_GROWTH_WINTER;
+					break;
+
+				case LT_TROPIC:
+					if (FindFirstCargoWithTownEffect(TE_FOOD) != NULL) t->goal[TE_FOOD] = TOWN_GROWTH_DESERT;
+					if (FindFirstCargoWithTownEffect(TE_WATER) != NULL) t->goal[TE_WATER] = TOWN_GROWTH_DESERT;
+					break;
+			}
+		}
+	}
+
+	if (IsSavegameVersionBefore(165)) {
+		/* Adjust zoom level to account for new levels */
+		_saved_scrollpos_zoom = _saved_scrollpos_zoom + ZOOM_LVL_SHIFT;
+		_saved_scrollpos_x *= ZOOM_LVL_BASE;
+		_saved_scrollpos_y *= ZOOM_LVL_BASE;
+	}
+
+	/* When any NewGRF has been changed the availability of some vehicles might
+	 * have been changed too. e->company_avail must be set to 0 in that case
+	 * which is done by StartupEngines(). */
+	if (gcf_res != GLC_ALL_GOOD) StartupEngines();
+
+	if (IsSavegameVersionBefore(166)) {
+		/* Update cargo acceptance map of towns. */
+		for (TileIndex t = 0; t < map_size; t++) {
+			if (!IsTileType(t, MP_HOUSE)) continue;
+			Town::Get(GetTownIndex(t))->cargo_accepted.Add(t);
+		}
+
+		Town *town;
+		FOR_ALL_TOWNS(town) {
+			UpdateTownCargoes(town);
+		}
+	}
+
 	/* Road stops is 'only' updating some caches */
 	AfterLoadRoadStops();
 	AfterLoadLabelMaps();
+	AfterLoadCompanyStats();
 
 	GamelogPrintDebug(1);
 
@@ -2674,18 +2753,22 @@ void ReloadNewGRFData()
 	LoadStringWidthTable();
 	RecomputePrices();
 	/* reload vehicles */
-	ResetVehiclePosHash();
+	ResetVehicleHash();
 	AfterLoadVehicles(false);
 	StartupEngines();
-	SetCachedEngineCounts();
+	GroupStatistics::UpdateAfterLoad();
 	/* update station graphics */
 	AfterLoadStations();
+	/* Update company statistics. */
+	AfterLoadCompanyStats();
 	/* Check and update house and town values */
 	UpdateHousesAndTowns();
 	/* Delete news referring to no longer existing entities */
 	DeleteInvalidEngineNews();
 	/* Update livery selection windows */
 	for (CompanyID i = COMPANY_FIRST; i < MAX_COMPANIES; i++) InvalidateWindowData(WC_COMPANY_COLOUR, i);
+	/* Update company infrastructure counts. */
+	InvalidateWindowClassesData(WC_COMPANY_INFRASTRUCTURE);
 	/* redraw the whole screen */
 	MarkWholeScreenDirty();
 	CheckTrainsLengths();

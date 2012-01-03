@@ -39,6 +39,7 @@ static ThreadObject *_draw_thread = NULL;
 static ThreadMutex *_draw_mutex = NULL;
 /** Should we keep continue drawing? */
 static volatile bool _draw_continue;
+static Palette _local_palette;
 
 #define MAX_DIRTY_RECTS 100
 static SDL_Rect _dirty_rects[MAX_DIRTY_RECTS];
@@ -55,37 +56,40 @@ void VideoDriver_SDL::MakeDirty(int left, int top, int width, int height)
 	_num_dirty_rects++;
 }
 
-static void UpdatePalette(uint start, uint count)
+static void UpdatePalette()
 {
 	SDL_Color pal[256];
 
-	for (uint i = 0; i != count; i++) {
-		pal[i].r = _cur_palette[start + i].r;
-		pal[i].g = _cur_palette[start + i].g;
-		pal[i].b = _cur_palette[start + i].b;
+	for (int i = 0; i != _local_palette.count_dirty; i++) {
+		pal[i].r = _local_palette.palette[_local_palette.first_dirty + i].r;
+		pal[i].g = _local_palette.palette[_local_palette.first_dirty + i].g;
+		pal[i].b = _local_palette.palette[_local_palette.first_dirty + i].b;
 		pal[i].unused = 0;
 	}
 
-	SDL_CALL SDL_SetColors(_sdl_screen, pal, start, count);
+	SDL_CALL SDL_SetColors(_sdl_screen, pal, _local_palette.first_dirty, _local_palette.count_dirty);
 }
 
 static void InitPalette()
 {
-	UpdatePalette(0, 256);
+	_local_palette = _cur_palette;
+	_local_palette.first_dirty = 0;
+	_local_palette.count_dirty = 256;
+	UpdatePalette();
 }
 
 static void CheckPaletteAnim()
 {
-	if (_pal_count_dirty != 0) {
+	if (_cur_palette.count_dirty != 0) {
 		Blitter *blitter = BlitterFactoryBase::GetCurrentBlitter();
 
 		switch (blitter->UsePaletteAnimation()) {
 			case Blitter::PALETTE_ANIMATION_VIDEO_BACKEND:
-				UpdatePalette(_pal_first_dirty, _pal_count_dirty);
+				UpdatePalette();
 				break;
 
 			case Blitter::PALETTE_ANIMATION_BLITTER:
-				blitter->PaletteAnimate(_pal_first_dirty, _pal_count_dirty);
+				blitter->PaletteAnimate(_local_palette);
 				break;
 
 			case Blitter::PALETTE_ANIMATION_NONE:
@@ -94,7 +98,7 @@ static void CheckPaletteAnim()
 			default:
 				NOT_REACHED();
 		}
-		_pal_count_dirty = 0;
+		_cur_palette.count_dirty = 0;
 	}
 }
 
@@ -121,6 +125,7 @@ static void DrawSurfaceToScreenThread(void *)
 	_draw_mutex->WaitForSignal();
 
 	while (_draw_continue) {
+		CheckPaletteAnim();
 		/* Then just draw and wait till we stop */
 		DrawSurfaceToScreen();
 		_draw_mutex->WaitForSignal();
@@ -259,10 +264,15 @@ static bool CreateMainSurface(uint w, uint h)
 
 	snprintf(caption, sizeof(caption), "OpenTTD %s", _openttd_revision);
 	SDL_CALL SDL_WM_SetCaption(caption, caption);
-	SDL_CALL SDL_ShowCursor(0);
 
 	GameSizeChanged();
 
+	return true;
+}
+
+bool VideoDriver_SDL::ClaimMousePointer()
+{
+	SDL_CALL SDL_ShowCursor(0);
 	return true;
 }
 
@@ -498,10 +508,11 @@ void VideoDriver_SDL::MainLoop()
 	uint32 cur_ticks = SDL_CALL SDL_GetTicks();
 	uint32 last_cur_ticks = cur_ticks;
 	uint32 next_tick = cur_ticks + MILLISECONDS_PER_TICK;
-	uint32 pal_tick = 0;
 	uint32 mod;
 	int numkeys;
 	Uint8 *keys;
+
+	CheckPaletteAnim();
 
 	if (_draw_threaded) {
 		/* Initialise the mutex first, because that's the thing we *need*
@@ -579,10 +590,7 @@ void VideoDriver_SDL::MainLoop()
 			if (_draw_threaded) _draw_mutex->BeginCritical();
 
 			UpdateWindows();
-			if (++pal_tick > 4) {
-				CheckPaletteAnim();
-				pal_tick = 1;
-			}
+			_local_palette = _cur_palette;
 		} else {
 			/* Release the thread while sleeping */
 			if (_draw_threaded) _draw_mutex->EndCritical();
@@ -598,6 +606,7 @@ void VideoDriver_SDL::MainLoop()
 			_draw_mutex->SendSignal();
 		} else {
 			/* Oh, we didn't have threads, then just draw unthreaded */
+			CheckPaletteAnim();
 			DrawSurfaceToScreen();
 		}
 	}
@@ -633,6 +642,11 @@ bool VideoDriver_SDL::ToggleFullscreen(bool fullscreen)
 		return false;
 	}
 	return true;
+}
+
+bool VideoDriver_SDL::AfterBlitterChange()
+{
+	return this->ChangeResolution(_screen.width, _screen.height);
 }
 
 #endif /* WITH_SDL */

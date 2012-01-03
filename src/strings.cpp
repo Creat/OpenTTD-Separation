@@ -23,7 +23,7 @@
 #include "signs_base.h"
 #include "cargotype.h"
 #include "fontcache.h"
-#include "gui.h"
+#include "error.h"
 #include "strings_func.h"
 #include "rev.h"
 #include "core/alloc_type.hpp"
@@ -38,6 +38,7 @@
 #include "smallmap_gui.h"
 #include "window_func.h"
 #include "debug.h"
+#include "game/game_text.hpp"
 #include <stack>
 
 #include "table/strings.h"
@@ -96,11 +97,35 @@ void CopyOutDParam(uint64 *dst, int offs, int num)
 	MemCpyT(dst, _global_string_params.GetPointerToOffset(offs), num);
 }
 
+/**
+ * Copy \a num string parameters from the global string parameter array to the \a dst array.
+ * Furthermore clone raw string parameters into \a strings and amend the data in \a dst.
+ * @param dst     Destination array of string parameters.
+ * @param strings Destination array for clone of the raw strings. Must be of same length as dst. Deallocation left to the caller.
+ * @param string  The string used to determine where raw strings are and where there are no raw strings.
+ * @param num     Number of string parameters to copy.
+ */
+void CopyOutDParam(uint64 *dst, const char **strings, StringID string, int num)
+{
+	char buf[DRAW_STRING_BUFFER];
+	GetString(buf, string, lastof(buf));
+
+	MemCpyT(dst, _global_string_params.GetPointerToOffset(0), num);
+	for (int i = 0; i < num; i++) {
+		if (_global_string_params.HasTypeInformation() && _global_string_params.GetTypeAtOffset(i) == SCC_RAW_STRING_POINTER) {
+			strings[i] = strdup((const char *)(size_t)_global_string_params.GetParam(i));
+			dst[i] = (size_t)strings[i];
+		} else {
+			strings[i] = NULL;
+		}
+	}
+}
+
 static char *StationGetSpecialString(char *buff, int x, const char *last);
 static char *GetSpecialTownNameString(char *buff, int ind, uint32 seed, const char *last);
 static char *GetSpecialNameString(char *buff, int ind, StringParameters *args, const char *last);
 
-static char *FormatString(char *buff, const char *str, StringParameters *args, uint casei, const char *last, bool dry_run = false);
+static char *FormatString(char *buff, const char *str, StringParameters *args, const char *last, uint case_index = 0, bool game_script = false, bool dry_run = false);
 
 struct LanguagePack : public LanguagePackHeader {
 	char data[]; // list of strings
@@ -108,50 +133,50 @@ struct LanguagePack : public LanguagePackHeader {
 
 static char **_langpack_offs;
 static LanguagePack *_langpack;
-static uint _langtab_num[32];   ///< Offset into langpack offs
-static uint _langtab_start[32]; ///< Offset into langpack offs
+static uint _langtab_num[TAB_COUNT];   ///< Offset into langpack offs
+static uint _langtab_start[TAB_COUNT]; ///< Offset into langpack offs
 static bool _keep_gender_data = false;  ///< Should we retain the gender data in the current string?
 
 
 const char *GetStringPtr(StringID string)
 {
-	switch (GB(string, 11, 5)) {
+	switch (GB(string, TAB_COUNT_OFFSET, TAB_COUNT_BITS)) {
+		case GAME_TEXT_TAB: return GetGameStringPtr(GB(string, TAB_SIZE_OFFSET, TAB_SIZE_BITS));
 		/* GetGRFStringPtr doesn't handle 0xD4xx ids, we need to convert those to 0xD0xx. */
-		case 26: return GetStringPtr(GetGRFStringID(0, 0xD000 + GB(string, 0, 10)));
-		case 28: return GetGRFStringPtr(GB(string, 0, 11));
-		case 29: return GetGRFStringPtr(GB(string, 0, 11) + 0x0800);
-		case 30: return GetGRFStringPtr(GB(string, 0, 11) + 0x1000);
-		default: return _langpack_offs[_langtab_start[string >> 11] + (string & 0x7FF)];
+		case 26: return GetStringPtr(GetGRFStringID(0, 0xD000 + GB(string, TAB_SIZE_OFFSET, 10)));
+		case 28: return GetGRFStringPtr(GB(string, TAB_SIZE_OFFSET, TAB_SIZE_BITS));
+		case 29: return GetGRFStringPtr(GB(string, TAB_SIZE_OFFSET, TAB_SIZE_BITS) + 0x0800);
+		case 30: return GetGRFStringPtr(GB(string, TAB_SIZE_OFFSET, TAB_SIZE_BITS) + 0x1000);
+		default: return _langpack_offs[_langtab_start[GB(string, TAB_COUNT_OFFSET, TAB_COUNT_BITS)] + GB(string, TAB_SIZE_OFFSET, TAB_SIZE_BITS)];
 	}
 }
 
 /**
- * The highest 8 bits of string contain the "case index".
- * These 8 bits will only be set when FormatString wants to print
- * the string in a different case. No one else except FormatString
- * should set those bits, therefore string CANNOT be StringID, but uint32.
+ * Get a parsed string with most special stringcodes replaced by the string parameters.
  * @param buffr  Pointer to a string buffer where the formatted string should be written to.
  * @param string
  * @param args   Arguments for the string.
  * @param last   Pointer just past the end of buffr.
+ * @param case_index  The "case index". This will only be set when FormatString wants to print the string in a different case.
+ * @param game_script The string is coming directly from a game script.
  * @return       Pointer to the final zero byte of the formatted string.
  */
-char *GetStringWithArgs(char *buffr, uint string, StringParameters *args, const char *last)
+char *GetStringWithArgs(char *buffr, StringID string, StringParameters *args, const char *last, uint case_index, bool game_script)
 {
-	if (GB(string, 0, 16) == 0) return GetStringWithArgs(buffr, STR_UNDEFINED, args, last);
+	if (string == 0) return GetStringWithArgs(buffr, STR_UNDEFINED, args, last);
 
-	uint index = GB(string,  0, 11);
-	uint tab   = GB(string, 11,  5);
+	uint index = GB(string, TAB_SIZE_OFFSET,  TAB_SIZE_BITS);
+	uint tab   = GB(string, TAB_COUNT_OFFSET, TAB_COUNT_BITS);
 
 	switch (tab) {
 		case 4:
-			if (index >= 0xC0) {
+			if (index >= 0xC0 && !game_script) {
 				return GetSpecialTownNameString(buffr, index - 0xC0, args->GetInt32(), last);
 			}
 			break;
 
 		case 14:
-			if (index >= 0xE4) {
+			if (index >= 0xE4 && !game_script) {
 				return GetSpecialNameString(buffr, index - 0xE4, args, last);
 			}
 			break;
@@ -160,32 +185,38 @@ char *GetStringWithArgs(char *buffr, uint string, StringParameters *args, const 
 			/* Old table for custom names. This is no longer used */
 			error("Incorrect conversion of custom name string.");
 
+		case GAME_TEXT_TAB:
+			return FormatString(buffr, GetGameStringPtr(index), args, last, case_index, true);
+
 		case 26:
 			/* Include string within newgrf text (format code 81) */
 			if (HasBit(index, 10)) {
 				StringID string = GetGRFStringID(0, 0xD000 + GB(index, 0, 10));
-				return GetStringWithArgs(buffr, string, args, last);
+				return GetStringWithArgs(buffr, string, args, last, case_index);
 			}
 			break;
 
 		case 28:
-			return FormatString(buffr, GetGRFStringPtr(index), args, GB(string, 24, 8), last);
+			return FormatString(buffr, GetGRFStringPtr(index), args, last, case_index);
 
 		case 29:
-			return FormatString(buffr, GetGRFStringPtr(index + 0x0800), args, GB(string, 24, 8), last);
+			return FormatString(buffr, GetGRFStringPtr(index + 0x0800), args, last, case_index);
 
 		case 30:
-			return FormatString(buffr, GetGRFStringPtr(index + 0x1000), args, GB(string, 24, 8), last);
+			return FormatString(buffr, GetGRFStringPtr(index + 0x1000), args, last, case_index);
 
 		case 31:
 			NOT_REACHED();
 	}
 
 	if (index >= _langtab_num[tab]) {
+		if (game_script) {
+			return GetStringWithArgs(buffr, STR_UNDEFINED, args, last);
+		}
 		error("String 0x%X is invalid. You are probably using an old version of the .lng file.\n", string);
 	}
 
-	return FormatString(buffr, GetStringPtr(GB(string, 0, 16)), args, GB(string, 24, 8), last);
+	return FormatString(buffr, GetStringPtr(string), args, last, case_index);
 }
 
 char *GetString(char *buffr, StringID string, const char *last)
@@ -335,24 +366,24 @@ static char *FormatBytes(char *buff, int64 number, const char *last)
 	return buff;
 }
 
-static char *FormatYmdString(char *buff, Date date, uint modifier, const char *last)
+static char *FormatYmdString(char *buff, Date date, const char *last, uint case_index)
 {
 	YearMonthDay ymd;
 	ConvertDateToYMD(date, &ymd);
 
 	int64 args[] = {ymd.day + STR_ORDINAL_NUMBER_1ST - 1, STR_MONTH_ABBREV_JAN + ymd.month, ymd.year};
 	StringParameters tmp_params(args);
-	return FormatString(buff, GetStringPtr(STR_FORMAT_DATE_LONG), &tmp_params, modifier >> 24, last);
+	return FormatString(buff, GetStringPtr(STR_FORMAT_DATE_LONG), &tmp_params, last, case_index);
 }
 
-static char *FormatMonthAndYear(char *buff, Date date, uint modifier, const char *last)
+static char *FormatMonthAndYear(char *buff, Date date, const char *last, uint case_index)
 {
 	YearMonthDay ymd;
 	ConvertDateToYMD(date, &ymd);
 
 	int64 args[] = {STR_MONTH_JAN + ymd.month, ymd.year};
 	StringParameters tmp_params(args);
-	return FormatString(buff, GetStringPtr(STR_FORMAT_DATE_SHORT), &tmp_params, modifier >> 24, last);
+	return FormatString(buff, GetStringPtr(STR_FORMAT_DATE_SHORT), &tmp_params, last, case_index);
 }
 
 static char *FormatTinyOrISODate(char *buff, Date date, StringID str, const char *last)
@@ -368,7 +399,7 @@ static char *FormatTinyOrISODate(char *buff, Date date, StringID str, const char
 
 	int64 args[] = {(int64)(size_t)day, (int64)(size_t)month, ymd.year};
 	StringParameters tmp_params(args);
-	return FormatString(buff, GetStringPtr(str), &tmp_params, 0, last);
+	return FormatString(buff, GetStringPtr(str), &tmp_params, last);
 }
 
 static char *FormatGenericCurrency(char *buff, const CurrencySpec *spec, Money number, bool compact, const char *last)
@@ -388,8 +419,8 @@ static char *FormatGenericCurrency(char *buff, const CurrencySpec *spec, Money n
 		number = -number;
 	}
 
-	/* Add prefix part, folowing symbol_pos specification.
-	 * Here, it can can be either 0 (prefix) or 2 (both prefix anf suffix).
+	/* Add prefix part, following symbol_pos specification.
+	 * Here, it can can be either 0 (prefix) or 2 (both prefix and suffix).
 	 * The only remaining value is 1 (suffix), so everything that is not 1 */
 	if (spec->symbol_pos != 1) buff = strecpy(buff, spec->prefix, last);
 
@@ -412,8 +443,8 @@ static char *FormatGenericCurrency(char *buff, const CurrencySpec *spec, Money n
 	buff = FormatNumber(buff, number, last, separator);
 	buff = strecpy(buff, multiplier, last);
 
-	/* Add suffix part, folowing symbol_pos specification.
-	 * Here, it can can be either 1 (suffix) or 2 (both prefix anf suffix).
+	/* Add suffix part, following symbol_pos specification.
+	 * Here, it can can be either 1 (suffix) or 2 (both prefix and suffix).
 	 * The only remaining value is 1 (prefix), so everything that is not 0 */
 	if (spec->symbol_pos != 0) buff = strecpy(buff, spec->suffix, last);
 
@@ -659,17 +690,16 @@ uint ConvertDisplaySpeedToSpeed(uint speed)
  * @param buff  The buffer to write the final string to.
  * @param str   The original string with format codes.
  * @param args  Pointer to extra arguments used by various string codes.
- * @param casei
+ * @param case_index
  * @param last  Pointer to just past the end of the buff array.
  * @param dry_run True when the argt array is not yet initialized.
  */
-static char *FormatString(char *buff, const char *str_arg, StringParameters *args, uint casei, const char *last, bool dry_run)
+static char *FormatString(char *buff, const char *str_arg, StringParameters *args, const char *last, uint case_index, bool game_script, bool dry_run)
 {
 	uint orig_offset = args->offset;
 
 	/* When there is no array with types there is no need to do a dry run. */
-	if (!args->HasTypeInformation()) dry_run = true;
-	if (!dry_run) {
+	if (args->HasTypeInformation() && !dry_run) {
 		if (UsingNewGRFTextStack()) {
 			/* Values from the NewGRF text stack are only copied to the normal
 			 * argv array at the time they are encountered. That means that if
@@ -678,16 +708,16 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 			 * pass makes sure the argv array is correctly filled and the second
 			 * pass can reference later values without problems. */
 			struct TextRefStack *backup = CreateTextRefStackBackup();
-			FormatString(buff, str_arg, args, casei, last, true);
+			FormatString(buff, str_arg, args, last, case_index, game_script, true);
 			RestoreTextRefStackBackup(backup);
 		} else {
-			FormatString(buff, str_arg, args, casei, last, true);
+			FormatString(buff, str_arg, args, last, case_index, game_script, true);
 		}
 		/* We have to restore the original offset here to to read the correct values. */
 		args->offset = orig_offset;
 	}
 	WChar b;
-	uint modifier = 0;
+	uint next_substr_case_index = 0;
 	char *buf_start = buff;
 	std::stack<const char *> str_stack;
 	str_stack.push(str_arg);
@@ -702,11 +732,108 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 		if (SCC_NEWGRF_FIRST <= b && b <= SCC_NEWGRF_LAST) {
 			/* We need to pass some stuff as it might be modified; oh boy. */
 			//todo: should argve be passed here too?
-			b = RemapNewGRFStringControlCode(b, buf_start, &buff, &str, (int64 *)args->GetDataPointer());
+			b = RemapNewGRFStringControlCode(b, buf_start, &buff, &str, (int64 *)args->GetDataPointer(), dry_run);
 			if (b == 0) continue;
 		}
 
 		switch (b) {
+			case SCC_ENCODED: {
+				uint64 sub_args_data[20];
+				WChar sub_args_type[20];
+				bool sub_args_need_free[20];
+				StringParameters sub_args(sub_args_data, 20, sub_args_type);
+
+				sub_args.ClearTypeInformation();
+				memset(sub_args_need_free, 0, sizeof(sub_args_need_free));
+
+				uint16 stringid;
+				const char *s = str;
+				char *p;
+				stringid = strtol(str, &p, 16);
+				if (*p != ':' && *p != '\0') {
+					while (*p != '\0') p++;
+					str = p;
+					buff = strecat(buff, "(invalid SCC_ENCODED)", last);
+					break;
+				}
+				if (stringid >= TAB_SIZE) {
+					while (*p != '\0') p++;
+					str = p;
+					buff = strecat(buff, "(invalid StringID)", last);
+					break;
+				}
+
+				int i = 0;
+				while (*p != '\0') {
+					uint64 param;
+					s = ++p;
+
+					/* Find the next value */
+					bool instring = false;
+					bool escape = false;
+					for (;; p++) {
+						if (*p == '\\') {
+							escape = true;
+							continue;
+						}
+						if (*p == '"' && escape) {
+							escape = false;
+							continue;
+						}
+						escape = false;
+
+						if (*p == '"') {
+							instring = !instring;
+							continue;
+						}
+						if (instring) {
+							continue;
+						}
+
+						if (*p == ':') break;
+						if (*p == '\0') break;
+					}
+
+					if (*s != '"') {
+						/* Check if we want to look up another string */
+						WChar l;
+						size_t len = Utf8Decode(&l, s);
+						bool lookup = (l == SCC_ENCODED);
+						if (lookup) s += len;
+
+						param = strtol(s, &p, 16);
+
+						if (lookup) {
+							if (param >= TAB_SIZE) {
+								while (*p != '\0') p++;
+								str = p;
+								buff = strecat(buff, "(invalid sub-StringID)", last);
+								break;
+							}
+							param = (GAME_TEXT_TAB << TAB_COUNT_OFFSET) + param;
+						}
+
+						sub_args.SetParam(i++, param);
+					} else {
+						char *g = strdup(s);
+						g[p - s] = '\0';
+
+						sub_args_need_free[i] = true;
+						sub_args.SetParam(i++, (uint64)(size_t)g);
+					}
+				}
+				/* We error'd out in the while, to error out in themain too */
+				if (*str == '\0') break;
+
+				str = p;
+				buff = GetStringWithArgs(buff, (GAME_TEXT_TAB << TAB_COUNT_OFFSET) + stringid, &sub_args, last, true);
+
+				for (int i = 0; i < 20; i++) {
+					if (sub_args_need_free[i]) free((void *)sub_args.GetParam(i));
+				}
+				break;
+			}
+
 			case SCC_NEWGRF_STRINL: {
 				StringID substr = Utf8Consume(&str);
 				str_stack.push(GetStringPtr(substr));
@@ -716,174 +843,11 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 			case SCC_NEWGRF_PRINT_WORD_STRING_ID: {
 				StringID substr = args->GetInt32(SCC_NEWGRF_PRINT_WORD_STRING_ID);
 				str_stack.push(GetStringPtr(substr));
+				case_index = next_substr_case_index;
+				next_substr_case_index = 0;
 				break;
 			}
 
-
-			case SCC_SETX: // {SETX}
-				if (buff + Utf8CharLen(SCC_SETX) + 1 < last) {
-					buff += Utf8Encode(buff, SCC_SETX);
-					*buff++ = *str++;
-				}
-				break;
-
-			case SCC_SETXY: // {SETXY}
-				if (buff + Utf8CharLen(SCC_SETXY) + 2 < last) {
-					buff += Utf8Encode(buff, SCC_SETXY);
-					*buff++ = *str++;
-					*buff++ = *str++;
-				}
-				break;
-
-			case SCC_STRING_ID: // {STRINL}
-				buff = GetStringWithArgs(buff, Utf8Consume(&str), args, last);
-				break;
-
-			case SCC_RAW_STRING_POINTER: { // {RAW_STRING}
-				const char *str = (const char *)(size_t)args->GetInt64();
-				buff = FormatString(buff, str, args, casei, last);
-				break;
-			}
-
-			case SCC_DATE_LONG: // {DATE_LONG}
-				buff = FormatYmdString(buff, args->GetInt32(SCC_DATE_LONG), modifier, last);
-				break;
-
-			case SCC_DATE_SHORT: // {DATE_SHORT}
-				buff = FormatMonthAndYear(buff, args->GetInt32(SCC_DATE_SHORT), modifier, last);
-				break;
-
-			case SCC_VELOCITY: { // {VELOCITY}
-				assert(_settings_game.locale.units < lengthof(_units));
-				int64 args_array[] = {ConvertSpeedToDisplaySpeed(args->GetInt64(SCC_VELOCITY) * 10 / 16)};
-				StringParameters tmp_params(args_array);
-				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].velocity), &tmp_params, modifier >> 24, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_HEIGHT: { // {HEIGHT}
-				int64 args_array[] = {_units[_settings_game.locale.units].c_height.ToDisplay(args->GetInt64())};
-				StringParameters tmp_params(args_array);
-				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].height), &tmp_params, modifier >> 24, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_CURRENCY_COMPACT: // {CURRCOMPACT}
-				buff = FormatGenericCurrency(buff, _currency, args->GetInt64(), true, last);
-				break;
-
-			case SCC_REVISION: // {REV}
-				buff = strecpy(buff, _openttd_revision, last);
-				break;
-
-			case SCC_CARGO_SHORT: { // {SHORTCARGO}
-				/* Short description of cargotypes. Layout:
-				 * 8-bit = cargo type
-				 * 16-bit = cargo count */
-				StringID cargo_str = CargoSpec::Get(args->GetInt32(SCC_CARGO_SHORT))->units_volume;
-				switch (cargo_str) {
-					case STR_TONS: {
-						assert(_settings_game.locale.units < lengthof(_units));
-						int64 args_array[] = {_units[_settings_game.locale.units].c_weight.ToDisplay(args->GetInt64())};
-						StringParameters tmp_params(args_array);
-						buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].l_weight), &tmp_params, modifier >> 24, last);
-						modifier = 0;
-						break;
-					}
-
-					case STR_LITERS: {
-						assert(_settings_game.locale.units < lengthof(_units));
-						int64 args_array[] = {_units[_settings_game.locale.units].c_volume.ToDisplay(args->GetInt64())};
-						StringParameters tmp_params(args_array);
-						buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].l_volume), &tmp_params, modifier >> 24, last);
-						modifier = 0;
-						break;
-					}
-
-					default: {
-						StringParameters tmp_params(*args, 1);
-						buff = GetStringWithArgs(buff, cargo_str, &tmp_params, last);
-						break;
-					}
-				}
-				break;
-			}
-
-			case SCC_STRING1: { // {STRING1}
-				/* String that consumes ONE argument */
-				uint str = modifier + args->GetInt32(SCC_STRING1);
-				StringParameters sub_args(*args, 1);
-				buff = GetStringWithArgs(buff, str, &sub_args, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_STRING2: { // {STRING2}
-				/* String that consumes TWO arguments */
-				uint str = modifier + args->GetInt32(SCC_STRING2);
-				StringParameters sub_args(*args, 2);
-				buff = GetStringWithArgs(buff, str, &sub_args, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_STRING3: { // {STRING3}
-				/* String that consumes THREE arguments */
-				uint str = modifier + args->GetInt32(SCC_STRING3);
-				StringParameters sub_args(*args, 3);
-				buff = GetStringWithArgs(buff, str, &sub_args, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_STRING4: { // {STRING4}
-				/* String that consumes FOUR arguments */
-				uint str = modifier + args->GetInt32(SCC_STRING4);
-				StringParameters sub_args(*args, 4);
-				buff = GetStringWithArgs(buff, str, &sub_args, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_STRING5: { // {STRING5}
-				/* String that consumes FIVE arguments */
-				uint str = modifier + args->GetInt32(SCC_STRING5);
-				StringParameters sub_args(*args, 5);
-				buff = GetStringWithArgs(buff, str, &sub_args, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_STATION_FEATURES: { // {STATIONFEATURES}
-				buff = StationGetSpecialString(buff, args->GetInt32(SCC_STATION_FEATURES), last);
-				break;
-			}
-
-			case SCC_INDUSTRY_NAME: { // {INDUSTRY}
-				const Industry *i = Industry::Get(args->GetInt32(SCC_INDUSTRY_NAME));
-
-				/* industry not valid anymore? */
-				assert(i != NULL);
-
-				/* First print the town name and the industry type name. */
-				int64 args_array[2] = {i->town->index, GetIndustrySpec(i->type)->name};
-				StringParameters tmp_params(args_array);
-
-				buff = FormatString(buff, GetStringPtr(STR_FORMAT_INDUSTRY_NAME), &tmp_params, modifier >> 24, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_VOLUME: { // {VOLUME}
-				assert(_settings_game.locale.units < lengthof(_units));
-				int64 args_array[1] = {_units[_settings_game.locale.units].c_volume.ToDisplay(args->GetInt64(SCC_VOLUME))};
-				StringParameters tmp_params(args_array);
-				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].l_volume), &tmp_params, modifier >> 24, last);
-				modifier = 0;
-				break;
-			}
 
 			case SCC_GENDER_LIST: { // {G 0 Der Die Das}
 				/* First read the meta data from the language file. */
@@ -902,7 +866,7 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 					bool old_kgd = _keep_gender_data;
 					_keep_gender_data = true;
 					StringParameters tmp_params(args->GetPointerToOffset(offset), args->num_param - offset, NULL);
-					p = FormatString(buf, input, &tmp_params, 0, lastof(buf));
+					p = FormatString(buf, input, &tmp_params, lastof(buf));
 					_keep_gender_data = old_kgd;
 					*p = '\0';
 
@@ -913,70 +877,6 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 					if (c == SCC_GENDER_INDEX) gender = (byte)s[0];
 				}
 				str = ParseStringChoice(str, gender, &buff, last);
-				break;
-			}
-
-			case SCC_DATE_TINY: { // {DATE_TINY}
-				buff = FormatTinyOrISODate(buff, args->GetInt32(SCC_DATE_TINY), STR_FORMAT_DATE_TINY, last);
-				break;
-			}
-
-			case SCC_DATE_ISO: { // {DATE_ISO}
-				buff = FormatTinyOrISODate(buff, args->GetInt32(), STR_FORMAT_DATE_ISO, last);
-				break;
-			}
-
-			case SCC_CARGO: { // {CARGO}
-				/* First parameter is cargo type, second parameter is cargo count */
-				CargoID cargo = args->GetInt32(SCC_CARGO);
-				StringID cargo_str = (cargo == CT_INVALID) ? STR_QUANTITY_N_A : CargoSpec::Get(cargo)->quantifier;
-				StringParameters tmp_args(*args, 1);
-				buff = GetStringWithArgs(buff, cargo_str, &tmp_args, last);
-				break;
-			}
-
-			case SCC_POWER: { // {POWER}
-				assert(_settings_game.locale.units < lengthof(_units));
-				int64 args_array[1] = {_units[_settings_game.locale.units].c_power.ToDisplay(args->GetInt64())};
-				StringParameters tmp_params(args_array);
-				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].power), &tmp_params, modifier >> 24, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_VOLUME_SHORT: { // {VOLUME_S}
-				assert(_settings_game.locale.units < lengthof(_units));
-				int64 args_array[1] = {_units[_settings_game.locale.units].c_volume.ToDisplay(args->GetInt64())};
-				StringParameters tmp_params(args_array);
-				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].s_volume), &tmp_params, modifier >> 24, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_WEIGHT: { // {WEIGHT}
-				assert(_settings_game.locale.units < lengthof(_units));
-				int64 args_array[1] = {_units[_settings_game.locale.units].c_weight.ToDisplay(args->GetInt64(SCC_WEIGHT))};
-				StringParameters tmp_params(args_array);
-				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].l_weight), &tmp_params, modifier >> 24, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_WEIGHT_SHORT: { // {WEIGHT_S}
-				assert(_settings_game.locale.units < lengthof(_units));
-				int64 args_array[1] = {_units[_settings_game.locale.units].c_weight.ToDisplay(args->GetInt64())};
-				StringParameters tmp_params(args_array);
-				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].s_weight), &tmp_params, modifier >> 24, last);
-				modifier = 0;
-				break;
-			}
-
-			case SCC_FORCE: { // {FORCE}
-				assert(_settings_game.locale.units < lengthof(_units));
-				int64 args_array[1] = {_units[_settings_game.locale.units].c_force.ToDisplay(args->GetInt64())};
-				StringParameters tmp_params(args_array);
-				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].force), &tmp_params, modifier >> 24, last);
-				modifier = 0;
 				break;
 			}
 
@@ -991,14 +891,133 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				}
 				break;
 
+			case SCC_PLURAL_LIST: { // {P}
+				int plural_form = *str++;          // contains the plural form for this string
+				uint offset = orig_offset + (byte)*str++;
+				int64 v = *args->GetPointerToOffset(offset); // contains the number that determines plural
+				str = ParseStringChoice(str, DeterminePluralForm(v, plural_form), &buff, last);
+				break;
+			}
+
+			case SCC_ARG_INDEX: { // Move argument pointer
+				args->offset = orig_offset + (byte)*str++;
+				break;
+			}
+
+			case SCC_SET_CASE: { // {SET_CASE}
+				/* This is a pseudo command, it's outputted when someone does {STRING.ack}
+				 * The modifier is added to all subsequent GetStringWithArgs that accept the modifier. */
+				next_substr_case_index = (byte)*str++;
+				break;
+			}
+
+			case SCC_SWITCH_CASE: { // {Used to implement case switching}
+				/* <0x9E> <NUM CASES> <CASE1> <LEN1> <STRING1> <CASE2> <LEN2> <STRING2> <CASE3> <LEN3> <STRING3> <STRINGDEFAULT>
+				 * Each LEN is printed using 2 bytes in big endian order. */
+				uint num = (byte)*str++;
+				while (num) {
+					if ((byte)str[0] == case_index) {
+						/* Found the case, adjust str pointer and continue */
+						str += 3;
+						break;
+					}
+					/* Otherwise skip to the next case */
+					str += 3 + (str[1] << 8) + str[2];
+					num--;
+				}
+				break;
+			}
+
+			case SCC_SETX: // {SETX}
+				if (buff + Utf8CharLen(SCC_SETX) + 1 < last) {
+					buff += Utf8Encode(buff, SCC_SETX);
+					*buff++ = *str++;
+				}
+				break;
+
+			case SCC_SETXY: // {SETXY}
+				if (buff + Utf8CharLen(SCC_SETXY) + 2 < last) {
+					buff += Utf8Encode(buff, SCC_SETXY);
+					*buff++ = *str++;
+					*buff++ = *str++;
+				}
+				break;
+
+			case SCC_REVISION: // {REV}
+				buff = strecpy(buff, _openttd_revision, last);
+				break;
+
+			case SCC_STRING_ID: // {STRINL}
+				if (game_script) break;
+				buff = GetStringWithArgs(buff, Utf8Consume(&str), args, last);
+				break;
+
+			case SCC_RAW_STRING_POINTER: { // {RAW_STRING}
+				if (game_script) break;
+				const char *str = (const char *)(size_t)args->GetInt64(SCC_RAW_STRING_POINTER);
+				buff = FormatString(buff, str, args, last);
+				break;
+			}
+
 			case SCC_STRING: {// {STRING}
-				uint str = modifier + args->GetInt32(SCC_STRING);
+				StringID str = args->GetInt32(SCC_STRING);
+				if (game_script && GB(str, TAB_COUNT_OFFSET, TAB_COUNT_BITS) != GAME_TEXT_TAB) break;
 				/* WARNING. It's prohibited for the included string to consume any arguments.
 				 * For included strings that consume argument, you should use STRING1, STRING2 etc.
 				 * To debug stuff you can set argv to NULL and it will tell you */
 				StringParameters tmp_params(args->GetDataPointer(), args->num_param - args->offset, NULL);
-				buff = GetStringWithArgs(buff, str, &tmp_params, last);
-				modifier = 0;
+				buff = GetStringWithArgs(buff, str, &tmp_params, last, next_substr_case_index, game_script);
+				next_substr_case_index = 0;
+				break;
+			}
+
+			case SCC_STRING1: { // {STRING1}
+				/* String that consumes ONE argument */
+				StringID str = args->GetInt32(SCC_STRING1);
+				if (game_script && GB(str, TAB_COUNT_OFFSET, TAB_COUNT_BITS) != GAME_TEXT_TAB) break;
+				StringParameters sub_args(*args, 1);
+				buff = GetStringWithArgs(buff, str, &sub_args, last, next_substr_case_index, game_script);
+				next_substr_case_index = 0;
+				break;
+			}
+
+			case SCC_STRING2: { // {STRING2}
+				/* String that consumes TWO arguments */
+				StringID str = args->GetInt32(SCC_STRING2);
+				if (game_script && GB(str, TAB_COUNT_OFFSET, TAB_COUNT_BITS) != GAME_TEXT_TAB) break;
+				StringParameters sub_args(*args, 2);
+				buff = GetStringWithArgs(buff, str, &sub_args, last, next_substr_case_index, game_script);
+				next_substr_case_index = 0;
+				break;
+			}
+
+			case SCC_STRING3: { // {STRING3}
+				/* String that consumes THREE arguments */
+				StringID str = args->GetInt32(SCC_STRING3);
+				if (game_script && GB(str, TAB_COUNT_OFFSET, TAB_COUNT_BITS) != GAME_TEXT_TAB) break;
+				StringParameters sub_args(*args, 3);
+				buff = GetStringWithArgs(buff, str, &sub_args, last, next_substr_case_index, game_script);
+				next_substr_case_index = 0;
+				break;
+			}
+
+			case SCC_STRING4: { // {STRING4}
+				/* String that consumes FOUR arguments */
+				StringID str = args->GetInt32(SCC_STRING4);
+				if (game_script && GB(str, TAB_COUNT_OFFSET, TAB_COUNT_BITS) != GAME_TEXT_TAB) break;
+				StringParameters sub_args(*args, 4);
+				buff = GetStringWithArgs(buff, str, &sub_args, last, next_substr_case_index, game_script);
+				next_substr_case_index = 0;
+				break;
+			}
+
+			case SCC_STRING5: { // {STRING5}
+				/* String that consumes FIVE arguments */
+				StringID str = args->GetInt32(SCC_STRING5);
+				if (game_script && GB(str, TAB_COUNT_OFFSET, TAB_COUNT_BITS) != GAME_TEXT_TAB) break;
+				StringParameters sub_args(*args, 5);
+				buff = GetStringWithArgs(buff, str, &sub_args, last, next_substr_case_index, game_script);
+				next_substr_case_index = 0;
 				break;
 			}
 
@@ -1010,19 +1029,6 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				int64 number = args->GetInt64(SCC_DECIMAL);
 				int digits = args->GetInt32(SCC_DECIMAL);
 				buff = FormatCommaNumber(buff, number, last, digits);
-				break;
-			}
-
-			case SCC_ARG_INDEX: { // Move argument pointer
-				args->offset = orig_offset + (byte)*str++;
-				break;
-			}
-
-			case SCC_PLURAL_LIST: { // {P}
-				int plural_form = *str++;          // contains the plural form for this string
-				uint offset = orig_offset + (byte)*str++;
-				int64 v = *args->GetPointerToOffset(offset); // contains the number that determines plural
-				str = ParseStringChoice(str, DeterminePluralForm(v, plural_form), &buff, last);
 				break;
 			}
 
@@ -1044,23 +1050,275 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				buff = FormatBytes(buff, args->GetInt64(), last);
 				break;
 
-			case SCC_CURRENCY: // {CURRENCY}
-				buff = FormatGenericCurrency(buff, _currency, args->GetInt64(SCC_CURRENCY), false, last);
+			case SCC_CARGO_TINY: { // {CARGO_TINY}
+				/* Tiny description of cargotypes. Layout:
+				 * param 1: cargo type
+				 * param 2: cargo count */
+				CargoID cargo = args->GetInt32(SCC_CARGO_TINY);
+				if (cargo >= CargoSpec::GetArraySize()) break;
+
+				StringID cargo_str = CargoSpec::Get(cargo)->units_volume;
+				int64 amount = 0;
+				switch (cargo_str) {
+					case STR_TONS:
+						amount = _units[_settings_game.locale.units].c_weight.ToDisplay(args->GetInt64());
+						break;
+
+					case STR_LITERS:
+						amount = _units[_settings_game.locale.units].c_volume.ToDisplay(args->GetInt64());
+						break;
+
+					default: {
+						amount = args->GetInt64();
+						break;
+					}
+				}
+
+				buff = FormatCommaNumber(buff, amount, last);
+				break;
+			}
+
+			case SCC_CARGO_SHORT: { // {CARGO_SHORT}
+				/* Short description of cargotypes. Layout:
+				 * param 1: cargo type
+				 * param 2: cargo count */
+				CargoID cargo = args->GetInt32(SCC_CARGO_SHORT);
+				if (cargo >= CargoSpec::GetArraySize()) break;
+
+				StringID cargo_str = CargoSpec::Get(cargo)->units_volume;
+				switch (cargo_str) {
+					case STR_TONS: {
+						assert(_settings_game.locale.units < lengthof(_units));
+						int64 args_array[] = {_units[_settings_game.locale.units].c_weight.ToDisplay(args->GetInt64())};
+						StringParameters tmp_params(args_array);
+						buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].l_weight), &tmp_params, last);
+						break;
+					}
+
+					case STR_LITERS: {
+						assert(_settings_game.locale.units < lengthof(_units));
+						int64 args_array[] = {_units[_settings_game.locale.units].c_volume.ToDisplay(args->GetInt64())};
+						StringParameters tmp_params(args_array);
+						buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].l_volume), &tmp_params, last);
+						break;
+					}
+
+					default: {
+						StringParameters tmp_params(*args, 1);
+						buff = GetStringWithArgs(buff, cargo_str, &tmp_params, last);
+						break;
+					}
+				}
+				break;
+			}
+
+			case SCC_CARGO_LONG: { // {CARGO_LONG}
+				/* First parameter is cargo type, second parameter is cargo count */
+				CargoID cargo = args->GetInt32(SCC_CARGO_LONG);
+				if (cargo != CT_INVALID && cargo >= CargoSpec::GetArraySize()) break;
+
+				StringID cargo_str = (cargo == CT_INVALID) ? STR_QUANTITY_N_A : CargoSpec::Get(cargo)->quantifier;
+				StringParameters tmp_args(*args, 1);
+				buff = GetStringWithArgs(buff, cargo_str, &tmp_args, last);
+				break;
+			}
+
+			case SCC_CURRENCY_SHORT: // {CURRENCY_SHORT}
+				buff = FormatGenericCurrency(buff, _currency, args->GetInt64(), true, last);
 				break;
 
-			case SCC_WAYPOINT_NAME: { // {WAYPOINT}
-				Waypoint *wp = Waypoint::Get(args->GetInt32(SCC_WAYPOINT_NAME));
+			case SCC_CURRENCY_LONG: // {CURRENCY_LONG}
+				buff = FormatGenericCurrency(buff, _currency, args->GetInt64(SCC_CURRENCY_LONG), false, last);
+				break;
 
-				assert(wp != NULL);
+			case SCC_DATE_TINY: // {DATE_TINY}
+				buff = FormatTinyOrISODate(buff, args->GetInt32(SCC_DATE_TINY), STR_FORMAT_DATE_TINY, last);
+				break;
 
-				if (wp->name != NULL) {
-					buff = strecpy(buff, wp->name, last);
-				} else {
-					int64 args_array[] = {wp->town->index, wp->town_cn + 1};
+			case SCC_DATE_SHORT: // {DATE_SHORT}
+				buff = FormatMonthAndYear(buff, args->GetInt32(SCC_DATE_SHORT), last, next_substr_case_index);
+				next_substr_case_index = 0;
+				break;
+
+			case SCC_DATE_LONG: // {DATE_LONG}
+				buff = FormatYmdString(buff, args->GetInt32(SCC_DATE_LONG), last, next_substr_case_index);
+				next_substr_case_index = 0;
+				break;
+
+			case SCC_DATE_ISO: // {DATE_ISO}
+				buff = FormatTinyOrISODate(buff, args->GetInt32(), STR_FORMAT_DATE_ISO, last);
+				break;
+
+			case SCC_FORCE: { // {FORCE}
+				assert(_settings_game.locale.units < lengthof(_units));
+				int64 args_array[1] = {_units[_settings_game.locale.units].c_force.ToDisplay(args->GetInt64())};
+				StringParameters tmp_params(args_array);
+				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].force), &tmp_params, last);
+				break;
+			}
+
+			case SCC_HEIGHT: { // {HEIGHT}
+				int64 args_array[] = {_units[_settings_game.locale.units].c_height.ToDisplay(args->GetInt64())};
+				StringParameters tmp_params(args_array);
+				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].height), &tmp_params, last);
+				break;
+			}
+
+			case SCC_POWER: { // {POWER}
+				assert(_settings_game.locale.units < lengthof(_units));
+				int64 args_array[1] = {_units[_settings_game.locale.units].c_power.ToDisplay(args->GetInt64())};
+				StringParameters tmp_params(args_array);
+				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].power), &tmp_params, last);
+				break;
+			}
+
+			case SCC_VELOCITY: { // {VELOCITY}
+				assert(_settings_game.locale.units < lengthof(_units));
+				int64 args_array[] = {ConvertSpeedToDisplaySpeed(args->GetInt64(SCC_VELOCITY) * 10 / 16)};
+				StringParameters tmp_params(args_array);
+				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].velocity), &tmp_params, last);
+				break;
+			}
+
+			case SCC_VOLUME_SHORT: { // {VOLUME_SHORT}
+				assert(_settings_game.locale.units < lengthof(_units));
+				int64 args_array[1] = {_units[_settings_game.locale.units].c_volume.ToDisplay(args->GetInt64())};
+				StringParameters tmp_params(args_array);
+				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].s_volume), &tmp_params, last);
+				break;
+			}
+
+			case SCC_VOLUME_LONG: { // {VOLUME_LONG}
+				assert(_settings_game.locale.units < lengthof(_units));
+				int64 args_array[1] = {_units[_settings_game.locale.units].c_volume.ToDisplay(args->GetInt64(SCC_VOLUME_LONG))};
+				StringParameters tmp_params(args_array);
+				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].l_volume), &tmp_params, last);
+				break;
+			}
+
+			case SCC_WEIGHT_SHORT: { // {WEIGHT_SHORT}
+				assert(_settings_game.locale.units < lengthof(_units));
+				int64 args_array[1] = {_units[_settings_game.locale.units].c_weight.ToDisplay(args->GetInt64())};
+				StringParameters tmp_params(args_array);
+				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].s_weight), &tmp_params, last);
+				break;
+			}
+
+			case SCC_WEIGHT_LONG: { // {WEIGHT_LONG}
+				assert(_settings_game.locale.units < lengthof(_units));
+				int64 args_array[1] = {_units[_settings_game.locale.units].c_weight.ToDisplay(args->GetInt64(SCC_WEIGHT_LONG))};
+				StringParameters tmp_params(args_array);
+				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].l_weight), &tmp_params, last);
+				break;
+			}
+
+			case SCC_COMPANY_NAME: { // {COMPANY}
+				const Company *c = Company::GetIfValid(args->GetInt32());
+				if (c == NULL) break;
+
+				if (c->name != NULL) {
+					int64 args_array[] = {(uint64)(size_t)c->name};
 					StringParameters tmp_params(args_array);
-					StringID str = ((wp->string_id == STR_SV_STNAME_BUOY) ? STR_FORMAT_BUOY_NAME : STR_FORMAT_WAYPOINT_NAME);
-					if (wp->town_cn != 0) str++;
-					buff = GetStringWithArgs(buff, str, &tmp_params, last);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
+				} else {
+					int64 args_array[] = {c->name_2};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, c->name_1, &tmp_params, last);
+				}
+				break;
+			}
+
+			case SCC_COMPANY_NUM: { // {COMPANY_NUM}
+				CompanyID company = (CompanyID)args->GetInt32();
+
+				/* Nothing is added for AI or inactive companies */
+				if (Company::IsValidHumanID(company)) {
+					int64 args_array[] = {company + 1};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_FORMAT_COMPANY_NUM, &tmp_params, last);
+				}
+				break;
+			}
+
+			case SCC_DEPOT_NAME: { // {DEPOT}
+				VehicleType vt = (VehicleType)args->GetInt32(SCC_DEPOT_NAME);
+				if (vt == VEH_AIRCRAFT) {
+					int64 args_array[] = {args->GetInt32()};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_FORMAT_DEPOT_NAME_AIRCRAFT, &tmp_params, last);
+					break;
+				}
+
+				const Depot *d = Depot::Get(args->GetInt32());
+				if (d->name != NULL) {
+					int64 args_array[] = {(uint64)(size_t)d->name};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
+				} else {
+					int64 args_array[] = {d->town->index, d->town_cn + 1};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_FORMAT_DEPOT_NAME_TRAIN + 2 * vt + (d->town_cn == 0 ? 0 : 1), &tmp_params, last);
+				}
+				break;
+			}
+
+			case SCC_ENGINE_NAME: { // {ENGINE}
+				const Engine *e = Engine::GetIfValid(args->GetInt32(SCC_ENGINE_NAME));
+				if (e == NULL) break;
+
+				if (e->name != NULL && e->IsEnabled()) {
+					int64 args_array[] = {(uint64)(size_t)e->name};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
+				} else {
+					StringParameters tmp_params(NULL, 0, NULL);
+					buff = GetStringWithArgs(buff, e->info.string_id, &tmp_params, last);
+				}
+				break;
+			}
+
+			case SCC_GROUP_NAME: { // {GROUP}
+				const Group *g = Group::GetIfValid(args->GetInt32());
+				if (g == NULL) break;
+
+				if (g->name != NULL) {
+					int64 args_array[] = {(uint64)(size_t)g->name};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
+				} else {
+					int64 args_array[] = {g->index};
+					StringParameters tmp_params(args_array);
+
+					buff = GetStringWithArgs(buff, STR_FORMAT_GROUP_NAME, &tmp_params, last);
+				}
+				break;
+			}
+
+			case SCC_INDUSTRY_NAME: { // {INDUSTRY}
+				const Industry *i = Industry::GetIfValid(args->GetInt32(SCC_INDUSTRY_NAME));
+				if (i == NULL) break;
+
+				/* First print the town name and the industry type name. */
+				int64 args_array[2] = {i->town->index, GetIndustrySpec(i->type)->name};
+				StringParameters tmp_params(args_array);
+
+				buff = FormatString(buff, GetStringPtr(STR_FORMAT_INDUSTRY_NAME), &tmp_params, last, next_substr_case_index);
+				next_substr_case_index = 0;
+				break;
+			}
+
+			case SCC_PRESIDENT_NAME: { // {PRESIDENT_NAME}
+				const Company *c = Company::GetIfValid(args->GetInt32(SCC_PRESIDENT_NAME));
+				if (c == NULL) break;
+
+				if (c->president_name != NULL) {
+					int64 args_array[] = {(uint64)(size_t)c->president_name};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
+				} else {
+					int64 args_array[] = {c->president_name_2};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, c->president_name_1, &tmp_params, last);
 				}
 				break;
 			}
@@ -1079,7 +1337,9 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				}
 
 				if (st->name != NULL) {
-					buff = strecpy(buff, st->name, last);
+					int64 args_array[] = {(uint64)(size_t)st->name};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
 				} else {
 					StringID str = st->string_id;
 					if (st->indtype != IT_INVALID) {
@@ -1101,77 +1361,46 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				break;
 			}
 
-			case SCC_DEPOT_NAME: { // {DEPOT}
-				VehicleType vt = (VehicleType)args->GetInt32(SCC_DEPOT_NAME);
-				if (vt == VEH_AIRCRAFT) {
-					int64 args_array[] = {args->GetInt32()};
-					StringParameters tmp_params(args_array);
-					buff = GetStringWithArgs(buff, STR_FORMAT_DEPOT_NAME_AIRCRAFT, &tmp_params, last);
-					break;
-				}
-
-				const Depot *d = Depot::Get(args->GetInt32());
-				if (d->name != NULL) {
-					buff = strecpy(buff, d->name, last);
-				} else {
-					int64 args_array[] = {d->town->index, d->town_cn + 1};
-					StringParameters tmp_params(args_array);
-					buff = GetStringWithArgs(buff, STR_FORMAT_DEPOT_NAME_TRAIN + 2 * vt + (d->town_cn == 0 ? 0 : 1), &tmp_params, last);
-				}
-				break;
-			}
-
 			case SCC_TOWN_NAME: { // {TOWN}
-				const Town *t = Town::Get(args->GetInt32(SCC_TOWN_NAME));
-
-				assert(t != NULL);
+				const Town *t = Town::GetIfValid(args->GetInt32(SCC_TOWN_NAME));
+				if (t == NULL) break;
 
 				if (t->name != NULL) {
-					buff = strecpy(buff, t->name, last);
+					int64 args_array[] = {(uint64)(size_t)t->name};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
 				} else {
 					buff = GetTownName(buff, t, last);
 				}
 				break;
 			}
 
-			case SCC_GROUP_NAME: { // {GROUP}
-				const Group *g = Group::Get(args->GetInt32());
+			case SCC_WAYPOINT_NAME: { // {WAYPOINT}
+				Waypoint *wp = Waypoint::GetIfValid(args->GetInt32(SCC_WAYPOINT_NAME));
+				if (wp == NULL) break;
 
-				assert(g != NULL);
-
-				if (g->name != NULL) {
-					buff = strecpy(buff, g->name, last);
-				} else {
-					int64 args_array[] = {g->index};
+				if (wp->name != NULL) {
+					int64 args_array[] = {(uint64)(size_t)wp->name};
 					StringParameters tmp_params(args_array);
-
-					buff = GetStringWithArgs(buff, STR_FORMAT_GROUP_NAME, &tmp_params, last);
-				}
-				break;
-			}
-
-			case SCC_ENGINE_NAME: { // {ENGINE}
-				EngineID engine = (EngineID)args->GetInt32(SCC_ENGINE_NAME);
-				const Engine *e = Engine::Get(engine);
-
-				assert(e != NULL);
-
-				if (e->name != NULL && e->IsEnabled()) {
-					buff = strecpy(buff, e->name, last);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
 				} else {
-					StringParameters tmp_params(NULL, 0, NULL);
-					buff = GetStringWithArgs(buff, e->info.string_id, &tmp_params, last);
+					int64 args_array[] = {wp->town->index, wp->town_cn + 1};
+					StringParameters tmp_params(args_array);
+					StringID str = ((wp->string_id == STR_SV_STNAME_BUOY) ? STR_FORMAT_BUOY_NAME : STR_FORMAT_WAYPOINT_NAME);
+					if (wp->town_cn != 0) str++;
+					buff = GetStringWithArgs(buff, str, &tmp_params, last);
 				}
 				break;
 			}
 
 			case SCC_VEHICLE_NAME: { // {VEHICLE}
-				const Vehicle *v = Vehicle::Get(args->GetInt32(SCC_VEHICLE_NAME));
-
-				assert(v != NULL);
+				const Vehicle *v = Vehicle::GetIfValid(args->GetInt32(SCC_VEHICLE_NAME));
+				if (v == NULL) break;
 
 				if (v->name != NULL) {
-					buff = strecpy(buff, v->name, last);
+					int64 args_array[] = {(uint64)(size_t)v->name};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
 				} else {
 					int64 args_array[] = {v->unitnumber};
 					StringParameters tmp_params(args_array);
@@ -1191,9 +1420,13 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 			}
 
 			case SCC_SIGN_NAME: { // {SIGN}
-				const Sign *si = Sign::Get(args->GetInt32());
+				const Sign *si = Sign::GetIfValid(args->GetInt32());
+				if (si == NULL) break;
+
 				if (si->name != NULL) {
-					buff = strecpy(buff, si->name, last);
+					int64 args_array[] = {(uint64)(size_t)si->name};
+					StringParameters tmp_params(args_array);
+					buff = GetStringWithArgs(buff, STR_JUST_RAW_STRING, &tmp_params, last);
 				} else {
 					StringParameters tmp_params(NULL, 0, NULL);
 					buff = GetStringWithArgs(buff, STR_DEFAULT_SIGN_NAME, &tmp_params, last);
@@ -1201,65 +1434,8 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				break;
 			}
 
-			case SCC_COMPANY_NAME: { // {COMPANY}
-				const Company *c = Company::Get((CompanyID)args->GetInt32());
-
-				if (c->name != NULL) {
-					buff = strecpy(buff, c->name, last);
-				} else {
-					int64 args_array[] = {c->name_2};
-					StringParameters tmp_params(args_array);
-					buff = GetStringWithArgs(buff, c->name_1, &tmp_params, last);
-				}
-				break;
-			}
-
-			case SCC_COMPANY_NUM: { // {COMPANYNUM}
-				CompanyID company = (CompanyID)args->GetInt32();
-
-				/* Nothing is added for AI or inactive companies */
-				if (Company::IsValidHumanID(company)) {
-					int64 args_array[] = {company + 1};
-					StringParameters tmp_params(args_array);
-					buff = GetStringWithArgs(buff, STR_FORMAT_COMPANY_NUM, &tmp_params, last);
-				}
-				break;
-			}
-
-			case SCC_PRESIDENT_NAME: { // {PRESIDENTNAME}
-				const Company *c = Company::Get((CompanyID)args->GetInt32(SCC_PRESIDENT_NAME));
-
-				if (c->president_name != NULL) {
-					buff = strecpy(buff, c->president_name, last);
-				} else {
-					int64 args_array[] = {c->president_name_2};
-					StringParameters tmp_params(args_array);
-					buff = GetStringWithArgs(buff, c->president_name_1, &tmp_params, last);
-				}
-				break;
-			}
-
-			case SCC_SETCASE: { // {SETCASE}
-				/* This is a pseudo command, it's outputted when someone does {STRING.ack}
-				 * The modifier is added to all subsequent GetStringWithArgs that accept the modifier. */
-				modifier = (byte)*str++ << 24;
-				break;
-			}
-
-			case SCC_SWITCH_CASE: { // {Used to implement case switching}
-				/* <0x9E> <NUM CASES> <CASE1> <LEN1> <STRING1> <CASE2> <LEN2> <STRING2> <CASE3> <LEN3> <STRING3> <STRINGDEFAULT>
-				 * Each LEN is printed using 2 bytes in big endian order. */
-				uint num = (byte)*str++;
-				while (num) {
-					if ((byte)str[0] == casei) {
-						/* Found the case, adjust str pointer and continue */
-						str += 3;
-						break;
-					}
-					/* Otherwise skip to the next case */
-					str += 3 + (str[1] << 8) + str[2];
-					num--;
-				}
+			case SCC_STATION_FEATURES: { // {STATIONFEATURES}
+				buff = StationGetSpecialString(buff, args->GetInt32(SCC_STATION_FEATURES), last);
 				break;
 			}
 
@@ -1409,7 +1585,7 @@ static char *GetSpecialNameString(char *buff, int ind, StringParameters *args, c
 {
 	switch (ind) {
 		case 1: // not used
-			return strecpy(buff, _silly_company_names[args->GetInt32() & 0xFFFF], last);
+			return strecpy(buff, _silly_company_names[min(args->GetInt32() & 0xFFFF, lengthof(_silly_company_names) - 1)], last);
 
 		case 2: // used for Foobar & Co company names
 			return GenAndCoName(buff, args->GetInt32(), last);
@@ -1498,13 +1674,13 @@ bool ReadLanguagePack(const LanguageMetadata *lang)
 	}
 
 #if TTD_ENDIAN == TTD_BIG_ENDIAN
-	for (uint i = 0; i < 32; i++) {
+	for (uint i = 0; i < TAB_COUNT; i++) {
 		lang_pack->offsets[i] = ReadLE16Aligned(&lang_pack->offsets[i]);
 	}
 #endif /* TTD_ENDIAN == TTD_BIG_ENDIAN */
 
 	uint count = 0;
-	for (uint i = 0; i < 32; i++) {
+	for (uint i = 0; i < TAB_COUNT; i++) {
 		uint num = lang_pack->offsets[i];
 		_langtab_start[i] = count;
 		_langtab_num[i] = num;
@@ -1569,6 +1745,7 @@ bool ReadLanguagePack(const LanguageMetadata *lang)
 #endif /* WITH_ICU */
 
 	/* Some lists need to be sorted again after a language change. */
+	ReconsiderGameScriptLanguage();
 	InitializeSortedCargoSpecs();
 	SortIndustryTypes();
 	BuildIndustriesLegend();
@@ -1641,7 +1818,7 @@ const LanguageMetadata *GetLanguage(byte newgrflangid)
 }
 
 /**
- * Reads the language file header and checks compatability.
+ * Reads the language file header and checks compatibility.
  * @param file the file to read
  * @param hdr  the place to write the header information to
  * @return true if and only if the language file is of a compatible version
@@ -1697,8 +1874,8 @@ static void GetLanguageList(const char *path)
 }
 
 /**
- * Make a list of the available language packs. put the data in
- * _dynlang struct.
+ * Make a list of the available language packs. Put the data in
+ * #_languages list.
  */
 void InitializeLanguagePacks()
 {
@@ -1715,7 +1892,7 @@ void InitializeLanguagePacks()
 	const char *lang = GetCurrentLocale("LC_MESSAGES");
 	if (lang == NULL) lang = "en_GB";
 
-	const LanguageMetadata *chosen_language   = NULL; ///< Matching the language in the configuartion file or the current locale
+	const LanguageMetadata *chosen_language   = NULL; ///< Matching the language in the configuration file or the current locale
 	const LanguageMetadata *language_fallback = NULL; ///< Using pt_PT for pt_BR locale when pt_BR is not available
 	const LanguageMetadata *en_GB_fallback    = _languages.Begin(); ///< Fallback when no locale-matching language has been found
 
@@ -1723,7 +1900,7 @@ void InitializeLanguagePacks()
 	for (const LanguageMetadata *lng = _languages.Begin(); lng != _languages.End(); lng++) {
 		/* We are trying to find a default language. The priority is by
 		 * configuration file, local environment and last, if nothing found,
-		 * english. */
+		 * English. */
 		const char *lang_file = strrchr(lng->file, PATHSEPCHAR) + 1;
 		if (strcmp(lang_file, _config_language_file) == 0) {
 			chosen_language = lng;
@@ -1756,48 +1933,88 @@ const char *GetCurrentLanguageIsoCode()
 /**
  * Check whether there are glyphs missing in the current language.
  * @param Pointer to an address for storing the text pointer.
- * @return If glyphs are missing, return \c true, else return \false.
+ * @return If glyphs are missing, return \c true, else return \c false.
  * @post If \c true is returned and str is not NULL, *str points to a string that is found to contain at least one missing glyph.
  */
-static bool FindMissingGlyphs(const char **str)
+bool MissingGlyphSearcher::FindMissingGlyphs(const char **str)
 {
-#ifdef WITH_FREETYPE
-	UninitFreeType();
-	InitFreeType();
-#endif
+	InitFreeType(this->Monospace());
 	const Sprite *question_mark[FS_END];
-	FontSize size;
 
-	for (size = FS_BEGIN; size < FS_END; size++) {
+	for (FontSize size = this->Monospace() ? FS_MONO : FS_BEGIN; size < (this->Monospace() ? FS_END : FS_MONO); size++) {
 		question_mark[size] = GetGlyph(size, '?');
 	}
 
-	for (uint i = 0; i != 32; i++) {
-		for (uint j = 0; j < _langtab_num[i]; j++) {
-			size = FS_NORMAL;
-			const char *text = _langpack_offs[_langtab_start[i] + j];
-			if (str != NULL) *str = text;
-			for (WChar c = Utf8Consume(&text); c != '\0'; c = Utf8Consume(&text)) {
-				if (c == SCC_SETX) {
-					/* SetX is, together with SetXY as special character that
-					 * uses the next (two) characters as data points. We have
-					 * to skip those, otherwise the UTF8 reading will go haywire. */
-					text++;
-				} else if (c == SCC_SETXY) {
-					text += 2;
-				} else if (c == SCC_TINYFONT) {
-					size = FS_SMALL;
-				} else if (c == SCC_BIGFONT) {
-					size = FS_LARGE;
-				} else if (IsPrintable(c) && !IsTextDirectionChar(c) && c != '?' && GetGlyph(size, c) == question_mark[size]) {
-					/* The character is printable, but not in the normal font. This is the case we were testing for. */
-					return true;
-				}
+	this->Reset();
+	for (const char *text = this->NextString(); text != NULL; text = this->NextString()) {
+		FontSize size = this->DefaultSize();
+		if (str != NULL) *str = text;
+		for (WChar c = Utf8Consume(&text); c != '\0'; c = Utf8Consume(&text)) {
+			if (c == SCC_SETX) {
+				/* SetX is, together with SetXY as special character that
+					* uses the next (two) characters as data points. We have
+					* to skip those, otherwise the UTF8 reading will go haywire. */
+				text++;
+			} else if (c == SCC_SETXY) {
+				text += 2;
+			} else if (c == SCC_TINYFONT) {
+				size = FS_SMALL;
+			} else if (c == SCC_BIGFONT) {
+				size = FS_LARGE;
+			} else if (!IsInsideMM(c, SCC_SPRITE_START, SCC_SPRITE_END) && IsPrintable(c) && !IsTextDirectionChar(c) && c != '?' && GetGlyph(size, c) == question_mark[size]) {
+				/* The character is printable, but not in the normal font. This is the case we were testing for. */
+				return true;
 			}
 		}
 	}
 	return false;
 }
+
+/** Helper for searching through the language pack. */
+class LanguagePackGlyphSearcher : public MissingGlyphSearcher {
+	uint i; ///< Iterator for the primary language tables.
+	uint j; ///< Iterator for the secondary language tables.
+
+	/* virtual */ void Reset()
+	{
+		this->i = 0;
+		this->j = 0;
+	}
+
+	/* virtual */ FontSize DefaultSize()
+	{
+		return FS_NORMAL;
+	}
+
+	/* virtual */ const char *NextString()
+	{
+		if (this->i >= TAB_COUNT) return NULL;
+
+		const char *ret = _langpack_offs[_langtab_start[i] + j];
+
+		this->j++;
+		while (this->j >= _langtab_num[this->i] && this->i < TAB_COUNT) {
+			i++;
+			j = 0;
+		}
+
+		return ret;
+	}
+
+	/* virtual */ bool Monospace()
+	{
+		return false;
+	}
+
+	/* virtual */ void SetFontNames(FreeTypeSettings *settings, const char *font_name)
+	{
+#ifdef WITH_FREETYPE
+		strecpy(settings->small_font,  font_name, lastof(settings->small_font));
+		strecpy(settings->medium_font, font_name, lastof(settings->medium_font));
+		strecpy(settings->large_font,  font_name, lastof(settings->large_font));
+#endif /* WITH_FREETYPE */
+	}
+};
 
 /**
  * Check whether the currently loaded language pack
@@ -1808,10 +2025,15 @@ static bool FindMissingGlyphs(const char **str)
  * mean it might use characters that are not in the
  * font, which is the whole reason this check has
  * been added.
+ * @param base_font Whether to look at the base font as well.
+ * @param searcher  The methods to use to search for strings to check.
+ *                  If NULL the loaded language pack searcher is used.
  */
-void CheckForMissingGlyphsInLoadedLanguagePack()
+void CheckForMissingGlyphs(bool base_font, MissingGlyphSearcher *searcher)
 {
-	bool bad_font = FindMissingGlyphs(NULL);
+	static LanguagePackGlyphSearcher pack_searcher;
+	if (searcher == NULL) searcher = &pack_searcher;
+	bool bad_font = !base_font || searcher->FindMissingGlyphs(NULL);
 #ifdef WITH_FREETYPE
 	if (bad_font) {
 		/* We found an unprintable character... lets try whether we can find
@@ -1819,16 +2041,15 @@ void CheckForMissingGlyphsInLoadedLanguagePack()
 		FreeTypeSettings backup;
 		memcpy(&backup, &_freetype, sizeof(backup));
 
-		bad_font = !SetFallbackFont(&_freetype, _langpack->isocode, _langpack->winlangid, &FindMissingGlyphs);
+		bad_font = !SetFallbackFont(&_freetype, _langpack->isocode, _langpack->winlangid, searcher);
 
 		memcpy(&_freetype, &backup, sizeof(backup));
 
-		if (bad_font) {
+		if (bad_font && base_font) {
 			/* Our fallback font does miss characters too, so keep the
 			 * user chosen font as that is more likely to be any good than
 			 * the wild guess we made */
-			UninitFreeType();
-			InitFreeType();
+			InitFreeType(searcher->Monospace());
 		}
 	}
 #endif
@@ -1845,12 +2066,12 @@ void CheckForMissingGlyphsInLoadedLanguagePack()
 		ShowErrorMessage(STR_JUST_RAW_STRING, INVALID_STRING_ID, WL_WARNING);
 
 		/* Reset the font width */
-		LoadStringWidthTable();
+		LoadStringWidthTable(searcher->Monospace());
 		return;
 	}
 
 	/* Update the font with cache */
-	LoadStringWidthTable();
+	LoadStringWidthTable(searcher->Monospace());
 
 #if !defined(WITH_ICU)
 	/*

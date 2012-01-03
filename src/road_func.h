@@ -17,6 +17,7 @@
 #include "direction_type.h"
 #include "company_type.h"
 #include "tile_type.h"
+#include "economy_func.h"
 
 /**
  * Iterate through each set RoadType in a RoadTypes value.
@@ -57,7 +58,6 @@ static inline RoadTypes RoadTypeToRoadTypes(RoadType rt)
  *
  * @param r The given RoadTypes
  * @return The complement of the given RoadTypes
- * @note The unused value ROADTYPES_HWAY will be used, too.
  */
 static inline RoadTypes ComplementRoadTypes(RoadTypes r)
 {
@@ -146,6 +146,19 @@ static inline RoadBits DiagDirToRoadBits(DiagDirection d)
 static inline RoadBits AxisToRoadBits(Axis a)
 {
 	return a == AXIS_X ? ROAD_X : ROAD_Y;
+}
+
+
+/**
+ * Calculates the maintenance cost of a number of road bits.
+ * @param roadtype Road type to get the cost for.
+ * @param num Number of road bits.
+ * @return Total cost.
+ */
+static inline Money RoadMaintenanceCost(RoadType roadtype, uint32 num)
+{
+	assert(roadtype < ROADTYPE_END);
+	return (_price[PR_INFRASTRUCTURE_ROAD] * (roadtype == ROADTYPE_TRAM ? 3 : 2) * num * (1 + IntSqrt(num))) >> 9; // 2 bits fraction for the multiplier and 7 bits scaling.
 }
 
 bool HasRoadTypesAvail(const CompanyID company, const RoadTypes rts);

@@ -16,10 +16,9 @@
 
 /**
  * The template to define classes in Squirrel. It takes care of the creation
- *  and calling of such classes, to make the AI Layer cleaner while having a
- *  powerful script as possible AI language.
+ *  and calling of such classes, to minimize the API layer.
  */
-template <class CL>
+template <class CL, ScriptType ST>
 class DefSQClass {
 private:
 	const char *classname;
@@ -36,7 +35,7 @@ public:
 	void DefSQMethod(Squirrel *engine, Func function_proc, const char *function_name)
 	{
 		using namespace SQConvert;
-		engine->AddMethod(function_name, DefSQNonStaticCallback<CL, Func>, 0, NULL, &function_proc, sizeof(function_proc));
+		engine->AddMethod(function_name, DefSQNonStaticCallback<CL, Func, ST>, 0, NULL, &function_proc, sizeof(function_proc));
 	}
 
 	/**
@@ -46,7 +45,7 @@ public:
 	void DefSQAdvancedMethod(Squirrel *engine, Func function_proc, const char *function_name)
 	{
 		using namespace SQConvert;
-		engine->AddMethod(function_name, DefSQAdvancedNonStaticCallback<CL, Func>, 0, NULL, &function_proc, sizeof(function_proc));
+		engine->AddMethod(function_name, DefSQAdvancedNonStaticCallback<CL, Func, ST>, 0, NULL, &function_proc, sizeof(function_proc));
 	}
 
 	/**
@@ -59,7 +58,7 @@ public:
 	void DefSQMethod(Squirrel *engine, Func function_proc, const char *function_name, int nparam, const char *params)
 	{
 		using namespace SQConvert;
-		engine->AddMethod(function_name, DefSQNonStaticCallback<CL, Func>, nparam, params, &function_proc, sizeof(function_proc));
+		engine->AddMethod(function_name, DefSQNonStaticCallback<CL, Func, ST>, nparam, params, &function_proc, sizeof(function_proc));
 	}
 
 	/**
@@ -70,6 +69,16 @@ public:
 	{
 		using namespace SQConvert;
 		engine->AddMethod(function_name, DefSQStaticCallback<CL, Func>, 0, NULL, &function_proc, sizeof(function_proc));
+	}
+
+	/**
+	 * This defines a static method inside a class for Squirrel, which has access to the 'engine' (experts only!).
+	 */
+	template <typename Func>
+	void DefSQAdvancedStaticMethod(Squirrel *engine, Func function_proc, const char *function_name)
+	{
+		using namespace SQConvert;
+		engine->AddMethod(function_name, DefSQAdvancedStaticCallback<CL, Func>, 0, NULL, &function_proc, sizeof(function_proc));
 	}
 
 	/**
@@ -106,6 +115,12 @@ public:
 	{
 		using namespace SQConvert;
 		engine->AddMethod("constructor", DefSQConstructorCallback<CL, Func, Tnparam>, Tnparam, params);
+	}
+
+	void AddSQAdvancedConstructor(Squirrel *engine)
+	{
+		using namespace SQConvert;
+		engine->AddMethod("constructor", DefSQAdvancedConstructorCallback<CL>, 0, NULL);
 	}
 
 	void PostRegister(Squirrel *engine)

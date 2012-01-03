@@ -28,6 +28,8 @@
 #include "language.h"
 
 #include "ai/ai_info.hpp"
+#include "game/game.hpp"
+#include "game/game_info.hpp"
 #include "company_base.h"
 #include "company_func.h"
 
@@ -151,10 +153,12 @@ char *CrashLog::LogConfiguration(char *buffer, const char *last) const
 		if (c->ai_info == NULL) {
 			buffer += seprintf(buffer, last, " %2i: Human\n", (int)c->index);
 		} else {
-#ifdef ENABLE_AI
 			buffer += seprintf(buffer, last, " %2i: %s (v%d)\n", (int)c->index, c->ai_info->GetName(), c->ai_info->GetVersion());
-#endif /* ENABLE_AI */
 		}
+	}
+
+	if (Game::GetInfo() != NULL) {
+		buffer += seprintf(buffer, last, " GS: %s (v%d)\n", Game::GetInfo()->GetName(), Game::GetInfo()->GetVersion());
 	}
 	buffer += seprintf(buffer, last, "\n");
 

@@ -22,6 +22,8 @@
 #include "rail.h"
 #include "settings_type.h"
 
+#include "widgets/engine_widget.h"
+
 #include "table/strings.h"
 
 /**
@@ -42,23 +44,16 @@ StringID GetEngineCategoryName(EngineID engine)
 	}
 }
 
-/** Widgets used for the engine preview window */
-enum EnginePreviewWidgets {
-	EPW_QUESTION,   ///< The container for the question
-	EPW_NO,         ///< No button
-	EPW_YES,        ///< Yes button
-};
-
 static const NWidgetPart _nested_engine_preview_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_CLOSEBOX, COLOUR_LIGHT_BLUE),
 		NWidget(WWT_CAPTION, COLOUR_LIGHT_BLUE), SetDataTip(STR_ENGINE_PREVIEW_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 	EndContainer(),
 	NWidget(WWT_PANEL, COLOUR_LIGHT_BLUE),
-		NWidget(WWT_EMPTY, INVALID_COLOUR, EPW_QUESTION), SetMinimalSize(300, 0), SetPadding(8, 8, 8, 8), SetFill(1, 0),
+		NWidget(WWT_EMPTY, INVALID_COLOUR, WID_EP_QUESTION), SetMinimalSize(300, 0), SetPadding(8, 8, 8, 8), SetFill(1, 0),
 		NWidget(NWID_HORIZONTAL, NC_EQUALSIZE), SetPIP(85, 10, 85),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_LIGHT_BLUE, EPW_NO), SetDataTip(STR_QUIT_NO, STR_NULL), SetFill(1, 0),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_LIGHT_BLUE, EPW_YES), SetDataTip(STR_QUIT_YES, STR_NULL), SetFill(1, 0),
+			NWidget(WWT_PUSHTXTBTN, COLOUR_LIGHT_BLUE, WID_EP_NO), SetDataTip(STR_QUIT_NO, STR_NULL), SetFill(1, 0),
+			NWidget(WWT_PUSHTXTBTN, COLOUR_LIGHT_BLUE, WID_EP_YES), SetDataTip(STR_QUIT_YES, STR_NULL), SetFill(1, 0),
 		EndContainer(),
 		NWidget(NWID_SPACER), SetMinimalSize(0, 8),
 	EndContainer(),
@@ -74,7 +69,7 @@ struct EnginePreviewWindow : Window {
 
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 	{
-		if (widget != EPW_QUESTION) return;
+		if (widget != WID_EP_QUESTION) return;
 
 		EngineID engine = this->window_number;
 		SetDParam(0, GetEngineCategoryName(engine));
@@ -85,7 +80,7 @@ struct EnginePreviewWindow : Window {
 
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
-		if (widget != EPW_QUESTION) return;
+		if (widget != WID_EP_QUESTION) return;
 
 		EngineID engine = this->window_number;
 		SetDParam(0, GetEngineCategoryName(engine));
@@ -96,7 +91,7 @@ struct EnginePreviewWindow : Window {
 		DrawString(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_RIGHT, y, STR_ENGINE_NAME, TC_BLACK, SA_HOR_CENTER);
 		y += FONT_HEIGHT_NORMAL;
 
-		DrawVehicleEngine(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_RIGHT, this->width >> 1, y + VEHICLE_SPACE / 2, engine, GetEnginePalette(engine, _local_company));
+		DrawVehicleEngine(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_RIGHT, this->width >> 1, y + VEHICLE_SPACE / 2, engine, GetEnginePalette(engine, _local_company), EIT_PREVIEW);
 
 		y += VEHICLE_SPACE;
 		DrawStringMultiLine(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_RIGHT, y, r.bottom, GetEngineInfoString(engine), TC_FROMSTRING, SA_CENTER);
@@ -105,10 +100,10 @@ struct EnginePreviewWindow : Window {
 	virtual void OnClick(Point pt, int widget, int click_count)
 	{
 		switch (widget) {
-			case EPW_YES:
+			case WID_EP_YES:
 				DoCommandP(0, this->window_number, 0, CMD_WANT_ENGINE_PREVIEW);
 				/* FALL THROUGH */
-			case EPW_NO:
+			case WID_EP_NO:
 				delete this;
 				break;
 		}
@@ -170,20 +165,22 @@ static StringID GetAircraftEngineInfoString(const Engine *e)
 	CargoID cargo = e->GetDefaultCargoType();
 	uint16 mail_capacity;
 	uint capacity = e->GetDisplayDefaultCapacity(&mail_capacity);
+	uint16 range = e->GetRange();
 
 	SetDParam(0, e->GetCost());
 	SetDParam(1, e->GetDisplayMaxSpeed());
 	SetDParam(2, cargo);
 	SetDParam(3, capacity);
+	SetDParam(7, range);
 
 	if (mail_capacity > 0) {
 		SetDParam(4, CT_MAIL);
 		SetDParam(5, mail_capacity);
 		SetDParam(6, e->GetRunningCost());
-		return STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST;
+		return range > 0 ? STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST : STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST;
 	} else {
 		SetDParam(4, e->GetRunningCost());
-		return STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST;
+		return range > 0 ? STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST : STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST;
 	}
 }
 
@@ -268,25 +265,25 @@ StringID GetEngineInfoString(EngineID engine)
  * @param engine Engine to draw.
  * @param pal    Palette to use for drawing.
  */
-void DrawVehicleEngine(int left, int right, int preferred_x, int y, EngineID engine, PaletteID pal)
+void DrawVehicleEngine(int left, int right, int preferred_x, int y, EngineID engine, PaletteID pal, EngineImageType image_type)
 {
 	const Engine *e = Engine::Get(engine);
 
 	switch (e->type) {
 		case VEH_TRAIN:
-			DrawTrainEngine(left, right, preferred_x, y, engine, pal);
+			DrawTrainEngine(left, right, preferred_x, y, engine, pal, image_type);
 			break;
 
 		case VEH_ROAD:
-			DrawRoadVehEngine(left, right, preferred_x, y, engine, pal);
+			DrawRoadVehEngine(left, right, preferred_x, y, engine, pal, image_type);
 			break;
 
 		case VEH_SHIP:
-			DrawShipEngine(left, right, preferred_x, y, engine, pal);
+			DrawShipEngine(left, right, preferred_x, y, engine, pal, image_type);
 			break;
 
 		case VEH_AIRCRAFT:
-			DrawAircraftEngine(left, right, preferred_x, y, engine, pal);
+			DrawAircraftEngine(left, right, preferred_x, y, engine, pal, image_type);
 			break;
 
 		default: NOT_REACHED();

@@ -7,29 +7,16 @@
  * See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with OpenTTD. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file ai_gui.hpp Window for configuring the AIs  */
+/** @file ai_gui.hpp %Window for configuring the AIs  */
 
 #ifndef AI_GUI_HPP
 #define AI_GUI_HPP
 
 #include "../company_type.h"
 
-#ifdef ENABLE_AI
 void ShowAIDebugWindow(CompanyID show_company = INVALID_COMPANY);
 void ShowAIConfigWindow();
 void ShowAIDebugWindowIfAIError();
 void InitializeAIGui();
-#else
-#include "../gui.h"
-#include "table/strings.h"
-
-static inline void ShowAIConfigWindow()
-{
-	ShowErrorMessage(STR_ERROR_NO_AI, STR_ERROR_NO_AI_SUB, WL_INFO);
-}
-static inline void ShowAIDebugWindow(CompanyID show_company = INVALID_COMPANY) {ShowAIConfigWindow();}
-static inline void ShowAIDebugWindowIfAIError() {}
-static inline void InitializeAIGui() {}
-#endif /* ENABLE_AI */
 
 #endif /* AI_GUI_HPP */

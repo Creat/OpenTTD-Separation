@@ -22,6 +22,8 @@
 #include "console_func.h"
 #include "rev.h"
 
+#include "widgets/console_widget.h"
+
 #include "table/strings.h"
 
 static const uint ICON_HISTORY_SIZE       = 20;
@@ -126,7 +128,7 @@ struct IConsoleLine {
 /* ** main console cmd buffer ** */
 static Textbuf _iconsole_cmdline;
 static char *_iconsole_history[ICON_HISTORY_SIZE];
-static byte _iconsole_historypos;
+static int _iconsole_historypos;
 IConsoleModes _iconsole_mode;
 
 /* *************** *
@@ -145,20 +147,15 @@ static void IConsoleClearCommand()
 
 static inline void IConsoleResetHistoryPos()
 {
-	_iconsole_historypos = ICON_HISTORY_SIZE - 1;
+	_iconsole_historypos = -1;
 }
 
 
 static const char *IConsoleHistoryAdd(const char *cmd);
 static void IConsoleHistoryNavigate(int direction);
 
-/** Widgets of the console window. */
-enum ConsoleWidgets {
-	CW_BACKGROUND, ///< Background of the console
-};
-
 static const struct NWidgetPart _nested_console_window_widgets[] = {
-	NWidget(WWT_EMPTY, INVALID_COLOUR, CW_BACKGROUND), SetResize(1, 1),
+	NWidget(WWT_EMPTY, INVALID_COLOUR, WID_C_BACKGROUND), SetResize(1, 1),
 };
 
 static const WindowDesc _console_window_desc(
@@ -353,7 +350,7 @@ int IConsoleWindow::scroll = 0;
 
 void IConsoleGUIInit()
 {
-	_iconsole_historypos = ICON_HISTORY_SIZE - 1;
+	IConsoleResetHistoryPos();
 	_iconsole_mode = ICONSOLE_CLOSED;
 
 	IConsoleLine::Reset();
@@ -454,25 +451,15 @@ static const char *IConsoleHistoryAdd(const char *cmd)
 static void IConsoleHistoryNavigate(int direction)
 {
 	if (_iconsole_history[0] == NULL) return; // Empty history
-	int i = _iconsole_historypos + direction;
+	_iconsole_historypos = Clamp(_iconsole_historypos + direction, -1, ICON_HISTORY_SIZE - 1);
 
-	/* watch out for overflows, just wrap around */
-	if (i < 0) i = ICON_HISTORY_SIZE - 1;
-	if ((uint)i >= ICON_HISTORY_SIZE) i = 0;
+	if (direction > 0 && _iconsole_history[_iconsole_historypos] == NULL) _iconsole_historypos--;
 
-	if (direction > 0) {
-		if (_iconsole_history[i] == NULL) i = 0;
+	if (_iconsole_historypos == -1) {
+		*_iconsole_cmdline.buf = '\0';
+	} else {
+		ttd_strlcpy(_iconsole_cmdline.buf, _iconsole_history[_iconsole_historypos], _iconsole_cmdline.max_bytes);
 	}
-
-	if (direction < 0) {
-		while (i > 0 && _iconsole_history[i] == NULL) i--;
-	}
-
-	_iconsole_historypos = i;
-	IConsoleClearCommand();
-	/* copy history to 'command prompt / bash' */
-	assert(_iconsole_history[i] != NULL && IsInsideMM(i, 0, ICON_HISTORY_SIZE));
-	ttd_strlcpy(_iconsole_cmdline.buf, _iconsole_history[i], _iconsole_cmdline.max_bytes);
 	UpdateTextBufferSize(&_iconsole_cmdline);
 }
 

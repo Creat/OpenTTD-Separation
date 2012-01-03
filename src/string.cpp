@@ -184,10 +184,9 @@ char *CDECL str_fmt(const char *str, ...)
  * replaces them with a question mark '?' (if not ignored)
  * @param str the string to validate
  * @param last the last valid character of str
- * @param allow_newlines whether newlines should be allowed or ignored
- * @param ignore whether to ignore or replace with a question mark
+ * @param settings the settings for the string validation.
  */
-void str_validate(char *str, const char *last, bool allow_newlines, bool ignore)
+void str_validate(char *str, const char *last, StringValidationSettings settings)
 {
 	/* Assume the ABSOLUTE WORST to be in str as it comes from the outside. */
 
@@ -208,23 +207,23 @@ void str_validate(char *str, const char *last, bool allow_newlines, bool ignore)
 		 * characters to be skipped */
 		if (c == '\0') break;
 
-		if (IsPrintable(c) && (c < SCC_SPRITE_START || c > SCC_SPRITE_END)) {
+		if ((IsPrintable(c) && (c < SCC_SPRITE_START || c > SCC_SPRITE_END)) || ((settings & SVS_ALLOW_CONTROL_CODE) != 0 && IsInsideMM(c, SCC_CONTROL_START, SCC_CONTROL_END))) {
 			/* Copy the character back. Even if dst is current the same as str
 			 * (i.e. no characters have been changed) this is quicker than
 			 * moving the pointers ahead by len */
 			do {
 				*dst++ = *str++;
 			} while (--len != 0);
-		} else if (allow_newlines && c == '\n') {
+		} else if ((settings & SVS_ALLOW_NEWLINE) != 0  && c == '\n') {
 			*dst++ = *str++;
 		} else {
-			if (allow_newlines && c == '\r' && str[1] == '\n') {
+			if ((settings & SVS_ALLOW_NEWLINE) != 0 && c == '\r' && str[1] == '\n') {
 				str += len;
 				continue;
 			}
 			/* Replace the undesirable character with a question mark */
 			str += len;
-			if (!ignore) *dst++ = '?';
+			if ((settings & SVS_REPLACE_WITH_QUESTION_MARK) != 0) *dst++ = '?';
 
 			/* In case of these two special cases assume that they really
 			 * mean SETX/SETXY and also "eat" the paramater. If this was
@@ -524,7 +523,7 @@ size_t Utf8Encode(char *buf, WChar c)
  * @param s string to check if it needs additional trimming
  * @param maxlen the maximum length the buffer can have.
  * @return the new length in bytes of the string (eg. strlen(new_string))
- * @NOTE maxlen is the string length _INCLUDING_ the terminating '\0'
+ * @note maxlen is the string length _INCLUDING_ the terminating '\0'
  */
 size_t Utf8TrimString(char *s, size_t maxlen)
 {

@@ -23,12 +23,15 @@ enum Subdirectory {
 	AUTOSAVE_DIR,  ///< Subdirectory of save for autosaves
 	SCENARIO_DIR,  ///< Base directory for all scenarios
 	HEIGHTMAP_DIR, ///< Subdirectory of scenario for heightmaps
-	GM_DIR,        ///< Subdirectory for all music
+	OLD_GM_DIR,    ///< Old subdirectory for the music
+	OLD_DATA_DIR,  ///< Old subdirectory for the data.
 	BASESET_DIR,   ///< Subdirectory for all base data (base sets, intro game)
 	NEWGRF_DIR,    ///< Subdirectory for all NewGRFs
 	LANG_DIR,      ///< Subdirectory for all translation files
-	AI_DIR,        ///< Subdirectory for all AI files
-	AI_LIBRARY_DIR,///< Subdirectory for all AI libraries
+	AI_DIR,        ///< Subdirectory for all %AI files
+	AI_LIBRARY_DIR,///< Subdirectory for all %AI libraries
+	GAME_DIR,      ///< Subdirectory for all game scripts
+	GAME_LIBRARY_DIR, ///< Subdirectory for all GS libraries
 	NUM_SUBDIRS,   ///< Number of subdirectories
 	NO_DIRECTORY,  ///< A path without any base directory
 };

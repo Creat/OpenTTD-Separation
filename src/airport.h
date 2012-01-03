@@ -52,7 +52,7 @@ enum AirportMovingDataFlags {
 	AMED_BRAKE      = 1 << 5, ///< Taxiing at the airport.
 	AMED_HELI_RAISE = 1 << 6, ///< Helicopter take-off.
 	AMED_HELI_LOWER = 1 << 7, ///< Helicopter landing.
-	AMED_HOLD       = 1 << 8  ///< Holding pattern movement (above the airport).
+	AMED_HOLD       = 1 << 8, ///< Holding pattern movement (above the airport).
 };
 
 /** Movement States on Airports (headings target) */
@@ -71,7 +71,7 @@ enum AirportMovementStates {
 	STARTTAKEOFF   = 11, ///< Airplane has arrived at a runway for take-off.
 	ENDTAKEOFF     = 12, ///< Airplane has reached end-point of the take-off runway.
 	HELITAKEOFF    = 13, ///< Helicopter wants to leave the airport.
-	FLYING         = 14, ///< Vehicle is flying in the air.
+	FLYING         = 14, ///< %Vehicle is flying in the air.
 	LANDING        = 15, ///< Airplane wants to land.
 	ENDLANDING     = 16, ///< Airplane wants to finish landing.
 	HELILANDING    = 17, ///< Helicopter wants to land.
@@ -144,7 +144,7 @@ public:
 		AIRPLANES   = 0x1,                     ///< Can planes land on this airport type?
 		HELICOPTERS = 0x2,                     ///< Can helicopters land on this airport type?
 		ALL         = AIRPLANES | HELICOPTERS, ///< Mask to check for both planes and helicopters.
-		SHORT_STRIP = 0x4                      ///< This airport has a short landing strip, dangerous for fast aircraft.
+		SHORT_STRIP = 0x4,                     ///< This airport has a short landing strip, dangerous for fast aircraft.
 	};
 
 	AirportFTAClass(
@@ -172,7 +172,7 @@ public:
 
 	const AirportMovingData *moving_data; ///< Movement data.
 	struct AirportFTA *layout;            ///< state machine for airport
-	const byte *terminals;                ///< Array with the number of terminal groups, followed by the number of terminals in each group.
+	const byte *terminals;                ///< %Array with the number of terminal groups, followed by the number of terminals in each group.
 	const byte num_helipads;              ///< Number of helipads on this airport. When 0 helicopters will go to normal terminals.
 	Flags flags;                          ///< Flags for this airport type.
 	byte nofelements;                     ///< number of positions the airport consists of

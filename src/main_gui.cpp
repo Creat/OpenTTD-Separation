@@ -34,6 +34,8 @@
 
 #include "saveload/saveload.h"
 
+#include "widgets/main_widget.h"
+
 #include "network/network.h"
 #include "network/network_func.h"
 #include "network/network_gui.h"
@@ -148,7 +150,7 @@ bool DoZoomInOutWindow(ZoomStateChange how, Window *w)
 			break;
 
 		case ZOOM_IN:
-			if (vp->zoom == ZOOM_LVL_MIN) return false;
+			if (vp->zoom <= _settings_client.gui.zoom_min) return false;
 			vp->zoom = (ZoomLevel)((int)vp->zoom - 1);
 			vp->virtual_width >>= 1;
 			vp->virtual_height >>= 1;
@@ -160,7 +162,7 @@ bool DoZoomInOutWindow(ZoomStateChange how, Window *w)
 			w->viewport->follow_vehicle = INVALID_VEHICLE;
 			break;
 		case ZOOM_OUT:
-			if (vp->zoom == ZOOM_LVL_MAX) return false;
+			if (vp->zoom >= _settings_client.gui.zoom_max) return false;
 			vp->zoom = (ZoomLevel)((int)vp->zoom + 1);
 
 			w->viewport->scrollpos_x -= vp->virtual_width >> 1;
@@ -188,7 +190,7 @@ void ZoomInOrOutToCursorWindow(bool in, Window *w)
 
 	if (_game_mode != GM_MENU) {
 		ViewPort *vp = w->viewport;
-		if ((in && vp->zoom == ZOOM_LVL_MIN) || (!in && vp->zoom == ZOOM_LVL_MAX)) return;
+		if ((in && vp->zoom <= _settings_client.gui.zoom_min) || (!in && vp->zoom >= _settings_client.gui.zoom_max)) return;
 
 		Point pt = GetTileZoomCenterWindow(in, w);
 		if (pt.x != -1) {
@@ -199,13 +201,8 @@ void ZoomInOrOutToCursorWindow(bool in, Window *w)
 	}
 }
 
-/** Widgets of the main window. */
-enum MainWindowWidgets {
-	MW_VIEWPORT, ///< Main window viewport.
-};
-
 static const struct NWidgetPart _nested_main_window_widgets[] = {
-	NWidget(NWID_VIEWPORT, INVALID_COLOUR, MW_VIEWPORT), SetResize(1, 1),
+	NWidget(NWID_VIEWPORT, INVALID_COLOUR, WID_M_VIEWPORT), SetResize(1, 1),
 };
 
 static const WindowDesc _main_window_desc(
@@ -244,10 +241,10 @@ struct MainWindow : Window
 	MainWindow() : Window()
 	{
 		this->InitNested(&_main_window_desc, 0);
-		CLRBITS(this->flags4, WF_WHITE_BORDER_MASK);
+		CLRBITS(this->flags, WF_WHITE_BORDER);
 		ResizeWindow(this, _screen.width, _screen.height);
 
-		NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(MW_VIEWPORT);
+		NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(WID_M_VIEWPORT);
 		nvp->InitializeViewport(this, TileXY(32, 32), ZOOM_LVL_VIEWPORT);
 	}
 
@@ -313,7 +310,7 @@ struct MainWindow : Window
 			case GHK_CENTER_ZOOM: {
 				Point pt = GetTileBelowCursor();
 				if (pt.x != -1) {
-					bool instant = (num == GHK_CENTER_ZOOM && this->viewport->zoom != ZOOM_LVL_MIN);
+					bool instant = (num == GHK_CENTER_ZOOM && this->viewport->zoom != _settings_client.gui.zoom_min);
 					if (num == GHK_CENTER_ZOOM) MaxZoomInOut(ZOOM_IN, this);
 					ScrollMainWindowTo(pt.x, pt.y, -1, instant);
 				}
@@ -426,7 +423,7 @@ struct MainWindow : Window
 	virtual void OnResize()
 	{
 		if (this->viewport != NULL) {
-			NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(MW_VIEWPORT);
+			NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(WID_M_VIEWPORT);
 			nvp->UpdateViewportCoordinates(this);
 		}
 	}

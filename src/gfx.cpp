@@ -44,10 +44,7 @@ bool _exit_game;
 GameMode _game_mode;
 SwitchMode _switch_mode;  ///< The next mainloop command.
 PauseModeByte _pause_mode;
-int _pal_first_dirty;
-int _pal_count_dirty;
-
-Colour _cur_palette[256];
+Palette _cur_palette;
 
 static int _max_char_height; ///< Cache of the height of the largest font
 static int _max_char_width;  ///< Cache of the width of the largest font
@@ -55,7 +52,8 @@ static byte _stringwidth_table[FS_END][224]; ///< Cache containing width of ofte
 DrawPixelInfo *_cur_dpi;
 byte _colour_gradient[COLOUR_END][8];
 
-static void GfxMainBlitter(const Sprite *sprite, int x, int y, BlitterMode mode, const SubSprite *sub = NULL, SpriteID sprite_id = SPR_CURSOR_MOUSE);
+static void GfxMainBlitterViewport(const Sprite *sprite, int x, int y, BlitterMode mode, const SubSprite *sub = NULL, SpriteID sprite_id = SPR_CURSOR_MOUSE);
+static void GfxMainBlitter(const Sprite *sprite, int x, int y, BlitterMode mode, const SubSprite *sub = NULL, SpriteID sprite_id = SPR_CURSOR_MOUSE, ZoomLevel zoom = ZOOM_LVL_NORMAL);
 
 /**
  * Text drawing parameters, which can change while drawing a line, but are kept between multiple parts
@@ -65,13 +63,13 @@ struct DrawStringParams {
 	FontSize fontsize;
 	TextColour cur_colour, prev_colour;
 
-	DrawStringParams(TextColour colour) : fontsize(FS_NORMAL), cur_colour(colour), prev_colour(colour) {}
+	DrawStringParams(TextColour colour, FontSize fontsize) : fontsize(fontsize), cur_colour(colour), prev_colour(colour) {}
 
 	/**
 	 * Switch to new colour \a c.
 	 * @param c New colour to use.
 	 */
-	FORCEINLINE void SetColour(TextColour c)
+	inline void SetColour(TextColour c)
 	{
 		assert(c >=  TC_BLUE && c <= TC_BLACK);
 		this->prev_colour = this->cur_colour;
@@ -79,7 +77,7 @@ struct DrawStringParams {
 	}
 
 	/** Switch to previous colour. */
-	FORCEINLINE void SetPreviousColour()
+	inline void SetPreviousColour()
 	{
 		Swap(this->cur_colour, this->prev_colour);
 	}
@@ -88,7 +86,7 @@ struct DrawStringParams {
 	 * Switch to using a new font \a f.
 	 * @param f New font to use.
 	 */
-	FORCEINLINE void SetFontSize(FontSize f)
+	inline void SetFontSize(FontSize f)
 	{
 		this->fontsize = f;
 	}
@@ -624,12 +622,13 @@ static int DrawString(int left, int right, int top, char *str, const char *last,
  *               case a right-to-left language is chosen this is inverted so it
  *               will be drawn in the right direction.
  * @param underline Whether to underline what has been drawn or not.
+ * @param fontsize The size of the initial characters.
  */
-int DrawString(int left, int right, int top, const char *str, TextColour colour, StringAlignment align, bool underline)
+int DrawString(int left, int right, int top, const char *str, TextColour colour, StringAlignment align, bool underline, FontSize fontsize)
 {
 	char buffer[DRAW_STRING_BUFFER];
 	strecpy(buffer, str, lastof(buffer));
-	DrawStringParams params(colour);
+	DrawStringParams params(colour, fontsize);
 	return DrawString(left, right, top, buffer, lastof(buffer), params, align, underline);
 }
 
@@ -645,12 +644,13 @@ int DrawString(int left, int right, int top, const char *str, TextColour colour,
  *               case a right-to-left language is chosen this is inverted so it
  *               will be drawn in the right direction.
  * @param underline Whether to underline what has been drawn or not.
+ * @param fontsize The size of the initial characters.
  */
-int DrawString(int left, int right, int top, StringID str, TextColour colour, StringAlignment align, bool underline)
+int DrawString(int left, int right, int top, StringID str, TextColour colour, StringAlignment align, bool underline, FontSize fontsize)
 {
 	char buffer[DRAW_STRING_BUFFER];
 	GetString(buffer, str, lastof(buffer));
-	DrawStringParams params(colour);
+	DrawStringParams params(colour, fontsize);
 	return DrawString(left, right, top, buffer, lastof(buffer), params, align, underline);
 }
 
@@ -834,10 +834,11 @@ Dimension GetStringMultiLineBoundingBox(StringID str, const Dimension &suggestio
  * @param colour Colour used for drawing the string, see DoDrawString() for details
  * @param align  The horizontal and vertical alignment of the string.
  * @param underline Whether to underline all strings
+ * @param fontsize The size of the initial characters.
  *
  * @return If \a align is #SA_BOTTOM, the top to where we have written, else the bottom to where we have written.
  */
-static int DrawStringMultiLine(int left, int right, int top, int bottom, char *str, const char *last, TextColour colour, StringAlignment align, bool underline)
+static int DrawStringMultiLine(int left, int right, int top, int bottom, char *str, const char *last, TextColour colour, StringAlignment align, bool underline, FontSize fontsize)
 {
 	int maxw = right - left + 1;
 	int maxh = bottom - top + 1;
@@ -883,7 +884,7 @@ static int DrawStringMultiLine(int left, int right, int top, int bottom, char *s
 	}
 
 	const char *src = str;
-	DrawStringParams params(colour);
+	DrawStringParams params(colour, fontsize);
 	int written_top = bottom; // Uppermost position of rendering a line of text
 	for (;;) {
 		if (skip_lines == 0) {
@@ -933,14 +934,15 @@ static int DrawStringMultiLine(int left, int right, int top, int bottom, char *s
  * @param colour Colour used for drawing the string, see DoDrawString() for details
  * @param align  The horizontal and vertical alignment of the string.
  * @param underline Whether to underline all strings
+ * @param fontsize The size of the initial characters.
  *
  * @return If \a align is #SA_BOTTOM, the top to where we have written, else the bottom to where we have written.
  */
-int DrawStringMultiLine(int left, int right, int top, int bottom, const char *str, TextColour colour, StringAlignment align, bool underline)
+int DrawStringMultiLine(int left, int right, int top, int bottom, const char *str, TextColour colour, StringAlignment align, bool underline, FontSize fontsize)
 {
 	char buffer[DRAW_STRING_BUFFER];
 	strecpy(buffer, str, lastof(buffer));
-	return DrawStringMultiLine(left, right, top, bottom, buffer, lastof(buffer), colour, align, underline);
+	return DrawStringMultiLine(left, right, top, bottom, buffer, lastof(buffer), colour, align, underline, fontsize);
 }
 
 /**
@@ -954,14 +956,15 @@ int DrawStringMultiLine(int left, int right, int top, int bottom, const char *st
  * @param colour Colour used for drawing the string, see DoDrawString() for details
  * @param align  The horizontal and vertical alignment of the string.
  * @param underline Whether to underline all strings
+ * @param fontsize The size of the initial characters.
  *
  * @return If \a align is #SA_BOTTOM, the top to where we have written, else the bottom to where we have written.
  */
-int DrawStringMultiLine(int left, int right, int top, int bottom, StringID str, TextColour colour, StringAlignment align, bool underline)
+int DrawStringMultiLine(int left, int right, int top, int bottom, StringID str, TextColour colour, StringAlignment align, bool underline, FontSize fontsize)
 {
 	char buffer[DRAW_STRING_BUFFER];
 	GetString(buffer, str, lastof(buffer));
-	return DrawStringMultiLine(left, right, top, bottom, buffer, lastof(buffer), colour, align, underline);
+	return DrawStringMultiLine(left, right, top, bottom, buffer, lastof(buffer), colour, align, underline, fontsize);
 }
 
 /**
@@ -1057,6 +1060,7 @@ void DrawCharCentered(WChar c, int x, int y, TextColour colour)
 static int ReallyDoDrawString(const UChar *string, int x, int y, DrawStringParams &params, bool parse_string_also_when_clipped)
 {
 	DrawPixelInfo *dpi = _cur_dpi;
+	bool draw_shadow = GetDrawGlyphShadow();
 	UChar c;
 	int xo = x;
 
@@ -1087,7 +1091,13 @@ skip_cont:;
 		if (IsPrintable(c) && !IsTextDirectionChar(c)) {
 			if (x >= dpi->left + dpi->width) goto skip_char;
 			if (x + _max_char_width >= dpi->left) {
-				GfxMainBlitter(GetGlyph(params.fontsize, c), x, y, BM_COLOUR_REMAP);
+				const Sprite *glyph = GetGlyph(params.fontsize, c);
+				if (draw_shadow && params.fontsize == FS_NORMAL && params.cur_colour != TC_BLACK && !(c >= SCC_SPRITE_START && c <= SCC_SPRITE_END)) {
+					SetColourRemap(TC_BLACK);
+					GfxMainBlitter(glyph, x + 1, y + 1, BM_COLOUR_REMAP);
+					SetColourRemap(params.cur_colour);
+				}
+				GfxMainBlitter(glyph, x, y, BM_COLOUR_REMAP);
 			}
 			x += GetCharacterWidth(params.fontsize, c);
 		} else if (c == '\n') { // newline = {}
@@ -1120,53 +1130,76 @@ skip_cont:;
  * @return Sprite size in pixels.
  * @note The size assumes (0, 0) as top-left coordinate and ignores any part of the sprite drawn at the left or above that position.
  */
-Dimension GetSpriteSize(SpriteID sprid, Point *offset)
+Dimension GetSpriteSize(SpriteID sprid, Point *offset, ZoomLevel zoom)
 {
 	const Sprite *sprite = GetSprite(sprid, ST_NORMAL);
 
 	if (offset != NULL) {
-		offset->x = sprite->x_offs;
-		offset->y = sprite->y_offs;
+		offset->x = UnScaleByZoom(sprite->x_offs, zoom);
+		offset->y = UnScaleByZoom(sprite->y_offs, zoom);
 	}
 
 	Dimension d;
-	d.width  = max<int>(0, sprite->x_offs + sprite->width);
-	d.height = max<int>(0, sprite->y_offs + sprite->height);
+	d.width  = max<int>(0, UnScaleByZoom(sprite->x_offs + sprite->width, zoom));
+	d.height = max<int>(0, UnScaleByZoom(sprite->y_offs + sprite->height, zoom));
 	return d;
 }
 
 /**
- * Draw a sprite.
+ * Draw a sprite in a viewport.
  * @param img  Image number to draw
  * @param pal  Palette to use.
- * @param x    Left coordinate of image
- * @param y    Top coordinate of image
+ * @param x    Left coordinate of image in viewport, scaled by zoom
+ * @param y    Top coordinate of image in viewport, scaled by zoom
  * @param sub  If available, draw only specified part of the sprite
  */
-void DrawSprite(SpriteID img, PaletteID pal, int x, int y, const SubSprite *sub)
+void DrawSpriteViewport(SpriteID img, PaletteID pal, int x, int y, const SubSprite *sub)
 {
 	SpriteID real_sprite = GB(img, 0, SPRITE_WIDTH);
 	if (HasBit(img, PALETTE_MODIFIER_TRANSPARENT)) {
 		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
-		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_TRANSPARENT, sub, real_sprite);
+		GfxMainBlitterViewport(GetSprite(real_sprite, ST_NORMAL), x, y, BM_TRANSPARENT, sub, real_sprite);
 	} else if (pal != PAL_NONE) {
 		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
-		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_COLOUR_REMAP, sub, real_sprite);
+		GfxMainBlitterViewport(GetSprite(real_sprite, ST_NORMAL), x, y, BM_COLOUR_REMAP, sub, real_sprite);
 	} else {
-		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_NORMAL, sub, real_sprite);
+		GfxMainBlitterViewport(GetSprite(real_sprite, ST_NORMAL), x, y, BM_NORMAL, sub, real_sprite);
 	}
 }
 
-static void GfxMainBlitter(const Sprite *sprite, int x, int y, BlitterMode mode, const SubSprite *sub, SpriteID sprite_id)
+/**
+ * Draw a sprite, not in a viewport
+ * @param img  Image number to draw
+ * @param pal  Palette to use.
+ * @param x    Left coordinate of image in pixels
+ * @param y    Top coordinate of image in pixels
+ * @param sub  If available, draw only specified part of the sprite
+ * @param zoom Zoom level of sprite
+ */
+void DrawSprite(SpriteID img, PaletteID pal, int x, int y, const SubSprite *sub, ZoomLevel zoom)
+{
+	SpriteID real_sprite = GB(img, 0, SPRITE_WIDTH);
+	if (HasBit(img, PALETTE_MODIFIER_TRANSPARENT)) {
+		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
+		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_TRANSPARENT, sub, real_sprite, zoom);
+	} else if (pal != PAL_NONE) {
+		_colour_remap_ptr = GetNonSprite(GB(pal, 0, PALETTE_WIDTH), ST_RECOLOUR) + 1;
+		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_COLOUR_REMAP, sub, real_sprite, zoom);
+	} else {
+		GfxMainBlitter(GetSprite(real_sprite, ST_NORMAL), x, y, BM_NORMAL, sub, real_sprite, zoom);
+	}
+}
+
+static void GfxMainBlitterViewport(const Sprite *sprite, int x, int y, BlitterMode mode, const SubSprite *sub, SpriteID sprite_id)
 {
 	const DrawPixelInfo *dpi = _cur_dpi;
 	Blitter::BlitterParams bp;
 
 	/* Amount of pixels to clip from the source sprite */
-	int clip_left   = (sub != NULL ? max(0,                   -sprite->x_offs + sub->left       ) : 0);
-	int clip_top    = (sub != NULL ? max(0,                   -sprite->y_offs + sub->top        ) : 0);
-	int clip_right  = (sub != NULL ? max(0, sprite->width  - (-sprite->x_offs + sub->right  + 1)) : 0);
-	int clip_bottom = (sub != NULL ? max(0, sprite->height - (-sprite->y_offs + sub->bottom + 1)) : 0);
+	int clip_left   = (sub != NULL ? max(0,                   -sprite->x_offs + sub->left * ZOOM_LVL_BASE       ) : 0);
+	int clip_top    = (sub != NULL ? max(0,                   -sprite->y_offs + sub->top  * ZOOM_LVL_BASE       ) : 0);
+	int clip_right  = (sub != NULL ? max(0, sprite->width  - (-sprite->x_offs + (sub->right + 1)  * ZOOM_LVL_BASE)) : 0);
+	int clip_bottom = (sub != NULL ? max(0, sprite->height - (-sprite->y_offs + (sub->bottom + 1) * ZOOM_LVL_BASE)) : 0);
 
 	if (clip_left + clip_right >= sprite->width) return;
 	if (clip_top + clip_bottom >= sprite->height) return;
@@ -1257,15 +1290,116 @@ static void GfxMainBlitter(const Sprite *sprite, int x, int y, BlitterMode mode,
 	BlitterFactoryBase::GetCurrentBlitter()->Draw(&bp, mode, dpi->zoom);
 }
 
+static void GfxMainBlitter(const Sprite *sprite, int x, int y, BlitterMode mode, const SubSprite *sub, SpriteID sprite_id, ZoomLevel zoom)
+{
+	const DrawPixelInfo *dpi = _cur_dpi;
+	Blitter::BlitterParams bp;
+
+	/* Amount of pixels to clip from the source sprite */
+	int clip_left   = (sub != NULL ? max(0,                   -sprite->x_offs + sub->left       ) : 0);
+	int clip_top    = (sub != NULL ? max(0,                   -sprite->y_offs + sub->top        ) : 0);
+	int clip_right  = (sub != NULL ? max(0, sprite->width  - (-sprite->x_offs + sub->right  + 1)) : 0);
+	int clip_bottom = (sub != NULL ? max(0, sprite->height - (-sprite->y_offs + sub->bottom + 1)) : 0);
+
+	if (clip_left + clip_right >= sprite->width) return;
+	if (clip_top + clip_bottom >= sprite->height) return;
+
+	/* Scale it */
+	x = ScaleByZoom(x, zoom);
+	y = ScaleByZoom(y, zoom);
+
+	/* Move to the correct offset */
+	x += sprite->x_offs;
+	y += sprite->y_offs;
+
+	/* Copy the main data directly from the sprite */
+	bp.sprite = sprite->data;
+	bp.sprite_width = sprite->width;
+	bp.sprite_height = sprite->height;
+	bp.width = UnScaleByZoom(sprite->width - clip_left - clip_right, zoom);
+	bp.height = UnScaleByZoom(sprite->height - clip_top - clip_bottom, zoom);
+	bp.top = 0;
+	bp.left = 0;
+	bp.skip_left = UnScaleByZoomLower(clip_left, zoom);
+	bp.skip_top = UnScaleByZoomLower(clip_top, zoom);
+
+	x += ScaleByZoom(bp.skip_left, zoom);
+	y += ScaleByZoom(bp.skip_top, zoom);
+
+	bp.dst = dpi->dst_ptr;
+	bp.pitch = dpi->pitch;
+	bp.remap = _colour_remap_ptr;
+
+	assert(sprite->width > 0);
+	assert(sprite->height > 0);
+
+	if (bp.width <= 0) return;
+	if (bp.height <= 0) return;
+
+	y -= ScaleByZoom(dpi->top, zoom);
+	/* Check for top overflow */
+	if (y < 0) {
+		bp.height -= -UnScaleByZoom(y, zoom);
+		if (bp.height <= 0) return;
+		bp.skip_top += -UnScaleByZoom(y, zoom);
+		y = 0;
+	} else {
+		bp.top = UnScaleByZoom(y, zoom);
+	}
+
+	/* Check for bottom overflow */
+	y += ScaleByZoom(bp.height - dpi->height, zoom);
+	if (y > 0) {
+		bp.height -= UnScaleByZoom(y, zoom);
+		if (bp.height <= 0) return;
+	}
+
+	x -= ScaleByZoom(dpi->left, zoom);
+	/* Check for left overflow */
+	if (x < 0) {
+		bp.width -= -UnScaleByZoom(x, zoom);
+		if (bp.width <= 0) return;
+		bp.skip_left += -UnScaleByZoom(x, zoom);
+		x = 0;
+	} else {
+		bp.left = UnScaleByZoom(x, zoom);
+	}
+
+	/* Check for right overflow */
+	x += ScaleByZoom(bp.width - dpi->width, zoom);
+	if (x > 0) {
+		bp.width -= UnScaleByZoom(x, zoom);
+		if (bp.width <= 0) return;
+	}
+
+	assert(bp.skip_left + bp.width <= UnScaleByZoom(sprite->width, zoom));
+	assert(bp.skip_top + bp.height <= UnScaleByZoom(sprite->height, zoom));
+
+	/* We do not want to catch the mouse. However we also use that spritenumber for unknown (text) sprites. */
+	if (_newgrf_debug_sprite_picker.mode == SPM_REDRAW && sprite_id != SPR_CURSOR_MOUSE) {
+		Blitter *blitter = BlitterFactoryBase::GetCurrentBlitter();
+		void *topleft = blitter->MoveTo(bp.dst, bp.left, bp.top);
+		void *bottomright = blitter->MoveTo(topleft, bp.width - 1, bp.height - 1);
+
+		void *clicked = _newgrf_debug_sprite_picker.clicked_pixel;
+
+		if (topleft <= clicked && clicked <= bottomright) {
+			uint offset = (((size_t)clicked - (size_t)topleft) / (blitter->GetScreenDepth() / 8)) % bp.pitch;
+			if (offset < (uint)bp.width) {
+				_newgrf_debug_sprite_picker.sprites.Include(sprite_id);
+			}
+		}
+	}
+
+	BlitterFactoryBase::GetCurrentBlitter()->Draw(&bp, mode, zoom);
+}
+
 void DoPaletteAnimations();
 
 void GfxInitPalettes()
 {
-	memcpy(_cur_palette, _palette, sizeof(_cur_palette));
-
+	memcpy(&_cur_palette, &_palette, sizeof(_cur_palette));
 	DoPaletteAnimations();
-	_pal_first_dirty = 0;
-	_pal_count_dirty = 256;
 }
 
 #define EXTR(p, q) (((uint16)(palette_animation_counter * (p)) * (q)) >> 16)
@@ -1289,7 +1423,7 @@ void DoPaletteAnimations()
 		palette_animation_counter = 0;
 	}
 
-	Colour *palette_pos = &_cur_palette[PALETTE_ANIM_START];  // Points to where animations are taking place on the palette
+	Colour *palette_pos = &_cur_palette.palette[PALETTE_ANIM_START];  // Points to where animations are taking place on the palette
 	/* Makes a copy of the current anmation palette in old_val,
 	 * so the work on the current palette could be compared, see if there has been any changes */
 	memcpy(old_val, palette_pos, sizeof(old_val));
@@ -1373,22 +1507,25 @@ void DoPaletteAnimations()
 	if (blitter != NULL && blitter->UsePaletteAnimation() == Blitter::PALETTE_ANIMATION_NONE) {
 		palette_animation_counter = old_tc;
 	} else {
-		if (memcmp(old_val, &_cur_palette[PALETTE_ANIM_START], sizeof(old_val)) != 0) {
+		if (memcmp(old_val, &_cur_palette.palette[PALETTE_ANIM_START], sizeof(old_val)) != 0 && _cur_palette.count_dirty == 0) {
 			/* Did we changed anything on the palette? Seems so.  Mark it as dirty */
-			_pal_first_dirty = PALETTE_ANIM_START;
-			_pal_count_dirty = PALETTE_ANIM_SIZE;
+			_cur_palette.first_dirty = PALETTE_ANIM_START;
+			_cur_palette.count_dirty = PALETTE_ANIM_SIZE;
 		}
 	}
 }
 
 
-/** Initialize _stringwidth_table cache */
-void LoadStringWidthTable()
+/**
+ * Initialize _stringwidth_table cache
+ * @param monospace Whether to load the monospace cache or the normal fonts.
+ */
+void LoadStringWidthTable(bool monospace)
 {
 	_max_char_height = 0;
 	_max_char_width  = 0;
 
-	for (FontSize fs = FS_BEGIN; fs < FS_END; fs++) {
+	for (FontSize fs = monospace ? FS_MONO : FS_BEGIN; fs < (monospace ? FS_END : FS_MONO); fs++) {
 		_max_char_height = max<int>(_max_char_height, GetCharacterHeight(fs));
 		for (uint i = 0; i != 224; i++) {
 			_stringwidth_table[fs][i] = GetGlyphWidth(fs, i + 32);
@@ -1566,7 +1703,6 @@ void DrawDirtyBlocks()
 		_modal_progress_paint_mutex->BeginCritical();
 		_modal_progress_work_mutex->BeginCritical();
 
-		extern void SwitchToMode(SwitchMode new_mode);
 		if (_switch_mode != SM_NONE && !HasModalProgress()) {
 			SwitchToMode(_switch_mode);
 			_switch_mode = SM_NONE;
@@ -1773,10 +1909,10 @@ void UpdateCursorSize()
 	CursorVars *cv = &_cursor;
 	const Sprite *p = GetSprite(GB(cv->sprite, 0, SPRITE_WIDTH), ST_NORMAL);
 
-	cv->size.y = p->height;
-	cv->size.x = p->width;
-	cv->offs.x = p->x_offs;
-	cv->offs.y = p->y_offs;
+	cv->size.y = UnScaleByZoom(p->height, ZOOM_LVL_GUI);
+	cv->size.x = UnScaleByZoom(p->width, ZOOM_LVL_GUI);
+	cv->offs.x = UnScaleByZoom(p->x_offs, ZOOM_LVL_GUI);
+	cv->offs.y = UnScaleByZoom(p->y_offs, ZOOM_LVL_GUI);
 
 	cv->dirty = true;
 }

@@ -15,6 +15,7 @@
 #include "cargotype.h"
 #include "rail_type.h"
 #include "fileio_type.h"
+#include "core/bitmath_func.hpp"
 
 /**
  * List of different canal 'features'.
@@ -28,6 +29,8 @@ enum CanalFeature {
 	CF_DOCKS,
 	CF_RIVER_SLOPE,
 	CF_RIVER_EDGE,
+	CF_RIVER_GUI,
+	CF_BUOY,
 	CF_END,
 };
 
@@ -54,7 +57,7 @@ enum GrfMiscBit {
 	GMB_DESERT_PAVED_ROADS     = 1,
 	GMB_FIELD_BOUNDING_BOX     = 2, // Unsupported.
 	GMB_TRAIN_WIDTH_32_PIXELS  = 3, ///< Use 32 pixels per train vehicle in depot gui and vehicle details. Never set in the global variable; @see GRFFile::traininfo_vehicle_width
-	GMB_AMBIENT_SOUND_CALLBACK = 4, // Unsupported.
+	GMB_AMBIENT_SOUND_CALLBACK = 4,
 	GMB_CATENARY_ON_3RD_TRACK  = 5, // Unsupported.
 };
 
@@ -70,7 +73,7 @@ enum GrfSpecFeature {
 	GSF_GLOBALVAR,
 	GSF_INDUSTRYTILES,
 	GSF_INDUSTRIES,
-	GSF_CARGOS,
+	GSF_CARGOES,
 	GSF_SOUNDFX,
 	GSF_AIRPORTS,
 	GSF_SIGNALS,
@@ -82,7 +85,7 @@ enum GrfSpecFeature {
 	GSF_FAKE_TOWNS = GSF_END, ///< Fake town GrfSpecFeature for NewGRF debugging (parent scope)
 	GSF_FAKE_END,             ///< End of the fake features
 
-	GSF_INVALID = 0xFF        ///< An invalid spec feature
+	GSF_INVALID = 0xFF,       ///< An invalid spec feature
 };
 
 static const uint32 INVALID_GRFID = 0xFFFFFFFF;
@@ -160,6 +163,17 @@ struct GRFLoadedFeatures {
 	ShoreReplacement shore;   ///< It which way shore sprites were replaced.
 };
 
+/**
+ * Check for grf miscelaneous bits
+ * @param bit The bit to check.
+ * @return Whether the bit is set.
+ */
+static inline bool HasGrfMiscBit(GrfMiscBit bit)
+{
+	extern byte _misc_grf_features;
+	return HasBit(_misc_grf_features, bit);
+}
+
 /* Indicates which are the newgrf features currently loaded ingame */
 extern GRFLoadedFeatures _loaded_newgrf_features;
 
@@ -171,8 +185,7 @@ void ResetPersistentNewGRFData();
 
 void CDECL grfmsg(int severity, const char *str, ...) WARN_FORMAT(2, 3);
 
-bool HasGrfMiscBit(GrfMiscBit bit);
-bool GetGlobalVariable(byte param, uint32 *value);
+bool GetGlobalVariable(byte param, uint32 *value, const GRFFile *grffile);
 
 StringID MapGRFStringID(uint32 grfid, StringID str);
 void ShowNewGRFError();

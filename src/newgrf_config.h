@@ -36,21 +36,22 @@ enum GRFStatus {
 	GCS_DISABLED,     ///< GRF file is disabled
 	GCS_NOT_FOUND,    ///< GRF file was not found in the local cache
 	GCS_INITIALISED,  ///< GRF file has been initialised
-	GCS_ACTIVATED     ///< GRF file has been activated
+	GCS_ACTIVATED,    ///< GRF file has been activated
 };
 
 /** Encountered GRF bugs */
 enum GRFBugs {
 	GBUG_VEH_LENGTH,        ///< Length of rail vehicle changes when not inside a depot
-	GBUG_VEH_REFIT,         ///< Articulated vehicles carry different cargos resp. are differently refittable than specified in purchase list
+	GBUG_VEH_REFIT,         ///< Articulated vehicles carry different cargoes resp. are differently refittable than specified in purchase list
 	GBUG_VEH_POWERED_WAGON, ///< Powered wagon changed poweredness state when not inside a depot
+	GBUG_UNKNOWN_CB_RESULT, ///< A callback returned an unknown/invalid result
 };
 
 /** Status of post-gameload GRF compatibility check */
 enum GRFListCompatibility {
 	GLC_ALL_GOOD,   ///< All GRF needed by game are present
 	GLC_COMPATIBLE, ///< Compatible (eg. the same ID, but different chacksum) GRF found in at least one case
-	GLC_NOT_FOUND   ///< At least one GRF couldn't be found (higher priority than GLC_COMPATIBLE)
+	GLC_NOT_FOUND,  ///< At least one GRF couldn't be found (higher priority than GLC_COMPATIBLE)
 };
 
 /** Information that can/has to be stored about a GRF's palette. */
@@ -58,6 +59,8 @@ enum GRFPalette {
 	GRFP_USE_BIT     = 0,   ///< The bit used for storing the palette to use.
 	GRFP_GRF_OFFSET  = 2,   ///< The offset of the GRFP_GRF data.
 	GRFP_GRF_SIZE    = 2,   ///< The size of the GRFP_GRF data.
+	GRFP_BLT_OFFSET  = 4,   ///< The offset of the GRFP_BLT data.
+	GRFP_BLT_SIZE    = 1,   ///< The size of the GRFP_BLT data.
 
 	GRFP_USE_DOS     = 0x0, ///< The palette state is set to use the DOS palette.
 	GRFP_USE_WINDOWS = 0x1, ///< The palette state is set to use the Windows palette.
@@ -68,6 +71,10 @@ enum GRFPalette {
 	GRFP_GRF_WINDOWS = 0x2 << GRFP_GRF_OFFSET,          ///< The NewGRF says the Windows palette can be used.
 	GRFP_GRF_ANY     = GRFP_GRF_DOS | GRFP_GRF_WINDOWS, ///< The NewGRF says any palette can be used.
 	GRFP_GRF_MASK    = GRFP_GRF_ANY,                    ///< Bitmask to get only the NewGRF supplied information.
+
+	GRFP_BLT_UNSET   = 0x0 << GRFP_BLT_OFFSET,          ///< The NewGRF provided no information or doesn't care about a 32 bpp blitter.
+	GRFP_BLT_32BPP   = 0x1 << GRFP_BLT_OFFSET,          ///< The NewGRF prefers a 32 bpp blitter.
+	GRFP_BLT_MASK    = GRFP_BLT_32BPP,                  ///< Bitmask to only get the blitter information.
 };
 
 
@@ -82,7 +89,7 @@ struct GRFIdentifier {
 	 * @param md5sum Expected md5sum, may be \c NULL (in which case, do not check it).
 	 * @return the object has the provided grfid and md5sum.
 	 */
-	FORCEINLINE bool HasGrfIdentifier(uint32 grfid, const uint8 *md5sum) const
+	inline bool HasGrfIdentifier(uint32 grfid, const uint8 *md5sum) const
 	{
 		if (this->grfid != grfid) return false;
 		if (md5sum == NULL) return true;
@@ -139,6 +146,18 @@ struct GRFTextWrapper : public SimpleCountedObject {
 	~GRFTextWrapper();
 };
 
+/** Additional text files accompanying NewGRFs */
+enum TextfileType {
+	TFT_BEGIN,
+
+	TFT_README = TFT_BEGIN,  ///< NewGRF readme
+	TFT_CHANGELOG,           ///< NewGRF changelog
+	TFT_LICENSE,             ///< NewGRF license
+
+	TFT_END,
+};
+DECLARE_POSTFIX_INCREMENT(TextfileType)
+
 /** Information about GRF, used in the game and (part of it) in savegames */
 struct GRFConfig : ZeroedMemoryAllocator {
 	GRFConfig(const char *filename = NULL);
@@ -150,6 +169,7 @@ struct GRFConfig : ZeroedMemoryAllocator {
 	char *filename;                                ///< Filename - either with or without full path
 	GRFTextWrapper *name;                          ///< NOSAVE: GRF name (Action 0x08)
 	GRFTextWrapper *info;                          ///< NOSAVE: GRF info (author, copyright, ...) (Action 0x08)
+	GRFTextWrapper *url;                           ///< NOSAVE: URL belonging to this GRF.
 	GRFError *error;                               ///< NOSAVE: Error/Warning during GRF loading (Action 0x0B)
 
 	uint32 version;                                ///< NOSAVE: Version a NewGRF can set so only the newest NewGRF is shown
@@ -168,8 +188,10 @@ struct GRFConfig : ZeroedMemoryAllocator {
 
 	bool IsOpenTTDBaseGRF() const;
 
+	const char *GetTextfile(TextfileType type) const;
 	const char *GetName() const;
 	const char *GetDescription() const;
+	const char *GetURL() const;
 
 	void SetParameterDefaults();
 	void SetSuitablePalette();
@@ -220,5 +242,6 @@ GRFTextWrapper *FindUnknownGRFName(uint32 grfid, uint8 *md5sum, bool create);
 #endif /* ENABLE_NETWORK */
 
 void UpdateNewGRFScanStatus(uint num, const char *name);
+bool UpdateNewGRFConfigPalette(int32 p1 = 0);
 
 #endif /* NEWGRF_CONFIG_H */

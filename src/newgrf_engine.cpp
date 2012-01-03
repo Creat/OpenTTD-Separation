@@ -37,7 +37,7 @@ void SetWagonOverrideSprites(EngineID engine, CargoID cargo, const SpriteGroup *
 	Engine *e = Engine::Get(engine);
 	WagonOverride *wo;
 
-	assert(cargo < NUM_CARGO + 2); // Include CT_DEFAULT and CT_PURCHASE pseudo cargos.
+	assert(cargo < NUM_CARGO + 2); // Include CT_DEFAULT and CT_PURCHASE pseudo cargoes.
 
 	e->overrides_count++;
 	e->overrides = ReallocT(e->overrides, e->overrides_count);
@@ -108,29 +108,6 @@ void SetEngineGRF(EngineID engine, const GRFFile *file)
 {
 	Engine *e = Engine::Get(engine);
 	e->grf_prop.grffile = file;
-}
-
-
-/**
- * Retrieve the GRFFile tied to an engine
- * @param engine Engine ID to retrieve.
- * @return Pointer to GRFFile.
- */
-const GRFFile *GetEngineGRF(EngineID engine)
-{
-	return Engine::Get(engine)->grf_prop.grffile;
-}
-
-
-/**
- * Retrieve the GRF ID of the GRFFile tied to an engine
- * @param engine Engine ID to retrieve.
- * @return 32 bit GRFID value.
- */
-uint32 GetEngineGRFID(EngineID engine)
-{
-	const GRFFile *file = GetEngineGRF(engine);
-	return file == NULL ? 0 : file->grfid;
 }
 
 
@@ -483,40 +460,12 @@ static uint32 PositionHelper(const Vehicle *v, bool consecutive)
 	return chain_before | chain_after << 8 | (chain_before + chain_after + consecutive) << 16;
 }
 
-static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, byte parameter, bool *available)
+static uint32 VehicleGetVariable(Vehicle *v, const ResolverObject *object, byte variable, uint32 parameter, bool *available)
 {
-	Vehicle *v = const_cast<Vehicle*>(GRV(object));
-
-	if (v == NULL) {
-		/* Vehicle does not exist, so we're in a purchase list */
-		switch (variable) {
-			case 0x43: return GetCompanyInfo(_current_company, LiveryHelper(object->u.vehicle.self_type, NULL)); // Owner information
-			case 0x46: return 0;               // Motion counter
-			case 0x47: { // Vehicle cargo info
-				const Engine *e = Engine::Get(object->u.vehicle.self_type);
-				CargoID cargo_type = e->GetDefaultCargoType();
-				if (cargo_type != CT_INVALID) {
-					const CargoSpec *cs = CargoSpec::Get(cargo_type);
-					return (cs->classes << 16) | (cs->weight << 8) | GetEngineGRF(e->index)->cargo_map[cargo_type];
-				} else {
-					return 0x000000FF;
-				}
-			}
-			case 0x48: return Engine::Get(object->u.vehicle.self_type)->flags; // Vehicle Type Info
-			case 0x49: return _cur_year; // 'Long' format build year
-			case 0xC4: return Clamp(_cur_year, ORIGINAL_BASE_YEAR, ORIGINAL_MAX_YEAR) - ORIGINAL_BASE_YEAR; // Build year
-			case 0xDA: return INVALID_VEHICLE; // Next vehicle
-			case 0xF2: return 0; // Cargo subtype
-		}
-
-		*available = false;
-		return UINT_MAX;
-	}
-
 	/* Calculated vehicle parameters */
 	switch (variable) {
 		case 0x25: // Get engine GRF ID
-			return GetEngineGRFID(v->engine_type);
+			return v->GetGRFID();
 
 		case 0x40: // Get length of consist
 			if (!HasBit(v->grf_cache.cache_valid, NCVV_POSITION_CONSIST_LENGTH)) {
@@ -532,18 +481,18 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 			}
 			return v->grf_cache.position_same_id_length;
 
-		case 0x42: // Consist cargo information
+		case 0x42: { // Consist cargo information
 			if (!HasBit(v->grf_cache.cache_valid, NCVV_CONSIST_CARGO_INFORMATION)) {
 				const Vehicle *u;
 				byte cargo_classes = 0;
-				uint8 common_cargos[NUM_CARGO];
+				uint8 common_cargoes[NUM_CARGO];
 				uint8 common_subtypes[256];
 				byte user_def_data = 0;
 				CargoID common_cargo_type = CT_INVALID;
 				uint8 common_subtype = 0xFF; // Return 0xFF if nothing is carried
 
 				/* Reset our arrays */
-				memset(common_cargos, 0, sizeof(common_cargos));
+				memset(common_cargoes, 0, sizeof(common_cargoes));
 				memset(common_subtypes, 0, sizeof(common_subtypes));
 
 				for (u = v; u != NULL; u = u->Next()) {
@@ -553,14 +502,14 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 					if (u->cargo_cap == 0) continue;
 
 					cargo_classes |= CargoSpec::Get(u->cargo_type)->classes;
-					common_cargos[u->cargo_type]++;
+					common_cargoes[u->cargo_type]++;
 				}
 
 				/* Pick the most common cargo type */
 				uint common_cargo_best_amount = 0;
 				for (CargoID cargo = 0; cargo < NUM_CARGO; cargo++) {
-					if (common_cargos[cargo] > common_cargo_best_amount) {
-						common_cargo_best_amount = common_cargos[cargo];
+					if (common_cargoes[cargo] > common_cargo_best_amount) {
+						common_cargo_best_amount = common_cargoes[cargo];
 						common_cargo_type = cargo;
 					}
 				}
@@ -582,11 +531,24 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 					}
 				}
 
-				uint8 common_bitnum = (common_cargo_type == CT_INVALID ? 0xFF : CargoSpec::Get(common_cargo_type)->bitnum);
-				v->grf_cache.consist_cargo_information = cargo_classes | (common_bitnum << 8) | (common_subtype << 16) | (user_def_data << 24);
+				/* Note: We have to store the untranslated cargotype in the cache as the cache can be read by different NewGRFs,
+				 *       which will need different translations */
+				v->grf_cache.consist_cargo_information = cargo_classes | (common_cargo_type << 8) | (common_subtype << 16) | (user_def_data << 24);
 				SetBit(v->grf_cache.cache_valid, NCVV_CONSIST_CARGO_INFORMATION);
 			}
-			return v->grf_cache.consist_cargo_information;
+
+			/* The cargo translation is specific to the accessing GRF, and thus cannot be cached. */
+			CargoID common_cargo_type = (v->grf_cache.consist_cargo_information >> 8) & 0xFF;
+
+			/* Unlike everywhere else the cargo translation table is only used since grf version 8, not 7.
+			 * Note: The grffile == NULL case only happens if this function is called for default vehicles.
+			 *       And this is only done by CheckCaches(). */
+			const GRFFile *grffile = object->grffile;
+			uint8 common_bitnum = (common_cargo_type == CT_INVALID) ? 0xFF :
+				(grffile == NULL || grffile->grf_version < 8) ? CargoSpec::Get(common_cargo_type)->bitnum : grffile->cargo_map[common_cargo_type];
+
+			return (v->grf_cache.consist_cargo_information & 0xFFFF00FF) | common_bitnum << 8;
+		}
 
 		case 0x43: // Company information
 			if (!HasBit(v->grf_cache.cache_valid, NCVV_COMPANY_INFORMATION)) {
@@ -596,7 +558,7 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 			return v->grf_cache.company_information;
 
 		case 0x44: // Aircraft information
-			if (v->type != VEH_AIRCRAFT) return UINT_MAX;
+			if (v->type != VEH_AIRCRAFT || !Aircraft::From(v)->IsNormalAircraft()) return UINT_MAX;
 
 			{
 				const Vehicle *w = v->Next();
@@ -609,7 +571,7 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 					airporttype = st->airport.GetSpec()->ttd_airport_type;
 				}
 
-				return (altitude << 8) | airporttype;
+				return (Clamp(altitude, 0, 0xFF) << 8) | airporttype;
 			}
 
 		case 0x45: { // Curvature info
@@ -643,10 +605,10 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 			 */
 			const CargoSpec *cs = CargoSpec::Get(v->cargo_type);
 
-			return (cs->classes << 16) | (cs->weight << 8) | GetEngineGRF(v->engine_type)->cargo_map[v->cargo_type];
+			return (cs->classes << 16) | (cs->weight << 8) | v->GetGRF()->cargo_map[v->cargo_type];
 		}
 
-		case 0x48: return Engine::Get(v->engine_type)->flags; // Vehicle Type Info
+		case 0x48: return v->GetEngine()->flags; // Vehicle Type Info
 		case 0x49: return v->build_year;
 
 		case 0x4A: {
@@ -655,18 +617,60 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 			return (HasPowerOnRail(Train::From(v)->railtype, rt) ? 0x100 : 0) | GetReverseRailTypeTranslation(rt, object->grffile);
 		}
 
+		case 0x4B: // Long date of last service
+			return v->date_of_last_service;
+
 		/* Variables which use the parameter */
 		case 0x60: // Count consist's engine ID occurance
-			//EngineID engine = GetNewEngineID(GetEngineGRF(v->engine_type), v->type, parameter);
-			if (v->type != VEH_TRAIN) return Engine::Get(v->engine_type)->grf_prop.local_id == parameter;
+			if (v->type != VEH_TRAIN) return v->GetEngine()->grf_prop.local_id == parameter ? 1 : 0;
 
 			{
 				uint count = 0;
 				for (; v != NULL; v = v->Next()) {
-					if (Engine::Get(v->engine_type)->grf_prop.local_id == parameter) count++;
+					if (v->GetEngine()->grf_prop.local_id == parameter) count++;
 				}
 				return count;
 			}
+
+		case 0x61: // Get variable of n-th vehicle in chain [signed number relative to vehicle]
+			if (!v->IsGroundVehicle() || parameter == 0x61) return 0;
+
+			/* Only allow callbacks that don't change properties to avoid circular dependencies. */
+			if (object->callback == CBID_NO_CALLBACK || object->callback == CBID_TRAIN_ALLOW_WAGON_ATTACH || object->callback == CBID_VEHICLE_START_STOP_CHECK || object->callback == CBID_VEHICLE_32DAY_CALLBACK) {
+				Vehicle *u = v->Move((int32)GetRegister(0x10F));
+				if (u == NULL) return 0;
+
+				return VehicleGetVariable(u, object, parameter, GetRegister(0x10E), available);
+			}
+			return 0;
+
+		case 0x62: { // Curvature/position difference for n-th vehicle in chain [signed number relative to vehicle]
+			/* Format: zzyyxxFD
+			 * zz - Signed difference of z position between the selected and this vehicle.
+			 * yy - Signed difference of y position between the selected and this vehicle.
+			 * xx - Signed difference of x position between the selected and this vehicle.
+			 * F  - Flags, bit 7 corresponds to VS_HIDDEN.
+			 * D  - Dir difference, like in 0x45.
+			 */
+			if (!v->IsGroundVehicle()) return 0;
+
+			const Vehicle *u = v->Move((int8)parameter);
+			if (u == NULL) return 0;
+
+			/* Get direction difference. */
+			bool prev = (int8)parameter < 0;
+			uint32 ret = prev ? DirDifference(u->direction, v->direction) : DirDifference(v->direction, u->direction);
+			if (ret > DIRDIFF_REVERSE) ret |= 0x08;
+
+			if (u->vehstatus & VS_HIDDEN) ret |= 0x80;
+
+			/* Get position difference. */
+			ret |= ((prev ? u->x_pos - v->x_pos : v->x_pos - u->x_pos) & 0xFF) << 8;
+			ret |= ((prev ? u->y_pos - v->y_pos : v->y_pos - u->y_pos) & 0xFF) << 16;
+			ret |= ((prev ? u->z_pos - v->z_pos : v->z_pos - u->z_pos) & 0xFF) << 24;
+
+			return ret;
+		}
 
 		case 0xFE:
 		case 0xFF: {
@@ -761,8 +765,8 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 		case 0x43: return GB(ClampToU16(v->max_age), 8, 8);
 		case 0x44: return Clamp(v->build_year, ORIGINAL_BASE_YEAR, ORIGINAL_MAX_YEAR) - ORIGINAL_BASE_YEAR;
 		case 0x45: return v->unitnumber;
-		case 0x46: return Engine::Get(v->engine_type)->grf_prop.local_id;
-		case 0x47: return GB(Engine::Get(v->engine_type)->grf_prop.local_id, 8, 8);
+		case 0x46: return v->GetEngine()->grf_prop.local_id;
+		case 0x47: return GB(v->GetEngine()->grf_prop.local_id, 8, 8);
 		case 0x48:
 			if (v->type != VEH_TRAIN || v->spritenum != 0xFD) return v->spritenum;
 			return HasBit(Train::From(v)->flags, VRF_REVERSE_DIRECTION) ? 0xFE : 0xFD;
@@ -801,7 +805,7 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 			switch (variable - 0x80) {
 				case 0x62: return t->track;
 				case 0x66: return t->railtype;
-				case 0x73: return t->gcache.cached_veh_length;
+				case 0x73: return 0x80 + VEHICLE_LENGTH - t->gcache.cached_veh_length;
 				case 0x74: return t->gcache.cached_power;
 				case 0x75: return GB(t->gcache.cached_power,  8, 24);
 				case 0x76: return GB(t->gcache.cached_power, 16, 16);
@@ -844,6 +848,42 @@ static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, by
 
 	*available = false;
 	return UINT_MAX;
+}
+
+static uint32 VehicleGetVariable(const ResolverObject *object, byte variable, uint32 parameter, bool *available)
+{
+	Vehicle *v = const_cast<Vehicle*>(GRV(object));
+
+	if (v == NULL) {
+		/* Vehicle does not exist, so we're in a purchase list */
+		switch (variable) {
+			case 0x43: return GetCompanyInfo(_current_company, LiveryHelper(object->u.vehicle.self_type, NULL)); // Owner information
+			case 0x46: return 0;               // Motion counter
+			case 0x47: { // Vehicle cargo info
+				const Engine *e = Engine::Get(object->u.vehicle.self_type);
+				CargoID cargo_type = e->GetDefaultCargoType();
+				if (cargo_type != CT_INVALID) {
+					const CargoSpec *cs = CargoSpec::Get(cargo_type);
+					return (cs->classes << 16) | (cs->weight << 8) | e->GetGRF()->cargo_map[cargo_type];
+				} else {
+					return 0x000000FF;
+				}
+			}
+			case 0x48: return Engine::Get(object->u.vehicle.self_type)->flags; // Vehicle Type Info
+			case 0x49: return _cur_year; // 'Long' format build year
+			case 0x4B: return _date; // Long date of last service
+			case 0x92: return Clamp(_date - DAYS_TILL_ORIGINAL_BASE_YEAR, 0, 0xFFFF); // Date of last service
+			case 0x93: return GB(Clamp(_date - DAYS_TILL_ORIGINAL_BASE_YEAR, 0, 0xFFFF), 8, 8);
+			case 0xC4: return Clamp(_cur_year, ORIGINAL_BASE_YEAR, ORIGINAL_MAX_YEAR) - ORIGINAL_BASE_YEAR; // Build year
+			case 0xDA: return INVALID_VEHICLE; // Next vehicle
+			case 0xF2: return 0; // Cargo subtype
+		}
+
+		*available = false;
+		return UINT_MAX;
+	}
+
+	return VehicleGetVariable(v, object, variable, parameter, available);
 }
 
 
@@ -890,7 +930,7 @@ static inline void NewVehicleResolver(ResolverObject *res, EngineID engine_type,
 	res->ResetState();
 
 	const Engine *e = Engine::Get(engine_type);
-	res->grffile         = (e != NULL ? e->grf_prop.grffile : NULL);
+	res->grffile         = (e != NULL ? e->GetGRF() : NULL);
 }
 
 
@@ -937,12 +977,14 @@ static const SpriteGroup *GetVehicleSpriteGroup(EngineID engine, const Vehicle *
 }
 
 
-SpriteID GetCustomEngineSprite(EngineID engine, const Vehicle *v, Direction direction)
+SpriteID GetCustomEngineSprite(EngineID engine, const Vehicle *v, Direction direction, EngineImageType image_type)
 {
 	const SpriteGroup *group;
 	ResolverObject object;
 
 	NewVehicleResolver(&object, engine, v);
+
+	object.callback_param1 = image_type;
 
 	group = SpriteGroup::Resolve(GetVehicleSpriteGroup(engine, v), &object);
 	if (group == NULL || group->GetNumResults() == 0) return 0;
@@ -951,7 +993,7 @@ SpriteID GetCustomEngineSprite(EngineID engine, const Vehicle *v, Direction dire
 }
 
 
-SpriteID GetRotorOverrideSprite(EngineID engine, const Aircraft *v, bool info_view)
+SpriteID GetRotorOverrideSprite(EngineID engine, const Aircraft *v, bool info_view, EngineImageType image_type)
 {
 	const Engine *e = Engine::Get(engine);
 
@@ -963,6 +1005,7 @@ SpriteID GetRotorOverrideSprite(EngineID engine, const Aircraft *v, bool info_vi
 
 	NewVehicleResolver(&object, engine, v);
 
+	object.callback_param1 = image_type;
 	object.u.vehicle.info_view = info_view;
 
 	const SpriteGroup *group = GetWagonOverrideSpriteSet(engine, CT_DEFAULT, engine);
@@ -1046,16 +1089,13 @@ uint16 GetVehicleCallbackParent(CallbackID callback, uint32 param1, uint32 param
 /* Callback 36 handlers */
 uint GetVehicleProperty(const Vehicle *v, PropertyID property, uint orig_value)
 {
-	uint16 callback = GetVehicleCallback(CBID_VEHICLE_MODIFY_PROPERTY, property, 0, v->engine_type, v);
-	if (callback != CALLBACK_FAILED) return callback;
-
-	return orig_value;
+	return GetEngineProperty(v->engine_type, property, orig_value, v);
 }
 
 
-uint GetEngineProperty(EngineID engine, PropertyID property, uint orig_value)
+uint GetEngineProperty(EngineID engine, PropertyID property, uint orig_value, const Vehicle *v)
 {
-	uint16 callback = GetVehicleCallback(CBID_VEHICLE_MODIFY_PROPERTY, property, 0, engine, NULL);
+	uint16 callback = GetVehicleCallback(CBID_VEHICLE_MODIFY_PROPERTY, property, 0, engine, v);
 	if (callback != CALLBACK_FAILED) return callback;
 
 	return orig_value;
@@ -1148,10 +1188,8 @@ void TriggerVehicle(Vehicle *v, VehicleTrigger trigger)
 uint ListPositionOfEngine(EngineID engine)
 {
 	const Engine *e = Engine::Get(engine);
-	if (e->grf_prop.grffile == NULL) return e->list_position;
-
 	/* Crude sorting to group by GRF ID */
-	return (e->grf_prop.grffile->grfid * 256) + e->list_position;
+	return (e->GetGRFID() * 256) + e->list_position;
 }
 
 struct ListOrderChange {
@@ -1188,7 +1226,7 @@ void CommitVehicleListOrderChanges()
 		/* Populate map with current list positions */
 		Engine *e;
 		FOR_ALL_ENGINES_OF_TYPE(e, source_e->type) {
-			if (!_settings_game.vehicle.dynamic_engines || e->grf_prop.grffile == source_e->grf_prop.grffile) {
+			if (!_settings_game.vehicle.dynamic_engines || e->GetGRF() == source_e->GetGRF()) {
 				if (e->grf_prop.local_id == target) target_e = e;
 				lptr_map[e->list_position] = e;
 			}

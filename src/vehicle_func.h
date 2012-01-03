@@ -21,16 +21,19 @@
 #include "newgrf_config.h"
 #include "track_type.h"
 #include "livery.h"
+#include "cargotype.h"
 
 #define is_custom_sprite(x) (x >= 0xFD)
 #define IS_CUSTOM_FIRSTHEAD_SPRITE(x) (x == 0xFD)
 #define IS_CUSTOM_SECONDHEAD_SPRITE(x) (x == 0xFE)
 
+static const int VEHICLE_PROFIT_MIN_AGE = DAYS_IN_YEAR * 2; ///< Only vehicles older than this have a meaningful profit.
+static const Money VEHICLE_PROFIT_THRESHOLD = 10000;        ///< Threshold for a vehicle to be considered making good profit.
+
 typedef Vehicle *VehicleFromPosProc(Vehicle *v, void *data);
 
 void VehicleServiceInDepot(Vehicle *v);
 uint CountVehiclesInChain(const Vehicle *v);
-void CountCompanyVehicles(CompanyID cid, uint counts[4]);
 void FindVehicleOnPos(TileIndex tile, void *data, VehicleFromPosProc *proc);
 void FindVehicleOnPosXY(int x, int y, void *data, VehicleFromPosProc *proc);
 bool HasVehicleOnPos(TileIndex tile, void *data, VehicleFromPosProc *proc);
@@ -38,11 +41,13 @@ bool HasVehicleOnPosXY(int x, int y, void *data, VehicleFromPosProc *proc);
 void CallVehicleTicks();
 uint8 CalcPercentVehicleFilled(const Vehicle *v, StringID *colour);
 
+void VehicleLengthChanged(const Vehicle *u);
+
 byte VehicleRandomBits();
-void ResetVehiclePosHash();
+void ResetVehicleHash();
 void ResetVehicleColourMap();
 
-byte GetBestFittingSubType(Vehicle *v_from, Vehicle *v_for);
+byte GetBestFittingSubType(Vehicle *v_from, Vehicle *v_for, CargoID dest_cargo_type);
 
 void ViewportAddVehicles(DrawPixelInfo *dpi);
 
@@ -54,7 +59,9 @@ void CheckVehicleBreakdown(Vehicle *v);
 void AgeVehicle(Vehicle *v);
 void VehicleEnteredDepotThisTick(Vehicle *v);
 
-void VehicleMove(Vehicle *v, bool update_viewport);
+void VehicleUpdatePosition(Vehicle *v);
+void VehicleUpdateViewport(Vehicle *v, bool dirty);
+void VehicleUpdatePositionAndViewport(Vehicle *v);
 void MarkSingleVehicleDirty(const Vehicle *v);
 
 UnitID GetFreeUnitNumber(VehicleType type);
@@ -106,8 +113,6 @@ const struct Livery *GetEngineLivery(EngineID engine_type, CompanyID company, En
 
 SpriteID GetEnginePalette(EngineID engine_type, CompanyID company);
 SpriteID GetVehiclePalette(const Vehicle *v);
-
-uint GetVehicleCapacity(const Vehicle *v, uint16 *mail_capacity = NULL);
 
 extern const uint32 _veh_build_proc_table[];
 extern const uint32 _veh_sell_proc_table[];
@@ -169,5 +174,7 @@ void ReleaseDisastersTargetingVehicle(VehicleID vehicle);
 
 typedef SmallVector<VehicleID, 2> VehicleSet;
 void GetVehicleSet(VehicleSet &set, Vehicle *v, uint8 num_vehicles);
+
+void CheckCargoCapacity(Vehicle *v);
 
 #endif /* VEHICLE_FUNC_H */

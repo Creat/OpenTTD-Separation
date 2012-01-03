@@ -7,7 +7,7 @@
  * See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with OpenTTD. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file industrytype.h Industry type specs. */
+/** @file industrytype.h %Industry type specs. */
 
 #ifndef INDUSTRYTYPE_H
 #define INDUSTRYTYPE_H
@@ -57,7 +57,7 @@ enum IndustryConstructionType {
 	ICT_UNKNOWN,          ///< in previous game version or without newindustries activated
 	ICT_NORMAL_GAMEPLAY,  ///< either by user or random creation process
 	ICT_MAP_GENERATION,   ///< during random map creation
-	ICT_SCENARIO_EDITOR   ///< while editing a scenario
+	ICT_SCENARIO_EDITOR,  ///< while editing a scenario
 };
 
 /** Various industry behaviours mostly to represent original TTD specialities */
@@ -110,13 +110,16 @@ struct IndustrySpec {
 	byte check_proc;                      ///< Index to a procedure to check for conflicting circumstances
 	CargoID produced_cargo[2];
 	byte production_rate[2];
-	byte minimal_cargo;                   ///< minimum amount of cargo transported to the stations
-	                                      ///< If the waiting cargo is less than this number, no cargo is moved to it
-	CargoID accepts_cargo[3];             ///< 3 accepted cargos
-	uint16 input_cargo_multiplier[3][2];  ///< Input cargo multipliers (multiply amount of incoming cargo for the produced cargos)
+	/**
+	 * minimum amount of cargo transported to the stations.
+	 * If the waiting cargo is less than this number, no cargo is moved to it.
+	 */
+	byte minimal_cargo;
+	CargoID accepts_cargo[3];             ///< 3 accepted cargoes.
+	uint16 input_cargo_multiplier[3][2];  ///< Input cargo multipliers (multiply amount of incoming cargo for the produced cargoes)
 	IndustryLifeType life_type;           ///< This is also known as Industry production flag, in newgrf specs
 	byte climate_availability;            ///< Bitmask, giving landscape enums as bit position
-	IndustryBehaviour behaviour;           ///< How this industry will behave, and how others entities can use it
+	IndustryBehaviour behaviour;          ///< How this industry will behave, and how others entities can use it
 	byte map_colour;                      ///< colour used for the small map
 	StringID name;                        ///< Displayed name of the industry
 	StringID new_industry_text;           ///< Message appearing when the industry is built
@@ -149,8 +152,11 @@ struct IndustryTileSpec {
 	Slope slopes_refused;                 ///< slope pattern on which this tile cannot be built
 	byte anim_production;                 ///< Animation frame to start when goods are produced
 	byte anim_next;                       ///< Next frame in an animation
-	bool anim_state;                      ///< When true, the tile has to be drawn using the animation
-	                                      ///< state instead of the construction state
+	/**
+	 * When true, the tile has to be drawn using the animation
+	 * state instead of the construction state
+	 */
+	bool anim_state;
 	/* Newgrf data */
 	uint8 callback_mask;                  ///< Bitmask of industry tile callbacks that have to be called
 	AnimationInfo animation;              ///< Information about the animation (is it looping, how many loops etc)

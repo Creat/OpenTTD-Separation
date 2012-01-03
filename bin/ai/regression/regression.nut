@@ -10,9 +10,11 @@ function Regression::TestInit()
 {
 	print("");
 	print("--TestInit--");
+	print(" Ops:      " + this.GetOpsTillSuspend());
 	print(" TickTest: " + this.GetTick());
 	this.Sleep(1);
 	print(" TickTest: " + this.GetTick());
+	print(" Ops:      " + this.GetOpsTillSuspend());
 	print(" SetCommandDelay: " + AIController.SetCommandDelay(1));
 	print(" IsValid(vehicle.plane_speed): " + AIGameSettings.IsValid("vehicle.plane_speed"));
 	print(" vehicle.plane_speed: " + AIGameSettings.GetValue("vehicle.plane_speed"));
@@ -166,6 +168,8 @@ function Regression::TestInit()
 	foreach (idx, val in list) {
 		print("   " + idx);
 	}
+
+	print(" Ops:      " + this.GetOpsTillSuspend());
 }
 
 function Regression::Std()
@@ -1387,8 +1391,16 @@ function Regression::TileList()
 	for (local i = list.Begin(); !list.IsEnd(); i = list.Next()) {
 		print("    " + i + " => " + list.GetValue(i));
 	}
+
+	list.AddRectangle(31895 - 256 * 5, 256 * 5 + 31895 + 8);
+
 	list.Valuate(AITile.GetOwner);
 	print("  GetOwner() ListDump:");
+	for (local i = list.Begin(); !list.IsEnd(); i = list.Next()) {
+		print("    " + i + " => " + list.GetValue(i));
+	}
+	list.Valuate(AITile.GetTownAuthority);
+	print("  GetTownAuthority() ListDump:");
 	for (local i = list.Begin(); !list.IsEnd(); i = list.Next()) {
 		print("    " + i + " => " + list.GetValue(i));
 	}
@@ -1855,13 +1867,13 @@ function Regression::Start()
 		print("  GetNextEvent:          " + (e == null ? "null" : "instance"));
 		print("    GetEventType:        " + e.GetEventType());
 		switch (e.GetEventType()) {
-			case AIEvent.AI_ET_SUBSIDY_OFFER: {
+			case AIEvent.ET_SUBSIDY_OFFER: {
 				local c = AIEventSubsidyOffer.Convert(e);
 				print("      EventName:         SubsidyOffer");
 				PrintSubsidy(c.GetSubsidyID());
 			} break;
 
-			case AIEvent.AI_ET_VEHICLE_WAITING_IN_DEPOT: {
+			case AIEvent.ET_VEHICLE_WAITING_IN_DEPOT: {
 				local c = AIEventVehicleWaitingInDepot.Convert(e);
 				print("      EventName:         VehicleWaitingInDepot");
 				print("      VehicleID:         " + c.GetVehicleID());

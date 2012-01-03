@@ -566,23 +566,23 @@ static const OldChunks town_chunk[] = {
 	OCL_SVAR( OC_FILE_U32 | OC_VAR_U16, Town, statues ),
 	OCL_NULL( 2 ),         ///< num_houses,        no longer in use
 	OCL_SVAR(  OC_FILE_U8 | OC_VAR_U16, Town, time_until_rebuild ),
-	OCL_SVAR(  OC_FILE_U8 | OC_VAR_I16, Town, growth_rate ),
+	OCL_SVAR(  OC_FILE_U8 | OC_VAR_U16, Town, growth_rate ),
 
-	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, new_max_pass ),
-	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, new_max_mail ),
-	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, new_act_pass ),
-	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, new_act_mail ),
-	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, max_pass ),
-	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, max_mail ),
-	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, act_pass ),
-	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, act_mail ),
+	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, supplied[CT_PASSENGERS].new_max ),
+	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, supplied[CT_MAIL].new_max ),
+	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, supplied[CT_PASSENGERS].new_act ),
+	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, supplied[CT_MAIL].new_act ),
+	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, supplied[CT_PASSENGERS].old_max ),
+	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, supplied[CT_MAIL].old_max ),
+	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, supplied[CT_PASSENGERS].old_act ),
+	OCL_SVAR( OC_FILE_U16 | OC_VAR_U32, Town, supplied[CT_MAIL].old_act ),
 
 	OCL_NULL( 2 ),         ///< pct_pass_transported / pct_mail_transported, now computed on the fly
 
-	OCL_SVAR( OC_TTD | OC_UINT16, Town, new_act_food ),
-	OCL_SVAR( OC_TTD | OC_UINT16, Town, new_act_water ),
-	OCL_SVAR( OC_TTD | OC_UINT16, Town, act_food ),
-	OCL_SVAR( OC_TTD | OC_UINT16, Town, act_water ),
+	OCL_SVAR( OC_TTD | OC_UINT16, Town, received[TE_FOOD].new_act ),
+	OCL_SVAR( OC_TTD | OC_UINT16, Town, received[TE_WATER].new_act ),
+	OCL_SVAR( OC_TTD | OC_UINT16, Town, received[TE_FOOD].old_act ),
+	OCL_SVAR( OC_TTD | OC_UINT16, Town, received[TE_WATER].old_act ),
 
 	OCL_SVAR(  OC_UINT8, Town, road_build_months ),
 	OCL_SVAR(  OC_UINT8, Town, fund_buildings_months ),
@@ -1152,7 +1152,7 @@ static const OldChunks vehicle_chunk[] = {
 
 	OCL_SVAR( OC_FILE_U16 | OC_VAR_I32, Vehicle, x_pos ),
 	OCL_SVAR( OC_FILE_U16 | OC_VAR_I32, Vehicle, y_pos ),
-	OCL_SVAR(  OC_UINT8, Vehicle, z_pos ),
+	OCL_SVAR( OC_FILE_U8  | OC_VAR_I32, Vehicle, z_pos ),
 	OCL_SVAR(  OC_UINT8, Vehicle, direction ),
 	OCL_NULL( 2 ),         ///< x_offs and y_offs, calculated automatically
 	OCL_NULL( 2 ),         ///< x_extent and y_extent, calculated automatically
@@ -1724,7 +1724,7 @@ static const OldChunks main_chunk[] = {
 	OCL_VAR ( OC_TTD | OC_UINT8,    1, &_trees_tick_ctr ),
 
 	OCL_CNULL( OC_TTD, 1 ),               ///< Custom vehicle types yes/no, no longer used
-	OCL_VAR ( OC_TTD | OC_UINT8,    1, &_settings_game.game_creation.snow_line ),
+	OCL_VAR ( OC_TTD | OC_UINT8,    1, &_settings_game.game_creation.snow_line_height ),
 
 	OCL_CNULL( OC_TTD, 32 ),              ///< new_industry_randtable, no longer used (because of new design)
 	OCL_CNULL( OC_TTD, 36 ),              ///< cargo-stuff

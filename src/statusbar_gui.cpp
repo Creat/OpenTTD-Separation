@@ -26,6 +26,8 @@
 #include "statusbar_gui.h"
 #include "core/geometry_func.hpp"
 
+#include "widgets/statusbar_widget.h"
+
 #include "table/strings.h"
 #include "table/sprites.h"
 
@@ -71,12 +73,6 @@ static bool DrawScrollingStatusText(const NewsItem *ni, int scroll_pos, int left
 	return (_current_text_dir == TD_RTL) ? (pos < right - left) : (pos + width > 0);
 }
 
-enum StatusbarWidget {
-	SBW_LEFT,   ///< left part of the statusbar; date is shown there
-	SBW_MIDDLE, ///< middle part; current news or company name or *** SAVING *** or *** PAUSED ***
-	SBW_RIGHT,  ///< right part; bank balance
-};
-
 struct StatusBarWindow : Window {
 	bool saving;
 	int ticker_scroll;
@@ -93,7 +89,7 @@ struct StatusBarWindow : Window {
 		this->reminder_timeout = REMINDER_STOP;
 
 		this->InitNested(desc);
-		CLRBITS(this->flags4, WF_WHITE_BORDER_MASK);
+		CLRBITS(this->flags, WF_WHITE_BORDER);
 		PositionStatusbar(this);
 	}
 
@@ -107,12 +103,12 @@ struct StatusBarWindow : Window {
 	{
 		Dimension d;
 		switch (widget) {
-			case SBW_LEFT:
+			case WID_S_LEFT:
 				SetDParam(0, MAX_YEAR * DAYS_IN_YEAR);
 				d = GetStringBoundingBox(STR_WHITE_DATE_LONG);
 				break;
 
-			case SBW_RIGHT: {
+			case WID_S_RIGHT: {
 				int64 max_money = UINT32_MAX;
 				const Company *c;
 				FOR_ALL_COMPANIES(c) max_money = max<int64>(c->money, max_money);
@@ -133,13 +129,13 @@ struct StatusBarWindow : Window {
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
 		switch (widget) {
-			case SBW_LEFT:
+			case WID_S_LEFT:
 				/* Draw the date */
 				SetDParam(0, _date);
 				DrawString(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_RIGHT, r.top + WD_FRAMERECT_TOP, STR_WHITE_DATE_LONG, TC_FROMSTRING, SA_HOR_CENTER);
 				break;
 
-			case SBW_RIGHT: {
+			case WID_S_RIGHT: {
 				/* Draw company money, if any */
 				const Company *c = Company::GetIfValid(_local_company);
 				if (c != NULL) {
@@ -149,7 +145,7 @@ struct StatusBarWindow : Window {
 				break;
 			}
 
-			case SBW_MIDDLE:
+			case WID_S_MIDDLE:
 				/* Draw status bar */
 				if (this->saving) { // true when saving is active
 					DrawString(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_RIGHT, r.top + WD_FRAMERECT_TOP, STR_STATUSBAR_SAVING_GAME, TC_FROMSTRING, SA_HOR_CENTER);
@@ -207,8 +203,8 @@ struct StatusBarWindow : Window {
 	virtual void OnClick(Point pt, int widget, int click_count)
 	{
 		switch (widget) {
-			case SBW_MIDDLE: ShowLastNewsMessage(); break;
-			case SBW_RIGHT:  if (_local_company != COMPANY_SPECTATOR) ShowCompanyFinances(_local_company); break;
+			case WID_S_MIDDLE: ShowLastNewsMessage(); break;
+			case WID_S_RIGHT:  if (_local_company != COMPANY_SPECTATOR) ShowCompanyFinances(_local_company); break;
 			default: ResetObjectToPlace();
 		}
 	}
@@ -219,23 +215,23 @@ struct StatusBarWindow : Window {
 
 		if (this->ticker_scroll < TICKER_STOP) { // Scrolling text
 			this->ticker_scroll += COUNTER_STEP;
-			this->SetWidgetDirty(SBW_MIDDLE);
+			this->SetWidgetDirty(WID_S_MIDDLE);
 		}
 
 		if (this->reminder_timeout > REMINDER_STOP) { // Red blot to show there are new unread newsmessages
 			this->reminder_timeout -= COUNTER_STEP;
 		} else if (this->reminder_timeout < REMINDER_STOP) {
 			this->reminder_timeout = REMINDER_STOP;
-			this->SetWidgetDirty(SBW_MIDDLE);
+			this->SetWidgetDirty(WID_S_MIDDLE);
 		}
 	}
 };
 
 static const NWidgetPart _nested_main_status_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
-		NWidget(WWT_PANEL, COLOUR_GREY, SBW_LEFT), SetMinimalSize(140, 12), EndContainer(),
-		NWidget(WWT_PUSHBTN, COLOUR_GREY, SBW_MIDDLE), SetMinimalSize(40, 12), SetDataTip(0x0, STR_STATUSBAR_TOOLTIP_SHOW_LAST_NEWS), SetResize(1, 0),
-		NWidget(WWT_PUSHBTN, COLOUR_GREY, SBW_RIGHT), SetMinimalSize(140, 12),
+		NWidget(WWT_PANEL, COLOUR_GREY, WID_S_LEFT), SetMinimalSize(140, 12), EndContainer(),
+		NWidget(WWT_PUSHBTN, COLOUR_GREY, WID_S_MIDDLE), SetMinimalSize(40, 12), SetDataTip(0x0, STR_STATUSBAR_TOOLTIP_SHOW_LAST_NEWS), SetResize(1, 0),
+		NWidget(WWT_PUSHBTN, COLOUR_GREY, WID_S_RIGHT), SetMinimalSize(140, 12),
 	EndContainer(),
 };
 

@@ -41,7 +41,7 @@
 #include "../string_func.h"
 #include "../engine_base.h"
 #include "../fios.h"
-#include "../gui.h"
+#include "../error.h"
 
 #include "table/strings.h"
 
@@ -224,10 +224,15 @@
  *  157   21862
  *  158   21933
  *  159   21962
- *  160   21974
+ *  160   21974   1.1.x
  *  161   22567
  *  162   22713
  *  163   22767
+ *  164   23290
+ *  165   23304
+ *  166   23415
+ *  167   23504
+ *  168   23637
  */
 extern const uint16 SAVEGAME_VERSION = SL_TTSEP_VER; ///< Current savegame version of OpenTTD.
 
@@ -273,7 +278,7 @@ struct ReadBuffer {
 	{
 	}
 
-	FORCEINLINE byte ReadByte()
+	inline byte ReadByte()
 	{
 		if (this->bufp == this->bufe) {
 			size_t len = this->reader->Read(this->buf, lengthof(this->buf));
@@ -313,7 +318,7 @@ struct MemoryDumper {
 	 * Write a single byte into the dumper.
 	 * @param b The byte to write.
 	 */
-	FORCEINLINE void WriteByte(byte b)
+	inline void WriteByte(byte b)
 	{
 		/* Are we at the end of this chunk? */
 		if (this->buf == this->bufe) {
@@ -398,7 +403,9 @@ extern const ChunkHandler _station_chunk_handlers[];
 extern const ChunkHandler _industry_chunk_handlers[];
 extern const ChunkHandler _economy_chunk_handlers[];
 extern const ChunkHandler _subsidy_chunk_handlers[];
+extern const ChunkHandler _goal_chunk_handlers[];
 extern const ChunkHandler _ai_chunk_handlers[];
+extern const ChunkHandler _game_chunk_handlers[];
 extern const ChunkHandler _animated_tile_chunk_handlers[];
 extern const ChunkHandler _newgrf_chunk_handlers[];
 extern const ChunkHandler _group_chunk_handlers[];
@@ -424,12 +431,14 @@ static const ChunkHandler * const _chunk_handlers[] = {
 	_industry_chunk_handlers,
 	_economy_chunk_handlers,
 	_subsidy_chunk_handlers,
+	_goal_chunk_handlers,
 	_engine_chunk_handlers,
 	_town_chunk_handlers,
 	_sign_chunk_handlers,
 	_station_chunk_handlers,
 	_company_chunk_handlers,
 	_ai_chunk_handlers,
+	_game_chunk_handlers,
 	_animated_tile_chunk_handlers,
 	_newgrf_chunk_handlers,
 	_group_chunk_handlers,
@@ -884,15 +893,15 @@ size_t SlGetFieldLength()
 int64 ReadValue(const void *ptr, VarType conv)
 {
 	switch (GetVarMemType(conv)) {
-		case SLE_VAR_BL:  return (*(bool *)ptr != 0);
-		case SLE_VAR_I8:  return *(int8  *)ptr;
-		case SLE_VAR_U8:  return *(byte  *)ptr;
-		case SLE_VAR_I16: return *(int16 *)ptr;
-		case SLE_VAR_U16: return *(uint16*)ptr;
-		case SLE_VAR_I32: return *(int32 *)ptr;
-		case SLE_VAR_U32: return *(uint32*)ptr;
-		case SLE_VAR_I64: return *(int64 *)ptr;
-		case SLE_VAR_U64: return *(uint64*)ptr;
+		case SLE_VAR_BL:  return (*(const bool *)ptr != 0);
+		case SLE_VAR_I8:  return *(const int8  *)ptr;
+		case SLE_VAR_U8:  return *(const byte  *)ptr;
+		case SLE_VAR_I16: return *(const int16 *)ptr;
+		case SLE_VAR_U16: return *(const uint16*)ptr;
+		case SLE_VAR_I32: return *(const int32 *)ptr;
+		case SLE_VAR_U32: return *(const uint32*)ptr;
+		case SLE_VAR_I64: return *(const int64 *)ptr;
+		case SLE_VAR_U64: return *(const uint64*)ptr;
 		case SLE_VAR_NULL:return 0;
 		default: NOT_REACHED();
 	}
@@ -1012,12 +1021,12 @@ static inline size_t SlCalcStringLen(const void *ptr, size_t length, VarType con
 		default: NOT_REACHED();
 		case SLE_VAR_STR:
 		case SLE_VAR_STRQ:
-			str = *(const char**)ptr;
+			str = *(const char * const *)ptr;
 			len = SIZE_MAX;
 			break;
 		case SLE_VAR_STRB:
 		case SLE_VAR_STRBQ:
-			str = (const char*)ptr;
+			str = (const char *)ptr;
 			len = length;
 			break;
 	}
@@ -1085,7 +1094,14 @@ static void SlString(void *ptr, size_t length, VarType conv)
 			}
 
 			((char *)ptr)[len] = '\0'; // properly terminate the string
-			str_validate((char *)ptr, (char *)ptr + len);
+			StringValidationSettings settings = SVS_REPLACE_WITH_QUESTION_MARK;
+			if ((conv & SLF_ALLOW_CONTROL) != 0) {
+				settings = settings | SVS_ALLOW_CONTROL_CODE;
+			}
+			if ((conv & SLF_ALLOW_NEWLINE) != 0) {
+				settings = settings | SVS_ALLOW_NEWLINE;
+			}
+			str_validate((char *)ptr, (char *)ptr + len, settings);
 			break;
 		}
 		case SLA_PTRS: break;
@@ -1265,7 +1281,7 @@ static void *IntToReference(size_t index, SLRefType rt)
  */
 static inline size_t SlCalcListLen(const void *list)
 {
-	std::list<void *> *l = (std::list<void *> *) list;
+	const std::list<void *> *l = (const std::list<void *> *) list;
 
 	int type_size = IsSavegameVersionBefore(69) ? 2 : 4;
 	/* Each entry is saved as type_size bytes, plus type_size bytes are used for the length
@@ -1438,7 +1454,7 @@ bool SlObjectMember(void *ptr, const SaveLoad *sld)
 					}
 					break;
 				case SL_ARR: SlArray(ptr, sld->length, conv); break;
-				case SL_STR: SlString(ptr, sld->length, conv); break;
+				case SL_STR: SlString(ptr, sld->length, sld->conv); break;
 				case SL_LST: SlList(ptr, (SLRefType)conv); break;
 				default: NOT_REACHED();
 			}
@@ -2282,7 +2298,8 @@ static const SaveLoadFormat *GetSavegameFormat(char *s, byte *compression_level)
 					char *end;
 					long level = strtol(complevel, &end, 10);
 					if (end == complevel || level != Clamp(level, slf->min_compression, slf->max_compression)) {
-						ShowInfoF("Compression level '%s' is not valid.", complevel);
+						SetDParamStr(0, complevel);
+						ShowErrorMessage(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_SAVEGAME_COMPRESSION_LEVEL, WL_CRITICAL);
 					} else {
 						*compression_level = level;
 					}
@@ -2291,7 +2308,9 @@ static const SaveLoadFormat *GetSavegameFormat(char *s, byte *compression_level)
 			}
 		}
 
-		ShowInfoF("Savegame format '%s' is not available. Reverting to '%s'.", s, def->name);
+		SetDParamStr(0, s);
+		SetDParamStr(1, def->name);
+		ShowErrorMessage(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_SAVEGAME_COMPRESSION_ALGORITHM, WL_CRITICAL);
 
 		/* Restore the string by adding the : back */
 		if (complevel != NULL) *complevel = ':';
@@ -2533,8 +2552,7 @@ static SaveOrLoadResult DoLoad(LoadFilter *reader, bool load_check)
 			_sl_version = TO_BE32(hdr[1]) >> 16;
 			/* Minor is not used anymore from version 18.0, but it is still needed
 			 * in versions before that (4 cases) which can't be removed easy.
-			 * Therefor it is loaded, but never saved (or, it saves a 0 in any scenario).
-			 * So never EVER use this minor version again. -- TrueLight -- 22-11-2005 */
+			 * Therefor it is loaded, but never saved (or, it saves a 0 in any scenario). */
 			_sl_minor_version = (TO_BE32(hdr[1]) >> 8) & 0xFF;
 
 			DEBUG(sl, 1, "Loading savegame version %d", _sl_version);
@@ -2695,6 +2713,7 @@ SaveOrLoadResult SaveOrLoad(const char *filename, int mode, Subdirectory sb, boo
 		/* Make it a little easier to load savegames from the console */
 		if (fh == NULL && mode != SL_SAVE) fh = FioFOpenFile(filename, "rb", SAVE_DIR);
 		if (fh == NULL && mode != SL_SAVE) fh = FioFOpenFile(filename, "rb", BASE_DIR);
+		if (fh == NULL && mode != SL_SAVE) fh = FioFOpenFile(filename, "rb", SCENARIO_DIR);
 
 		if (fh == NULL) {
 			SlError(mode == SL_SAVE ? STR_GAME_SAVELOAD_ERROR_FILE_NOT_WRITEABLE : STR_GAME_SAVELOAD_ERROR_FILE_NOT_READABLE);

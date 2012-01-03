@@ -33,6 +33,8 @@
 #include "newgrf_station.h"
 #include "newgrf_town.h"
 
+#include "widgets/newgrf_debug_widget.h"
+
 #include "table/strings.h"
 
 /** The sprite picker. */
@@ -189,7 +191,7 @@ public:
 	 * @param grfid Parameter for the PSA. Only required for items with parameters.
 	 * @return Pointer to the first position of the storage array or NULL if not present.
 	 */
-	virtual int32 *GetPSAFirstPosition(uint index, uint32 grfid) const
+	virtual const int32 *GetPSAFirstPosition(uint index, uint32 grfid) const
 	{
 		return NULL;
 	}
@@ -274,15 +276,6 @@ static inline const NIHelper *GetFeatureHelper(uint window_number)
 	return GetFeature(window_number)->helper;
 }
 
-
-/** Widget numbers of settings window */
-enum NewGRFInspectWidgets {
-	NIW_CAPTION,   ///< The caption bar ofcourse
-	NIW_PARENT,    ///< Inspect the parent
-	NIW_MAINPANEL, ///< Panel widget containing the actual data
-	NIW_SCROLLBAR, ///< Scrollbar
-};
-
 /** Window used for inspecting NewGRFs. */
 struct NewGRFInspectWindow : Window {
 	static const int LEFT_OFFSET   = 5; ///< Position of left edge
@@ -291,7 +284,7 @@ struct NewGRFInspectWindow : Window {
 	static const int BOTTOM_OFFSET = 5; ///< Position of bottom edge
 
 	/** The value for the variable 60 parameters. */
-	static byte var60params[GSF_FAKE_END][0x20];
+	static uint32 var60params[GSF_FAKE_END][0x20];
 
 	/** GRFID of the caller of this window, 0 if it has no caller. */
 	uint32 caller_grfid;
@@ -324,23 +317,23 @@ struct NewGRFInspectWindow : Window {
 	NewGRFInspectWindow(const WindowDesc *desc, WindowNumber wno) : Window()
 	{
 		this->CreateNestedTree(desc);
-		this->vscroll = this->GetScrollbar(NIW_SCROLLBAR);
+		this->vscroll = this->GetScrollbar(WID_NGRFI_SCROLLBAR);
 		this->FinishInitNested(desc, wno);
 
 		this->vscroll->SetCount(0);
-		this->SetWidgetDisabledState(NIW_PARENT, GetFeatureHelper(this->window_number)->GetParent(GetFeatureIndex(this->window_number)) == UINT32_MAX);
+		this->SetWidgetDisabledState(WID_NGRFI_PARENT, GetFeatureHelper(this->window_number)->GetParent(GetFeatureIndex(this->window_number)) == UINT32_MAX);
 	}
 
 	virtual void SetStringParameters(int widget) const
 	{
-		if (widget != NIW_CAPTION) return;
+		if (widget != WID_NGRFI_CAPTION) return;
 
 		GetFeatureHelper(this->window_number)->SetStringParameters(GetFeatureIndex(this->window_number));
 	}
 
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 	{
-		if (widget != NIW_MAINPANEL) return;
+		if (widget != WID_NGRFI_MAINPANEL) return;
 
 		resize->height = max(11, FONT_HEIGHT_NORMAL + 1);
 		resize->width  = 1;
@@ -371,7 +364,7 @@ struct NewGRFInspectWindow : Window {
 
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
-		if (widget != NIW_MAINPANEL) return;
+		if (widget != WID_NGRFI_MAINPANEL) return;
 
 		uint index = GetFeatureIndex(this->window_number);
 		const NIFeature *nif  = GetFeature(this->window_number);
@@ -398,7 +391,7 @@ struct NewGRFInspectWindow : Window {
 		}
 
 		uint psa_size = nih->GetPSASize(index, this->caller_grfid);
-		int32 *psa = nih->GetPSAFirstPosition(index, this->caller_grfid);
+		const int32 *psa = nih->GetPSAFirstPosition(index, this->caller_grfid);
 		if (psa_size != 0 && psa != NULL) {
 			if (nih->PSAWithParameter()) {
 				this->DrawString(r, i++, "Persistent storage [%08X]:", BSWAP32(this->caller_grfid));
@@ -414,12 +407,12 @@ struct NewGRFInspectWindow : Window {
 		if (nif->properties != NULL) {
 			this->DrawString(r, i++, "Properties:");
 			for (const NIProperty *nip = nif->properties; nip->name != NULL; nip++) {
-				void *ptr = (byte*)base + nip->offset;
+				const void *ptr = (const byte *)base + nip->offset;
 				uint value;
 				switch (nip->read_size) {
-					case 1: value = *(uint8  *)ptr; break;
-					case 2: value = *(uint16 *)ptr; break;
-					case 4: value = *(uint32 *)ptr; break;
+					case 1: value = *(const uint8  *)ptr; break;
+					case 2: value = *(const uint16 *)ptr; break;
+					case 4: value = *(const uint32 *)ptr; break;
 					default: NOT_REACHED();
 				}
 
@@ -448,12 +441,12 @@ struct NewGRFInspectWindow : Window {
 			this->DrawString(r, i++, "Callbacks:");
 			for (const NICallback *nic = nif->callbacks; nic->name != NULL; nic++) {
 				if (nic->cb_bit != CBM_NO_BIT) {
-					void *ptr = (byte*)base_spec + nic->offset;
+					const void *ptr = (const byte *)base_spec + nic->offset;
 					uint value;
 					switch (nic->read_size) {
-						case 1: value = *(uint8  *)ptr; break;
-						case 2: value = *(uint16 *)ptr; break;
-						case 4: value = *(uint32 *)ptr; break;
+						case 1: value = *(const uint8  *)ptr; break;
+						case 2: value = *(const uint16 *)ptr; break;
+						case 4: value = *(const uint32 *)ptr; break;
 						default: NOT_REACHED();
 					}
 
@@ -474,20 +467,20 @@ struct NewGRFInspectWindow : Window {
 	virtual void OnClick(Point pt, int widget, int click_count)
 	{
 		switch (widget) {
-			case NIW_PARENT: {
+			case WID_NGRFI_PARENT: {
 				const NIHelper *nih   = GetFeatureHelper(this->window_number);
 				uint index = nih->GetParent(GetFeatureIndex(this->window_number));
 				::ShowNewGRFInspectWindow((GrfSpecFeature)GB(index, 24, 8), GetFeatureIndex(index), nih->GetGRFID(GetFeatureIndex(this->window_number)));
 				break;
 			}
 
-			case NIW_MAINPANEL: {
+			case WID_NGRFI_MAINPANEL: {
 				/* Does this feature have variables? */
 				const NIFeature *nif  = GetFeature(this->window_number);
 				if (nif->variables == NULL) return;
 
 				/* Get the line, make sure it's within the boundaries. */
-				int line = this->vscroll->GetScrolledRowFromWidget(pt.y, this, NIW_MAINPANEL, TOP_OFFSET);
+				int line = this->vscroll->GetScrolledRowFromWidget(pt.y, this, WID_NGRFI_MAINPANEL, TOP_OFFSET);
 				if (line == INT_MAX) return;
 
 				/* Find the variable related to the line */
@@ -497,7 +490,7 @@ struct NewGRFInspectWindow : Window {
 					if (!HasVariableParameter(niv->var)) break;
 
 					this->current_edit_param = niv->var;
-					ShowQueryString(STR_EMPTY, STR_NEWGRF_INSPECT_QUERY_CAPTION, 3, this, CS_HEXADECIMAL, QSF_NONE);
+					ShowQueryString(STR_EMPTY, STR_NEWGRF_INSPECT_QUERY_CAPTION, 9, this, CS_HEXADECIMAL, QSF_NONE);
 				}
 			}
 		}
@@ -513,24 +506,24 @@ struct NewGRFInspectWindow : Window {
 
 	virtual void OnResize()
 	{
-		this->vscroll->SetCapacityFromWidget(this, NIW_MAINPANEL, TOP_OFFSET + BOTTOM_OFFSET);
+		this->vscroll->SetCapacityFromWidget(this, WID_NGRFI_MAINPANEL, TOP_OFFSET + BOTTOM_OFFSET);
 	}
 };
 
-/* static */ byte NewGRFInspectWindow::var60params[GSF_FAKE_END][0x20] = { {0} }; // Use spec to have 0s in whole array
+/* static */ uint32 NewGRFInspectWindow::var60params[GSF_FAKE_END][0x20] = { {0} }; // Use spec to have 0s in whole array
 
 static const NWidgetPart _nested_newgrf_inspect_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
-		NWidget(WWT_CAPTION, COLOUR_GREY, NIW_CAPTION), SetDataTip(STR_NEWGRF_INSPECT_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
-		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, NIW_PARENT), SetDataTip(STR_NEWGRF_INSPECT_PARENT_BUTTON, STR_NEWGRF_INSPECT_PARENT_TOOLTIP),
+		NWidget(WWT_CAPTION, COLOUR_GREY, WID_NGRFI_CAPTION), SetDataTip(STR_NEWGRF_INSPECT_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
+		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_NGRFI_PARENT), SetDataTip(STR_NEWGRF_INSPECT_PARENT_BUTTON, STR_NEWGRF_INSPECT_PARENT_TOOLTIP),
 		NWidget(WWT_SHADEBOX, COLOUR_GREY),
 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL),
-		NWidget(WWT_PANEL, COLOUR_GREY, NIW_MAINPANEL), SetMinimalSize(300, 0), SetScrollbar(NIW_SCROLLBAR), EndContainer(),
+		NWidget(WWT_PANEL, COLOUR_GREY, WID_NGRFI_MAINPANEL), SetMinimalSize(300, 0), SetScrollbar(WID_NGRFI_SCROLLBAR), EndContainer(),
 		NWidget(NWID_VERTICAL),
-			NWidget(NWID_VSCROLLBAR, COLOUR_GREY, NIW_SCROLLBAR),
+			NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_NGRFI_SCROLLBAR),
 			NWidget(WWT_RESIZEBOX, COLOUR_GREY),
 		EndContainer(),
 	EndContainer(),
@@ -643,23 +636,6 @@ GrfSpecFeature GetGrfSpecFeature(VehicleType type)
 
 /**** Sprite Aligner ****/
 
-/** Widgets we want (some) influence over. */
-enum SpriteAlignerWidgets {
-	SAW_CAPTION,  ///< Caption of the window
-	SAW_PREVIOUS, ///< Skip to the previous sprite
-	SAW_GOTO,     ///< Go to a given sprite
-	SAW_NEXT,     ///< Skip to the next sprite
-	SAW_UP,       ///< Move the sprite up
-	SAW_LEFT,     ///< Move the sprite to the left
-	SAW_RIGHT,    ///< Move the sprite to the right
-	SAW_DOWN,     ///< Move the sprite down
-	SAW_SPRITE,   ///< The actual sprite
-	SAW_OFFSETS,  ///< The sprite offsets
-	SAW_PICKER,   ///< Sprite picker
-	SAW_LIST,     ///< Queried sprite list
-	SAW_SCROLLBAR,///< Scrollbar for sprite list
-};
-
 /** Window used for aligning sprites. */
 struct SpriteAlignerWindow : Window {
 	SpriteID current_sprite; ///< The currently shown sprite
@@ -668,7 +644,7 @@ struct SpriteAlignerWindow : Window {
 	SpriteAlignerWindow(const WindowDesc *desc, WindowNumber wno) : Window()
 	{
 		this->CreateNestedTree(desc);
-		this->vscroll = this->GetScrollbar(SAW_SCROLLBAR);
+		this->vscroll = this->GetScrollbar(WID_SA_SCROLLBAR);
 		this->FinishInitNested(desc, wno);
 
 		/* Oh yes, we assume there is at least one normal sprite! */
@@ -678,15 +654,15 @@ struct SpriteAlignerWindow : Window {
 	virtual void SetStringParameters(int widget) const
 	{
 		switch (widget) {
-			case SAW_CAPTION:
+			case WID_SA_CAPTION:
 				SetDParam(0, this->current_sprite);
 				SetDParamStr(1, FioGetFilename(GetOriginFileSlot(this->current_sprite)));
 				break;
 
-			case SAW_OFFSETS: {
+			case WID_SA_OFFSETS: {
 				const Sprite *spr = GetSprite(this->current_sprite, ST_NORMAL);
-				SetDParam(0, spr->x_offs);
-				SetDParam(1, spr->y_offs);
+				SetDParam(0, spr->x_offs / ZOOM_LVL_BASE);
+				SetDParam(1, spr->y_offs / ZOOM_LVL_BASE);
 				break;
 			}
 
@@ -697,7 +673,7 @@ struct SpriteAlignerWindow : Window {
 
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 	{
-		if (widget != SAW_LIST) return;
+		if (widget != WID_SA_LIST) return;
 
 		resize->height = max(11, FONT_HEIGHT_NORMAL + 1);
 		resize->width  = 1;
@@ -709,27 +685,27 @@ struct SpriteAlignerWindow : Window {
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
 		switch (widget) {
-			case SAW_SPRITE: {
+			case WID_SA_SPRITE: {
 				/* Center the sprite ourselves */
 				const Sprite *spr = GetSprite(this->current_sprite, ST_NORMAL);
 				int width  = r.right  - r.left + 1;
 				int height = r.bottom - r.top  + 1;
-				int x = r.left - spr->x_offs + (width  - spr->width) / 2;
-				int y = r.top  - spr->y_offs + (height - spr->height) / 2;
+				int x = r.left - spr->x_offs / ZOOM_LVL_BASE + (width  - spr->width / ZOOM_LVL_BASE) / 2;
+				int y = r.top  - spr->y_offs / ZOOM_LVL_BASE + (height - spr->height / ZOOM_LVL_BASE) / 2;
 
 				/* And draw only the part within the sprite area */
 				SubSprite subspr = {
-					spr->x_offs + (spr->width  - width)  / 2 + 1,
-					spr->y_offs + (spr->height - height) / 2 + 1,
-					spr->x_offs + (spr->width  + width)  / 2 - 1,
-					spr->y_offs + (spr->height + height) / 2 - 1,
+					spr->x_offs + (spr->width  - width  * ZOOM_LVL_BASE) / 2 + 1,
+					spr->y_offs + (spr->height - height * ZOOM_LVL_BASE) / 2 + 1,
+					spr->x_offs + (spr->width  + width  * ZOOM_LVL_BASE) / 2 - 1,
+					spr->y_offs + (spr->height + height * ZOOM_LVL_BASE) / 2 - 1,
 				};
 
-				DrawSprite(this->current_sprite, PAL_NONE, x, y, &subspr);
+				DrawSprite(this->current_sprite, PAL_NONE, x, y, &subspr, ZOOM_LVL_GUI);
 				break;
 			}
 
-			case SAW_LIST: {
+			case WID_SA_LIST: {
 				const NWidgetBase *nwid = this->GetWidget<NWidgetBase>(widget);
 				int step_size = nwid->resize_y;
 
@@ -750,31 +726,31 @@ struct SpriteAlignerWindow : Window {
 	virtual void OnClick(Point pt, int widget, int click_count)
 	{
 		switch (widget) {
-			case SAW_PREVIOUS:
+			case WID_SA_PREVIOUS:
 				do {
 					this->current_sprite = (this->current_sprite == 0 ? GetMaxSpriteID() :  this->current_sprite) - 1;
 				} while (GetSpriteType(this->current_sprite) != ST_NORMAL);
 				this->SetDirty();
 				break;
 
-			case SAW_GOTO:
+			case WID_SA_GOTO:
 				ShowQueryString(STR_EMPTY, STR_SPRITE_ALIGNER_GOTO_CAPTION, 7, this, CS_NUMERAL, QSF_NONE);
 				break;
 
-			case SAW_NEXT:
+			case WID_SA_NEXT:
 				do {
 					this->current_sprite = (this->current_sprite + 1) % GetMaxSpriteID();
 				} while (GetSpriteType(this->current_sprite) != ST_NORMAL);
 				this->SetDirty();
 				break;
 
-			case SAW_PICKER:
-				this->LowerWidget(SAW_PICKER);
+			case WID_SA_PICKER:
+				this->LowerWidget(WID_SA_PICKER);
 				_newgrf_debug_sprite_picker.mode = SPM_WAIT_CLICK;
 				this->SetDirty();
 				break;
 
-			case SAW_LIST: {
+			case WID_SA_LIST: {
 				const NWidgetBase *nwid = this->GetWidget<NWidgetBase>(widget);
 				int step_size = nwid->resize_y;
 
@@ -787,10 +763,10 @@ struct SpriteAlignerWindow : Window {
 				break;
 			}
 
-			case SAW_UP:
-			case SAW_DOWN:
-			case SAW_LEFT:
-			case SAW_RIGHT: {
+			case WID_SA_UP:
+			case WID_SA_DOWN:
+			case WID_SA_LEFT:
+			case WID_SA_RIGHT: {
 				/*
 				 * Yes... this is a hack.
 				 *
@@ -806,10 +782,10 @@ struct SpriteAlignerWindow : Window {
 				 */
 				Sprite *spr = const_cast<Sprite *>(GetSprite(this->current_sprite, ST_NORMAL));
 				switch (widget) {
-					case SAW_UP:    spr->y_offs--; break;
-					case SAW_DOWN:  spr->y_offs++; break;
-					case SAW_LEFT:  spr->x_offs--; break;
-					case SAW_RIGHT: spr->x_offs++; break;
+					case WID_SA_UP:    spr->y_offs -= ZOOM_LVL_BASE; break;
+					case WID_SA_DOWN:  spr->y_offs += ZOOM_LVL_BASE; break;
+					case WID_SA_LEFT:  spr->x_offs -= ZOOM_LVL_BASE; break;
+					case WID_SA_RIGHT: spr->x_offs += ZOOM_LVL_BASE; break;
 				}
 				/* Ofcourse, we need to redraw the sprite, but where is it used?
 				 * Everywhere is a safe bet. */
@@ -841,22 +817,22 @@ struct SpriteAlignerWindow : Window {
 		if (!gui_scope) return;
 		if (data == 1) {
 			/* Sprite picker finished */
-			this->RaiseWidget(SAW_PICKER);
+			this->RaiseWidget(WID_SA_PICKER);
 			this->vscroll->SetCount(_newgrf_debug_sprite_picker.sprites.Length());
 		}
 	}
 
 	virtual void OnResize()
 	{
-		this->vscroll->SetCapacityFromWidget(this, SAW_LIST);
-		this->GetWidget<NWidgetCore>(SAW_LIST)->widget_data = (this->vscroll->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+		this->vscroll->SetCapacityFromWidget(this, WID_SA_LIST);
+		this->GetWidget<NWidgetCore>(WID_SA_LIST)->widget_data = (this->vscroll->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 	}
 };
 
 static const NWidgetPart _nested_sprite_aligner_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
-		NWidget(WWT_CAPTION, COLOUR_GREY, SAW_CAPTION), SetDataTip(STR_SPRITE_ALIGNER_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
+		NWidget(WWT_CAPTION, COLOUR_GREY, WID_SA_CAPTION), SetDataTip(STR_SPRITE_ALIGNER_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_SHADEBOX, COLOUR_GREY),
 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
 	EndContainer(),
@@ -864,43 +840,43 @@ static const NWidgetPart _nested_sprite_aligner_widgets[] = {
 		NWidget(NWID_HORIZONTAL), SetPIP(0, 0, 10),
 			NWidget(NWID_VERTICAL), SetPIP(10, 5, 10),
 				NWidget(NWID_HORIZONTAL, NC_EQUALSIZE), SetPIP(10, 5, 10),
-					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, SAW_PREVIOUS), SetDataTip(STR_SPRITE_ALIGNER_PREVIOUS_BUTTON, STR_SPRITE_ALIGNER_PREVIOUS_TOOLTIP), SetFill(1, 0),
-					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, SAW_GOTO), SetDataTip(STR_SPRITE_ALIGNER_GOTO_BUTTON, STR_SPRITE_ALIGNER_GOTO_TOOLTIP), SetFill(1, 0),
-					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, SAW_NEXT), SetDataTip(STR_SPRITE_ALIGNER_NEXT_BUTTON, STR_SPRITE_ALIGNER_NEXT_TOOLTIP), SetFill(1, 0),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SA_PREVIOUS), SetDataTip(STR_SPRITE_ALIGNER_PREVIOUS_BUTTON, STR_SPRITE_ALIGNER_PREVIOUS_TOOLTIP), SetFill(1, 0),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SA_GOTO), SetDataTip(STR_SPRITE_ALIGNER_GOTO_BUTTON, STR_SPRITE_ALIGNER_GOTO_TOOLTIP), SetFill(1, 0),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_SA_NEXT), SetDataTip(STR_SPRITE_ALIGNER_NEXT_BUTTON, STR_SPRITE_ALIGNER_NEXT_TOOLTIP), SetFill(1, 0),
 				EndContainer(),
 				NWidget(NWID_HORIZONTAL), SetPIP(10, 5, 10),
 					NWidget(NWID_SPACER), SetFill(1, 1),
-					NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, SAW_UP), SetDataTip(SPR_ARROW_UP, STR_SPRITE_ALIGNER_MOVE_TOOLTIP), SetResize(0, 0),
+					NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_SA_UP), SetDataTip(SPR_ARROW_UP, STR_SPRITE_ALIGNER_MOVE_TOOLTIP), SetResize(0, 0),
 					NWidget(NWID_SPACER), SetFill(1, 1),
 				EndContainer(),
 				NWidget(NWID_HORIZONTAL_LTR), SetPIP(10, 5, 10),
 					NWidget(NWID_VERTICAL),
 						NWidget(NWID_SPACER), SetFill(1, 1),
-						NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, SAW_LEFT), SetDataTip(SPR_ARROW_LEFT, STR_SPRITE_ALIGNER_MOVE_TOOLTIP), SetResize(0, 0),
+						NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_SA_LEFT), SetDataTip(SPR_ARROW_LEFT, STR_SPRITE_ALIGNER_MOVE_TOOLTIP), SetResize(0, 0),
 						NWidget(NWID_SPACER), SetFill(1, 1),
 					EndContainer(),
-					NWidget(WWT_PANEL, COLOUR_DARK_BLUE, SAW_SPRITE), SetDataTip(STR_NULL, STR_SPRITE_ALIGNER_SPRITE_TOOLTIP),
+					NWidget(WWT_PANEL, COLOUR_DARK_BLUE, WID_SA_SPRITE), SetDataTip(STR_NULL, STR_SPRITE_ALIGNER_SPRITE_TOOLTIP),
 					EndContainer(),
 					NWidget(NWID_VERTICAL),
 						NWidget(NWID_SPACER), SetFill(1, 1),
-						NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, SAW_RIGHT), SetDataTip(SPR_ARROW_RIGHT, STR_SPRITE_ALIGNER_MOVE_TOOLTIP), SetResize(0, 0),
+						NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_SA_RIGHT), SetDataTip(SPR_ARROW_RIGHT, STR_SPRITE_ALIGNER_MOVE_TOOLTIP), SetResize(0, 0),
 						NWidget(NWID_SPACER), SetFill(1, 1),
 					EndContainer(),
 				EndContainer(),
 				NWidget(NWID_HORIZONTAL), SetPIP(10, 5, 10),
 					NWidget(NWID_SPACER), SetFill(1, 1),
-					NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, SAW_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_SPRITE_ALIGNER_MOVE_TOOLTIP), SetResize(0, 0),
+					NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_SA_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_SPRITE_ALIGNER_MOVE_TOOLTIP), SetResize(0, 0),
 					NWidget(NWID_SPACER), SetFill(1, 1),
 				EndContainer(),
 				NWidget(NWID_HORIZONTAL), SetPIP(10, 5, 10),
-					NWidget(WWT_LABEL, COLOUR_GREY, SAW_OFFSETS), SetDataTip(STR_SPRITE_ALIGNER_OFFSETS, STR_NULL), SetFill(1, 0),
+					NWidget(WWT_LABEL, COLOUR_GREY, WID_SA_OFFSETS), SetDataTip(STR_SPRITE_ALIGNER_OFFSETS, STR_NULL), SetFill(1, 0),
 				EndContainer(),
 			EndContainer(),
 			NWidget(NWID_VERTICAL), SetPIP(10, 5, 10),
-				NWidget(WWT_TEXTBTN, COLOUR_GREY, SAW_PICKER), SetDataTip(STR_SPRITE_ALIGNER_PICKER_BUTTON, STR_SPRITE_ALIGNER_PICKER_TOOLTIP), SetFill(1, 0),
+				NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_SA_PICKER), SetDataTip(STR_SPRITE_ALIGNER_PICKER_BUTTON, STR_SPRITE_ALIGNER_PICKER_TOOLTIP), SetFill(1, 0),
 				NWidget(NWID_HORIZONTAL),
-					NWidget(WWT_MATRIX, COLOUR_GREY, SAW_LIST), SetResize(1, 1), SetDataTip(0x101, STR_NULL), SetFill(1, 1), SetScrollbar(SAW_SCROLLBAR),
-					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, SAW_SCROLLBAR),
+					NWidget(WWT_MATRIX, COLOUR_GREY, WID_SA_LIST), SetResize(1, 1), SetDataTip(0x101, STR_NULL), SetFill(1, 1), SetScrollbar(WID_SA_SCROLLBAR),
+					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_SA_SCROLLBAR),
 				EndContainer(),
 			EndContainer(),
 		EndContainer(),

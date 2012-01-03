@@ -1,6 +1,6 @@
 OpenTTD's known bugs
-Last updated:    2011-09-15
-Release version: 1.1.3
+Last updated:    2011-12-24
+Release version: 1.2.0-beta1
 ------------------------------------------------------------------------
 
 
@@ -39,10 +39,10 @@ officially supporting Mac OS X again. For now it remains unsupported and
 we only apply bug fixes provided by the community but we are unable to fix
 these bugs ourselves.
 
+- 4857	[OSX] No support for detecting mono space font
+- 4847	[OSX] No support for bootstrap downloading of base graphics
 - 4744  [OSX] Crash when switching to full screen with OS X Lion
 - 4689  [OSX] Crash when hiding window after coming from full screen
-- 4594  [Windows] Minimizing the windows when a modal error message is
-        shown makes it difficult to exit the game
 - 4420  [OSX] OS' mouse pointer still shows
 - 2484  [OSX] Cannot enter CJK characters
 
@@ -326,6 +326,19 @@ Unreadable characters for non-latin locales [FS#4607]
 	8 bits blitter there are not enough colours to properly perform the
 	anti-aliasing.
 
+(Temporary) wrong colours when switching to full screen [FS#4511]:
+	On Windows it can happen that you temporarily see wrong colours
+	when switching to full screen OpenTTD, either by starting
+	OpenTTD in full screen mode, changing to full screen mode or by
+	ALT-TAB-ing into a full screen OpenTTD. This is caused by the
+	fact that OpenTTD, by default, uses 8bpp paletted output. The
+	wrong colours you are seeing is a temporary effect of the video
+	driver switching to 8bpp palette mode.
+
+	This issue can be worked around in two ways:
+		a) Setting fullscreen_bpp to 32
+		b) Setting up the 32bpp-anim or 32bpp-optimized blitter
+
 Train does not crash with itself [FS#4635]:
 	When a train drives in a circle the front engine passes through
 	wagons of the same train without crashing. This is intentional.
@@ -338,3 +351,65 @@ Train does not crash with itself [FS#4635]:
 	it does not add anything to gameplay.
 	Nevertheless trains shall not crash in normal operation, so making
 	a train not crash with itself is the best solution for everyone.
+
+Aircraft coming through wall in rotated airports [FS#4705]:
+	With rotated airports, specifically hangars, you will see that the
+	aircraft will show a part through the back wall of the hangar.
+	This can be solved by only drawing a part of the plane when being
+	at the back of the hangar, however then with transparency turned on
+	the aircraft would be shown partially which would be even weirder.
+	As such the current behaviour is deemed the least bad.
+	The same applies to overly long ships and their depots.
+
+Vehicles not keeping their "maximum" speed [FS#4815]:
+	Vehicles that have not enough power to reach and maintain their
+	advertised maximum speed might be constantly jumping between two
+	speeds. This is due to the fact that speed and its calculations
+	are done with integral numbers instead of floating point numbers.
+	As a result of this a vehicle will never reach its equilibrium
+	between the drag/friction and propulsion. So in effect it will be
+	in a vicious circle of speeding up and slowing down due to being
+	just at the other side of the equilibrium.
+
+	Not speeding up when near the equilibrium will cause the vehicle
+	to never come in the neighbourhood of the equilibrium and not
+	slowing down when near the equilibrium will cause the vehicle
+	to never slow down towards the equilibrium once it has come down
+	a hill.
+
+	It is possible to calculate whether the equilibrium will be
+	passed, but then all acceleration calculations need to be done
+	twice.
+
+Settings not saved when OpenTTD crashes [FS#4846]:
+	The settings are not saved when OpenTTD crashes for several reasons.
+	The most important is that the game state is broken and as such the
+	settings might contain invalid values, or the settings have not even
+	been loaded yet. This would cause invalid or totally wrong settings
+	to be written to the configuration file.
+
+	A solution to that would be saving the settings whenever one changes,
+	however due to the way the configuration file is saved this requires
+	a flush of the file to the disk and OpenTTD needs to wait till that
+	is finished. On some file system implementations this causes the
+	flush of all 'write-dirty' caches, which can be a significant amount
+	of data to be written. This can further be aggravated by spinning
+	down disks to conserve power, in which case this disk needs to be
+	spun up first. This means that many seconds may pass before the
+	configuration file is actually written, and all that time OpenTTD
+	will not be able to show any progress. Changing the way the
+	configuration file is saved is not an option as that leaves us more
+	vulnerable to corrupt configuration files.
+
+	Finally, crashes should not be happening. If they happen they should
+	be reported and fixed, so essentially fixing this is fixing the
+	wrong thing. If you really need the configuration changes to be
+	saved, and you need to run a version that crashes regularly, then
+	you can use the 'saveconfig' command in the console to save the
+	settings.
+
+Not all NewGRFs, AIs, game scripts are found [FS#4887]:
+	Under certain situations, where the path for the content within a
+	tar file is the same as other content on the file system or in another
+	tar file, it is possible that content is not found. A more thorough
+	explanation and solutions are described in section 4.4 of readme.txt.

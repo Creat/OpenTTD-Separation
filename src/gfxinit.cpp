@@ -15,12 +15,15 @@
 #include "3rdparty/md5/md5.h"
 #include "fontcache.h"
 #include "gfx_func.h"
+#include "blitter/factory.hpp"
+#include "video/video_driver.hpp"
 
 /* The type of set we're replacing */
 #define SET_TYPE "graphics"
 #include "base_media_func.h"
 
 #include "table/sprites.h"
+#include "table/strings.h"
 
 /** Whether the given NewGRFs must get a palette remap from windows to DOS or not. */
 bool _palette_remap_grf[MAX_FILE_SLOTS];
@@ -203,11 +206,39 @@ static void LoadSpriteTables()
 }
 
 
+/**
+ * Check blitter needed by NewGRF config and switch if needed.
+ */
+static void SwitchNewGRFBlitter()
+{
+	/* Get blitter of base set. */
+	bool is_32bpp = BaseGraphics::GetUsedSet()->blitter == BLT_32BPP;
+
+	/* Get combined blitter mode of all NewGRFs. */
+	for (GRFConfig *c = _grfconfig; c != NULL; c = c->next) {
+		if (c->status == GCS_DISABLED || c->status == GCS_NOT_FOUND || HasBit(c->flags, GCF_INIT_ONLY)) continue;
+
+		if (c->palette & GRFP_BLT_32BPP) is_32bpp = true;
+	}
+
+	/* A GRF would like a 32 bpp blitter, switch blitter if needed. Never switch if the blitter was specified by the user. */
+	if (_blitter_autodetected && is_32bpp && BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth() != 0 && BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth() < 16) {
+		const char *cur_blitter = BlitterFactoryBase::GetCurrentBlitter()->GetName();
+		if (BlitterFactoryBase::SelectBlitter("32bpp-anim") != NULL) {
+			if (!_video_driver->AfterBlitterChange()) {
+				/* Failed to switch blitter, let's hope we can return to the old one. */
+				if (BlitterFactoryBase::SelectBlitter(cur_blitter) == NULL || !_video_driver->AfterBlitterChange()) usererror("Failed to reinitialize video driver for 32 bpp blitter. Specify a fixed blitter in the config");
+			}
+		}
+	}
+}
+
 /** Initialise and load all the sprites. */
 void GfxLoadSprites()
 {
 	DEBUG(sprite, 2, "Loading sprite set %d", _settings_game.game_creation.landscape);
 
+	SwitchNewGRFBlitter();
 	GfxInitSpriteMem();
 	LoadSpriteTables();
 	GfxInitPalettes();
@@ -217,13 +248,17 @@ void GfxLoadSprites()
 
 bool GraphicsSet::FillSetDetails(IniFile *ini, const char *path, const char *full_filename)
 {
-	bool ret = this->BaseSet<GraphicsSet, MAX_GFT, BASESET_DIR>::FillSetDetails(ini, path, full_filename, false);
+	bool ret = this->BaseSet<GraphicsSet, MAX_GFT, true>::FillSetDetails(ini, path, full_filename, false);
 	if (ret) {
 		IniGroup *metadata = ini->GetGroup("metadata");
 		IniItem *item;
 
 		fetch_metadata("palette");
 		this->palette = (*item->value == 'D' || *item->value == 'd') ? PAL_DOS : PAL_WINDOWS;
+
+		/* Get optional blitter information. */
+		item = metadata->GetItem("blitter", false);
+		this->blitter = (item != NULL && *item->value == '3') ? BLT_32BPP : BLT_8BPP;
 	}
 	return ret;
 }
@@ -264,8 +299,8 @@ MD5File::ChecksumResult MD5File::CheckMD5(Subdirectory subdir) const
 static const char * const _graphics_file_names[] = { "base", "logos", "arctic", "tropical", "toyland", "extra" };
 
 /** Implementation */
-template <class T, size_t Tnum_files, Subdirectory Tsubdir>
-/* static */ const char * const *BaseSet<T, Tnum_files, Tsubdir>::file_names = _graphics_file_names;
+template <class T, size_t Tnum_files, bool Tsearch_in_tars>
+/* static */ const char * const *BaseSet<T, Tnum_files, Tsearch_in_tars>::file_names = _graphics_file_names;
 
 template <class Tbase_set>
 /* static */ bool BaseMedia<Tbase_set>::DetermineBestSet()

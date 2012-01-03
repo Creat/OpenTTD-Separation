@@ -61,12 +61,12 @@ static const NIVariable _niv_vehicles[] = {
 };
 
 class NIHVehicle : public NIHelper {
-	bool IsInspectable(uint index) const                 { return Engine::Get(Vehicle::Get(index)->engine_type)->grf_prop.grffile != NULL; }
+	bool IsInspectable(uint index) const                 { return Vehicle::Get(index)->GetGRF() != NULL; }
 	uint GetParent(uint index) const                     { const Vehicle *first = Vehicle::Get(index)->First(); return GetInspectWindowNumber(GetGrfSpecFeature(first->type), first->index); }
 	const void *GetInstance(uint index)const             { return Vehicle::Get(index); }
-	const void *GetSpec(uint index) const                { return Engine::Get(Vehicle::Get(index)->engine_type); }
+	const void *GetSpec(uint index) const                { return Vehicle::Get(index)->GetEngine(); }
 	void SetStringParameters(uint index) const           { this->SetSimpleStringParameters(STR_VEHICLE_NAME, index); }
-	uint32 GetGRFID(uint index) const                    { return (this->IsInspectable(index)) ? Engine::Get(Vehicle::Get(index)->engine_type)->grf_prop.grffile->grfid : 0; }
+	uint32 GetGRFID(uint index) const                    { return Vehicle::Get(index)->GetGRFID(); }
 	void Resolve(ResolverObject *ro, uint32 index) const { extern void GetVehicleResolver(ResolverObject *ro, uint index); GetVehicleResolver(ro, index); }
 };
 
@@ -253,7 +253,7 @@ static const NIProperty _nip_industries[] = {
 
 #define NICI(cb_id, bit) NIC(cb_id, IndustrySpec, callback_mask, bit)
 static const NICallback _nic_industries[] = {
-	NICI(CBID_INDUSTRY_AVAILABLE,            CBM_IND_AVAILABLE),
+	NICI(CBID_INDUSTRY_PROBABILITY,          CBM_IND_PROBABILITY),
 	NICI(CBID_INDUSTRY_LOCATION,             CBM_IND_LOCATION),
 	NICI(CBID_INDUSTRY_PRODUCTION_CHANGE,    CBM_IND_PRODUCTION_CHANGE),
 	NICI(CBID_INDUSTRY_MONTHLYPROD_CHANGE,   CBM_IND_MONTHLYPROD_CHANGE),
@@ -298,9 +298,9 @@ class NIHIndustry : public NIHelper {
 	void Resolve(ResolverObject *ro, uint32 index) const { extern void GetIndustryResolver(ResolverObject *ro, uint index); GetIndustryResolver(ro, index); }
 	uint GetPSASize(uint index, uint32 grfid) const      { return cpp_lengthof(PersistentStorage, storage); }
 
-	int32 *GetPSAFirstPosition(uint index, uint32 grfid) const
+	const int32 *GetPSAFirstPosition(uint index, uint32 grfid) const
 	{
-		Industry *i = (Industry *)this->GetInstance(index);
+		const Industry *i = (const Industry *)this->GetInstance(index);
 		if (i->psa == NULL) return NULL;
 		return (int32 *)(&i->psa->storage);
 	}
@@ -446,7 +446,7 @@ class NIHTown : public NIHelper {
 	bool PSAWithParameter() const                        { return true; }
 	uint GetPSASize(uint index, uint32 grfid) const      { return cpp_lengthof(PersistentStorage, storage); }
 
-	int32 *GetPSAFirstPosition(uint index, uint32 grfid) const
+	const int32 *GetPSAFirstPosition(uint index, uint32 grfid) const
 	{
 		Town *t = Town::Get(index);
 
@@ -479,7 +479,7 @@ static const NIFeature * const _nifeatures[] = {
 	NULL,               // GSF_GLOBALVAR (has no "physical" objects)
 	&_nif_industrytile, // GSF_INDUSTRYTILES
 	&_nif_industry,     // GSF_INDUSTRIES
-	NULL,               // GSF_CARGOS (has no "physical" objects)
+	NULL,               // GSF_CARGOES (has no "physical" objects)
 	NULL,               // GSF_SOUNDFX (has no "physical" objects)
 	NULL,               // GSF_AIRPORTS (feature not implemented)
 	NULL,               // GSF_SIGNALS (feature not implemented)

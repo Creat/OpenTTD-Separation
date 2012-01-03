@@ -15,9 +15,23 @@
 #include <squirrel.h>
 #include "../misc/countedptr.hpp"
 
-class ScriptFileInfo : public SimpleCountedObject {
+#include "script_config.hpp"
+
+/** The maximum number of operations for saving or loading the data of a script. */
+static const int MAX_SL_OPS             = 100000;
+/** The maximum number of operations for initial start of a script. */
+static const int MAX_CONSTRUCTOR_OPS    = 100000;
+/** Number of operations to create an instance of a script. */
+static const int MAX_CREATEINSTANCE_OPS = 100000;
+/** Number of operations to get the author and similar information. */
+static const int MAX_GET_OPS            =   1000;
+/** Maximum number of operations allowed for getting a particular setting. */
+static const int MAX_GET_SETTING_OPS    = 100000;
+
+/** All static information from an Script like name, version, etc. */
+class ScriptInfo : public SimpleCountedObject {
 public:
-	ScriptFileInfo() :
+	ScriptInfo() :
 		SQ_instance(NULL),
 		main_script(NULL),
 		tar_file(NULL),
@@ -28,9 +42,10 @@ public:
 		date(NULL),
 		instance_name(NULL),
 		version(0),
-		url(NULL)
+		url(NULL),
+		scanner(NULL)
 	{}
-	~ScriptFileInfo();
+	~ScriptInfo();
 
 	/**
 	 * Get the Author of the script.
@@ -90,22 +105,66 @@ public:
 	/**
 	 * Process the creation of a FileInfo object.
 	 */
-	static SQInteger Constructor(HSQUIRRELVM vm, ScriptFileInfo *info);
+	static SQInteger Constructor(HSQUIRRELVM vm, ScriptInfo *info);
+
+	/**
+	 * Get the scanner which has found this ScriptInfo.
+	 */
+	virtual class ScriptScanner *GetScanner() { return this->scanner; }
+
+	/**
+	 * Get the settings of the Script.
+	 */
+	bool GetSettings();
+
+	/**
+	 * Get the config list for this Script.
+	 */
+	const ScriptConfigItemList *GetConfigList() const;
+
+	/**
+	 * Get the description of a certain Script config option.
+	 */
+	const ScriptConfigItem *GetConfigItem(const char *name) const;
+
+	/**
+	 * Set a setting.
+	 */
+	SQInteger AddSetting(HSQUIRRELVM vm);
+
+	/**
+	 * Add labels for a setting.
+	 */
+	SQInteger AddLabels(HSQUIRRELVM vm);
+
+	/**
+	 * Get the default value for a setting.
+	 */
+	int GetSettingDefaultValue(const char *name) const;
+
+	/**
+	 * Can this script be selected by developers only?
+	 */
+	virtual bool IsDeveloperOnly() const { return false; }
 
 protected:
-	class Squirrel *engine;
-	HSQOBJECT *SQ_instance;
+	class Squirrel *engine;           ///< Engine used to register for Squirrel.
+	HSQOBJECT *SQ_instance;           ///< The Squirrel instance created for this info.
+	ScriptConfigItemList config_list; ///< List of settings from this Script.
+
 private:
-	char *main_script;
-	char *tar_file;
-	const char *author;
-	const char *name;
-	const char *short_name;
-	const char *description;
-	const char *date;
-	const char *instance_name;
-	int version;
-	const char *url;
+	char *main_script;            ///< The full path of the script.
+	char *tar_file;               ///< If, which tar file the script was in.
+	const char *author;           ///< Author of the script.
+	const char *name;             ///< Full name of the script.
+	const char *short_name;       ///< Short name (4 chars) which uniquely identifies the script.
+	const char *description;      ///< Small description of the script.
+	const char *date;             ///< The date the script was written at.
+	const char *instance_name;    ///< Name of the main class in the script.
+	int version;                  ///< Version of the script.
+	const char *url;              ///< URL of the script.
+
+	class ScriptScanner *scanner; ///< ScriptScanner object that was used to scan this script info.
 };
 
 #endif /* SCRIPT_INFO_HPP */

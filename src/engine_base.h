@@ -83,8 +83,26 @@ struct Engine : EnginePool::PoolItem<&_engine_pool> {
 		return this->info.cargo_type;
 	}
 
+	uint DetermineCapacity(const Vehicle *v, uint16 *mail_capacity = NULL) const;
+
 	bool CanCarryCargo() const;
-	uint GetDisplayDefaultCapacity(uint16 *mail_capacity = NULL) const;
+
+	/**
+	 * Determines the default cargo capacity of an engine for display purposes.
+	 *
+	 * For planes carrying both passenger and mail this is the passenger capacity.
+	 * For multiheaded engines this is the capacity of both heads.
+	 * For articulated engines use GetCapacityOfArticulatedParts
+	 *
+	 * @param mail_capacity returns secondary cargo (mail) capacity of aircraft
+	 * @return The default capacity
+	 * @see GetDefaultCargoType
+	 */
+	uint GetDisplayDefaultCapacity(uint16 *mail_capacity = NULL) const
+	{
+		return this->DetermineCapacity(NULL, mail_capacity);
+	}
+
 	Money GetRunningCost() const;
 	Money GetCost() const;
 	uint GetDisplayMaxSpeed() const;
@@ -92,15 +110,28 @@ struct Engine : EnginePool::PoolItem<&_engine_pool> {
 	uint GetDisplayWeight() const;
 	uint GetDisplayMaxTractiveEffort() const;
 	Date GetLifeLengthInDays() const;
+	uint16 GetRange() const;
 
 	/**
 	 * Check if the engine is a ground vehicle.
 	 * @return True iff the engine is a train or a road vehicle.
 	 */
-	FORCEINLINE bool IsGroundVehicle() const
+	inline bool IsGroundVehicle() const
 	{
 		return this->type == VEH_TRAIN || this->type == VEH_ROAD;
 	}
+
+	/**
+	 * Retrieve the NewGRF the engine is tied to.
+	 * This is the GRF providing the Action 3.
+	 * @return NewGRF associated to the engine.
+	 */
+	const GRFFile *GetGRF() const
+	{
+		return this->grf_prop.grffile;
+	}
+
+	uint32 GetGRFID() const;
 };
 
 struct EngineIDMapping {

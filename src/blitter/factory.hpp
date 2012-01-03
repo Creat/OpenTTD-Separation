@@ -78,7 +78,7 @@ public:
 		if (this->name == NULL) return;
 		GetBlitters().erase(this->name);
 		if (GetBlitters().empty()) delete &GetBlitters();
-		free((void *)this->name);
+		free(this->name);
 	}
 
 	/**
@@ -174,5 +174,6 @@ public:
 };
 
 extern char *_ini_blitter;
+extern bool _blitter_autodetected;
 
 #endif /* BLITTER_FACTORY_HPP */

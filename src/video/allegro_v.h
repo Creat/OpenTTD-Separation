@@ -28,6 +28,11 @@ public:
 	/* virtual */ bool ChangeResolution(int w, int h);
 
 	/* virtual */ bool ToggleFullscreen(bool fullscreen);
+
+	/* virtual */ bool AfterBlitterChange();
+
+	/* virtual */ bool ClaimMousePointer();
+
 	/* virtual */ const char *GetName() const { return "allegro"; }
 };
 

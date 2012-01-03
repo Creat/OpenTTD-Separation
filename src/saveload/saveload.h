@@ -42,7 +42,7 @@ enum SavegameType {
 	SGT_TTDP2,  ///< TTDP savegame in new format (data at SE border)
 	SGT_OTTD,   ///< OTTD savegame
 	SGT_TTO,    ///< TTO savegame
-	SGT_INVALID = 0xFF ///< broken savegame (used internally)
+	SGT_INVALID = 0xFF, ///< broken savegame (used internally)
 };
 
 void GenerateDefaultSaveName(char *buf, const char *last);
@@ -176,7 +176,9 @@ enum VarTypes {
 	SLF_NOT_IN_SAVE     = 1 <<  8, ///< do not save with savegame, basically client-based
 	SLF_NOT_IN_CONFIG   = 1 <<  9, ///< do not save to config file
 	SLF_NO_NETWORK_SYNC = 1 << 10, ///< do not synchronize over network (but it is saved if SLF_NOT_IN_SAVE is not set)
-	/* 5 more possible flags */
+	SLF_ALLOW_CONTROL   = 1 << 11, ///< allow control codes in the strings
+	SLF_ALLOW_NEWLINE   = 1 << 12, ///< allow new lines in the strings
+	/* 3 more possible flags */
 };
 
 typedef uint32 VarType;
@@ -516,7 +518,7 @@ static inline bool IsNumericType(VarType conv)
  */
 static inline void *GetVariableAddress(const void *object, const SaveLoad *sld)
 {
-	return (byte*)(sld->global ? NULL : object) + (ptrdiff_t)sld->address;
+	return const_cast<byte *>((const byte*)(sld->global ? NULL : object) + (ptrdiff_t)sld->address);
 }
 
 int64 ReadValue(const void *ptr, VarType conv);

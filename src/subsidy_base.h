@@ -7,7 +7,7 @@
  * See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with OpenTTD. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** @file subsidy_base.h Subsidy base class. */
+/** @file subsidy_base.h %Subsidy base class. */
 
 #ifndef SUBSIDY_BASE_H
 #define SUBSIDY_BASE_H
@@ -17,7 +17,7 @@
 #include "subsidy_type.h"
 #include "core/pool_type.hpp"
 
-typedef Pool<Subsidy, SubsidyID, 1, MAX_COMPANIES> SubsidyPool;
+typedef Pool<Subsidy, SubsidyID, 1, 256> SubsidyPool;
 extern SubsidyPool _subsidy_pool;
 
 /** Struct about subsidies, offered and awarded */
@@ -33,18 +33,18 @@ struct Subsidy : SubsidyPool::PoolItem<&_subsidy_pool> {
 	/**
 	 * We need an (empty) constructor so struct isn't zeroed (as C++ standard states)
 	 */
-	FORCEINLINE Subsidy() { }
+	inline Subsidy() { }
 
 	/**
 	 * (Empty) destructor has to be defined else operator delete might be called with NULL parameter
 	 */
-	FORCEINLINE ~Subsidy() { }
+	inline ~Subsidy() { }
 
 	/**
 	 * Tests whether this subsidy has been awarded to someone
 	 * @return is this subsidy awarded?
 	 */
-	FORCEINLINE bool IsAwarded() const
+	inline bool IsAwarded() const
 	{
 		return this->awarded != INVALID_COMPANY;
 	}

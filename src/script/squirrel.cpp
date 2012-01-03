@@ -33,7 +33,7 @@ void Squirrel::CompileError(HSQUIRRELVM vm, const SQChar *desc, const SQChar *so
 	engine->crashed = true;
 	SQPrintFunc *func = engine->print_func;
 	if (func == NULL) {
-		scfprintf(stderr, _SC("%s"), buf);
+		DEBUG(misc, 0, "[Squirrel] Compile error: %s", SQ2OTTD(buf));
 	} else {
 		(*func)(true, buf);
 	}
@@ -237,7 +237,7 @@ bool Squirrel::CallMethod(HSQOBJECT instance, const char *method_name, HSQOBJECT
 	sq_pushobject(this->vm, instance);
 	if (SQ_FAILED(sq_call(this->vm, 1, ret == NULL ? SQFalse : SQTrue, SQTrue, suspend))) return false;
 	if (ret != NULL) sq_getstackobj(vm, -1, ret);
-	/* Reset the top, but don't do so for the AI main function, as we need
+	/* Reset the top, but don't do so for the script main function, as we need
 	 *  a correct stack when resuming. */
 	if (suspend == -1 || !this->IsSuspended()) sq_settop(this->vm, top);
 	/* Restore the return-value location. */
@@ -273,22 +273,33 @@ bool Squirrel::CallBoolMethod(HSQOBJECT instance, const char *method_name, bool 
 	return true;
 }
 
-/* static */ bool Squirrel::CreateClassInstanceVM(HSQUIRRELVM vm, const char *class_name, void *real_instance, HSQOBJECT *instance, SQRELEASEHOOK release_hook)
+/* static */ bool Squirrel::CreateClassInstanceVM(HSQUIRRELVM vm, const char *class_name, void *real_instance, HSQOBJECT *instance, SQRELEASEHOOK release_hook, bool prepend_API_name)
 {
+	Squirrel *engine = (Squirrel *)sq_getforeignptr(vm);
+
 	int oldtop = sq_gettop(vm);
 
 	/* First, find the class */
 	sq_pushroottable(vm);
-	sq_pushstring(vm, OTTD2SQ(class_name), -1);
+
+	if (prepend_API_name) {
+		char *class_name2 = (char *)alloca(strlen(class_name) + strlen(engine->GetAPIName()) + 1);
+		sprintf(class_name2, "%s%s", engine->GetAPIName(), class_name);
+
+		sq_pushstring(vm, OTTD2SQ(class_name2), -1);
+	} else {
+		sq_pushstring(vm, OTTD2SQ(class_name), -1);
+	}
+
 	if (SQ_FAILED(sq_get(vm, -2))) {
-		DEBUG(misc, 0, "[squirrel] Failed to find class by the name '%s'", class_name);
+		DEBUG(misc, 0, "[squirrel] Failed to find class by the name '%s%s'", prepend_API_name ? engine->GetAPIName() : "", class_name);
 		sq_settop(vm, oldtop);
 		return false;
 	}
 
 	/* Create the instance */
 	if (SQ_FAILED(sq_createinstance(vm, -1))) {
-		DEBUG(misc, 0, "[squirrel] Failed to create instance for class '%s'", class_name);
+		DEBUG(misc, 0, "[squirrel] Failed to create instance for class '%s%s'", prepend_API_name ? engine->GetAPIName() : "", class_name);
 		sq_settop(vm, oldtop);
 		return false;
 	}
@@ -316,13 +327,14 @@ bool Squirrel::CreateClassInstance(const char *class_name, void *real_instance, 
 	return Squirrel::CreateClassInstanceVM(this->vm, class_name, real_instance, instance, NULL);
 }
 
-Squirrel::Squirrel()
+Squirrel::Squirrel(const char *APIName) :
+	global_pointer(NULL),
+	print_func(NULL),
+	crashed(false),
+	overdrawn_ops(0),
+	APIName(APIName)
 {
 	this->vm = sq_open(1024);
-	this->print_func = NULL;
-	this->global_pointer = NULL;
-	this->crashed = false;
-	this->overdrawn_ops = 0;
 
 	/* Handle compile-errors ourself, so we can display it nicely */
 	sq_setcompilererrorhandler(this->vm, &Squirrel::CompileError);
@@ -425,14 +437,24 @@ static SQInteger _io_file_read(SQUserPointer file, SQUserPointer buf, SQInteger 
 	return ret;
 }
 
-/* static */ SQRESULT Squirrel::LoadFile(HSQUIRRELVM vm, const char *filename, SQBool printerror)
+SQRESULT Squirrel::LoadFile(HSQUIRRELVM vm, const char *filename, SQBool printerror)
 {
 	size_t size;
-	FILE *file = FioFOpenFile(filename, "rb", AI_DIR, &size);
+	FILE *file;
 	SQInteger ret;
 	unsigned short us;
 	unsigned char uc;
 	SQLEXREADFUNC func;
+
+	if (strncmp(this->GetAPIName(), "AI", 2) == 0) {
+		file = FioFOpenFile(filename, "rb", AI_DIR, &size);
+		if (file == NULL) file = FioFOpenFile(filename, "rb", AI_LIBRARY_DIR, &size);
+	} else if (strncmp(this->GetAPIName(), "GS", 2) == 0) {
+		file = FioFOpenFile(filename, "rb", GAME_DIR, &size);
+		if (file == NULL) file = FioFOpenFile(filename, "rb", GAME_LIBRARY_DIR, &size);
+	} else {
+		NOT_REACHED();
+	}
 
 	if (file != NULL) {
 		SQFile f(file, size);
@@ -476,20 +498,24 @@ static SQInteger _io_file_read(SQUserPointer file, SQUserPointer buf, SQInteger 
 	return sq_throwerror(vm, _SC("cannot open the file"));
 }
 
-/* static */ bool Squirrel::LoadScript(HSQUIRRELVM vm, const char *script, bool in_root)
+bool Squirrel::LoadScript(HSQUIRRELVM vm, const char *script, bool in_root)
 {
 	/* Make sure we are always in the root-table */
 	if (in_root) sq_pushroottable(vm);
 
+	SQInteger ops_left = vm->_ops_till_suspend;
 	/* Load and run the script */
 	if (SQ_SUCCEEDED(LoadFile(vm, script, SQTrue))) {
 		sq_push(vm, -2);
 		if (SQ_SUCCEEDED(sq_call(vm, 1, SQFalse, SQTrue, 100000))) {
 			sq_pop(vm, 1);
+			/* After compiling the file we want to reset the amount of opcodes. */
+			vm->_ops_till_suspend = ops_left;
 			return true;
 		}
 	}
 
+	vm->_ops_till_suspend = ops_left;
 	DEBUG(misc, 0, "[squirrel] Failed to compile '%s'", script);
 	return false;
 }
@@ -548,4 +574,9 @@ void Squirrel::CrashOccurred()
 bool Squirrel::CanSuspend()
 {
 	return sq_can_suspend(this->vm);
+}
+
+SQInteger Squirrel::GetOpsTillSuspend()
+{
+	return this->vm->_ops_till_suspend;
 }

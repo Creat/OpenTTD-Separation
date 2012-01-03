@@ -59,27 +59,31 @@ StringID TTDPStringIDToOTTDStringIDMapping(StringID str)
 	/* A string straight from a NewGRF; no need to remap this as it's already mapped. */
 	if (IsInsideMM(str, 0xD000, 0xD7FF)) return str;
 
-#define TEXTID_TO_STRINGID(begin, end, stringid) if (str >= begin && str <= end) return str + (stringid - begin)
+#define TEXTID_TO_STRINGID(begin, end, stringid, stringend) \
+	assert_compile(stringend - stringid == end - begin); \
+	if (str >= begin && str <= end) return str + (stringid - begin)
+
 	/* We have some changes in our cargo strings, resulting in some missing. */
-	TEXTID_TO_STRINGID(0x000E, 0x002D, STR_CARGO_PLURAL_NOTHING);
-	TEXTID_TO_STRINGID(0x002E, 0x004D, STR_CARGO_SINGULAR_NOTHING);
+	TEXTID_TO_STRINGID(0x000E, 0x002D, STR_CARGO_PLURAL_NOTHING,                      STR_CARGO_PLURAL_FIZZY_DRINKS);
+	TEXTID_TO_STRINGID(0x002E, 0x004D, STR_CARGO_SINGULAR_NOTHING,                    STR_CARGO_SINGULAR_FIZZY_DRINK);
 	if (str >= 0x004E && str <= 0x006D) return units_volume[str - 0x004E];
-	TEXTID_TO_STRINGID(0x006E, 0x008D, STR_QUANTITY_NOTHING);
-	TEXTID_TO_STRINGID(0x008E, 0x00AD, STR_ABBREV_NOTHING);
+	TEXTID_TO_STRINGID(0x006E, 0x008D, STR_QUANTITY_NOTHING,                          STR_QUANTITY_FIZZY_DRINKS);
+	TEXTID_TO_STRINGID(0x008E, 0x00AD, STR_ABBREV_NOTHING,                            STR_ABBREV_FIZZY_DRINKS);
+	TEXTID_TO_STRINGID(0x00D1, 0x00E0, STR_COLOUR_DARK_BLUE,                          STR_COLOUR_WHITE);
 
 	/* Map building names according to our lang file changes. There are several
 	 * ranges of house ids, all of which need to be remapped to allow newgrfs
 	 * to use original house names. */
-	TEXTID_TO_STRINGID(0x200F, 0x201F, STR_TOWN_BUILDING_NAME_TALL_OFFICE_BLOCK_1);
-	TEXTID_TO_STRINGID(0x2036, 0x2041, STR_TOWN_BUILDING_NAME_COTTAGES_1);
-	TEXTID_TO_STRINGID(0x2059, 0x205C, STR_TOWN_BUILDING_NAME_IGLOO_1);
+	TEXTID_TO_STRINGID(0x200F, 0x201F, STR_TOWN_BUILDING_NAME_TALL_OFFICE_BLOCK_1,    STR_TOWN_BUILDING_NAME_OLD_HOUSES_1);
+	TEXTID_TO_STRINGID(0x2036, 0x2041, STR_TOWN_BUILDING_NAME_COTTAGES_1,             STR_TOWN_BUILDING_NAME_SHOPPING_MALL_1);
+	TEXTID_TO_STRINGID(0x2059, 0x205C, STR_TOWN_BUILDING_NAME_IGLOO_1,                STR_TOWN_BUILDING_NAME_PIGGY_BANK_1);
 
 	/* Same thing for industries */
-	TEXTID_TO_STRINGID(0x4802, 0x4826, STR_INDUSTRY_NAME_COAL_MINE);
-	TEXTID_TO_STRINGID(0x482D, 0x482E, STR_NEWS_INDUSTRY_CONSTRUCTION);
-	TEXTID_TO_STRINGID(0x4832, 0x4834, STR_NEWS_INDUSTRY_CLOSURE_GENERAL);
-	TEXTID_TO_STRINGID(0x4835, 0x4838, STR_NEWS_INDUSTRY_PRODUCTION_INCREASE_GENERAL);
-	TEXTID_TO_STRINGID(0x4839, 0x483A, STR_NEWS_INDUSTRY_PRODUCTION_DECREASE_GENERAL);
+	TEXTID_TO_STRINGID(0x4802, 0x4826, STR_INDUSTRY_NAME_COAL_MINE,                   STR_INDUSTRY_NAME_SUGAR_MINE);
+	TEXTID_TO_STRINGID(0x482D, 0x482E, STR_NEWS_INDUSTRY_CONSTRUCTION,                STR_NEWS_INDUSTRY_PLANTED);
+	TEXTID_TO_STRINGID(0x4832, 0x4834, STR_NEWS_INDUSTRY_CLOSURE_GENERAL,             STR_NEWS_INDUSTRY_CLOSURE_LACK_OF_TREES);
+	TEXTID_TO_STRINGID(0x4835, 0x4838, STR_NEWS_INDUSTRY_PRODUCTION_INCREASE_GENERAL, STR_NEWS_INDUSTRY_PRODUCTION_INCREASE_FARM);
+	TEXTID_TO_STRINGID(0x4839, 0x483A, STR_NEWS_INDUSTRY_PRODUCTION_DECREASE_GENERAL, STR_NEWS_INDUSTRY_PRODUCTION_DECREASE_FARM);
 
 	switch (str) {
 		case 0x4830: return STR_ERROR_CAN_T_CONSTRUCT_THIS_INDUSTRY;
@@ -371,7 +375,9 @@ struct UnmappedChoiceList : ZeroedMemoryAllocator {
 			for (int i = 0; i < count; i++) {
 				int idx = (this->type == SCC_GENDER_LIST ? lm->GetReverseMapping(i, true) : i + 1);
 				const char *str = this->strings[this->strings.Contains(idx) ? idx : 0];
-				size_t len = strlen(str);
+				/* Limit the length of the string we copy to 0xFE. The length is written above
+				 * as a byte and we need room for the final '\0'. */
+				size_t len = min<size_t>(0xFE, strlen(str));
 				memcpy(d, str, len);
 				d += len;
 				*d++ = '\0';
@@ -383,13 +389,14 @@ struct UnmappedChoiceList : ZeroedMemoryAllocator {
 
 /**
  * Translate TTDPatch string codes into something OpenTTD can handle (better).
- * @param grfid       The (NewGRF) ID associated with this string
- * @param language_id The (NewGRF) language ID associated with this string.
- * @param str         The string to translate.
- * @param [out] olen  The length of the final string.
+ * @param grfid          The (NewGRF) ID associated with this string
+ * @param language_id    The (NewGRF) language ID associated with this string.
+ * @param allow_newlines Whether newlines are allowed in the string or not.
+ * @param str            The string to translate.
+ * @param [out] olen     The length of the final string.
  * @return The translated string.
  */
-char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, int *olen)
+char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, bool allow_newlines, const char *str, int *olen)
 {
 	char *tmp = MallocT<char>(strlen(str) * 10 + 1); // Allocate space to allow for expansion
 	char *d = tmp;
@@ -428,7 +435,13 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 				*d++ = *str++;
 				break;
 			case 0x0A: break;
-			case 0x0D: *d++ = 0x0A; break;
+			case 0x0D:
+				if (allow_newlines) {
+					*d++ = 0x0A;
+				} else {
+					grfmsg(1, "Detected newline in string that does not allow one");
+				}
+				break;
 			case 0x0E: d += Utf8Encode(d, SCC_TINYFONT); break;
 			case 0x0F: d += Utf8Encode(d, SCC_BIGFONT); break;
 			case 0x1F:
@@ -457,7 +470,7 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 			case 0x84: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_DATE_LONG + c - 0x82); break;
 			case 0x85: d += Utf8Encode(d, SCC_NEWGRF_DISCARD_WORD);       break;
 			case 0x86: d += Utf8Encode(d, SCC_NEWGRF_ROTATE_TOP_4_WORDS); break;
-			case 0x87: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_VOLUME);  break;
+			case 0x87: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_VOLUME_LONG);  break;
 			case 0x88: d += Utf8Encode(d, SCC_BLUE);    break;
 			case 0x89: d += Utf8Encode(d, SCC_SILVER);  break;
 			case 0x8A: d += Utf8Encode(d, SCC_GOLD);    break;
@@ -506,7 +519,7 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 					/* 0x09, 0x0A are TTDPatch internal use only string codes. */
 					case 0x0B: d += Utf8Encode(d, SCC_NEWGRF_PRINT_QWORD_HEX);         break;
 					case 0x0C: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_STATION_NAME); break;
-					case 0x0D: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_WEIGHT);       break;
+					case 0x0D: d += Utf8Encode(d, SCC_NEWGRF_PRINT_WORD_WEIGHT_LONG);  break;
 					case 0x0E:
 					case 0x0F: {
 						if (str[0] == '\0') goto string_end;
@@ -514,8 +527,8 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 						int index = *str++;
 						int mapped = lm != NULL ? lm->GetMapping(index, code == 0x0E) : -1;
 						if (mapped >= 0) {
-							d += Utf8Encode(d, code == 0x0E ? SCC_GENDER_INDEX : SCC_SETCASE);
-							d += Utf8Encode(d, mapped);
+							d += Utf8Encode(d, code == 0x0E ? SCC_GENDER_INDEX : SCC_SET_CASE);
+							d += Utf8Encode(d, code == 0x0E ? mapped : mapped + 1);
 						}
 						break;
 					}
@@ -569,7 +582,9 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 
 					case 0x16:
 					case 0x17:
-					case 0x18: d += Utf8Encode(d, SCC_NEWGRF_PRINT_DWORD_DATE_LONG + code - 0x16); break;
+					case 0x18:
+					case 0x19:
+					case 0x1A: d += Utf8Encode(d, SCC_NEWGRF_PRINT_DWORD_DATE_LONG + code - 0x16); break;
 
 					default:
 						grfmsg(1, "missing handler for extended format code");
@@ -578,21 +593,21 @@ char *TranslateTTDPatchCodes(uint32 grfid, uint8 language_id, const char *str, i
 				break;
 			}
 
-			case 0x9E: d += Utf8Encode(d, 0x20AC);             break; // Euro
-			case 0x9F: d += Utf8Encode(d, 0x0178);             break; // Y with diaeresis
-			case 0xA0: d += Utf8Encode(d, SCC_UPARROW);        break;
-			case 0xAA: d += Utf8Encode(d, SCC_DOWNARROW);      break;
-			case 0xAC: d += Utf8Encode(d, SCC_CHECKMARK);      break;
-			case 0xAD: d += Utf8Encode(d, SCC_CROSS);          break;
-			case 0xAF: d += Utf8Encode(d, SCC_RIGHTARROW);     break;
-			case 0xB4: d += Utf8Encode(d, SCC_TRAIN);          break;
-			case 0xB5: d += Utf8Encode(d, SCC_LORRY);          break;
-			case 0xB6: d += Utf8Encode(d, SCC_BUS);            break;
-			case 0xB7: d += Utf8Encode(d, SCC_PLANE);          break;
-			case 0xB8: d += Utf8Encode(d, SCC_SHIP);           break;
-			case 0xB9: d += Utf8Encode(d, SCC_SUPERSCRIPT_M1); break;
-			case 0xBC: d += Utf8Encode(d, SCC_SMALLUPARROW);   break;
-			case 0xBD: d += Utf8Encode(d, SCC_SMALLDOWNARROW); break;
+			case 0x9E: d += Utf8Encode(d, 0x20AC);               break; // Euro
+			case 0x9F: d += Utf8Encode(d, 0x0178);               break; // Y with diaeresis
+			case 0xA0: d += Utf8Encode(d, SCC_UP_ARROW);         break;
+			case 0xAA: d += Utf8Encode(d, SCC_DOWN_ARROW);       break;
+			case 0xAC: d += Utf8Encode(d, SCC_CHECKMARK);        break;
+			case 0xAD: d += Utf8Encode(d, SCC_CROSS);            break;
+			case 0xAF: d += Utf8Encode(d, SCC_RIGHT_ARROW);      break;
+			case 0xB4: d += Utf8Encode(d, SCC_TRAIN);            break;
+			case 0xB5: d += Utf8Encode(d, SCC_LORRY);            break;
+			case 0xB6: d += Utf8Encode(d, SCC_BUS);              break;
+			case 0xB7: d += Utf8Encode(d, SCC_PLANE);            break;
+			case 0xB8: d += Utf8Encode(d, SCC_SHIP);             break;
+			case 0xB9: d += Utf8Encode(d, SCC_SUPERSCRIPT_M1);   break;
+			case 0xBC: d += Utf8Encode(d, SCC_SMALL_UP_ARROW);   break;
+			case 0xBD: d += Utf8Encode(d, SCC_SMALL_DOWN_ARROW); break;
 			default:
 				/* Validate any unhandled character */
 				if (!IsValidChar(c, CS_ALPHANUMERAL)) c = '?';
@@ -641,13 +656,14 @@ void AddGRFTextToList(GRFText **list, GRFText *text_to_add)
  * @param list The list where the text should be added to.
  * @param langid The language of the new text.
  * @param grfid The grfid where this string is defined.
+ * @param allow_newlines Whether newlines are allowed in this string.
  * @param text_to_add The text to add to the list.
  * @note All text-codes will be translated.
  */
-void AddGRFTextToList(struct GRFText **list, byte langid, uint32 grfid, const char *text_to_add)
+void AddGRFTextToList(struct GRFText **list, byte langid, uint32 grfid, bool allow_newlines, const char *text_to_add)
 {
 	int len;
-	char *translatedtext = TranslateTTDPatchCodes(grfid, langid, text_to_add, &len);
+	char *translatedtext = TranslateTTDPatchCodes(grfid, langid, allow_newlines, text_to_add, &len);
 	GRFText *newtext = GRFText::New(langid, translatedtext, len);
 	free(translatedtext);
 
@@ -684,7 +700,7 @@ GRFText *DuplicateGRFText(GRFText *orig)
 /**
  * Add the new read string into our structure.
  */
-StringID AddGRFString(uint32 grfid, uint16 stringid, byte langid_to_add, bool new_scheme, const char *text_to_add, StringID def_string)
+StringID AddGRFString(uint32 grfid, uint16 stringid, byte langid_to_add, bool new_scheme, bool allow_newlines, const char *text_to_add, StringID def_string)
 {
 	char *translatedtext;
 	uint id;
@@ -700,9 +716,9 @@ StringID AddGRFString(uint32 grfid, uint16 stringid, byte langid_to_add, bool ne
 			langid_to_add = GRFLX_ENGLISH;
 		} else {
 			StringID ret = STR_EMPTY;
-			if (langid_to_add & GRFLB_GERMAN)  ret = AddGRFString(grfid, stringid, GRFLX_GERMAN,  true, text_to_add, def_string);
-			if (langid_to_add & GRFLB_FRENCH)  ret = AddGRFString(grfid, stringid, GRFLX_FRENCH,  true, text_to_add, def_string);
-			if (langid_to_add & GRFLB_SPANISH) ret = AddGRFString(grfid, stringid, GRFLX_SPANISH, true, text_to_add, def_string);
+			if (langid_to_add & GRFLB_GERMAN)  ret = AddGRFString(grfid, stringid, GRFLX_GERMAN,  true, allow_newlines, text_to_add, def_string);
+			if (langid_to_add & GRFLB_FRENCH)  ret = AddGRFString(grfid, stringid, GRFLX_FRENCH,  true, allow_newlines, text_to_add, def_string);
+			if (langid_to_add & GRFLB_SPANISH) ret = AddGRFString(grfid, stringid, GRFLX_SPANISH, true, allow_newlines, text_to_add, def_string);
 			return ret;
 		}
 	}
@@ -717,7 +733,7 @@ StringID AddGRFString(uint32 grfid, uint16 stringid, byte langid_to_add, bool ne
 	if (id == lengthof(_grf_text)) return STR_EMPTY;
 
 	int len;
-	translatedtext = TranslateTTDPatchCodes(grfid, langid_to_add, text_to_add, &len);
+	translatedtext = TranslateTTDPatchCodes(grfid, langid_to_add, allow_newlines, text_to_add, &len);
 
 	GRFText *newtext = GRFText::New(langid_to_add, translatedtext, len);
 
@@ -1006,11 +1022,12 @@ void RewindTextRefStack()
  * @param buff  the buffer we're writing to
  * @param str   the string that we need to write
  * @param argv  the OpenTTD stack of values
+ * @param modify_argv When true, modify the OpenTTD stack.
  * @return the string control code to "execute" now
  */
-uint RemapNewGRFStringControlCode(uint scc, char *buf_start, char **buff, const char **str, int64 *argv)
+uint RemapNewGRFStringControlCode(uint scc, char *buf_start, char **buff, const char **str, int64 *argv, bool modify_argv)
 {
-	if (_newgrf_textrefstack.used) {
+	if (_newgrf_textrefstack.used && modify_argv) {
 		switch (scc) {
 			default: NOT_REACHED();
 			case SCC_NEWGRF_PRINT_BYTE_SIGNED:      *argv = _newgrf_textrefstack.PopSignedByte();    break;
@@ -1023,11 +1040,13 @@ uint RemapNewGRFStringControlCode(uint scc, char *buf_start, char **buff, const 
 			case SCC_NEWGRF_PRINT_QWORD_HEX:        *argv = _newgrf_textrefstack.PopUnsignedQWord(); break;
 
 			case SCC_NEWGRF_PRINT_WORD_SPEED:
-			case SCC_NEWGRF_PRINT_WORD_VOLUME:
+			case SCC_NEWGRF_PRINT_WORD_VOLUME_LONG:
+			case SCC_NEWGRF_PRINT_WORD_VOLUME_SHORT:
 			case SCC_NEWGRF_PRINT_WORD_SIGNED:      *argv = _newgrf_textrefstack.PopSignedWord();    break;
 
 			case SCC_NEWGRF_PRINT_WORD_HEX:
-			case SCC_NEWGRF_PRINT_WORD_WEIGHT:
+			case SCC_NEWGRF_PRINT_WORD_WEIGHT_LONG:
+			case SCC_NEWGRF_PRINT_WORD_WEIGHT_SHORT:
 			case SCC_NEWGRF_PRINT_WORD_POWER:
 			case SCC_NEWGRF_PRINT_WORD_STATION_NAME:
 			case SCC_NEWGRF_PRINT_WORD_UNSIGNED:    *argv = _newgrf_textrefstack.PopUnsignedWord();  break;
@@ -1067,7 +1086,7 @@ uint RemapNewGRFStringControlCode(uint scc, char *buf_start, char **buff, const 
 
 		case SCC_NEWGRF_PRINT_DWORD_CURRENCY:
 		case SCC_NEWGRF_PRINT_QWORD_CURRENCY:
-			return SCC_CURRENCY;
+			return SCC_CURRENCY_LONG;
 
 		case SCC_NEWGRF_PRINT_WORD_STRING_ID:
 			return SCC_NEWGRF_PRINT_WORD_STRING_ID;
@@ -1083,11 +1102,17 @@ uint RemapNewGRFStringControlCode(uint scc, char *buf_start, char **buff, const 
 		case SCC_NEWGRF_PRINT_WORD_SPEED:
 			return SCC_VELOCITY;
 
-		case SCC_NEWGRF_PRINT_WORD_VOLUME:
-			return SCC_VOLUME;
+		case SCC_NEWGRF_PRINT_WORD_VOLUME_LONG:
+			return SCC_VOLUME_LONG;
 
-		case SCC_NEWGRF_PRINT_WORD_WEIGHT:
-			return SCC_WEIGHT;
+		case SCC_NEWGRF_PRINT_WORD_VOLUME_SHORT:
+			return SCC_VOLUME_SHORT;
+
+		case SCC_NEWGRF_PRINT_WORD_WEIGHT_LONG:
+			return SCC_WEIGHT_LONG;
+
+		case SCC_NEWGRF_PRINT_WORD_WEIGHT_SHORT:
+			return SCC_WEIGHT_SHORT;
 
 		case SCC_NEWGRF_PRINT_WORD_POWER:
 			return SCC_POWER;

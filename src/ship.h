@@ -15,13 +15,13 @@
 #include "vehicle_base.h"
 #include "water_map.h"
 
-void GetShipSpriteSize(EngineID engine, uint &width, uint &height);
+void GetShipSpriteSize(EngineID engine, uint &width, uint &height, EngineImageType image_type);
 WaterClass GetEffectiveWaterClass(TileIndex tile);
 
 /**
  * All ships have this type.
  */
-struct Ship: public SpecializedVehicle<Ship, VEH_SHIP> {
+struct Ship FINAL : public SpecializedVehicle<Ship, VEH_SHIP> {
 	TrackBitsByte state; ///< The "track" the ship is following.
 
 	/** We don't want GCC to zero our struct! It already is zeroed and has an index! */
@@ -34,7 +34,7 @@ struct Ship: public SpecializedVehicle<Ship, VEH_SHIP> {
 	ExpensesType GetExpenseType(bool income) const { return income ? EXPENSES_SHIP_INC : EXPENSES_SHIP_RUN; }
 	void PlayLeaveStationSound() const;
 	bool IsPrimaryVehicle() const { return true; }
-	SpriteID GetImage(Direction direction) const;
+	SpriteID GetImage(Direction direction, EngineImageType image_type) const;
 	int GetDisplaySpeed() const { return this->cur_speed / 2; }
 	int GetDisplayMaxSpeed() const { return this->vcache.cached_max_speed / 2; }
 	Money GetRunningCost() const;

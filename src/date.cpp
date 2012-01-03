@@ -238,10 +238,10 @@ static void OnNewMonth()
 
 	SetWindowClassesDirty(WC_CHEATS);
 	CompaniesMonthlyLoop();
-	SubsidyMonthlyLoop();
 	EnginesMonthlyLoop();
 	TownsMonthlyLoop();
 	IndustryMonthlyLoop();
+	SubsidyMonthlyLoop();
 	StationMonthlyLoop();
 #ifdef ENABLE_NETWORK
 	if (_network_server) NetworkServerMonthlyLoop();

@@ -156,8 +156,19 @@ bool Engine::IsEnabled() const
 }
 
 /**
+ * Retrieve the GRF ID of the NewGRF the engine is tied to.
+ * This is the GRF providing the Action 3.
+ * @return GRF ID of the associated NewGRF.
+ */
+uint32 Engine::GetGRFID() const
+{
+	const GRFFile *file = this->GetGRF();
+	return file == NULL ? 0 : file->grfid;
+}
+
+/**
  * Determines whether an engine can carry something.
- * A vehicle cannot carry anything if its capacity is zero, or none of the possible cargos is available in the climate.
+ * A vehicle cannot carry anything if its capacity is zero, or none of the possible cargoes is available in the climate.
  * @return true if the vehicle can carry something.
  */
 bool Engine::CanCarryCargo() const
@@ -185,50 +196,84 @@ bool Engine::CanCarryCargo() const
 	return this->GetDefaultCargoType() != CT_INVALID;
 }
 
+
 /**
- * Determines the default cargo capacity of an engine for display purposes.
- *
- * For planes carrying both passenger and mail this is the passenger capacity.
- * For multiheaded engines this is the capacity of both heads.
- * For articulated engines use GetCapacityOfArticulatedParts
- *
- * @note Keep this function consistent with GetVehicleCapacity().
+ * Determines capacity of a given vehicle from scratch.
+ * For aircraft the main capacity is determined. Mail might be present as well.
+ * @param v Vehicle of interest; NULL in purchase list
  * @param mail_capacity returns secondary cargo (mail) capacity of aircraft
- * @return The default capacity
- * @see GetDefaultCargoType
+ * @return Capacity
  */
-uint Engine::GetDisplayDefaultCapacity(uint16 *mail_capacity) const
+uint Engine::DetermineCapacity(const Vehicle *v, uint16 *mail_capacity) const
 {
+	assert(v == NULL || this->index == v->engine_type);
 	if (mail_capacity != NULL) *mail_capacity = 0;
+
 	if (!this->CanCarryCargo()) return 0;
-	switch (type) {
+
+	CargoID default_cargo = this->GetDefaultCargoType();
+	CargoID cargo_type = (v != NULL) ? v->cargo_type : default_cargo;
+
+	if (mail_capacity != NULL && this->type == VEH_AIRCRAFT && IsCargoInClass(cargo_type, CC_PASSENGERS)) {
+		*mail_capacity = GetEngineProperty(this->index, PROP_AIRCRAFT_MAIL_CAPACITY, this->u.air.mail_capacity, v);
+	}
+
+	/* Check the refit capacity callback if we are not in the default configuration.
+	 * Note: This might change to become more consistent/flexible/sane, esp. when default cargo is first refittable. */
+	if (HasBit(this->info.callback_mask, CBM_VEHICLE_REFIT_CAPACITY) &&
+			(default_cargo != cargo_type || (v != NULL && v->cargo_subtype != 0))) {
+		uint16 callback = GetVehicleCallback(CBID_VEHICLE_REFIT_CAPACITY, 0, 0, this->index, v);
+		if (callback != CALLBACK_FAILED) return callback;
+	}
+
+	/* Get capacity according to property resp. CB */
+	uint capacity;
+	switch (this->type) {
 		case VEH_TRAIN:
-			return GetEngineProperty(this->index, PROP_TRAIN_CARGO_CAPACITY, this->u.rail.capacity) + (this->u.rail.railveh_type == RAILVEH_MULTIHEAD ? this->u.rail.capacity : 0);
+			capacity = GetEngineProperty(this->index, PROP_TRAIN_CARGO_CAPACITY,        this->u.rail.capacity, v);
+
+			/* In purchase list add the capacity of the second head. Always use the plain property for this. */
+			if (v == NULL && this->u.rail.railveh_type == RAILVEH_MULTIHEAD) capacity += this->u.rail.capacity;
+			break;
 
 		case VEH_ROAD:
-			return GetEngineProperty(this->index, PROP_ROADVEH_CARGO_CAPACITY, this->u.road.capacity);
+			capacity = GetEngineProperty(this->index, PROP_ROADVEH_CARGO_CAPACITY,      this->u.road.capacity, v);
+			break;
 
 		case VEH_SHIP:
-			return GetEngineProperty(this->index, PROP_SHIP_CARGO_CAPACITY, this->u.ship.capacity);
+			capacity = GetEngineProperty(this->index, PROP_SHIP_CARGO_CAPACITY,         this->u.ship.capacity, v);
+			break;
 
-		case VEH_AIRCRAFT: {
-			uint capacity = GetEngineProperty(this->index, PROP_AIRCRAFT_PASSENGER_CAPACITY, this->u.air.passenger_capacity);
-			CargoID cargo = this->GetDefaultCargoType();
-			if (IsCargoInClass(cargo, CC_PASSENGERS)) {
-				if (mail_capacity != NULL) *mail_capacity = GetEngineProperty(this->index, PROP_AIRCRAFT_MAIL_CAPACITY, this->u.air.mail_capacity);
-			} else {
-				capacity += GetEngineProperty(this->index, PROP_AIRCRAFT_MAIL_CAPACITY, this->u.air.mail_capacity);
+		case VEH_AIRCRAFT:
+			capacity = GetEngineProperty(this->index, PROP_AIRCRAFT_PASSENGER_CAPACITY, this->u.air.passenger_capacity, v);
+			if (!IsCargoInClass(cargo_type, CC_PASSENGERS)) {
+				capacity += GetEngineProperty(this->index, PROP_AIRCRAFT_MAIL_CAPACITY, this->u.air.mail_capacity, v);
 			}
-			switch (cargo) {
-				case CT_PASSENGERS:
-				case CT_MAIL:       return capacity;
-				case CT_GOODS:      return capacity / 2;
-				default:            return capacity / 4;
-			}
-		}
+			if (cargo_type == CT_MAIL) return capacity;
+			default_cargo = CT_PASSENGERS; // Always use 'passengers' wrt. cargo multipliers
+			break;
 
 		default: NOT_REACHED();
 	}
+
+	/* Apply multipliers depending on cargo- and vehicletype.
+	 * Note: This might change to become more consistent/flexible. */
+	if (this->type != VEH_SHIP && default_cargo != cargo_type) {
+		switch (default_cargo) {
+			case CT_PASSENGERS: break;
+			case CT_MAIL:
+			case CT_GOODS: capacity *= 2; break;
+			default:       capacity *= 4; break;
+		}
+		switch (cargo_type) {
+			case CT_PASSENGERS: break;
+			case CT_MAIL:
+			case CT_GOODS: capacity /= 2; break;
+			default:       capacity /= 4; break;
+		}
+	}
+
+	return capacity;
 }
 
 /**
@@ -265,7 +310,7 @@ Money Engine::GetRunningCost() const
 		default: NOT_REACHED();
 	}
 
-	return GetPrice(base_price, cost_factor, this->grf_prop.grffile, -8);
+	return GetPrice(base_price, cost_factor, this->GetGRF(), -8);
 }
 
 /**
@@ -305,7 +350,7 @@ Money Engine::GetCost() const
 		default: NOT_REACHED();
 	}
 
-	return GetPrice(base_price, cost_factor, this->grf_prop.grffile, -8);
+	return GetPrice(base_price, cost_factor, this->GetGRF(), -8);
 }
 
 /**
@@ -404,6 +449,20 @@ Date Engine::GetLifeLengthInDays() const
 }
 
 /**
+ * Get the range of an aircraft type.
+ * @return Range of the aircraft type in tiles or 0 if unlimited range.
+ */
+uint16 Engine::GetRange() const
+{
+	switch (this->type) {
+		case VEH_AIRCRAFT:
+			return GetEngineProperty(this->index, PROP_AIRCRAFT_RANGE, this->u.air.max_range);
+
+		default: NOT_REACHED();
+	}
+}
+
+/**
  * Initializes the EngineOverrideManager with the default engines.
  */
 void EngineOverrideManager::ResetToDefaultMapping()
@@ -458,45 +517,6 @@ bool EngineOverrideManager::ResetToCurrentNewGRFConfig()
 	ReloadNewGRFData();
 
 	return true;
-}
-
-/**
- * Sets cached values in Company::num_vehicles and Group::num_vehicles
- */
-void SetCachedEngineCounts()
-{
-	size_t engines = Engine::GetPoolSize();
-
-	/* Set up the engine count for all companies */
-	Company *c;
-	FOR_ALL_COMPANIES(c) {
-		free(c->num_engines);
-		c->num_engines = CallocT<EngineID>(engines);
-	}
-
-	/* Recalculate */
-	Group *g;
-	FOR_ALL_GROUPS(g) {
-		free(g->num_engines);
-		g->num_engines = CallocT<EngineID>(engines);
-	}
-
-	const Vehicle *v;
-	FOR_ALL_VEHICLES(v) {
-		if (!v->IsEngineCountable()) continue;
-
-		assert(v->engine_type < engines);
-
-		Company::Get(v->owner)->num_engines[v->engine_type]++;
-
-		if (v->group_id == DEFAULT_GROUP) continue;
-
-		g = Group::Get(v->group_id);
-		assert(v->type == g->vehicle_type);
-		assert(v->owner == g->owner);
-
-		g->num_engines[v->engine_type]++;
-	}
 }
 
 /**
@@ -663,7 +683,10 @@ void StartupOneEngine(Engine *e, Date aging_date)
 	}
 }
 
-/** Start/initialise all our engines. */
+/**
+ * Start/initialise all our engines. Must be called whenever there are changes
+ * to the NewGRF config.
+ */
 void StartupEngines()
 {
 	Engine *e;
@@ -784,7 +807,7 @@ void EnginesDailyLoop()
 
 				e->flags |= ENGINE_OFFER_WINDOW_OPEN;
 				e->preview_wait = 20;
-				AI::NewEvent(best_company, new AIEventEnginePreview(i));
+				AI::NewEvent(best_company, new ScriptEventEnginePreview(i));
 				if (IsInteractiveCompany(best_company)) ShowEnginePreviewWindow(i);
 			}
 		}
@@ -865,7 +888,7 @@ static void NewVehicleAvailable(Engine *e)
 		FOR_ALL_COMPANIES(c) SetBit(c->avail_roadtypes, HasBit(e->info.misc_flags, EF_ROAD_TRAM) ? ROADTYPE_TRAM : ROADTYPE_ROAD);
 	}
 
-	AI::BroadcastNewEvent(new AIEventEngineAvailable(index));
+	AI::BroadcastNewEvent(new ScriptEventEngineAvailable(index));
 
 	SetDParam(0, GetEngineCategoryName(index));
 	SetDParam(1, index);
@@ -973,11 +996,11 @@ bool IsEngineBuildable(EngineID engine, VehicleType type, CompanyID company)
 	if (e->type != type) return false;
 
 	/* check if it's available */
-	if (!HasBit(e->company_avail, company)) return false;
+	if (company != OWNER_DEITY && !HasBit(e->company_avail, company)) return false;
 
 	if (!e->IsEnabled()) return false;
 
-	if (type == VEH_TRAIN) {
+	if (type == VEH_TRAIN && company != OWNER_DEITY) {
 		/* Check if the rail type is available to this company */
 		const Company *c = Company::Get(company);
 		if (((GetRailTypeInfo(e->u.rail.railtype))->compatible_railtypes & c->avail_railtypes) == 0) return false;

@@ -15,11 +15,12 @@
 #include "32bpp_optimized.hpp"
 
 /** The optimised 32 bpp blitter with palette animation. */
-class Blitter_32bppAnim : public Blitter_32bppOptimized {
+class Blitter_32bppAnim FINAL : public Blitter_32bppOptimized {
 private:
-	uint8 *anim_buf;     ///< In this buffer we keep track of the 8bpp indexes so we can do palette animation
+	uint16 *anim_buf;    ///< In this buffer we keep track of the 8bpp indexes so we can do palette animation
 	int anim_buf_width;  ///< The width of the animation buffer.
 	int anim_buf_height; ///< The height of the animation buffer.
+	Palette palette;     ///< The current palette.
 
 public:
 	Blitter_32bppAnim() :
@@ -36,12 +37,20 @@ public:
 	/* virtual */ void CopyToBuffer(const void *video, void *dst, int width, int height);
 	/* virtual */ void ScrollBuffer(void *video, int &left, int &top, int &width, int &height, int scroll_x, int scroll_y);
 	/* virtual */ int BufferSize(int width, int height);
-	/* virtual */ void PaletteAnimate(uint start, uint count);
+	/* virtual */ void PaletteAnimate(const Palette &palette);
 	/* virtual */ Blitter::PaletteAnimation UsePaletteAnimation();
 
 	/* virtual */ const char *GetName() { return "32bpp-anim"; }
 	/* virtual */ int GetBytesPerPixel() { return 5; }
 	/* virtual */ void PostResize();
+
+	/**
+	 * Look up the colour in the current palette.
+	 */
+	inline uint32 LookupColourInPalette(uint index)
+	{
+		return this->palette.palette[index].data;
+	}
 
 	template <BlitterMode mode> void Draw(const Blitter::BlitterParams *bp, ZoomLevel zoom);
 };

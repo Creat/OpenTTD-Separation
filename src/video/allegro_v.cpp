@@ -75,9 +75,9 @@ static void UpdatePalette(uint start, uint count)
 
 	uint end = start + count;
 	for (uint i = start; i != end; i++) {
-		pal[i].r = _cur_palette[i].r / 4;
-		pal[i].g = _cur_palette[i].g / 4;
-		pal[i].b = _cur_palette[i].b / 4;
+		pal[i].r = _cur_palette.palette[i].r / 4;
+		pal[i].g = _cur_palette.palette[i].g / 4;
+		pal[i].b = _cur_palette.palette[i].b / 4;
 		pal[i].filler = 0;
 	}
 
@@ -91,16 +91,16 @@ static void InitPalette()
 
 static void CheckPaletteAnim()
 {
-	if (_pal_count_dirty != 0) {
+	if (_cur_palette.count_dirty != 0) {
 		Blitter *blitter = BlitterFactoryBase::GetCurrentBlitter();
 
 		switch (blitter->UsePaletteAnimation()) {
 			case Blitter::PALETTE_ANIMATION_VIDEO_BACKEND:
-				UpdatePalette(_pal_first_dirty, _pal_count_dirty);
+				UpdatePalette(_cur_palette.first_dirty, _cur_palette.count_dirty);
 				break;
 
 			case Blitter::PALETTE_ANIMATION_BLITTER:
-				blitter->PaletteAnimate(_pal_first_dirty, _pal_count_dirty);
+				blitter->PaletteAnimate(_cur_palette);
 				break;
 
 			case Blitter::PALETTE_ANIMATION_NONE:
@@ -109,7 +109,7 @@ static void CheckPaletteAnim()
 			default:
 				NOT_REACHED();
 		}
-		_pal_count_dirty = 0;
+		_cur_palette.count_dirty = 0;
 	}
 }
 
@@ -225,8 +225,20 @@ static bool CreateMainSurface(uint w, uint h)
 	snprintf(caption, sizeof(caption), "OpenTTD %s", _openttd_revision);
 	set_window_title(caption);
 
+	enable_hardware_cursor();
+	select_mouse_cursor(MOUSE_CURSOR_ARROW);
+	show_mouse(_allegro_screen);
+
 	GameSizeChanged();
 
+	return true;
+}
+
+bool VideoDriver_Allegro::ClaimMousePointer()
+{
+	select_mouse_cursor(MOUSE_CURSOR_NONE);
+	show_mouse(NULL);
+	disable_hardware_cursor();
 	return true;
 }
 
@@ -475,7 +487,8 @@ void VideoDriver_Allegro::MainLoop()
 	uint32 cur_ticks = GetTime();
 	uint32 last_cur_ticks = cur_ticks;
 	uint32 next_tick = cur_ticks + MILLISECONDS_PER_TICK;
-	uint32 pal_tick = 0;
+
+	CheckPaletteAnim();
 
 	for (;;) {
 		uint32 prev_cur_ticks = cur_ticks; // to check for wrapping
@@ -520,10 +533,7 @@ void VideoDriver_Allegro::MainLoop()
 			GameLoop();
 
 			UpdateWindows();
-			if (++pal_tick > 4) {
-				CheckPaletteAnim();
-				pal_tick = 1;
-			}
+			CheckPaletteAnim();
 			DrawSurfaceToScreen();
 		} else {
 			CSleep(1);
@@ -553,6 +563,11 @@ bool VideoDriver_Allegro::ToggleFullscreen(bool fullscreen)
 	}
 	return true;
 #endif
+}
+
+bool VideoDriver_Allegro::AfterBlitterChange()
+{
+	return CreateMainSurface(_screen.width, _screen.height);
 }
 
 #endif /* WITH_ALLEGRO */

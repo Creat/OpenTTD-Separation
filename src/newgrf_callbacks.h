@@ -50,7 +50,7 @@ enum CallbackID {
 	CBID_VEHICLE_REFIT_CAPACITY          = 0x15, // 15 bit callback
 
 	/** Builds articulated engines for trains and RVs. */
-	CBID_VEHICLE_ARTIC_ENGINE            = 0x16, // 8 bit callback
+	CBID_VEHICLE_ARTIC_ENGINE            = 0x16, // 8 bit callback for grf version < 8
 
 	/** Determine whether the house can be built on the specified tile. */
 	CBID_HOUSE_ALLOW_CONSTRUCTION        = 0x17, // 8 bit callback
@@ -85,8 +85,8 @@ enum CallbackID {
 	/** Called periodically to determine if a house should be destroyed. */
 	CBID_HOUSE_DESTRUCTION               = 0x21, // 8 bit callback
 
-	/** Called to determine if the given industry type is available */
-	CBID_INDUSTRY_AVAILABLE              = 0x22, // 15 bit callback
+	/** Called to determine if the given industry type is available. For grf version >= 8 also a probability can be returned. */
+	CBID_INDUSTRY_PROBABILITY            = 0x22, // 15 bit callback
 
 	/**
 	 * This callback is called from vehicle purchase lists. It returns a value to be
@@ -196,7 +196,7 @@ enum CallbackID {
 	CBID_HOUSE_DENY_DESTRUCTION          = 0x143, // 15 bit callback
 
 	/** Select an ambient sound to play for a given type of tile. */
-	CBID_SOUNDS_AMBIENT_EFFECT           = 0x144, // 15 bit callback, not implemented
+	CBID_SOUNDS_AMBIENT_EFFECT           = 0x144, // 15 bit callback
 
 	/** Called to calculate part of a station rating. */
 	CBID_CARGO_STATION_RATING_CALC       = 0x145, // 15 bit callback
@@ -208,7 +208,7 @@ enum CallbackID {
 	CBID_CANALS_SPRITE_OFFSET            = 0x147, // 15 bit callback
 
 	/** Called when a cargo type specified in property 20 is accepted. */
-	CBID_HOUSE_WATCHED_CARGO_ACCEPTED    = 0x148, // 15 bit callback, not implemented
+	CBID_HOUSE_WATCHED_CARGO_ACCEPTED    = 0x148, // 15 bit callback
 
 	/** Callback done for each tile of a station to check the slope. */
 	CBID_STATION_LAND_SLOPE_CHECK        = 0x149, // 15 bit callback
@@ -272,6 +272,9 @@ enum CallbackID {
 
 	/** Called to determine if one can alter the ground below an object tile */
 	CBID_OBJECT_AUTOSLOPE                = 0x15D, // 15 bit callback
+
+	/** Called to determine the cost factor for refitting a vehicle. */
+	CBID_VEHICLE_REFIT_COST              = 0x15E, // 15 bit callback
 };
 
 /**
@@ -308,7 +311,7 @@ enum HouseCallbackMask {
 	CBM_HOUSE_ANIMATION_NEXT_FRAME      =  1, ///< decides next animation frame
 	CBM_HOUSE_ANIMATION_START_STOP      =  2, ///< periodically start/stop the animation
 	CBM_HOUSE_CONSTRUCTION_STATE_CHANGE =  3, ///< change animation when construction state changes
-	CBM_HOUSE_COLOUR                    =  4, ///< decide the color of the building
+	CBM_HOUSE_COLOUR                    =  4, ///< decide the colour of the building
 	CBM_HOUSE_CARGO_ACCEPTANCE          =  5, ///< decides amount of cargo acceptance
 	CBM_HOUSE_ANIMATION_SPEED           =  6, ///< decides animation speed
 	CBM_HOUSE_DESTRUCTION               =  7, ///< trigger destruction of building
@@ -327,7 +330,7 @@ enum CanalCallbackMask {
 };
 
 /**
- * Callback masks for cargos.
+ * Callback masks for cargoes.
  */
 enum CargoCallbackMask {
 	CBM_CARGO_PROFIT_CALC         = 0, ///< custom profit calculation
@@ -338,7 +341,7 @@ enum CargoCallbackMask {
  * Callback masks for Industries
  */
 enum IndustryCallbackMask {
-	CBM_IND_AVAILABLE                 =  0, ///< industry availability callback
+	CBM_IND_PROBABILITY               =  0, ///< industry availability/probability callback
 	CBM_IND_PRODUCTION_CARGO_ARRIVAL  =  1, ///< call production callback when cargo arrives at the industry
 	CBM_IND_PRODUCTION_256_TICKS      =  2, ///< call production callback every 256 ticks
 	CBM_IND_LOCATION                  =  3, ///< check industry construction on given area
@@ -350,8 +353,8 @@ enum IndustryCallbackMask {
 	CBM_IND_SPECIAL_EFFECT            =  9, ///< control special effects
 	CBM_IND_REFUSE_CARGO              = 10, ///< option out of accepting cargo
 	CBM_IND_DECIDE_COLOUR             = 11, ///< give a custom colour to newly build industries
-	CBM_IND_INPUT_CARGO_TYPES         = 12, ///< customize the cargos the industry requires
-	CBM_IND_OUTPUT_CARGO_TYPES        = 13, ///< customize the cargos the industry produces
+	CBM_IND_INPUT_CARGO_TYPES         = 12, ///< customize the cargoes the industry requires
+	CBM_IND_OUTPUT_CARGO_TYPES        = 13, ///< customize the cargoes the industry produces
 };
 
 /**
@@ -374,7 +377,7 @@ enum ObjectCallbackMask {
 	CBM_OBJ_SLOPE_CHECK               =  0, ///< decides slope suitability
 	CBM_OBJ_ANIMATION_NEXT_FRAME      =  1, ///< decides next animation frame
 	CBM_OBJ_ANIMATION_SPEED           =  2, ///< decides animation speed
-	CBM_OBJ_COLOUR                    =  3, ///< decide the color of the building
+	CBM_OBJ_COLOUR                    =  3, ///< decide the colour of the building
 	CBM_OBJ_FUND_MORE_TEXT            =  4, ///< additional text in fund window
 	CBM_OBJ_AUTOSLOPE                 =  5, ///< decides allowance of autosloping
 };

@@ -1,5 +1,7 @@
 syntax: glob
 
+.svn
+bin/baseset/openttd.32.bmp
 bin/lang/*
 bin/openttd*
 bin/*.cfg
@@ -9,6 +11,7 @@ config.cache*
 config.log
 config.pwd
 docs/aidocs/*
+docs/gamedocs/*
 docs/source/*
 Makefile
 Makefile.am

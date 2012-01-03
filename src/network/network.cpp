@@ -36,6 +36,7 @@
 #include "../rev.h"
 #include "../core/pool_func.hpp"
 #include "../gfx_func.h"
+#include "../error.h"
 #include "table/strings.h"
 
 #ifdef DEBUG_DUMP_COMMANDS
@@ -287,8 +288,7 @@ uint NetworkCalculateLag(const NetworkClientSocket *cs)
 void NetworkError(StringID error_string)
 {
 	_switch_mode = SM_MENU;
-	extern StringID _switch_mode_errorstr;
-	_switch_mode_errorstr = error_string;
+	ShowErrorMessage(error_string, INVALID_STRING_ID, WL_CRITICAL);
 }
 
 /**
@@ -336,6 +336,7 @@ void NetworkHandlePauseChange(PauseMode prev_mode, PauseMode changed_mode)
 	switch (changed_mode) {
 		case PM_PAUSED_NORMAL:
 		case PM_PAUSED_JOIN:
+		case PM_PAUSED_GAME_SCRIPT:
 		case PM_PAUSED_ACTIVE_CLIENTS: {
 			bool changed = ((_pause_mode == PM_UNPAUSED) != (prev_mode == PM_UNPAUSED));
 			bool paused = (_pause_mode != PM_UNPAUSED);
@@ -344,14 +345,17 @@ void NetworkHandlePauseChange(PauseMode prev_mode, PauseMode changed_mode)
 			StringID str;
 			if (!changed) {
 				int i = -1;
+
 				if ((_pause_mode & PM_PAUSED_NORMAL) != PM_UNPAUSED)         SetDParam(++i, STR_NETWORK_SERVER_MESSAGE_GAME_REASON_MANUAL);
 				if ((_pause_mode & PM_PAUSED_JOIN) != PM_UNPAUSED)           SetDParam(++i, STR_NETWORK_SERVER_MESSAGE_GAME_REASON_CONNECTING_CLIENTS);
+				if ((_pause_mode & PM_PAUSED_GAME_SCRIPT) != PM_UNPAUSED)    SetDParam(++i, STR_NETWORK_SERVER_MESSAGE_GAME_REASON_GAME_SCRIPT);
 				if ((_pause_mode & PM_PAUSED_ACTIVE_CLIENTS) != PM_UNPAUSED) SetDParam(++i, STR_NETWORK_SERVER_MESSAGE_GAME_REASON_NOT_ENOUGH_PLAYERS);
 				str = STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_1 + i;
 			} else {
 				switch (changed_mode) {
 					case PM_PAUSED_NORMAL:         SetDParam(0, STR_NETWORK_SERVER_MESSAGE_GAME_REASON_MANUAL); break;
 					case PM_PAUSED_JOIN:           SetDParam(0, STR_NETWORK_SERVER_MESSAGE_GAME_REASON_CONNECTING_CLIENTS); break;
+					case PM_PAUSED_GAME_SCRIPT:    SetDParam(0, STR_NETWORK_SERVER_MESSAGE_GAME_REASON_GAME_SCRIPT); break;
 					case PM_PAUSED_ACTIVE_CLIENTS: SetDParam(0, STR_NETWORK_SERVER_MESSAGE_GAME_REASON_NOT_ENOUGH_PLAYERS); break;
 					default: NOT_REACHED();
 				}
@@ -791,7 +795,7 @@ void NetworkDisconnect(bool blocking, bool close_admins)
 
 	if (_settings_client.network.server_advertise) NetworkUDPRemoveAdvertise(blocking);
 
-	DeleteWindowById(WC_NETWORK_STATUS_WINDOW, 0);
+	DeleteWindowById(WC_NETWORK_STATUS_WINDOW, WN_NETWORK_STATUS_WINDOW_JOIN);
 
 	NetworkClose(close_admins);
 
