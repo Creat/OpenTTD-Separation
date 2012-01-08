@@ -181,8 +181,7 @@ struct TimetableWindow : Window {
 			Window(),
 			sel_index(-1),
 			vehicle(Vehicle::Get(window_number)),
-			show_expected(true),
-			NewSettings(vehicle->orders.list->GetSepSettings())
+			show_expected(true)
 	{
 		NewSettings = (vehicle->orders.list != NULL) ? vehicle->orders.list->GetSepSettings() : TTSepSettings();
 		this->CreateNestedTree(desc);
