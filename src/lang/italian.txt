@@ -1489,7 +1489,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Compagn
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Bulldozer magico (rimuove industrie e oggetti fissi): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}I tunnel possono incrociarsi tra loro: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}I jet non si schiantano (frequentemente) nei piccoli aeroporti: {ORANGE} {STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Cambia tipo di paesaggio: {ORANGE} {STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Paesaggio 'temperato'
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Paesaggio 'sub-artico'
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Paesaggio 'sub-tropicale'
@@ -1824,6 +1823,8 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Sei stat
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Sei stato espulso dalla partita
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}I trucchi non sono ammessi su questo server
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Stavano venendo inviati troppi comandi al server
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Si è impiegato troppo tempo ad inserire la password
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Il computer ha impiegato troppo tempo ad entrare nella partita
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :errore generale
@@ -2483,6 +2484,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Changelo
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licenza
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Imposta parametri
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Mostra parametri
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Alterna tavolozze
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Alterna la tavolozza colori utilizzata dal NewGRF selezionato.{}Utilizzare questa impostazione se la grafica di questo NewGRF durante il gioco appare rosa.
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Applica modifiche
@@ -2697,6 +2699,29 @@ STR_GOALS_NONE                                                  :{ORANGE}- Nessu
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Obiettivi della compagnia:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Fare clic su un obiettivo per centrare la visuale principale sull'industria, città o riquadro. CTRL+clic mostra l'industria/città/riquadro in una mini visuale
 
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Domanda
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Annulla
+STR_GOAL_QUESTION_BUTTON_OK                                     :OK
+STR_GOAL_QUESTION_BUTTON_NO                                     :No
+STR_GOAL_QUESTION_BUTTON_YES                                    :Sì
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Rifiuta
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Accetta
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Ignora
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Riprova
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Precedente
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Successivo
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Termina
+STR_GOAL_QUESTION_BUTTON_START                                  :Inizia
+STR_GOAL_QUESTION_BUTTON_GO                                     :Vai
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Continua
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Ricomincia
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Rimanda
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Rinuncia
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Chiudi
+
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Sussidi
 STR_SUBSIDIES_OFFERED_TITLE                                     :{BLACK}Sussidi offerti per la realizzazione di servizi:
@@ -2835,7 +2860,7 @@ STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP                         :{BLACK}Cambia i
 STR_COMPANY_VIEW_BUY_SHARE_BUTTON                               :{BLACK}Compra il 25% delle azioni
 STR_COMPANY_VIEW_SELL_SHARE_BUTTON                              :{BLACK}Vendi il 25% delle azioni
 STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Compra una quota del 25% di questa compagnia. MAIUSC+clic mostra il costo stimato senza comprare azioni
-STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Vende una quota pari al 25% di questa compagnia. MAIUSC+clic mostra il costo stimato senza vendere azioni
+STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Vende una quota pari al 25% di questa compagnia. MAIUSC+clic mostra l'incasso stimato senza vendere azioni
 
 STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Nome della compagnia
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Nome del presidente
@@ -3514,7 +3539,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Script d
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Visualizza il log degli script di gioco
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Impossibile trovare una IA adatta da caricare.{}La IA caricata è solo un abbozzo e resterà semplicemente passiva.{}È possibile scaricare numerose IA tramite il sistema 'Contenuti online'
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Una delle IA in funzione è andata in crash. Si prega di inviare una segnalazione all'autore della IA con uno screenshot della finestra Debug IA
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Uno degli script in funzione è andato in crash. Si prega di inviare una segnalazione all'autore dello script con uno screenshot della finestra Debug IA / GameScript
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}La finestra di debug IA / GameScript è disponibile soltanto per il server
 
 # AI configuration window

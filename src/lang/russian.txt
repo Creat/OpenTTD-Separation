@@ -994,7 +994,7 @@ STR_NEWS_SERVICE_SUBSIDY_AWARDED_DOUBLE                         :{BIG_FONT}{BLAC
 STR_NEWS_SERVICE_SUBSIDY_AWARDED_TRIPLE                         :{BIG_FONT}{BLACK}Компания «{STRING}» получает субсидию!{}{}Перевозка {STRING.gen} по маршруту {STRING} - {STRING} будет оплачиваться в тройном размере в течение года!
 STR_NEWS_SERVICE_SUBSIDY_AWARDED_QUADRUPLE                      :{BIG_FONT}{BLACK}Компания «{STRING}» получает субсидию!{}{}Перевозка {STRING.gen} по маршруту {STRING} - {STRING} будет оплачиваться в четырёхкратном размере в течение года!
 
-STR_NEWS_ROAD_REBUILDING                                        :{BIG_FONT}{BLACK}Хаос на дорогах города{NBSP}{TOWN}!{}{}Реконструкция дорог, профинансированная {STRING}, на 6 месяцев парализовала работу автотранспорта!
+STR_NEWS_ROAD_REBUILDING                                        :{BIG_FONT}{BLACK}Хаос на дорогах города{NBSP}{TOWN}!{}{}Профинансированная {STRING} реконструкция дорог на 6 месяцев парализовала работу автотранспорта!
 
 # Extra view window
 STR_EXTRA_VIEW_PORT_TITLE                                       :{WHITE}Окно просмотра {COMMA}
@@ -1621,7 +1621,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Игр�
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Волшебный динамит (снос ВСЕГО): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Туннели могут пересекаться: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Большие самолёты реже разбиваются в малых аэропортах: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Сменить климат на: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Умеренный ландшафт
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Субарктический ландшафт
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Субтропический ландшафт
@@ -1956,6 +1955,8 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Вас �
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Вас выкинули из игры
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Чит-коды не разрешены на этом сервере
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Вы посылали на сервер слишком много команд
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Вы не успели ввести пароль
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Ваш компьютер не успел подключиться
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :общая ошибка
@@ -2639,6 +2640,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Спис
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Лицензия
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Параметры
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Показать параметры
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Переключить палитру
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Переключить палитру для выбраного NewGRF файла.{}Используйте переключение, если графика отрисовывается розовым цветом.
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Применить изменения
@@ -2852,6 +2854,29 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 STR_GOALS_NONE                                                  :{ORANGE}- Нет -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Задачи компании:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Щёлкните по задаче, чтобы показать предприятие/город/клетку. Ctrl+щелчок показывает в новом окне.
+
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Вопрос
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Отменить
+STR_GOAL_QUESTION_BUTTON_OK                                     :Ok
+STR_GOAL_QUESTION_BUTTON_NO                                     :Нет
+STR_GOAL_QUESTION_BUTTON_YES                                    :Да
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Отклонить
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Принять
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Пропустить
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Повторить
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Назад
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Далее
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Стоп
+STR_GOAL_QUESTION_BUTTON_START                                  :Пуск
+STR_GOAL_QUESTION_BUTTON_GO                                     :Начать
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Продолжить
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Перезапустить
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Отсрочить
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Сдаться
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Закрыть
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Субсидии
@@ -3680,7 +3705,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Игро
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Показать журнал работы игрового скрипта
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Не найдено подходящих модулей ИИ, поэтому конкуренты ничего делать не будут.{}Вы можете скачать модули ИИ через систему онлайн-контента.
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Один из запущенных ИИ выполнил недопустимую операцию и был закрыт. Пожалуйста, сообщите об этом автору ИИ, приложив скриншот окна отладки.
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Один из запущенных ИИ / скриптов завершил свою работу аварийно. Пожалуйста, сообщите об этом автору скрипта, приложив снимок окна отладки.
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Окно отладки ИИ / скрипта доступно только для сервера
 
 # AI configuration window

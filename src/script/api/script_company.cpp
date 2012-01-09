@@ -12,7 +12,6 @@
 #include "../../stdafx.h"
 #include "script_company.hpp"
 #include "script_error.hpp"
-#include "../../command_func.h"
 #include "../../company_func.h"
 #include "../../company_base.h"
 #include "../../company_manager_face.h"
@@ -56,12 +55,8 @@
 	company = ResolveCompanyID(company);
 	if (company == COMPANY_INVALID) return NULL;
 
-	static const int len = 64;
-	char *company_name = MallocT<char>(len);
-
 	::SetDParam(0, company);
-	::GetString(company_name, STR_COMPANY_NAME, &company_name[len - 1]);
-	return company_name;
+	return GetString(STR_COMPANY_NAME);
 }
 
 /* static */ bool ScriptCompany::SetPresidentName(Text *name)

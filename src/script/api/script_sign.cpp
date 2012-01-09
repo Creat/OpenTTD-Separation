@@ -13,8 +13,6 @@
 #include "script_sign.hpp"
 #include "table/strings.h"
 #include "../script_instance.hpp"
-#include "../../command_func.h"
-#include "../../core/alloc_func.hpp"
 #include "../../signs_base.h"
 #include "../../string_func.h"
 #include "../../strings_func.h"
@@ -50,13 +48,8 @@
 {
 	if (!IsValidSign(sign_id)) return NULL;
 
-	static const int len = 64;
-	char *sign_name = MallocT<char>(len);
-
 	::SetDParam(0, sign_id);
-	::GetString(sign_name, STR_SIGN_NAME, &sign_name[len - 1]);
-
-	return sign_name;
+	return GetString(STR_SIGN_NAME);
 }
 
 /* static */ TileIndex ScriptSign::GetLocation(SignID sign_id)

@@ -14,7 +14,6 @@
 #include "../error.h"
 #include "../gui.h"
 #include "../querystring_gui.h"
-#include "../company_func.h"
 #include "../company_base.h"
 #include "../company_gui.h"
 #include "../strings_func.h"
@@ -24,7 +23,6 @@
 #include "../network/network.h"
 #include "../settings_func.h"
 #include "../network/network_content.h"
-#include "../core/backup_type.hpp"
 
 #include "ai.hpp"
 #include "../script/api/script_log.hpp"
@@ -36,7 +34,6 @@
 #include "../game/game_info.hpp"
 #include "../game/game_instance.hpp"
 
-#include "../widgets/ai_widget.h"
 
 #include "table/strings.h"
 
@@ -387,7 +384,7 @@ struct AISettingsWindow : public Window {
 			}
 
 			if ((config_item.flags & SCRIPTCONFIG_BOOLEAN) != 0) {
-				DrawFrameRect(buttons_left, y  + 2, buttons_left + 19, y + 10, (current_value != 0) ? COLOUR_GREEN : COLOUR_RED, (current_value != 0) ? FR_LOWERED : FR_NONE);
+				DrawBoolButton(buttons_left, y + 2, current_value != 0, editable);
 				SetDParam(idx++, current_value == 0 ? STR_CONFIG_SETTING_OFF : STR_CONFIG_SETTING_ON);
 			} else {
 				DrawArrowButtons(buttons_left, y + 2, COLOUR_YELLOW, (this->clicked_button == i) ? 1 + (this->clicked_increase != rtl) : 0, editable && current_value > config_item.min_value, editable && current_value < config_item.max_value);

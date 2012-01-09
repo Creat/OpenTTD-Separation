@@ -16,10 +16,6 @@
 #include "script_map.hpp"
 #include "script_town.hpp"
 #include "../script_instance.hpp"
-#include "../../command_type.h"
-#include "../../settings_type.h"
-#include "../../openttd.h"
-#include "../../network/network.h"
 #include "../../goal_base.h"
 #include "../../string_func.h"
 
@@ -32,6 +28,7 @@
 {
 	CCountedPtr<Text> counter(goal);
 
+	EnforcePrecondition(GOAL_INVALID, ScriptObject::GetCompany() == OWNER_DEITY);
 	EnforcePrecondition(GOAL_INVALID, goal != NULL);
 	EnforcePrecondition(GOAL_INVALID, !StrEmpty(goal->GetEncodedText()));
 	EnforcePrecondition(GOAL_INVALID, company == ScriptCompany::COMPANY_INVALID || ScriptCompany::ResolveCompanyID(company) != ScriptCompany::COMPANY_INVALID);
@@ -48,7 +45,31 @@
 
 /* static */ bool ScriptGoal::Remove(GoalID goal_id)
 {
+	EnforcePrecondition(false, ScriptObject::GetCompany() == OWNER_DEITY);
 	EnforcePrecondition(false, IsValidGoal(goal_id));
 
 	return ScriptObject::DoCommand(0, goal_id, 0, CMD_REMOVE_GOAL);
+}
+
+/* static */ bool ScriptGoal::Question(uint16 uniqueid, ScriptCompany::CompanyID company, Text *question, int buttons)
+{
+	CCountedPtr<Text> counter(question);
+
+	EnforcePrecondition(false, ScriptObject::GetCompany() == OWNER_DEITY);
+	EnforcePrecondition(false, question != NULL);
+	EnforcePrecondition(false, !StrEmpty(question->GetEncodedText()));
+	EnforcePrecondition(false, company == ScriptCompany::COMPANY_INVALID || ScriptCompany::ResolveCompanyID(company) != ScriptCompany::COMPANY_INVALID);
+	EnforcePrecondition(false, CountBits(buttons) >= 1 && CountBits(buttons) <= 3);
+
+	uint8 c = company;
+	if (company == ScriptCompany::COMPANY_INVALID) c = INVALID_COMPANY;
+
+	return ScriptObject::DoCommand(0, uniqueid | (c << 16), buttons, CMD_GOAL_QUESTION, question->GetEncodedText());
+}
+
+/* static */ bool ScriptGoal::CloseQuestion(uint16 uniqueid)
+{
+	EnforcePrecondition(false, ScriptObject::GetCompany() == OWNER_DEITY);
+
+	return ScriptObject::DoCommand(0, uniqueid, 0, CMD_GOAL_QUESTION_ANSWER);
 }

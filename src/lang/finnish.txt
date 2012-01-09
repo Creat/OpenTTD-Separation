@@ -446,7 +446,8 @@ STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Konsoli
 STR_ABOUT_MENU_AI_DEBUG                                         :Tekoälyn / Peliskriptin virheenjäljitys
 STR_ABOUT_MENU_SCREENSHOT                                       :Kuvakaappaus
-STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Lähennetty kuvakaappaus
+STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Täysin lähennetty kuvakaappaus
+STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Kuvakaappaus oletuslähennystasolla
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Koko kartan kuvakaappaus
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Tietoja 'OpenTTD':stä
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Sprite-kohdistaja
@@ -1464,7 +1465,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Hallinn
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Taikapuskutraktori (poista teollisuutta, liikuttamattomia kohteita): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Tunnelit voivat mennä ristiin: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Suihkukoneet eivät syöksy (usein) pienille lentokentille: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Vaihda ilmastoa: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :lauhkea maasto
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :pohjoinen maasto
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :subtrooppinen maasto
@@ -1799,6 +1799,8 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Sinut on
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Sinut potkittiin pihalle palvelimelta
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Huijaaminen ei ole sallittua tällä palvelimella
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Lähetit liian monta komentoa palvelimelle
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Käytit liian paljon aikaa salasanan syöttämiseen
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Tietokoneesi käytti liian paljon aikaa liittymiseen
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :yleinen virhe
@@ -2454,6 +2456,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Muutoslo
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Lisenssi
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Aseta parametrit
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Näytä parametrit
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Käytä eri palettia
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Käytä valitun NewGRF:n kanssa eri palettia.{}Tee näin, jos tämän NewGRF:n grafiikat näkyvät pelissä vaaleanpunaisina.
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Ota käyttöön
@@ -2668,6 +2671,29 @@ STR_GOALS_NONE                                                  :{ORANGE}- Ei mi
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Yhtiön tavoitteet:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Klikkaa tavoitetta keskittääksesi päänäkymän teollisuuteen/kaupunkiin/ruutuun. Ctrl+Klik avaa uuden näkymän teollisuuden/kaupungin/ruudun sijaintiin
 
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Kysymys
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Peruuta
+STR_GOAL_QUESTION_BUTTON_OK                                     :OK
+STR_GOAL_QUESTION_BUTTON_NO                                     :Ei
+STR_GOAL_QUESTION_BUTTON_YES                                    :Kyllä
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Kieltäydy
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Hyväksy
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Jätä huomiotta
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Yritä uudelleen
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Edellinen
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Seuraava
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Pysäytä
+STR_GOAL_QUESTION_BUTTON_START                                  :Aloita
+STR_GOAL_QUESTION_BUTTON_GO                                     :Mene
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Jatka
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Aloita uudelleen
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Lykkää myöhemmäksi
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Luovuta
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Sulje
+
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Tuet
 STR_SUBSIDIES_OFFERED_TITLE                                     :{BLACK}Tarjotut tuet:
@@ -2778,11 +2804,11 @@ STR_COMPANY_VIEW_VEHICLES_NONE                                  :{WHITE}Ei mitä
 STR_COMPANY_VIEW_COMPANY_VALUE                                  :{GOLD}Yhtiön arvo: {WHITE}{CURRENCY_LONG}
 STR_COMPANY_VIEW_SHARES_OWNED_BY                                :{WHITE}({COMMA}{NBSP}%:n omistus: {COMPANY})
 STR_COMPANY_VIEW_INFRASTRUCTURE                                 :{GOLD}Infrastruktuuri:
-STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} rautatiepalaa
-STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} teiden palasta
-STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} vesiruutua
-STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} asemaruutua
-STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT                         :{WHITE}{COMMA} lentokenttää
+STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} rautatiepala{P "" a}
+STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} tiepala{P "" a}
+STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} vesiruutu{P "" a}
+STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} asemaruutu{P "" a}
+STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT                         :{WHITE}{COMMA} lentokenttä{P "" ä}
 STR_COMPANY_VIEW_INFRASTRUCTURE_NONE                            :{WHITE}Ei mitään
 
 STR_COMPANY_VIEW_BUILD_HQ_BUTTON                                :{BLACK}Rakenna päämaja
@@ -3485,7 +3511,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Peliskri
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Tarkista peliskriptin loki
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Sopivaa tekoälyä ei löydetty.{}Tämä tekoäly ei tee mitään.{}Voit ladata tekoälyjä 'Online-sisältö' järjestelmällä
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Yksi käynnissä olevista tekoälyistä kaatui. Ilmoita tästä tekoälyn kehittäjälle littäen mukaan kuvankaappaus Tekoälyn virheenjäljitys -ikkunasta
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Yksi käynnissä olevista skripteistä kaatui. Ilmoita tästä skriptin kehittäjälle littäen mukaan kuvankaappaus Tekoälyn/Skriptin virheenjäljitys -ikkunasta
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Tekoälyn / Peliskriptin virheenjäljitysikkuna on vain palvelimen käytettävissä
 
 # AI configuration window

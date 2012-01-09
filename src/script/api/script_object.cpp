@@ -15,14 +15,13 @@
 #include "../../company_func.h"
 #include "../../company_base.h"
 #include "../../network/network.h"
-#include "../../tunnelbridge.h"
 #include "../../genworld.h"
-#include "../../goal_type.h"
+#include "../../string_func.h"
+#include "../../strings_func.h"
 
 #include "../script_storage.hpp"
 #include "../script_instance.hpp"
 #include "../script_fatalerror.hpp"
-#include "../script_suspend.hpp"
 #include "script_error.hpp"
 
 /**
@@ -234,6 +233,14 @@ ScriptObject::ActiveInstance::~ActiveInstance()
 /* static */ void *&ScriptObject::GetLogPointer()
 {
 	return GetStorage()->log_data;
+}
+
+/* static */ char *ScriptObject::GetString(StringID string)
+{
+	char buffer[64];
+	::GetString(buffer, string, lastof(buffer));
+	::str_validate(buffer, lastof(buffer), SVS_NONE);
+	return ::strdup(buffer);
 }
 
 /* static */ void ScriptObject::SetCallbackVariable(int index, int value)

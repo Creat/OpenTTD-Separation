@@ -291,6 +291,7 @@ STR_SORT_BY_RANGE                                               :வரையற
 
 # Tooltips for the main toolbar
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}இடை நிறுத்து
+STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}அதி வேகமாக விளையாடு
 STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}விருப்பத் தேர்வு
 STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}விளையாட்டை சேமி,கைவிடு, வெளியேறு
 STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}வரைபடத்தை காட்டு
@@ -1390,6 +1391,10 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 STR_GOALS_NONE                                                  :{ORANGE}- ஏதுமில்லை -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}நிறுவனத்தின் குறிக்கோள்கள்:
 
+# Goal question window
+
+### Start of Goal Question button list
+
 # Subsidies window
 
 # Station list window
@@ -1734,13 +1739,16 @@ STR_ERROR_CAN_T_BUILD_ON_RIVER                                  :{WHITE}... ஆ�
 # Tree related errors
 
 # Bridge related errors
+STR_ERROR_BRIDGE_TOO_LONG                                       :{WHITE}... பாலம் மிக நீளமாக உள்ளது
 
 # Tunnel related errors
 STR_ERROR_TUNNEL_TOO_LONG                                       :{WHITE}... சுரங்கம் வெகு நீளம்
 
 # Object related errors
+STR_ERROR_YOU_ALREADY_OWN_IT                                    :{WHITE}... இது ஏற்கனவே உங்களிடம் உள்ளது!
 
 # Group related errors
+STR_ERROR_GROUP_CAN_T_CREATE                                    :{WHITE}குழுவை உருவாக்க முடியாது...
 
 # Generic vehicle errors
 
@@ -1770,36 +1778,221 @@ STR_ERROR_TRAIN_START_NO_POWER                                  :இரயில
 
 ##id 0x2000
 # Town building names
+STR_TOWN_BUILDING_NAME_PARK_1                                   :பூங்கா
+STR_TOWN_BUILDING_NAME_SHOPS_AND_OFFICES_1                      :கடைகள் மற்றும் அலுவலகங்கள்
+STR_TOWN_BUILDING_NAME_STADIUM_1                                :மைதானம்
+STR_TOWN_BUILDING_NAME_OLD_HOUSES_1                             :பழைய வீடுகள்
+STR_TOWN_BUILDING_NAME_HOUSES_1                                 :வீடுகள்
+STR_TOWN_BUILDING_NAME_FLATS_1                                  :பிளாட்டுகள்
+STR_TOWN_BUILDING_NAME_SHOPS_AND_OFFICES_2                      :கடைகள் மற்றும் அலுவலகங்கள்
+STR_TOWN_BUILDING_NAME_SHOPS_AND_OFFICES_3                      :கடைகள் மற்றும் அலுவலகங்கள்
+STR_TOWN_BUILDING_NAME_THEATER_1                                :திரையரங்கம்
+STR_TOWN_BUILDING_NAME_STADIUM_2                                :மைதானம்
+STR_TOWN_BUILDING_NAME_OFFICES_1                                :அலுவலகங்கள்
+STR_TOWN_BUILDING_NAME_HOUSES_2                                 :வீடுகள்
+STR_TOWN_BUILDING_NAME_CINEMA_1                                 :சினிமா
+STR_TOWN_BUILDING_NAME_IGLOO_1                                  :இக்லூ
 
 ##id 0x4800
 # industry names
+STR_INDUSTRY_NAME_COAL_MINE                                     :நிலக்கரி சுரங்கம்
+STR_INDUSTRY_NAME_FOREST                                        :காடு
+STR_INDUSTRY_NAME_OIL_REFINERY                                  :எண்ணெய் சுத்திகரிப்பு நிலையம்
+STR_INDUSTRY_NAME_FACTORY                                       :தொழிற்சாலை
+STR_INDUSTRY_NAME_STEEL_MILL                                    :எஃகு மில்
+STR_INDUSTRY_NAME_FARM                                          :பண்ணை
+STR_INDUSTRY_NAME_COPPER_ORE_MINE                               :செப்புத் தாது சுரங்கம்
+STR_INDUSTRY_NAME_OIL_WELLS                                     :எண்ணெய்க் கிணறுகள்
+STR_INDUSTRY_NAME_BANK                                          :வங்கி
+STR_INDUSTRY_NAME_PAPER_MILL                                    :காகித மில்
+STR_INDUSTRY_NAME_GOLD_MINE                                     :தங்கச் சுரங்கம்
+STR_INDUSTRY_NAME_BANK_TROPIC_ARCTIC                            :வங்கி
+STR_INDUSTRY_NAME_DIAMOND_MINE                                  :வைரச் சுரங்கம்
+STR_INDUSTRY_NAME_IRON_ORE_MINE                                 :இரும்புத் தாது சுரங்கம்
+STR_INDUSTRY_NAME_WATER_TOWER                                   :தண்ணீர்த் தொட்டி
+STR_INDUSTRY_NAME_FACTORY_2                                     :தொழிற்சாலை
+STR_INDUSTRY_NAME_FARM_2                                        :பண்ணை
+STR_INDUSTRY_NAME_COTTON_CANDY_FOREST                           :பஞ்சு மிட்டாய் காடு
+STR_INDUSTRY_NAME_CANDY_FACTORY                                 :இனிப்பு தொழிற்சாலை
+STR_INDUSTRY_NAME_BATTERY_FARM                                  :மின்கல பண்ணை
+STR_INDUSTRY_NAME_COLA_WELLS                                    :கோலா கிணறுகள்
+STR_INDUSTRY_NAME_TOY_SHOP                                      :விளையாட்டுப் பொருள் கடை
+STR_INDUSTRY_NAME_TOY_FACTORY                                   :விளையாட்டுப் பொருள் தொழிற்சாலை
+STR_INDUSTRY_NAME_SUGAR_MINE                                    :சர்க்கரை சுரங்கம்
 
 ############ WARNING, using range 0x6000 for strings that are stored in the savegame
 ############ These strings may never get a new id, or savegames will break!
 ##id 0x6000
 STR_SV_EMPTY                                                    :
+STR_SV_UNNAMED                                                  :பெயரிடாதது
+STR_SV_TRAIN_NAME                                               :இரயில் {COMMA}
+STR_SV_ROAD_VEHICLE_NAME                                        :சாலை வாகனம் {COMMA}
+STR_SV_SHIP_NAME                                                :கப்பல் {COMMA}
+STR_SV_AIRCRAFT_NAME                                            :விமானம் {COMMA}
 
 STR_SV_STNAME                                                   :{STRING}
+STR_SV_STNAME_NORTH                                             :{STRING} வடக்கு
+STR_SV_STNAME_SOUTH                                             :{STRING} தெற்கு
+STR_SV_STNAME_EAST                                              :{STRING} கிழக்கு
+STR_SV_STNAME_WEST                                              :{STRING} மேற்கு
+STR_SV_STNAME_CENTRAL                                           :{STRING} நடு
+STR_SV_STNAME_TRANSFER                                          :{STRING} மாற்றல்
+STR_SV_STNAME_WOODS                                             :{STRING} காடு
+STR_SV_STNAME_AIRPORT                                           :{STRING} விமான நிலையம்
+STR_SV_STNAME_OILFIELD                                          :{STRING} எண்ணெய் வயல்
+STR_SV_STNAME_MINES                                             :{STRING} சுரங்கங்கள்
+STR_SV_STNAME_DOCKS                                             :{STRING} துறைமுக மேடைகள்
+STR_SV_STNAME_BUOY                                              :{STRING}
+STR_SV_STNAME_WAYPOINT                                          :{STRING}
 ##id 0x6020
 STR_SV_STNAME_BRANCH                                            :{STRING} பிரிவு
+STR_SV_STNAME_UPPER                                             :மேல் {STRING}
+STR_SV_STNAME_LOWER                                             :கீழ் {STRING}
 STR_SV_STNAME_FOREST                                            :{STRING} காடு
 STR_SV_STNAME_FALLBACK                                          :{STRING} நிலையம் #{NUM}
 ############ end of savegame specific region!
 
 ##id 0x8000
 # Vehicle names
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_KIRBY_PAUL_TANK_STEAM        :கிர்பி பால் டேன்க் (நீராவி)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_MJS_250_DIESEL               :MJS 250 (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_PLODDYPHUT_CHOO_CHOO         :பிலாடிபுட் சூ-சூ
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_POWERNAUT_CHOO_CHOO          :பவர்னாட் சூ-சூ
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_MIGHTYMOVER_CHOO_CHOO        :மைட்டிமூவர் சூ-சூ
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_PLODDYPHUT_DIESEL            :பிலாடிபுட் டீசல்
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_POWERNAUT_DIESEL             :பவர்னாட் டீசல்
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_WILLS_2_8_0_STEAM            :வில்ஸ் 2-8-0 (நீராவி)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_CHANEY_JUBILEE_STEAM         :சனே 'ஜூபிலி' (நீராவி)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_GINZU_A4_STEAM               :கின்சு 'அ4' (நீராவி)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_SH_8P_STEAM                  :SH '8P' (நீராவி)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_MANLEY_MOREL_DMU_DIESEL      :மேன்லீ-மாரேல் DMU (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_DASH_DIESEL                  :'டாஷ்' (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_SH_HENDRY_25_DIESEL          :SH/ஹென்றி '25' (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_UU_37_DIESEL                 :UU '37' (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_FLOSS_47_DIESEL              :பிலாஸ் '47' (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_CS_4000_DIESEL               :CS 4000 (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_CS_2400_DIESEL               :CS 2400 (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_CENTENNIAL_DIESEL            :சென்ட்டென்னியல் (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_KELLING_3100_DIESEL          :கெல்லிங் 3100 (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_TURNER_TURBO_DIESEL          :டர்னர் டர்போ (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_MJS_1000_DIESEL              :MJS 1000 (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_SH_125_DIESEL                :SH '125' (டீசல்)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_SH_30_ELECTRIC               :SH '30' (மின்சார)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_SH_40_ELECTRIC               :SH '40' (மின்சார)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_T_I_M_ELECTRIC               :'T.I.M.' (மின்சார)
+STR_VEHICLE_NAME_TRAIN_ENGINE_RAIL_ASIASTAR_ELECTRIC            :'ஆசிய நட்சத்திரம்' (மின்சார)
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_PASSENGER_CAR                 :பயணிகள் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_MAIL_VAN                      :அஞ்சல் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_COAL_CAR                      :நிலக்கரி பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_OIL_TANKER                    :எண்ணெய் வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_LIVESTOCK_VAN                 :பண்ணை பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_GOODS_VAN                     :சரக்கு பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_GRAIN_HOPPER                  :தானிய பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_WOOD_TRUCK                    :மர பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_IRON_ORE_HOPPER               :இரும்புத் தாது பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_STEEL_TRUCK                   :எஃகு பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_ARMORED_VAN                   :உறுதிபடுத்தப்பட்ட பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_FOOD_VAN                      :உணவுப் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_PAPER_TRUCK                   :காகித பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_COPPER_ORE_HOPPER             :செப்பு தாது பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_WATER_TANKER                  :தண்ணீர் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_FRUIT_TRUCK                   :பழ பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_RUBBER_TRUCK                  :ரப்பர் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_SUGAR_TRUCK                   :சர்க்கரை பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_COTTON_CANDY_HOPPER           :பஞ்சு மிட்டாய் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_BUBBLE_VAN                    :குமிழிகள் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_CANDY_VAN                     :இனிப்புப் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_TOY_VAN                       :விளையாட்டுப் பொருள் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_BATTERY_TRUCK                 :மின்கல பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_RAIL_PLASTIC_TRUCK                 :பிளாஸ்டிக் பெட்டி
+STR_VEHICLE_NAME_TRAIN_ENGINE_MONORAIL_X2001_ELECTRIC           :'X2001' (மின்சார)
+STR_VEHICLE_NAME_TRAIN_ENGINE_MONORAIL_MILLENNIUM_Z1_ELECTRIC   :'மில்லேனியம் Z1' (மின்சார)
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_PASSENGER_CAR             :பயணிகள் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_MAIL_VAN                  :அஞ்சல் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_COAL_CAR                  :நிலக்கரி பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_OIL_TANKER                :எண்ணெய் வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_LIVESTOCK_VAN             :பண்ணை பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_GOODS_VAN                 :சரக்குப் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_GRAIN_HOPPER              :தானிய பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_WOOD_TRUCK                :மர பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_IRON_ORE_HOPPER           :இரும்புத் தாது பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_STEEL_TRUCK               :எஃகு பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_ARMORED_VAN               :உறுதிபடுத்தப்பட்ட பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_FOOD_VAN                  :உணவு பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_PAPER_TRUCK               :காகித பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_COPPER_ORE_HOPPER         :செப்புத் தாது பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_WATER_TANKER              :தண்ணீர் வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_FRUIT_TRUCK               :பழ வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_RUBBER_TRUCK              :ரப்பர் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_SUGAR_TRUCK               :சர்க்கரைப் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_COTTON_CANDY_HOPPER       :பஞ்சு மிட்டாய் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_BUBBLE_VAN                :குமிழி வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_CANDY_VAN                 :இனிப்பு வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_BATTERY_TRUCK             :மின்கல வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MONORAIL_PLASTIC_TRUCK             :பிளாஸ்டிக் பெட்டி
 STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_PASSENGER_CAR               :பயணிகள் பெட்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_MAIL_VAN                    :அஞ்சல் வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_COAL_CAR                    :நிலக்கரி வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_OIL_TANKER                  :எண்ணெய் லாரி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_LIVESTOCK_VAN               :பண்ணை வண்டி
 STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_GOODS_VAN                   :சரக்கு வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_GRAIN_HOPPER                :தானிய வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_WOOD_TRUCK                  :மர வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_IRON_ORE_HOPPER             :இரும்புத் தாது வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_STEEL_TRUCK                 :எஃகு வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_ARMORED_VAN                 :உறுதிப்படுத்தப்பட்ட வண்டி
 STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_FOOD_VAN                    :உணவு வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_PAPER_TRUCK                 :காகித லாரி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_COPPER_ORE_HOPPER           :செம்புத் தாது வண்டி
 STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_WATER_TANKER                :தண்ணீர் லாரி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_FRUIT_TRUCK                 :பழ வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_RUBBER_TRUCK                :ரப்பர் வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_SUGAR_TRUCK                 :சர்க்கரை வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_COTTON_CANDY_HOPPER         :பஞ்சு மிட்டாய் வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_BUBBLE_VAN                  :குமிழி வாகனம்
 STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_CANDY_VAN                   :இனிப்பு வாகனம்
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_BATTERY_TRUCK               :மின்கல வண்டி
+STR_VEHICLE_NAME_TRAIN_WAGON_MAGLEV_PLASTIC_TRUCK               :பிளாஸ்டிக் லாரி
 STR_VEHICLE_NAME_ROAD_VEHICLE_MPS_REGAL_BUS                     :MPS ரீகல் பேருந்து
 STR_VEHICLE_NAME_ROAD_VEHICLE_HEREFORD_LEOPARD_BUS              :ஹியர்போர்ட் லியோபார்ட் பேருந்து
 STR_VEHICLE_NAME_ROAD_VEHICLE_FOSTER_BUS                        :ப்பாஸ்டர் பேருந்து
 STR_VEHICLE_NAME_ROAD_VEHICLE_FOSTER_MKII_SUPERBUS              :பாஸ்டர் MkII பேருந்து
+STR_VEHICLE_NAME_ROAD_VEHICLE_PLODDYPHUT_MKI_BUS                :பிலோடிபுட் MkI பேருந்து
+STR_VEHICLE_NAME_ROAD_VEHICLE_PLODDYPHUT_MKII_BUS               :பிலோடிபுட் MkII பேருந்து
+STR_VEHICLE_NAME_ROAD_VEHICLE_PLODDYPHUT_MKIII_BUS              :பிலோடிபுட் MkIII பேருந்து
+STR_VEHICLE_NAME_ROAD_VEHICLE_BALOGH_COAL_TRUCK                 :பாலாக்ஃ நிலக்கரி வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_UHL_COAL_TRUCK                    :Uhl நிலக்கரி வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_DW_COAL_TRUCK                     :DW நிலக்கரி வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_MPS_MAIL_TRUCK                    :MPS அஞ்சல் வாகனம்
+STR_VEHICLE_NAME_ROAD_VEHICLE_REYNARD_MAIL_TRUCK                :ரேய்னார்டு அஞ்சல் வாகனம்
+STR_VEHICLE_NAME_ROAD_VEHICLE_PERRY_MAIL_TRUCK                  :பெர்ரி அஞ்சல் வாகனம்
+STR_VEHICLE_NAME_ROAD_VEHICLE_MIGHTYMOVER_MAIL_TRUCK            :மைட்டிமூவர் அஞ்சல் வாகனம்
+STR_VEHICLE_NAME_ROAD_VEHICLE_POWERNAUGHT_MAIL_TRUCK            :பவர்நாட் அஞ்சல் வாகனம்
+STR_VEHICLE_NAME_ROAD_VEHICLE_WIZZOWOW_MAIL_TRUCK               :வீஸவொவ் அஞ்சல் வாகனம்
+STR_VEHICLE_NAME_ROAD_VEHICLE_WITCOMBE_OIL_TANKER               :விட்கோம்ப் எண்ணெய் லாரி
+STR_VEHICLE_NAME_ROAD_VEHICLE_FOSTER_OIL_TANKER                 :பாஸ்டர் எண்ணெய் லாரி
+STR_VEHICLE_NAME_ROAD_VEHICLE_PERRY_OIL_TANKER                  :பெர்ரி எண்ணெய் லாரி
+STR_VEHICLE_NAME_ROAD_VEHICLE_TALBOTT_LIVESTOCK_VAN             :தால்பாட் பண்ணை வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_UHL_LIVESTOCK_VAN                 :Uhl பண்ணை வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_FOSTER_LIVESTOCK_VAN              :பாஸ்டர் பண்ணை வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_BALOGH_GOODS_TRUCK                :பாலாக்ஃ சரக்கு வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_CRAIGHEAD_GOODS_TRUCK             :க்ரேய்க் சரக்கு வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_GOSS_GOODS_TRUCK                  :கொஸ் சரக்கு வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_HEREFORD_GRAIN_TRUCK              :ஹியர்போர்ட் தானிய வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_THOMAS_GRAIN_TRUCK                :தாமஸ் தானிய வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_GOSS_GRAIN_TRUCK                  :கொஸ் தானிய வண்டி
+STR_VEHICLE_NAME_ROAD_VEHICLE_WITCOMBE_WOOD_TRUCK               :விட்கோம்ப் மர ட்ரக்
+STR_VEHICLE_NAME_ROAD_VEHICLE_FOSTER_WOOD_TRUCK                 :பாஸ்டர் மர ட்ரக்
+STR_VEHICLE_NAME_ROAD_VEHICLE_MORELAND_WOOD_TRUCK               :மோர்லாந்து மர ட்ரக்
+STR_VEHICLE_NAME_ROAD_VEHICLE_MPS_IRON_ORE_TRUCK                :MPS இரும்புத் தாது ட்ரக்
+STR_VEHICLE_NAME_ROAD_VEHICLE_UHL_IRON_ORE_TRUCK                :Uhl இரும்புத் தாது ட்ரக்
+STR_VEHICLE_NAME_ROAD_VEHICLE_CHIPPY_IRON_ORE_TRUCK             :சிப்பி இரும்புத் தாது ட்ரக்
 STR_VEHICLE_NAME_ROAD_VEHICLE_BALOGH_STEEL_TRUCK                :பாலாக்ஃ எஃகு லாரி
 STR_VEHICLE_NAME_ROAD_VEHICLE_UHL_STEEL_TRUCK                   :Uhl எஃகு லாரி
 STR_VEHICLE_NAME_ROAD_VEHICLE_KELLING_STEEL_TRUCK               :கெல்லிங் எஃகு பாரஊர்தி
+STR_VEHICLE_NAME_ROAD_VEHICLE_BALOGH_ARMORED_TRUCK              :பாலொகஃ உறுதிப்படுத்தப்பட்ட ட்ரக்
+STR_VEHICLE_NAME_ROAD_VEHICLE_UHL_ARMORED_TRUCK                 :Uhl உறுதிப்படுத்தப்பட்ட ட்ரக்
+STR_VEHICLE_NAME_ROAD_VEHICLE_FOSTER_ARMORED_TRUCK              :பாஸ்டர் உறுதிப்படுத்தப்பட்ட ட்ரக்
 STR_VEHICLE_NAME_ROAD_VEHICLE_FOSTER_FOOD_VAN                   :பாஸ்டர் உணவு வாகனம்
 STR_VEHICLE_NAME_ROAD_VEHICLE_PERRY_FOOD_VAN                    :பெர்ரி உணவு வாகனம்
 STR_VEHICLE_NAME_ROAD_VEHICLE_CHIPPY_FOOD_VAN                   :சிப்பி உணவு வாகனம்

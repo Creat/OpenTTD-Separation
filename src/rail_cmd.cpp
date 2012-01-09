@@ -21,7 +21,6 @@
 #include "autoslope.h"
 #include "water.h"
 #include "tunnelbridge_map.h"
-#include "window_func.h"
 #include "vehicle_func.h"
 #include "sound_func.h"
 #include "tunnelbridge.h"
@@ -100,6 +99,9 @@ RailType AllocateRailType(RailTypeLabel label)
 			/* Set up new rail type */
 			memcpy(rti, &_railtypes[RAILTYPE_RAIL], sizeof(*rti));
 			rti->label = label;
+			/* Clear alternate label list. Can't use Reset() here as that would free
+			 * the data pointer of RAILTYPE_RAIL and not our new rail type. */
+			new (&rti->alternate_labels) RailTypeLabelList;
 
 			/* Make us compatible with ourself. */
 			rti->powered_railtypes    = (RailTypes)(1 << rt);
@@ -1656,7 +1658,7 @@ CommandCost CmdConvertRail(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 	if (flags & DC_EXEC) {
 		/* Railtype changed, update trains as when entering different track */
 		for (Train **v = affected_trains.Begin(); v != affected_trains.End(); v++) {
-			(*v)->RailtypeChanged();
+			(*v)->ConsistChanged(true);
 		}
 	}
 

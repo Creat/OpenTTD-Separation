@@ -1464,7 +1464,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Điều
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Xe ủi thần kỳ (xúc văng nhà máy, vật không thể di chuyển): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Đường ngầm có thể vượt lẫn nhau : {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Máy bay phản lực sẽ không tai nạn (thường xuyên) ở các sân bay nhỏ: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Đổi thời tiết: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Địa hình vừa phải
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Địa hình giá lạnh
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Địa hình cận nhiệt đới
@@ -2667,6 +2666,15 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 STR_GOALS_NONE                                                  :{ORANGE}- Không -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Các mục tiêu của công ty:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Click vào mục tiêu để canh giữa cửa sổ lớn chính vào ô/đô thị/nhà máy tương ứng. Ctrl+Click để mở bằng các cửa sổ bổ sung tương ứng
+
+# Goal question window
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Tiếp tục
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Làm lại
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Hoãn lại
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Từ bỏ
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Đóng
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Trợ Cấp

@@ -17,9 +17,7 @@
 #include "network/network_type.h"
 #include "network/network.h"
 #include "genworld.h"
-#include "newgrf_storage.h"
 #include "strings_func.h"
-#include "gfx_func.h"
 #include "texteff.hpp"
 #include "town.h"
 #include "date_func.h"
@@ -152,6 +150,8 @@ CommandProc CmdCompanyCtrl;
 CommandProc CmdCustomNewsItem;
 CommandProc CmdCreateGoal;
 CommandProc CmdRemoveGoal;
+CommandProc CmdGoalQuestion;
+CommandProc CmdGoalQuestionAnswer;
 
 CommandProc CmdLevelLand;
 
@@ -291,6 +291,8 @@ static const Command _command_proc_table[] = {
 	DEF_CMD(CmdCustomNewsItem,          CMD_STR_CTRL | CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_CUSTOM_NEWS_ITEM
 	DEF_CMD(CmdCreateGoal,              CMD_STR_CTRL | CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_CREATE_GOAL
 	DEF_CMD(CmdRemoveGoal,                             CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_REMOVE_GOAL
+	DEF_CMD(CmdGoalQuestion,            CMD_STR_CTRL | CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_GOAL_QUESTION
+	DEF_CMD(CmdGoalQuestionAnswer,                     CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_GOAL_QUESTION_ANSWER
 
 	DEF_CMD(CmdLevelLand, CMD_ALL_TILES | CMD_NO_TEST | CMD_AUTO, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_LEVEL_LAND; test run might clear tiles multiple times, in execution that only happens once
 

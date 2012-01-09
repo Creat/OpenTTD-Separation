@@ -1466,7 +1466,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Spiele 
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Mächtigeres Abrisswerkzeug (entfernt Industrien und unbewegliche Objekte): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Tunnel dürfen sich kreuzen: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Düsenflugzeuge stürzen auf kleinen Flughäfen nicht häufiger ab: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Wechsle Klima: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Gemäßigt
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Subarktisch
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Subtropisch
@@ -1801,6 +1800,8 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Sie sind
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Sie wurden vom Server hinausgeworfen
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Mogeln ist auf diesem Server nicht erlaubt
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Es wurden zu viele Kommandos an den Server gesendet
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Zeit für die Eingabe des Passwortes wurde überschritten
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Dieser Computer brauchte zu lange, dem Spiel beizutreten
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :Allgemeiner Fehler
@@ -2456,6 +2457,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Änderun
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Lizenz
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Parameter setzen
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Zeige Parameter
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Farbpalette ändern
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Farbpalette des ausgewählten NewGRF ändern.{}Nutze dieses, wenn die Grafiken des NewGRF im Spiel pink dargestellt werden
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Übernehmen
@@ -2669,6 +2671,29 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 STR_GOALS_NONE                                                  :{ORANGE}- Keine -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Firmenspezifische Ziele:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Klick auf Ziel zentriert Hauptansicht auf Industrie/Stadt/Feld. Strg+Klick öffnet eine darauf zentrierte Zusatzansicht
+
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Frage
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Abbruch
+STR_GOAL_QUESTION_BUTTON_OK                                     :OK
+STR_GOAL_QUESTION_BUTTON_NO                                     :Nein
+STR_GOAL_QUESTION_BUTTON_YES                                    :Ja
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Ablehnen
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Akzeptieren
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Ignorieren
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Wiederholen
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Vorhergehendes
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Nächstes
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Aufhören
+STR_GOAL_QUESTION_BUTTON_START                                  :Start
+STR_GOAL_QUESTION_BUTTON_GO                                     :Weiter
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Fortfahren
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Neustart
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Verschieben
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Aufgeben
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Schließen
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Subventionen
@@ -3487,7 +3512,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Skript
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Überprüfe die Aufzeichnungen des Skripts
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Keine passende KI gefunden.{}Diese KI ist ein Platzhalter und wird nichts tun.{}KIs können im Hauptmenü als Erweiterung heruntergeladen werden
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Eine der laufenden KIs ist abgestürzt. Es ist nett, den Fehler dem Autor der KI mittels eines Screenshots vom KI-Debug-Fenster unter Angabe der OpenTTD und AI-Versionsnummer zu melden
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Eine der laufenden KIs oder Scripte ist abgestürzt. Es ist nett, den Fehler dem Autor der KI oder des Scripts mittels eines Screenshots vom Debug-Fenster unter Angabe der OpenTTD und KI- bzw. Script-Versionsnummer zu melden
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Debugfenster für KI oder Skripte ist nur auf dem Server verfügbar
 
 # AI configuration window

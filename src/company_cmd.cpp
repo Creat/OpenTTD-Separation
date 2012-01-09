@@ -10,7 +10,6 @@
 /** @file company_cmd.cpp Handling of companies. */
 
 #include "stdafx.h"
-#include "engine_base.h"
 #include "company_base.h"
 #include "company_func.h"
 #include "company_gui.h"
@@ -33,7 +32,6 @@
 #include "settings_func.h"
 #include "vehicle_base.h"
 #include "vehicle_func.h"
-#include "sprite.h"
 #include "smallmap_gui.h"
 #include "game/game.hpp"
 
@@ -112,6 +110,7 @@ void SetLocalCompany(CompanyID new_company)
 
 	/* ... and redraw the whole screen. */
 	MarkWholeScreenDirty();
+	InvalidateWindowClassesData(WC_SIGN_LIST, -1);
 }
 
 /**

@@ -983,12 +983,12 @@ STR_CURRENCY_INCREASE_EXCHANGE_RATE_TOOLTIP                     :{BLACK}amlhau y
 STR_CURRENCY_SET_EXCHANGE_RATE_TOOLTIP                          :{BLACK}newid y raddfa gyfnewid o eich arian cyfred i un Punt (£)
 
 STR_CURRENCY_SEPARATOR                                          :{LTBLUE}Gwahanydd: {ORANGE}{STRING}
-STR_CURRENCY_SET_CUSTOM_CURRENCY_SEPARATOR_TOOLTIP              :{BLACK}Creu yr ysgar i eich arian Cyfred
+STR_CURRENCY_SET_CUSTOM_CURRENCY_SEPARATOR_TOOLTIP              :{BLACK}Dewis y nod gwahanu ar gyfer eich arian
 
 STR_CURRENCY_PREFIX                                             :{LTBLUE}Rhagddodiad: {ORANGE}{STRING}
-STR_CURRENCY_SET_CUSTOM_CURRENCY_PREFIX_TOOLTIP                 :{BLACK}Creu yr rhagddodiad i eich arian Cyfred
+STR_CURRENCY_SET_CUSTOM_CURRENCY_PREFIX_TOOLTIP                 :{BLACK}Dewis y rhagddodiad ar gyfer eich arian
 STR_CURRENCY_SUFFIX                                             :{LTBLUE}Olddodiad: {ORANGE}{STRING}
-STR_CURRENCY_SET_CUSTOM_CURRENCY_SUFFIX_TOOLTIP                 :{BLACK}Creu yr olddodiad i eich arian Cyfred
+STR_CURRENCY_SET_CUSTOM_CURRENCY_SUFFIX_TOOLTIP                 :{BLACK}Dewis yr ôl-lddodiad ar gyfer eich arian
 
 STR_CURRENCY_SWITCH_TO_EURO                                     :{LTBLUE}Newid i'r Ewro: {ORANGE}{NUM}
 STR_CURRENCY_SWITCH_TO_EURO_NEVER                               :{LTBLUE}Newid i'r Ewro: {ORANGE}byth
@@ -1465,7 +1465,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Chwarae
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Tarw Dur Hud (chwalu diwydiannau, gwrthrychau nad oes modd eu chwalu): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Caiff twneli groesi eu gilydd: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Ni fydd awyrennau jet yn crashio (yn aml) ar feysydd awyr bychain: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Newid hinsawdd: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Tirwedd Tymherus
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Tirwedd Is-arctig
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Tirwedd Is-drofannol
@@ -1800,6 +1799,8 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Rydych c
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}YCafoch chi eich cicio o'r gêm
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Ni chaniateir twyllo ar y gweinydd hwn
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Roeddech yn gyrru gormod o orchmynion i'r gweinydd
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Fe gymeroch ormod o amser i fewnbynnu'r cyfrinair
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Roedd eich cyfrifiadur yn cymeryd gormod o amser i ymuno
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :gwall cyffredinol
@@ -2455,6 +2456,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Log Newi
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Trwydded
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Gosod paramedrau
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Dangos paramedrau
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Toglu palet
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Toglu palet y NewGRFa ddewiswyd.{}Gwnech hyn pan fo graffegau'r NewGRF yn edrych yn binc yn y gêm
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Gweithredu newidiadau
@@ -2668,6 +2670,29 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 STR_GOALS_NONE                                                  :{ORANGE}- Dim -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Nodau cwmni:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Cliciwch ar nod i ganoli'r brif olygfa ar y diwydiant/tref/teil Mae Ctrl+Clic yn agor ffenestr golwg newydd ar leoliad y diwydiant/tref/teil
+
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Cwestiwn
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Canslo
+STR_GOAL_QUESTION_BUTTON_OK                                     :Iawn
+STR_GOAL_QUESTION_BUTTON_NO                                     :Na
+STR_GOAL_QUESTION_BUTTON_YES                                    :Ia
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Gwrthod
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Derbyn
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Anwybyddu
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Ail-geisio
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Blaenorol
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Nesaf
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Aros
+STR_GOAL_QUESTION_BUTTON_START                                  :Dechrau
+STR_GOAL_QUESTION_BUTTON_GO                                     :Mynd
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Parhau
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Ailddechrau
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Gohirio
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Ildio
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Cau
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Cymorthdaliadau

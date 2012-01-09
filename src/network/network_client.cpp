@@ -12,7 +12,6 @@
 #ifdef ENABLE_NETWORK
 
 #include "../stdafx.h"
-#include "../debug.h"
 #include "network_gui.h"
 #include "../saveload/saveload.h"
 #include "../saveload/saveload_filter.h"
@@ -670,6 +669,12 @@ NetworkRecvStatus ClientNetworkGameSocketHandler::Receive_SERVER_ERROR(Packet *p
 			break;
 		case NETWORK_ERROR_TOO_MANY_COMMANDS:
 			ShowErrorMessage(STR_NETWORK_ERROR_TOO_MANY_COMMANDS, INVALID_STRING_ID, WL_CRITICAL);
+			break;
+		case NETWORK_ERROR_TIMEOUT_PASSWORD:
+			ShowErrorMessage(STR_NETWORK_ERROR_TIMEOUT_PASSWORD, INVALID_STRING_ID, WL_CRITICAL);
+			break;
+		case NETWORK_ERROR_TIMEOUT_COMPUTER:
+			ShowErrorMessage(STR_NETWORK_ERROR_TIMEOUT_COMPUTER, INVALID_STRING_ID, WL_CRITICAL);
 			break;
 		default:
 			ShowErrorMessage(STR_NETWORK_ERROR_LOSTCONNECTION, INVALID_STRING_ID, WL_CRITICAL);
