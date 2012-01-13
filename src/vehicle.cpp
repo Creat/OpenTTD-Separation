@@ -197,12 +197,14 @@ uint Vehicle::Crash(bool flooded)
 	return pass;
 }
 
+/** Marks the separation of this vehicle's order list invalid. */
 void Vehicle::MarkSeparationInvalid()
 {
 	if (this->orders.list != NULL) this->orders.list->MarkSeparationInvalid();
 }
 
-void Vehicle::SetSepSettings(TTSep_Mode Mode, uint Parameter)
+/** Sets new separation settings for this vehicle's shared orders. */
+void Vehicle::SetSepSettings(TTSepMode Mode, uint Parameter)
 {
 	if (this->orders.list != NULL) this->orders.list->SetSepSettings(Mode, Parameter);
 }
@@ -1950,8 +1952,13 @@ void Vehicle::BeginLoading()
 		}
 		this->current_order.MakeLoading(false);
 	}
-	if (_settings_game.order.automatic_timetable_separation && this->IsOrderListShared() && this->orders.list->IsCompleteTimetable()
-		&& (this->cur_real_order_index == 0)) {
+
+	/* If all requirements for separation are met, we can initialize it. */
+	if (_settings_game.order.automatic_timetable_separation
+			&& this->IsOrderListShared()
+			&& this->orders.list->IsCompleteTimetable()
+			&& (this->cur_real_order_index == 0)) {
+
 		if (!this->orders.list->IsSeparationValid()) this->orders.list->InitializeSeparation();
 		this->lateness_counter = this->orders.list->SeparateVehicle();
 	}

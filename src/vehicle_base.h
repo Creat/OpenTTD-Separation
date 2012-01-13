@@ -735,7 +735,7 @@ public:
 	bool HasDepotOrder() const;
 	void HandlePathfindingResult(bool path_found);
 	void MarkSeparationInvalid();
-	void SetSepSettings(TTSep_Mode Mode, uint Parameter);
+	void SetSepSettings(TTSepMode Mode, uint Parameter);
 
 	/**
 	 * Check if the vehicle is a front engine.

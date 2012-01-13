@@ -29,9 +29,9 @@ enum VehicleTimetableWidgets {
 	WID_VT_SHARED_ORDER_LIST,           ///< Show the shared order list.
 	WID_VT_ARRIVAL_DEPARTURE_SELECTION, ///< Disable/hide the arrival departure panel.
 	WID_VT_EXPECTED_SELECTION,          ///< Disable/hide the expected selection button.
-	TTV_TTSEP_MODE_DROPDOWN,            ///< Select separation mode dropdown
-	TTV_TTSEP_SET_PARAMETER,            ///< Set the separation parameter (time / number)
-	TTV_TTSEP_PANEL_TEXT                ///< Panel area for separation info text
+	WID_VT_TTSEP_MODE_DROPDOWN,         ///< Select separation mode dropdown
+	WID_VT_TTSEP_SET_PARAMETER,         ///< Set the separation parameter (time / number)
+	WID_VT_TTSEP_PANEL_TEXT             ///< Panel area for separation info text
 };
 
 #endif /* WIDGETS_TIMETABLE_WIDGET_H */

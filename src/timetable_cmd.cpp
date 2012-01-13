@@ -232,14 +232,15 @@ CommandCost CmdAutofillTimetable(TileIndex tile, DoCommandFlag flags, uint32 p1,
 
 /**
  * Set new separation parameters
- * @param tile Not used.
+ * @param tile  Not used.
  * @param flags Operation to perform.
- * @param p1 Order lit id.
+ * @param p1    Order lit id.
  * @param p2
- - p2 = (bit 0-1) - Separation mode (off / Auto / Man N / Man T)
- - p2 = (bit 2-31) - Separation parameter (Unused if off | Auto, Number of vehicles if Man N, Separation delay in Ticks if Man T)
- * @param text Not used.
- * @return The error or cost of the operation.
+ *   - p2 = (bit 0-1)  - Separation mode (@see TTSepMode)
+ *   - p2 = (bit 2-31) - Separation parameter (Unused if #TTS_MODE_OFF | #TTS_MODE_AUTO,
+ *                       Number of vehicles if #TTS_MODE_MAN_N, separation delay in ticks if #TTS_MODE_MAN_T).
+ * @param text  Not used.
+ * @return      The error or cost of the operation.
  */
 CommandCost CmdReinitSeparation(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text)
 {
@@ -250,7 +251,7 @@ CommandCost CmdReinitSeparation(TileIndex tile, DoCommandFlag flags, uint32 p1, 
 	if (ret.Failed()) return ret;
 
 	if (flags & DC_EXEC) {
-		v->SetSepSettings((TTSep_Mode)GB(p2,0,2), GB(p2,2,29));
+		v->SetSepSettings((TTSepMode)GB(p2,0,2), GB(p2,2,29));
 	}
 
 	return CommandCost();

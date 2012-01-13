@@ -3587,7 +3587,7 @@ STR_FEEDER                                                      :{YELLOW}Transfe
 STR_MESSAGE_ESTIMATED_COST                                      :{WHITE}Estimated Cost: {CURRENCY_LONG}
 STR_MESSAGE_ESTIMATED_INCOME                                    :{WHITE}Estimated Income: {CURRENCY_LONG}
 
-# Timetable Separation stuff
+# Timetable separation UI strings
 STR_TTSEPARATION_AUTO                                           :Auto
 STR_TTSEPARATION_MAN_NUM                                        :Manual Number
 STR_TTSEPARATION_MAN_TIME                                       :Manual Time
