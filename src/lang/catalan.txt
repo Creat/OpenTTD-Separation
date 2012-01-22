@@ -447,7 +447,7 @@ STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Canvia al terminal
 STR_ABOUT_MENU_AI_DEBUG                                         :IA / Depuració de l'script del joc
 STR_ABOUT_MENU_SCREENSHOT                                       :Captura de pantalla
-STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Ampliació en la captura de pantalla
+STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Zoom màxim en la captura de pantalla
 STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Zoom predeterminat en les captures de pantalla
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Captura de pantalla de tot el mapa
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Quant a 'OpenTTD'
@@ -1466,7 +1466,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Jugant 
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Eruga màgica (treu indústries, objectes inamovibles): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Els túnels es poden creuar: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Els avions a reacció no tindran accidents (freqüents) en els aeroports petits: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Canvia el clima: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :paisatge temperat
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :paisatge subàrtic
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :paisatge subtropical
@@ -1801,6 +1800,10 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Estàs e
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}T'han fet fora del joc
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}No es permet fer trampes en aquest servidor
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Estaves enviant massa ordres al servidor
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Has tardat massa a introduir la contrasenya
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}El teu ordenador ha tardat massa a unir-se
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Has tardat massa a descarregar el mapa
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Has tardat massa a unir-te al servidor
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :error general
@@ -1819,6 +1822,10 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :tret pel servid
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :s'ha intentat utilitzar una trampa
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :servidor ple
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :estava enviant massa ordres
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :no s'ha rebut la contrasenya a temps
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :temps d'espera general
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :la descàrrega del mapa ha tardat massa
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :el processat del mapa ha tardat massa
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Possible pèrdua de connexió
@@ -2456,6 +2463,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Registra
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Llicència
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Estableix paràm.
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Mostra els paràmetres
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Commuta paleta
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Commuta la paleta del NewGRF seleccionat.{}Fes això quan els gràfics del NewGRF en el joc siguin rosats
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Aplica els canvis
@@ -2532,17 +2540,10 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} ha d
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} necessita OpenTTD versió {STRING} o més modern
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :l'arxiu GRF dissenyat està pendent de traduir
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Hi ha massa arxius NewGRF carregats
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Carregant {2:STRING} com a NewGRF estàtic amb {4:STRING} podria causar desincronitzacions
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Sprite no esperat
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Acció desconeguda 0 atributs
-STR_NEWGRF_ERROR_INVALID_ID                                     :Intenta utilitzar una ID invàlida
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Carregant {1:STRING} com a NewGRF estàtic amb {STRING} podria causar desincronitzacions
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} conté un sprite corrupte. Tots els sprites corruptes seran mostrats amb un interrogant vermell (?)
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Conté múltiples Accions 8 entrades
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lectura després de la fi d'un pseudo-sprite
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Al joc de gràfics base establert actualment li falten un nombre d'sprites.{}Si us plau actualitza el joc de gràfics base
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Els recursos GRF demanats no estan disponibles
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} ha estat desactivat per {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Format de disposició d'Sprites invàlid/desconegut
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} ha estat desactivat per {STRING}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Alerta!
@@ -2670,6 +2671,29 @@ STR_GOALS_NONE                                                  :{ORANGE}- Cap -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Objectius de la companyia:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Clica sobre l'objectiu per centrar la vista principal sobre la indústria/poble/cel·la. Ctrl+clic per obrir una nova vista sobre la indústria/poble/cel·la
 
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Pregunta
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Cancel·la
+STR_GOAL_QUESTION_BUTTON_OK                                     :OK
+STR_GOAL_QUESTION_BUTTON_NO                                     :No
+STR_GOAL_QUESTION_BUTTON_YES                                    :Si
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Declina
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Accepta
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Ignora
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Reintenta
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Anterior
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Següent
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Para
+STR_GOAL_QUESTION_BUTTON_START                                  :Comença
+STR_GOAL_QUESTION_BUTTON_GO                                     :Ves
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Continua
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Reinicia
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Postposa
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Rendir-se
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Tanca
+
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Subvencions
 STR_SUBSIDIES_OFFERED_TITLE                                     :{BLACK}Subvencions per prestació de serveis oferts:
@@ -2780,11 +2804,11 @@ STR_COMPANY_VIEW_VEHICLES_NONE                                  :{WHITE}Cap
 STR_COMPANY_VIEW_COMPANY_VALUE                                  :{GOLD}Valor de l'Empresa: {WHITE}{CURRENCY_LONG}
 STR_COMPANY_VIEW_SHARES_OWNED_BY                                :{WHITE}({COMMA}% propietat de {COMPANY})
 STR_COMPANY_VIEW_INFRASTRUCTURE                                 :{GOLD}Infrastructura:
-STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} troços de via
-STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} troços de carretera
-STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} cel·les d'aigua
-STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} cel·les d'estació
-STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT                         :{WHITE}{COMMA} aeroports
+STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} tros{P "" sos} de via
+STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} tros{P "" sos} de carretera
+STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} cel·l{P a es} d'aigua
+STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} cel·l{P a es} d'estació
+STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT                         :{WHITE}{COMMA} aeroport{P "" s}
 STR_COMPANY_VIEW_INFRASTRUCTURE_NONE                            :{WHITE}Cap
 
 STR_COMPANY_VIEW_BUILD_HQ_BUTTON                                :{BLACK}Construir Seu
@@ -2807,8 +2831,8 @@ STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP                         :{BLACK}Canvia e
 
 STR_COMPANY_VIEW_BUY_SHARE_BUTTON                               :{BLACK}Compra un 25% d'accions
 STR_COMPANY_VIEW_SELL_SHARE_BUTTON                              :{BLACK}Vendre un 25% d'accions
-STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Compra el 25% d'accions d'aquesta companyia. Shift+Clic mostra el cost estimat sense comprar cap acció
-STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Ven un 25% d'accions d'aquesta companyia. Shift+Clic mostra el cost estimat sense vendre cap acció
+STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Compra el 25% de les accions d'aquesta companyia. Shift+Clic mostra el cost estimat sense comprar cap acció
+STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Ven un 25% de les accions d'aquesta companyia. Shift+Clic mostra el cost estimat sense vendre cap acció
 
 STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Nom Empresa
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Nom President
@@ -3487,7 +3511,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Script d
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Comprova el registre de l'script de joc
 
 STR_ERROR_AI_NO_AI_FOUND                                        :No s'ha trobat una IA adequada per carregar.{}Aquesta IA és una IA falsa i no farà res.{}Pots descarregar diverses IAs via el sistema de "Contingut en línia"
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Una de les IAs s'ha penjat. Si us plau reporta això a l'autor de la IA amb una captura de pantalla de la finestra de depuració IA
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Un dels scripts s'ha penjat. Si us plau reporta això a l'autor de l'script amb una captura de pantalla de la finestra de depuració IA / Script
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}IA / La finestra de depuració només està disponible pel servidor
 
 # AI configuration window

@@ -126,6 +126,13 @@ enum WindowClass {
 	 */
 	WC_CONFIRM_POPUP_QUERY,
 
+	/**
+	 * Popup with a set of buttons, designed to ask the user a question
+	 *  from a GameScript. %Window numbers:
+	 *   - uniqueid = #GoalQuestionWidgets
+	 */
+	WC_GOAL_QUESTION,
+
 
 	/**
 	 * Saveload window; %Window numbers:

@@ -29,7 +29,6 @@
 #include "../sortlist_type.h"
 #include "../company_func.h"
 #include "../core/geometry_func.hpp"
-#include "../newgrf_text.h"
 #include "../genworld.h"
 
 #include "../widgets/network_widget.h"
@@ -1686,7 +1685,7 @@ static void ClientList_GiveMoney(const NetworkClientInfo *ci)
 
 static void ClientList_SpeakToClient(const NetworkClientInfo *ci)
 {
-	ShowNetworkChatQueryWindow(DESTTYPE_CLIENT,ci->client_id);
+	ShowNetworkChatQueryWindow(DESTTYPE_CLIENT, ci->client_id);
 }
 
 static void ClientList_SpeakToCompany(const NetworkClientInfo *ci)

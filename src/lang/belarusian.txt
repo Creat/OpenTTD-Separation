@@ -759,7 +759,7 @@ STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Кансоль
 STR_ABOUT_MENU_AI_DEBUG                                         :Наладка штучнага інтэлекту (ШІ/AI) / скрыптоў
 STR_ABOUT_MENU_SCREENSHOT                                       :Здымак экрана (Ctrl+S)
-STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Здымак экрана ў звычайным маштабе
+STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Здымак экрана ў макс. набліжэнні
 STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Павялiчаны здымак экрана па змоўчаньнi
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Здымак усёй мапы (Ctrl+G)
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Аб гульні OpenTTD
@@ -1782,7 +1782,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Гул�
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Чароўны дынамiт (знос УСЯГО): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Тунэлi могуць перасякацца: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Вялікія самалёты радзей разьбіваюцца ў малых аэрапортах: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Зьмяніць ляндшафт на: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :умераны ляндшафт
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :субарктычны ляндшафт
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :субтрапічны ляндшафт
@@ -2117,6 +2116,10 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Дост
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Вас выкінулі з гульні
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Махлярства не дазволена на гэтым сэрвэры
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Вы дасылалi да сэрвэра занадта шмат камандаў
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Вы задоўга ня можаце ўвесьцi пароль
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Ваш кампутар задоўга ня можа далучыцца
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Вы задоўга пампуеце мапу
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Вы задоўга далучаецеся да сэрвэра
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :агульная памылка
@@ -2135,6 +2138,10 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :Вас выкі
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :паспрабаваў махляваць
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :сэрвэр перапоўнены
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :дасылаў занадта шмат каманд
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :пароль не атрыманы своечасова
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :агульны перапынак
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :мапа пампуецца задоўга
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :апрацоўка мапы iдзе задоўга
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Падключэньне згублена
@@ -2792,6 +2799,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Журн
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Лiцэнзiя
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Усталяваць парамэтры
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Паказаць парамэтры
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Пераключыць палітру
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Пераключыць палітру для выбраных NewGRF файлаў.{}Выкарыстоўвайце пераключэньне, калі графіка ў гульні малюецца ружовым колерам.
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Ужыць зьмены
@@ -2868,17 +2876,17 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} па
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} патрабуе OpenTTD вэрсіі {STRING} або вышэй.
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :файл GRF, які ім перакладаецца.
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Загружана занадта шмат новай графікі.
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Загрузка {2:STRING} у якасьці статычнага NewGRF з {4:STRING} можа выклікаць памылку сынхранізацыі.
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Нечаканы спрайт.
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Невядомая ўласьцівасьць для Action 0.
-STR_NEWGRF_ERROR_INVALID_ID                                     :Выкарыстоўваецца няправільны ID.
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Загрузка {1:STRING} у якасьці статычнага NewGRF з {STRING} можа выклікаць памылку сынхранізацыі.
+STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Няверны спрайт (спрайт {3:NUM})
+STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Невядомая ўласцівасьць у «Action 0» {4:HEX} (спрайт {3:NUM})
+STR_NEWGRF_ERROR_INVALID_ID                                     :Спроба выкарыстаньня недапушчальнага ідэнтыфікатара (спрайт {3:NUM})
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} утрымлiвае пашкоджаны спрайт. Усе пашкоджаныя спрайты будуць паказаны чырвоным знакам пытаньня (?).
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Зьмяшчае некалькі Action 8 дзеяньняў.
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Дадзеныя раптоўна скончыліся.
+STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Утрымоўвае некалькі блокаў «Action 8» (спрайт {3:NUM})
+STR_NEWGRF_ERROR_READ_BOUNDS                                    :Чытанне за канцом псеўда-спрайту (спрайт {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}У бягучым наборы базавай графікі адсутнічаюць выявы некаторых аб'ектаў.{}Калі ласка, абнавіце модуль базавай графікі.
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Запрошаныя рэсурсы GRF недаступныя
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} быў адключаны з-за {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Няслушны/невядомы фармат разьмяшчэньня спрайтаў
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Запытаныя рэсурсы GRF недаступныя (спрайт {3:NUM})
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} быў адключаны з-за {2:STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Недапушчальны/невядомы фармат размяшчэньня спрайтаў (спрайт {3:NUM})
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Асцярожна!
@@ -2976,7 +2984,7 @@ STR_LOCAL_AUTHORITY_CAPTION                                     :{WHITE}Адмі
 STR_LOCAL_AUTHORITY_COMPANY_RATINGS                             :{BLACK}Рэйтынг транспартных кампаніяў
 STR_LOCAL_AUTHORITY_COMPANY_RATING                              :{YELLOW}{COMPANY} {COMPANY_NUM}: {ORANGE}{STRING}
 STR_LOCAL_AUTHORITY_ACTIONS_TITLE                               :{BLACK}Даступныя дзеяньні:
-STR_LOCAL_AUTHORITY_ACTIONS_TOOLTIP                             :{BLACK}Тое, што можна зрабіць у гэтым горадзе - клікніце, каб даведацца больш
+STR_LOCAL_AUTHORITY_ACTIONS_TOOLTIP                             :{BLACK}Сьпіс магчымых дзеяньняў у гэтым горадзе - пстрыкніце для атрымання дад. звестак
 STR_LOCAL_AUTHORITY_DO_IT_BUTTON                                :{BLACK}Скарыстаць
 STR_LOCAL_AUTHORITY_DO_IT_TOOLTIP                               :{BLACK}Выканаць дзеяньне, выбранае ў сьпісе вышэй
 
@@ -3005,6 +3013,29 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 STR_GOALS_NONE                                                  :{ORANGE}- Няма -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Задачы кампаніі:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Пстрыкніце па задачы, каб паказаць прадпрыемства/горад/клетку. Ctrl+пстрычка паказвае ў новым вакне.
+
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Пытаньне
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Адмова
+STR_GOAL_QUESTION_BUTTON_OK                                     :Так
+STR_GOAL_QUESTION_BUTTON_NO                                     :Не
+STR_GOAL_QUESTION_BUTTON_YES                                    :Так
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Адхiлiць
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Прыняць
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Iгнараваць
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Спрабаваць iзноў
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Папярэднi
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Наступны
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Спынiць
+STR_GOAL_QUESTION_BUTTON_START                                  :Пачаць
+STR_GOAL_QUESTION_BUTTON_GO                                     :Iсьцi
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Працягнуць
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Пачаць iзноў
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Адкласьцi
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Здацца
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Закрыць
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Субсыдыі:
@@ -3116,10 +3147,10 @@ STR_COMPANY_VIEW_VEHICLES_NONE                                  :{WHITE}няма
 STR_COMPANY_VIEW_COMPANY_VALUE                                  :{GOLD}Кошт кампаніі: {WHITE}{CURRENCY_LONG}
 STR_COMPANY_VIEW_SHARES_OWNED_BY                                :{WHITE}({COMMA}% валодае {COMPANY})
 STR_COMPANY_VIEW_INFRASTRUCTURE                                 :{GOLD}Iнфраструктура:
-STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} чыгуначн{P ы ыя ых} элемэнт{P "" ы аў}
-STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} дарожн{P ы ыя ых} элемэнт{P "" ы аў}
-STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} водн{P ая ыя ых} клетк{P а i ак}
-STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} станцыйн{P ая ыя ых} клетк{P а i ак}
+STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} чыгуначн{P ы ыя ых} {P ў ў у}част{P ак кi аў}
+STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} дарожн{P ы ыя ых} {P ў ў у}част{P ак кi аў}
+STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} водн{P ы ыя ых} {P ў ў у}част{P ак кi аў}
+STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} {P ў ў у}част{P ак кi аў} занята станцыямі
 STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT                         :{WHITE}{COMMA} аэрапорт{P "" ы аў}
 STR_COMPANY_VIEW_INFRASTRUCTURE_NONE                            :{WHITE}Нiчога
 
@@ -3288,7 +3319,7 @@ STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Далё
 STR_BUY_VEHICLE_TRAIN_LIST_TOOLTIP                              :{BLACK}Выбар вагонаў - клікніце для даведкі
 STR_BUY_VEHICLE_ROAD_VEHICLE_LIST_TOOLTIP                       :{BLACK}Сьпiс аўтатранспарту - націсьніце для атрыманьня даведкі
 STR_BUY_VEHICLE_SHIP_LIST_TOOLTIP                               :{BLACK}Сьпiс караблёў - націсьніце для атрыманьня даведкі
-STR_BUY_VEHICLE_AIRCRAFT_LIST_TOOLTIP                           :{BLACK}Авiятранспарт - націсьніце для атрыманьня даведкі
+STR_BUY_VEHICLE_AIRCRAFT_LIST_TOOLTIP                           :{BLACK}Сьпіс паветраных судоў - пстрыкніце для атрыманьня інфармацыі
 
 STR_BUY_VEHICLE_TRAIN_BUY_VEHICLE_BUTTON                        :{BLACK}Купiць
 STR_BUY_VEHICLE_ROAD_VEHICLE_BUY_VEHICLE_BUTTON                 :{BLACK}Купiць
@@ -3843,7 +3874,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Гуль
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Паказаць журнал працы гульнёвага скрыпту
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Ня знойдзена прыдатных модуляў ШI,{}таму канкурэнты нічога рабіць не будуць.{}Модулі ШI можна спампаваць праз сістэму анлайн-кантэнту.
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Адзін з запушчаных ШI выканаў недапушчальную аперацыю і быў закрыты. Калі ласка, паведаміце аб гэтым аўтару ШI, прыклаўшы здымак вакна адладкі.
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Адзін з запушчаных ШI / скрыптоў завяршыў сваю працу аварыйна. Калі ласка, паведаміце аб гэтым аўтару скрыпту, прыклаўшы здымак акна адладкі.
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Вакно адладкі ШІ / скрыпту даступна толькі для сэрвэра
 
 # AI configuration window

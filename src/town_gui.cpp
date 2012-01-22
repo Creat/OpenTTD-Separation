@@ -22,19 +22,15 @@
 #include "string_func.h"
 #include "strings_func.h"
 #include "sound_func.h"
-#include "economy_func.h"
 #include "tilehighlight_func.h"
 #include "sortlist_type.h"
 #include "road_cmd.h"
 #include "landscape.h"
-#include "cargotype.h"
 #include "querystring_gui.h"
 #include "window_func.h"
 #include "townname_func.h"
-#include "townname_type.h"
 #include "core/geometry_func.hpp"
 #include "genworld.h"
-#include "sprite.h"
 
 #include "widgets/town_widget.h"
 
@@ -313,7 +309,7 @@ public:
 
 		this->FinishInitNested(desc, window_number);
 
-		this->flags|= WF_DISABLE_VP_SCROLL;
+		this->flags |= WF_DISABLE_VP_SCROLL;
 		NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(WID_TV_VIEWPORT);
 		nvp->InitializeViewport(this, this->town->xy, ZOOM_LVL_NEWS);
 

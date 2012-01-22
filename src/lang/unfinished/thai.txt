@@ -1428,7 +1428,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}เล�
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}รถไถเวทมนต์ (ทำลายส่วนอุตสาหกรรม, ของที่เคลื่อนย้ายไม่ได้): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}อุโมงค์สามารถตัดกันได้: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}เครื่องบินไอพ่นจะไม่ตกบ่อยๆ ในสนามบินขนาดเล็ก: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}เปลี่ยนสภาพอากาศ: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :ภูมิประเทศเขตอบอุ่น
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :ภูมิประเทศเขตกึ่งขั้วโลก
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :ภูมิประเทศเขตกึ่งมรสุม
@@ -2276,11 +2275,8 @@ STR_NEWGRF_INSPECT_CAPTION_OBJECT_AT_OBJECT                     :วัตถุ
 
 # NewGRF (self) generated warnings/errors
 STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}เกิดความผิดพลาดร้ายแรงเกี่ยวกับ NewGRF: {}{STRING}
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Read past end of pseudo-sprite.
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}กราฟิกพื้นฐานที่ใช้อยู่นี้ขาดตัวเลขของสไปรท์{}Please update the base graphics set.
-STR_NEWGRF_ERROR_GRM_FAILED                                     :ไม่มี GRF ให้เรียกใช้
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} ถูกยกเลิกโดย {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :ไม่ถูกต้อง/ไม่รู้จักข้อมูลเลย์เอาท์ของแผ่นภาพ
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} ถูกยกเลิกโดย {STRING}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}คำเตือน!

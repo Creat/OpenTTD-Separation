@@ -37,7 +37,6 @@
 #include "../core/pool_func.hpp"
 #include "../gfx_func.h"
 #include "../error.h"
-#include "table/strings.h"
 
 #ifdef DEBUG_DUMP_COMMANDS
 #include "../fileio_func.h"
@@ -316,8 +315,13 @@ StringID GetNetworkErrorMsg(NetworkErrorCode err)
 		STR_NETWORK_ERROR_CLIENT_KICKED,
 		STR_NETWORK_ERROR_CLIENT_CHEATER,
 		STR_NETWORK_ERROR_CLIENT_SERVER_FULL,
-		STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS
+		STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS,
+		STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD,
+		STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER,
+		STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP,
+		STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN,
 	};
+	assert_compile(lengthof(network_error_strings) == NETWORK_ERROR_END);
 
 	if (err >= (ptrdiff_t)lengthof(network_error_strings)) err = NETWORK_ERROR_GENERAL;
 
@@ -828,20 +832,18 @@ static void NetworkSend()
 	}
 }
 
-/* We have to do some UDP checking */
-void NetworkUDPGameLoop()
+/**
+ * We have to do some (simple) background stuff that runs normally,
+ * even when we are not in multiplayer. For example stuff needed
+ * for finding servers or downloading content.
+ */
+void NetworkBackgroundLoop()
 {
 	_network_content_client.SendReceive();
 	TCPConnecter::CheckCallbacks();
 	NetworkHTTPSocketHandler::HTTPReceive();
 
-	if (_network_udp_server) {
-		_udp_server_socket->ReceivePackets();
-		_udp_master_socket->ReceivePackets();
-	} else {
-		_udp_client_socket->ReceivePackets();
-		if (_network_udp_broadcast > 0) _network_udp_broadcast--;
-	}
+	NetworkBackgroundUDPLoop();
 }
 
 /* The main loop called from ttd.c

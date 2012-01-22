@@ -1437,7 +1437,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}الع�
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}الجرافة السحرية - لازالة المصانع و الاجسام غير القابلة للازالة.{ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}يمكن للانفاق ان تتقاطع: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}الطائرات النفاثة لن تتحطم كثيرا في المطارات الصغيرة {ORANGE} {STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}بدل الطقس {ORANGE} {STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :مناطق معتدلة
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :مناطق ثلجية
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :مناطق مدارية
@@ -2496,17 +2495,10 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} يج
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} يتطلب نسخة {STRING} من النسخة المفتوحة او احدث .
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :تم تصميم ملف GRF بغرض الترجمة
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :العديد من NewGRF تم تحميلها
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :تحميل {2:STRING}كملف ثابت مع NewGRF {4:STRING}قد يتسبب بمشكلة توافق.
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :خطأ غير متوقع
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :طلب غير معروف 0 بدون خصائص
-STR_NEWGRF_ERROR_INVALID_ID                                     :محاولة استخدام ID معرف غير معروف .
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :تحميل {1:STRING}كملف ثابت مع NewGRF {STRING}قد يتسبب بمشكلة توافق.
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} يحتوي على خصائص غير صالحة. جميع الخصائص الغير صالحة سوف يشار لها بعلامة استفهام حمراء.
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :يحتوي على اوامر متعددة - 8 مدخلات
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :خطأ في قرائة البرمجة
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}ملف الرسوم المستخدم حاليا يفتقد لبعض الرسوم الاساسية.{}الرجاء حدث ملف الرسوم.
-STR_NEWGRF_ERROR_GRM_FAILED                                     :معلومات الاضافة غير متاحة
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING}تم تعطيلة بواسطة{4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :شبح/ ماكرو غير معروف
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING}تم تعطيلة بواسطة{STRING}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}تحذير!

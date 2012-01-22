@@ -22,13 +22,13 @@
 #include "gfx_func.h"
 #include "sortlist_type.h"
 #include "core/geometry_func.hpp"
-#include "math.h"
 #include "currency.h"
 
 #include "widgets/graph_widget.h"
 
 #include "table/strings.h"
 #include "table/sprites.h"
+#include <math.h>
 
 /* Bitmasks of company and cargo indices that shouldn't be drawn. */
 static uint _legend_excluded_companies;
@@ -717,7 +717,7 @@ struct DeliveredCargoGraphWindow : BaseGraphWindow {
 
 	virtual OverflowSafeInt64 GetGraphData(const Company *c, int j)
 	{
-		return c->old_economy[j].delivered_cargo;
+		return c->old_economy[j].delivered_cargo.GetSum<OverflowSafeInt64>();
 	}
 };
 

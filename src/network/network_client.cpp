@@ -12,7 +12,6 @@
 #ifdef ENABLE_NETWORK
 
 #include "../stdafx.h"
-#include "../debug.h"
 #include "network_gui.h"
 #include "../saveload/saveload.h"
 #include "../saveload/saveload_filter.h"
@@ -330,6 +329,7 @@ NetworkRecvStatus ClientNetworkGameSocketHandler::SendJoin()
 
 	Packet *p = new Packet(PACKET_CLIENT_JOIN);
 	p->Send_string(_openttd_revision);
+	p->Send_uint32(_openttd_newgrf_version);
 	p->Send_string(_settings_client.network.client_name); // Client name
 	p->Send_uint8 (_network_join_as);     // PlayAs
 	p->Send_uint8 (NETLANG_ANY);          // Language
@@ -375,13 +375,6 @@ NetworkRecvStatus ClientNetworkGameSocketHandler::SendGetMap()
 	my_client->status = STATUS_MAP_WAIT;
 
 	Packet *p = new Packet(PACKET_CLIENT_GETMAP);
-	/* Send the OpenTTD version to the server, let it validate it too.
-	 * But only do it for stable releases because of those we are sure
-	 * that everybody has the same NewGRF version. For trunk and the
-	 * branches we make tarballs of the OpenTTDs compiled from tarball
-	 * will have the lower bits set to 0. As such they would become
-	 * incompatible, which we would like to prevent by this. */
-	if (IsReleasedVersion()) p->Send_uint32(_openttd_newgrf_version);
 	my_client->SendPacket(p);
 	return NETWORK_RECV_STATUS_OKAY;
 }
@@ -578,7 +571,7 @@ NetworkRecvStatus ClientNetworkGameSocketHandler::Receive_SERVER_COMPANY_INFO(Pa
 
 		p->Recv_string(company_info->clients, sizeof(company_info->clients));
 
-		SetWindowDirty(WC_NETWORK_WINDOW, WN_NETWORK_WINDOW_GAME);
+		SetWindowDirty(WC_NETWORK_WINDOW, WN_NETWORK_WINDOW_LOBBY);
 
 		return NETWORK_RECV_STATUS_OKAY;
 	}
@@ -644,36 +637,36 @@ NetworkRecvStatus ClientNetworkGameSocketHandler::Receive_SERVER_CLIENT_INFO(Pac
 
 NetworkRecvStatus ClientNetworkGameSocketHandler::Receive_SERVER_ERROR(Packet *p)
 {
+	static const StringID network_error_strings[] = {
+		STR_NETWORK_ERROR_LOSTCONNECTION,    // NETWORK_ERROR_GENERAL
+		STR_NETWORK_ERROR_LOSTCONNECTION,    // NETWORK_ERROR_DESYNC
+		STR_NETWORK_ERROR_LOSTCONNECTION,    // NETWORK_ERROR_SAVEGAME_FAILED
+		STR_NETWORK_ERROR_LOSTCONNECTION,    // NETWORK_ERROR_CONNECTION_LOST
+		STR_NETWORK_ERROR_LOSTCONNECTION,    // NETWORK_ERROR_ILLEGAL_PACKET
+		STR_NETWORK_ERROR_LOSTCONNECTION,    // NETWORK_ERROR_NEWGRF_MISMATCH
+		STR_NETWORK_ERROR_SERVER_ERROR,      // NETWORK_ERROR_NOT_AUTHORIZED
+		STR_NETWORK_ERROR_SERVER_ERROR,      // NETWORK_ERROR_NOT_EXPECTED
+		STR_NETWORK_ERROR_WRONG_REVISION,    // NETWORK_ERROR_WRONG_REVISION
+		STR_NETWORK_ERROR_LOSTCONNECTION,    // NETWORK_ERROR_NAME_IN_USE
+		STR_NETWORK_ERROR_WRONG_PASSWORD,    // NETWORK_ERROR_WRONG_PASSWORD
+		STR_NETWORK_ERROR_SERVER_ERROR,      // NETWORK_ERROR_COMPANY_MISMATCH
+		STR_NETWORK_ERROR_KICKED,            // NETWORK_ERROR_KICKED
+		STR_NETWORK_ERROR_CHEATER,           // NETWORK_ERROR_CHEATER
+		STR_NETWORK_ERROR_SERVER_FULL,       // NETWORK_ERROR_FULL
+		STR_NETWORK_ERROR_TOO_MANY_COMMANDS, // NETWORK_ERROR_TOO_MANY_COMMANDS
+		STR_NETWORK_ERROR_TIMEOUT_PASSWORD,  // NETWORK_ERROR_TIMEOUT_PASSWORD
+		STR_NETWORK_ERROR_TIMEOUT_COMPUTER,  // NETWORK_ERROR_TIMEOUT_COMPUTER
+		STR_NETWORK_ERROR_TIMEOUT_MAP,       // NETWORK_ERROR_TIMEOUT_MAP
+		STR_NETWORK_ERROR_TIMEOUT_JOIN,      // NETWORK_ERROR_TIMEOUT_JOIN
+	};
+	assert_compile(lengthof(network_error_strings) == NETWORK_ERROR_END);
+
 	NetworkErrorCode error = (NetworkErrorCode)p->Recv_uint8();
 
-	switch (error) {
-		/* We made an error in the protocol, and our connection is closed.... */
-		case NETWORK_ERROR_NOT_AUTHORIZED:
-		case NETWORK_ERROR_NOT_EXPECTED:
-		case NETWORK_ERROR_COMPANY_MISMATCH:
-			ShowErrorMessage(STR_NETWORK_ERROR_SERVER_ERROR, INVALID_STRING_ID, WL_CRITICAL);
-			break;
-		case NETWORK_ERROR_FULL:
-			ShowErrorMessage(STR_NETWORK_ERROR_SERVER_FULL, INVALID_STRING_ID, WL_CRITICAL);
-			break;
-		case NETWORK_ERROR_WRONG_REVISION:
-			ShowErrorMessage(STR_NETWORK_ERROR_WRONG_REVISION, INVALID_STRING_ID, WL_CRITICAL);
-			break;
-		case NETWORK_ERROR_WRONG_PASSWORD:
-			ShowErrorMessage(STR_NETWORK_ERROR_WRONG_PASSWORD, INVALID_STRING_ID, WL_CRITICAL);
-			break;
-		case NETWORK_ERROR_KICKED:
-			ShowErrorMessage(STR_NETWORK_ERROR_KICKED, INVALID_STRING_ID, WL_CRITICAL);
-			break;
-		case NETWORK_ERROR_CHEATER:
-			ShowErrorMessage(STR_NETWORK_ERROR_CHEATER, INVALID_STRING_ID, WL_CRITICAL);
-			break;
-		case NETWORK_ERROR_TOO_MANY_COMMANDS:
-			ShowErrorMessage(STR_NETWORK_ERROR_TOO_MANY_COMMANDS, INVALID_STRING_ID, WL_CRITICAL);
-			break;
-		default:
-			ShowErrorMessage(STR_NETWORK_ERROR_LOSTCONNECTION, INVALID_STRING_ID, WL_CRITICAL);
-	}
+	StringID err = STR_NETWORK_ERROR_LOSTCONNECTION;
+	if (error < (ptrdiff_t)lengthof(network_error_strings)) err = network_error_strings[error];
+
+	ShowErrorMessage(err, INVALID_STRING_ID, WL_CRITICAL);
 
 	DeleteWindowById(WC_NETWORK_STATUS_WINDOW, WN_NETWORK_STATUS_WINDOW_JOIN);
 

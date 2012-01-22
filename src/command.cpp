@@ -17,9 +17,7 @@
 #include "network/network_type.h"
 #include "network/network.h"
 #include "genworld.h"
-#include "newgrf_storage.h"
 #include "strings_func.h"
-#include "gfx_func.h"
 #include "texteff.hpp"
 #include "town.h"
 #include "date_func.h"
@@ -152,6 +150,8 @@ CommandProc CmdCompanyCtrl;
 CommandProc CmdCustomNewsItem;
 CommandProc CmdCreateGoal;
 CommandProc CmdRemoveGoal;
+CommandProc CmdGoalQuestion;
+CommandProc CmdGoalQuestionAnswer;
 
 CommandProc CmdLevelLand;
 
@@ -291,6 +291,8 @@ static const Command _command_proc_table[] = {
 	DEF_CMD(CmdCustomNewsItem,          CMD_STR_CTRL | CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_CUSTOM_NEWS_ITEM
 	DEF_CMD(CmdCreateGoal,              CMD_STR_CTRL | CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_CREATE_GOAL
 	DEF_CMD(CmdRemoveGoal,                             CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_REMOVE_GOAL
+	DEF_CMD(CmdGoalQuestion,            CMD_STR_CTRL | CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_GOAL_QUESTION
+	DEF_CMD(CmdGoalQuestionAnswer,                     CMD_DEITY, CMDT_OTHER_MANAGEMENT      ), // CMD_GOAL_QUESTION_ANSWER
 
 	DEF_CMD(CmdLevelLand, CMD_ALL_TILES | CMD_NO_TEST | CMD_AUTO, CMDT_LANDSCAPE_CONSTRUCTION), // CMD_LEVEL_LAND; test run might clear tiles multiple times, in execution that only happens once
 
@@ -633,40 +635,31 @@ CommandCost DoCommandPInternal(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd,
 	if (exec_as_spectator) cur_company.Change(COMPANY_SPECTATOR);
 
 	bool test_and_exec_can_differ = (cmd_flags & CMD_NO_TEST) != 0;
-	bool skip_test = _networking && (cmd & CMD_NO_TEST_IF_IN_NETWORK) != 0;
 
-	/* Do we need to do a test run?
-	 * Basically we need to always do this, except when
-	 * the no-test-in-network flag is giving and we're
-	 * in a network game (e.g. restoring orders would
-	 * fail this test because the first order does not
-	 * exist yet when inserting the second, giving that
-	 * a wrong insert location and ignoring the command
-	 * and thus breaking restoring). However, when we
-	 * just want to do cost estimation we don't care
-	 * because it's only done once anyway. */
-	CommandCost res;
-	if (estimate_only || !skip_test) {
-		/* Test the command. */
-		_cleared_object_areas.Clear();
-		SetTownRatingTestMode(true);
-		ClearStorageChanges(false);
-		res = proc(tile, flags, p1, p2, text);
-		SetTownRatingTestMode(false);
+	/* Test the command. */
+	_cleared_object_areas.Clear();
+	SetTownRatingTestMode(true);
+	ClearStorageChanges(false);
+	CommandCost res = proc(tile, flags, p1, p2, text);
+	SetTownRatingTestMode(false);
 
-		/* Make sure we're not messing things up here. */
-		assert(exec_as_spectator ? _current_company == COMPANY_SPECTATOR : cur_company.Verify());
+	/* Make sure we're not messing things up here. */
+	assert(exec_as_spectator ? _current_company == COMPANY_SPECTATOR : cur_company.Verify());
 
-		/* If the command fails, we're doing an estimate
-		 * or the player does not have enough money
-		 * (unless it's a command where the test and
-		 * execution phase might return different costs)
-		 * we bail out here. */
-		if (res.Failed() || estimate_only ||
-				(!test_and_exec_can_differ && !CheckCompanyHasMoney(res))) {
-			cur_company.Restore();
-			return_dcpi(res, false);
+	/* If the command fails, we're doing an estimate
+	 * or the player does not have enough money
+	 * (unless it's a command where the test and
+	 * execution phase might return different costs)
+	 * we bail out here. */
+	if (res.Failed() || estimate_only ||
+			(!test_and_exec_can_differ && !CheckCompanyHasMoney(res))) {
+		if (!_networking || _generating_world || (cmd & CMD_NETWORK_COMMAND) != 0) {
+			/* Log the failed command as well. Just to be able to be find
+			 * causes of desyncs due to bad command test implementations. */
+			DEBUG(desync, 1, "cmdf: %08x; %02x; %02x; %06x; %08x; %08x; %08x; \"%s\" (%s)", _date, _date_fract, (int)_current_company, tile, p1, p2, cmd & ~CMD_NETWORK_COMMAND, text, GetCommandName(cmd));
 		}
+		cur_company.Restore();
+		return_dcpi(res, false);
 	}
 
 #ifdef ENABLE_NETWORK
@@ -705,11 +698,11 @@ CommandCost DoCommandPInternal(TileIndex tile, uint32 p1, uint32 p2, uint32 cmd,
 		cur_company.Restore();
 	}
 
-	/* If the test and execution can differ, or we skipped the test
-	 * we have to check the return of the command. Otherwise we can
-	 * check whether the test and execution have yielded the same
-	 * result, i.e. cost and error state are the same. */
-	if (!test_and_exec_can_differ && !skip_test) {
+	/* If the test and execution can differ we have to check the
+	 * return of the command. Otherwise we can check whether the
+	 * test and execution have yielded the same result,
+	 * i.e. cost and error state are the same. */
+	if (!test_and_exec_can_differ) {
 		assert(res.GetCost() == res2.GetCost() && res.Failed() == res2.Failed()); // sanity check
 	} else if (res2.Failed()) {
 		return_dcpi(res2, false);

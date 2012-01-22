@@ -245,8 +245,8 @@ STR_BUTTON_CANCEL                                               :{BLACK}Cancelar
 STR_BUTTON_OK                                                   :{BLACK}OK
 
 # On screen keyboard window
-STR_OSK_KEYBOARD_LAYOUT                                         :`1234567890-=\qwertyuiop[]asdfghjkl;'  zxcvbnm,./ .
-STR_OSK_KEYBOARD_LAYOUT_CAPS                                    :~!@#$%^&*()_+|QWERTYUIOP{{}}ASDFGHJKL:"  ZXCVBNM<>? .
+STR_OSK_KEYBOARD_LAYOUT                                         :º1234567890'¡\qwertyuiop`+asdfghjklñ´ç<zxcvbnm,.- .
+STR_OSK_KEYBOARD_LAYOUT_CAPS                                    :ª!"·$%&/()=?¿|QWERTYUIOP^*ASDFGHJKLÑ¨Ç>ZXCVBNM;:_ .
 
 # Measurement tooltip
 STR_MEASURE_LENGTH                                              :{BLACK}Longitud: {NUM}
@@ -554,9 +554,9 @@ STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_ENGINEER                   :Ingeniero
 STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_TRAFFIC_MANAGER            :Gerente de tráfico
 STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_TRANSPORT_COORDINATOR      :Coordinador de transporte
 STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_ROUTE_SUPERVISOR           :Supervisor de ruta
-STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_DIRECTOR                   :Director
-STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_CHIEF_EXECUTIVE            :Jefe ejecutivo
-STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_CHAIRMAN                   :Director general
+STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_DIRECTOR                   :Directivo
+STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_CHIEF_EXECUTIVE            :Subdirector
+STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_CHAIRMAN                   :Director
 STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_PRESIDENT                  :Presidente
 STR_COMPANY_LEAGUE_PERFORMANCE_TITLE_TYCOON                     :Magnate
 
@@ -896,12 +896,12 @@ STR_GAME_OPTIONS_CURRENCY_EEK                                   :Krooni Estonio 
 STR_GAME_OPTIONS_CURRENCY_CUSTOM                                :Personalizada...
 ############ end of currency region
 
-STR_GAME_OPTIONS_MEASURING_UNITS_FRAME                          :{BLACK}Medir unidades
-STR_GAME_OPTIONS_MEASURING_UNITS_DROPDOWN_TOOLTIP               :{BLACK}Medir unidades seleccionadas
+STR_GAME_OPTIONS_MEASURING_UNITS_FRAME                          :{BLACK}Unidades de medida
+STR_GAME_OPTIONS_MEASURING_UNITS_DROPDOWN_TOOLTIP               :{BLACK}Unidades de medida seleccionadas
 
 ############ start of measuring units region
-STR_GAME_OPTIONS_MEASURING_UNITS_IMPERIAL                       :Imperial
-STR_GAME_OPTIONS_MEASURING_UNITS_METRIC                         :Métrico
+STR_GAME_OPTIONS_MEASURING_UNITS_IMPERIAL                       :Imperiales
+STR_GAME_OPTIONS_MEASURING_UNITS_METRIC                         :Métricas
 STR_GAME_OPTIONS_MEASURING_UNITS_SI                             :SI
 ############ end of measuring units region
 
@@ -1466,7 +1466,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Jugando
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Bulldózer mágico (elimina industrias, objetos inamovibles): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Los túneles pueden cruzarse: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Jets se estrellan menos en aeropuertos pequeños: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Cambiar clima: {ORANGE} {STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Terreno templado
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Terreno subártico
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Terreno subtropical
@@ -1522,9 +1521,9 @@ STR_FACE_FEMALE_BUTTON                                          :{BLACK}Mujer
 STR_FACE_FEMALE_TOOLTIP                                         :{BLACK}Selecciona cara femenina
 STR_FACE_NEW_FACE_BUTTON                                        :{BLACK}Cara Nueva
 STR_FACE_NEW_FACE_TOOLTIP                                       :{BLACK}Generar cara al azar
-STR_FACE_ADVANCED                                               :{BLACK}Avanzado
+STR_FACE_ADVANCED                                               :{BLACK}Avanzada
 STR_FACE_ADVANCED_TOOLTIP                                       :{BLACK}Selección avanzada de caras
-STR_FACE_SIMPLE                                                 :{BLACK}Simple
+STR_FACE_SIMPLE                                                 :{BLACK}Sencilla
 STR_FACE_SIMPLE_TOOLTIP                                         :{BLACK}Selección simple de caras
 STR_FACE_LOAD                                                   :{BLACK}Cargar
 STR_FACE_LOAD_TOOLTIP                                           :{BLACK}Cargar cara favorita
@@ -1574,7 +1573,7 @@ STR_NETWORK_SERVER_LIST_CONNECTION                              :{BLACK}Conexió
 STR_NETWORK_SERVER_LIST_CONNECTION_TOOLTIP                      :{BLACK}Seleccione entre un juego en Internet o en una Red de Área Local
 STR_NETWORK_SERVER_LIST_LAN                                     :LAN
 STR_NETWORK_SERVER_LIST_INTERNET                                :Internet
-STR_NETWORK_SERVER_LIST_PLAYER_NAME                             :{BLACK}Nombre del Jugador:
+STR_NETWORK_SERVER_LIST_PLAYER_NAME                             :{BLACK}Nombre del jugador:
 STR_NETWORK_SERVER_LIST_ENTER_NAME_TOOLTIP                      :{BLACK}Este es el nombre con el que otros jugadores le identificarán
 
 STR_NETWORK_SERVER_LIST_GAME_NAME                               :{BLACK}Nombre
@@ -1801,6 +1800,10 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Se ha pr
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Has sido expulsado del servidor
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}No se permiten trucos en este servidor
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Estabas enviando demasiados comandos al servidor
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Tardaste demasiado en introducir la contraseña
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Su ordenador tardó demasiado tiempo en conectar
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Llevó demasiado tiempo descargar el mapa
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Llevó demasiado tiempo conectar al servidor
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :error general
@@ -1819,6 +1822,10 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :expulsado por e
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :ha intentado usar un truco
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :servidor lleno
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :estaba enviando demasiados comandos
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :no se recibió la contraseña a tiempo
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :timeout general
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :la descarga del mapa llevó demasiado tiempo
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :el procesado del mapa llevó demasiado tiempo
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Posible pérdida de conexión
@@ -2265,7 +2272,7 @@ STR_LAI_RAIL_DESCRIPTION_TRACK_WITH_COMBO_NOENTRYSIGNALS        :{STRING} con se
 STR_LAI_RAIL_DESCRIPTION_TRACK_WITH_PBS_NOENTRYSIGNALS          :{STRING} con señales de ruta y señales de ruta de un solo sentido
 STR_LAI_RAIL_DESCRIPTION_TRAIN_DEPOT                            :{STRING} depósito de tren
 
-STR_LAI_ROAD_DESCRIPTION_ROAD                                   :Road
+STR_LAI_ROAD_DESCRIPTION_ROAD                                   :Carretera
 STR_LAI_ROAD_DESCRIPTION_ROAD_WITH_STREETLIGHTS                 :Carretera con farolas
 STR_LAI_ROAD_DESCRIPTION_TREE_LINED_ROAD                        :Carretera arbolada
 STR_LAI_ROAD_DESCRIPTION_ROAD_VEHICLE_DEPOT                     :Depósito de carretera
@@ -2456,6 +2463,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Registro
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licencia
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Establecer parámetros
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Mostrar parámetros
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Seleccionar paleta
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Seleccionar la paleta del NewGRF seleccionado.{}Esto es necesario cuando los gráficos de este NewGRF se vean de color rosa
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Aplicar cambios
@@ -2479,7 +2487,7 @@ STR_NEWGRF_SETTINGS_INCOMPATIBLE                                :{RED}Incompatib
 # NewGRF parameters window
 STR_NEWGRF_PARAMETERS_CAPTION                                   :{WHITE}Cambiar parámetros NewGRF
 STR_NEWGRF_PARAMETERS_CLOSE                                     :{BLACK}Cerrar
-STR_NEWGRF_PARAMETERS_RESET                                     :{BLACK}Reset
+STR_NEWGRF_PARAMETERS_RESET                                     :{BLACK}Reiniciar
 STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Fijar todos los parámetros a su valor por defecto
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parámetro {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
@@ -2522,7 +2530,7 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Atención: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Error: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Error Fatal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Un error fatal de NewGRF ha ocurrido: {}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Ha ocurrido un error fatal de NewGRF: {}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} no funcionará con la con la versión de TTDPatch reportada por OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} es la para la versión {STRING} de TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} está diseñado para ser usado con {STRING}
@@ -2532,17 +2540,17 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} debe
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} requiere OpenTTD versión {STRING} o superior
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :El fichero GRF ha sido diseñado para ser traducido
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Demasiados NewGRFs han sido cargados
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Cargar {2:STRING} como NewGRF estático con {4:STRING} puede causar desincronizaciones
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Sprite inesperado
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Acción 0 con propiedad desconocida
-STR_NEWGRF_ERROR_INVALID_ID                                     :Intento de usar un ID incorrecto
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Cargar {1:STRING} como NewGRF estático con {STRING} puede causar desincronizaciones
+STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Sprite inesperado (sprite {3:NUM})
+STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Propiedad de Acción 0 desconocida {4:HEX} (sprite {3:NUM})
+STR_NEWGRF_ERROR_INVALID_ID                                     :Intento de usar una ID inválida (sprite {3:NUM})
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} contiene un sprite corrupto. Todos los sprites corruptos serán mostrados como un interrogante rojo (?)
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Contiene múltiples entradas Action 8
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lectura después del final de un pseudo-sprite
+STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Contiene múltiples entradas de Acción 8 (sprite {3:NUM})
+STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lectura mas allá del fin de un pseudo-sprite (sprite {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Al conjunto de gráficos base actualmente en uso le faltan algunos sprites.{}El conjunto de gráficos base debe ser actualizado
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Recursos GRF requeridos no disponibles
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} fue desactivado por {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Formato de distribución de sprite inválido o desconocido
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Recursos GRF solicitados no disponibles (sprite {3:NUM})
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} fue desactivado por {STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Formato de colocación de sprites inválido o desconocido (sprite {3:NUM})
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}¡Precaución!
@@ -2670,6 +2678,29 @@ STR_GOALS_NONE                                                  :{ORANGE}- Ningu
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Metas de la compañía:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Click en una meta para centrar la vista principal en la casilla, industria o pueblo. Ctrl+Click abre una nueva vista en esa localización
 
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Pregunta
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Cancelar
+STR_GOAL_QUESTION_BUTTON_OK                                     :Ok
+STR_GOAL_QUESTION_BUTTON_NO                                     :No
+STR_GOAL_QUESTION_BUTTON_YES                                    :Si
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Rechazar
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Aceptar
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Ignorar
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Reintentar
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Anterior
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Siguiente
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Parar
+STR_GOAL_QUESTION_BUTTON_START                                  :Comenzar
+STR_GOAL_QUESTION_BUTTON_GO                                     :Ir
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Continuar
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Reiniciar
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Posponer
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Rendirse
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Cerrar
+
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Subvenciones
 STR_SUBSIDIES_OFFERED_TITLE                                     :{BLACK}Se ofrecen subvenciones por llevar:
@@ -2780,11 +2811,11 @@ STR_COMPANY_VIEW_VEHICLES_NONE                                  :{WHITE}Ninguno
 STR_COMPANY_VIEW_COMPANY_VALUE                                  :{GOLD}Valor de la empresa: {WHITE}{CURRENCY_LONG}
 STR_COMPANY_VIEW_SHARES_OWNED_BY                                :{WHITE}({COMMA}% propiedad de {COMPANY})
 STR_COMPANY_VIEW_INFRASTRUCTURE                                 :{GOLD}Infraestructura:
-STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} trozos de ferrocarril
-STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} trozos de carretera
-STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} casillas de agua
-STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} casillas de estación
-STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT                         :{WHITE}{COMMA} aeropuertos
+STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} trozo{P "" s} de ferrocarril
+STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} trozo{P "" s} de carretera
+STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} casilla{P "" s} de agua
+STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} casilla{P "" s} de estación
+STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT                         :{WHITE}{COMMA} aeropuerto{P "" s}
 STR_COMPANY_VIEW_INFRASTRUCTURE_NONE                            :{WHITE}Ninguna
 
 STR_COMPANY_VIEW_BUILD_HQ_BUTTON                                :{BLACK}Construir Sede
@@ -2808,7 +2839,7 @@ STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP                         :{BLACK}Cambiar 
 STR_COMPANY_VIEW_BUY_SHARE_BUTTON                               :{BLACK}Comprar un 25% de sus acciones
 STR_COMPANY_VIEW_SELL_SHARE_BUTTON                              :{BLACK}Vender 25% de acciones
 STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Comprar 25% de acciones de esta empresa. Shift+Click muestra una estimación del precio sin comprar ninguna acción
-STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Vender 25% acciones de esta empresa. Shift+Click muestra una estimación del precio sin vender ninguna acción
+STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Vender 25% acciones de esta empresa. Shift+Click muestra una estimación del beneficio sin vender ninguna acción
 
 STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Nombre Empresa
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Nombre del Presidente
@@ -3423,7 +3454,7 @@ STR_TIMETABLE_TRAVEL_FOR                                        :Viajar durante 
 STR_TIMETABLE_STAY_FOR                                          :y esperar {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :y viajar durante {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} día{P "" s}
-STR_TIMETABLE_TICKS                                             :{COMMA} tick{P "" s}
+STR_TIMETABLE_TICKS                                             :{COMMA} tic{P "" s}
 
 STR_TIMETABLE_TOTAL_TIME                                        :{BLACK}Los horarios tomarán {STRING} para completarse
 STR_TIMETABLE_TOTAL_TIME_INCOMPLETE                             :{BLACK}Estos horarios tomarán {STRING} para completarse (no todos los horarios)
@@ -3487,7 +3518,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Script d
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Comprobar el registro del Script de Juego
 
 STR_ERROR_AI_NO_AI_FOUND                                        :No se encontró IA apropiada para cargar.{}Esta es una IA por defecto que no realiza acción alguna.{}Puedes descargar nuevas IAs mediante el sistema de 'Contenido Online'
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Una de las IA ejecutadas ha fallado. Por favor, reporte el fallo al autor de la misma desde la ventana Depuración de IA
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Uno de los scripts ejecutados ha fallado. Por favor, reporte el fallo al autor del script con una captura de la ventana de IA / Script
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}La ventana de depuración de scripts solo está disponible para el servidor
 
 # AI configuration window
@@ -4033,7 +4064,7 @@ STR_SV_STNAME_SOUTH                                             :{STRING} Sur
 STR_SV_STNAME_EAST                                              :{STRING} Este
 STR_SV_STNAME_WEST                                              :{STRING} Oeste
 STR_SV_STNAME_CENTRAL                                           :{STRING} Central
-STR_SV_STNAME_TRANSFER                                          :{STRING} Intercambio
+STR_SV_STNAME_TRANSFER                                          :{STRING} Transferencia
 STR_SV_STNAME_HALT                                              :{STRING} Parada
 STR_SV_STNAME_VALLEY                                            :Valle de {STRING}
 STR_SV_STNAME_HEIGHTS                                           :Cumbres de {STRING}

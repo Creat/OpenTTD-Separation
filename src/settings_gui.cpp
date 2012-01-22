@@ -32,13 +32,10 @@
 #include "viewport_func.h"
 #include "core/geometry_func.hpp"
 #include "ai/ai.hpp"
+#include "blitter/factory.hpp"
 #include "language.h"
 
-#include "widgets/settings_widget.h"
 
-#include "table/sprites.h"
-#include "table/strings.h"
-#include <map>
 
 static const StringID _units_dropdown[] = {
 	STR_GAME_OPTIONS_MEASURING_UNITS_IMPERIAL,
@@ -264,6 +261,7 @@ struct GameOptionsWindow : Window {
 				list = new DropDownList();
 				*selected_index = _cur_screenshot_format;
 				for (uint i = 0; i < _num_screenshot_formats; i++) {
+					if (!GetScreenshotFormatSupports_32bpp(i) && BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth() == 32) continue;
 					list->push_back(new DropDownListStringItem(SPECSTR_SCREENSHOT_START + i, i, false));
 				}
 				break;
@@ -1201,11 +1199,10 @@ void SettingEntry::DrawSetting(GameSettings *settings_ptr, const SettingDesc *sd
 	if ((sdb->flags & SGF_NO_NETWORK) && _networking) editable = false;
 
 	if (sdb->cmd == SDT_BOOLX) {
-		static const Colours _bool_ctabs[2][2] = {{COLOUR_CREAM, COLOUR_RED}, {COLOUR_DARK_GREEN, COLOUR_GREEN}};
 		/* Draw checkbox for boolean-value either on/off */
 		bool on = ReadValue(var, sd->save.conv) != 0;
 
-		DrawFrameRect(buttons_left, button_y, buttons_left + 19, button_y + 8, _bool_ctabs[!!on][!!editable], on ? FR_LOWERED : FR_NONE);
+		DrawBoolButton(buttons_left, button_y, on, editable);
 		SetDParam(0, on ? STR_CONFIG_SETTING_ON : STR_CONFIG_SETTING_OFF);
 	} else {
 		int32 value;
@@ -1825,6 +1822,19 @@ void DrawArrowButtons(int x, int y, Colours button_colour, byte state, bool clic
 	if (rtl ? !clickable_left : !clickable_right) {
 		GfxFillRect(x + 11, y + 1, x + 11 + 8, y + 8, colour, FILLRECT_CHECKER);
 	}
+}
+
+/**
+ * Draw a toggle button.
+ * @param x the x position to draw
+ * @param y the y position to draw
+ * @param state true = lowered
+ * @param clickable is the button clickable?
+ */
+void DrawBoolButton(int x, int y, bool state, bool clickable)
+{
+	static const Colours _bool_ctabs[2][2] = {{COLOUR_CREAM, COLOUR_RED}, {COLOUR_DARK_GREEN, COLOUR_GREEN}};
+	DrawFrameRect(x, y + 1, x + 19, y + 9, _bool_ctabs[state][clickable], state ? FR_LOWERED : FR_NONE);
 }
 
 struct CustomCurrencyWindow : Window {

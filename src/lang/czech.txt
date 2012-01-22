@@ -1546,7 +1546,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Hrát j
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Magický buldozer (odstraní průmysl a další objekty): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Tunely se mohou křížit: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Letadla nebudou na malých letištích havarovat (tak často): {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Změnit podnebí: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :krajina mírného pásma
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :subarktická krajina
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :subtropická kraina
@@ -1899,6 +1898,8 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :vyhozen servere
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :se pokoušel podvádět
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :na serveru je plno
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :posílal příliš mnoho příkazů
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :stahování mapy trvalo příliš dlouho
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :zpracování mapy trvalo příliš dlouho
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Pravděpodobná ztráta spojení
@@ -2618,17 +2619,10 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} mus�
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} potřebuje verzi OpenTTD {STRING} nebo vyšší
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :grafika, která se měla přeložit
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Je nahráno příliš mnoho grafik
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Nahrání {2:STRING} jako statické grafiky spolu s {4:STRING} může způsobit chybu synchronizace
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Nepředpokládaný sprite
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Neznámá vlastnost Action 0
-STR_NEWGRF_ERROR_INVALID_ID                                     :Pokus o použití neplatného ID
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Nahrání {1:STRING} jako statické grafiky spolu s {STRING} může způsobit chybu synchronizace
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} obsahuje poškozený sprite. Všechny takové se zobrazí jako červený otazník (?)
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Obsahuje víc GRF akcí 8
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Čtení za koncem pseudo-spritu
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Právě používanému základnímu grafickému setu chybí obrázky.{}Prosím, updatujte ho
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Požadované zdroje grafiky nejsou k dispozici
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} byla vypnuta {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Chybný/neznámý formát sprajtu
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} byla vypnuta {STRING}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Varování!
@@ -2754,6 +2748,20 @@ STR_GOALS_GLOBAL_TITLE                                          :{BLACK}Globáln
 STR_GOALS_TEXT                                                  :{ORANGE}{STRING}
 STR_GOALS_NONE                                                  :{ORANGE}- Žádné -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Cíle společnosti:
+
+# Goal question window
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Zrušit
+STR_GOAL_QUESTION_BUTTON_OK                                     :OK
+STR_GOAL_QUESTION_BUTTON_NO                                     :Ne
+STR_GOAL_QUESTION_BUTTON_YES                                    :Ano
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Odmítnout
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Příjmout
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Předchozí
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Další
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Odložit
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Vzdát se
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Dotace

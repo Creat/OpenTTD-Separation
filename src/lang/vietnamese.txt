@@ -1464,7 +1464,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Điều
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Xe ủi thần kỳ (xúc văng nhà máy, vật không thể di chuyển): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Đường ngầm có thể vượt lẫn nhau : {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Máy bay phản lực sẽ không tai nạn (thường xuyên) ở các sân bay nhỏ: {ORANGE}{STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Đổi thời tiết: {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Địa hình vừa phải
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Địa hình giá lạnh
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Địa hình cận nhiệt đới
@@ -2530,17 +2529,10 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} ph�
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} yêu cầu phiên bản OpenTTD {STRING} hoặc cao hơn.
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :GRF file được thiết kế để phiên dịch
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Quá nhiều NewGRFs đã nạp.
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Nạp {2:STRING} như là NewGRF tĩnh với {4:STRING} có thể gây mất đồng bộ
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Sprite không mong muốn
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Không biết về thuộc tích action 0
-STR_NEWGRF_ERROR_INVALID_ID                                     :Sử dụng ID không hợp lệ.
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Nạp {1:STRING} như là NewGRF tĩnh với {STRING} có thể gây mất đồng bộ
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} bị hỏng sprite. Tất cả các sprite sẽ hiện thị với dấu hỏi (?) màu đỏ.
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Chứa nhiều mục action 8.
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Đọc tới điểm cuối của sprite-giả
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Gói đồ họa bạn đang dùng thiếu một số mẫu đồ họa.{}Hãy cập nhật gói đồ họa lên phiên bản mới.
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Tài nguyên GRF được yêu cầu không có sẵn
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} bị tắt bởi {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Khuôn dạng sprite không hợp lệ/không hiểu
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} bị tắt bởi {STRING}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Chú Ý!
@@ -2667,6 +2659,15 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 STR_GOALS_NONE                                                  :{ORANGE}- Không -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Các mục tiêu của công ty:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Click vào mục tiêu để canh giữa cửa sổ lớn chính vào ô/đô thị/nhà máy tương ứng. Ctrl+Click để mở bằng các cửa sổ bổ sung tương ứng
+
+# Goal question window
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Tiếp tục
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Làm lại
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Hoãn lại
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Từ bỏ
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Đóng
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Trợ Cấp

@@ -12,22 +12,20 @@
 #ifndef COMPANY_BASE_H
 #define COMPANY_BASE_H
 
-#include "core/pool_type.hpp"
 #include "road_type.h"
-#include "rail_type.h"
 #include "livery.h"
 #include "autoreplace_type.h"
-#include "economy_type.h"
 #include "tile_type.h"
 #include "settings_type.h"
 #include "group.h"
 
+/** Statistics about the economy. */
 struct CompanyEconomyEntry {
-	Money income;
-	Money expenses;
-	int32 delivered_cargo;
-	int32 performance_history; ///< company score (scale 0-1000)
-	Money company_value;
+	Money income;               ///< The amount of income.
+	Money expenses;             ///< The amount of expenses.
+	CargoArray delivered_cargo; ///< The amount of delivered cargo.
+	int32 performance_history;  ///< Company score (scale 0-1000)
+	Money company_value;        ///< The value of the company.
 };
 
 struct CompanyInfrastructure {
@@ -64,8 +62,6 @@ struct CompanyProperties {
 	RailTypes avail_railtypes;       ///< Rail types available to the company.
 
 	byte block_preview;              ///< Number of quarters that the company is not allowed to get new exclusive engine previews (see CompaniesGenStatistics).
-
-	uint32 cargo_types;              ///< Which cargo types were transported the last year.
 
 	TileIndex location_of_HQ;        ///< Northern tile of HQ; #INVALID_TILE when there is none.
 	TileIndex last_build_coordinate; ///< Coordinate of the last build thing by this company.

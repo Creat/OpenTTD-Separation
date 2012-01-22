@@ -12,14 +12,10 @@
 #include "../stdafx.h"
 #include "../core/endian_func.hpp"
 #include "../string_func.h"
-#include "../strings_type.h"
-#include "../language.h"
 #include "../table/control_codes.h"
 
 #include "strgen.h"
 
-#include <stdarg.h>
-#include <exception>
 
 #include "../table/strgen_tables.h"
 
@@ -631,6 +627,8 @@ static const CmdStruct *TranslateCmdForCompare(const CmdStruct *a)
 			strcmp(a->cmd, "STRING3") == 0 ||
 			strcmp(a->cmd, "STRING4") == 0 ||
 			strcmp(a->cmd, "STRING5") == 0 ||
+			strcmp(a->cmd, "STRING6") == 0 ||
+			strcmp(a->cmd, "STRING7") == 0 ||
 			strcmp(a->cmd, "RAW_STRING") == 0) {
 		return FindCmd("STRING", 6);
 	}

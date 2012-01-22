@@ -266,6 +266,8 @@ enum Commands {
 	CMD_CUSTOM_NEWS_ITEM,             ///< create a custom news message
 	CMD_CREATE_GOAL,                  ///< create a new goal
 	CMD_REMOVE_GOAL,                  ///< remove a goal
+	CMD_GOAL_QUESTION,                ///< ask a goal related question
+	CMD_GOAL_QUESTION_ANSWER,         ///< answer(s) to CMD_GOAL_QUESTION
 	CMD_LEVEL_LAND,                   ///< level land
 
 	CMD_BUILD_LOCK,                   ///< build a lock
@@ -344,7 +346,6 @@ DECLARE_ENUM_AS_BIT_SET(DoCommandFlag)
  */
 enum FlaggedCommands {
 	CMD_NETWORK_COMMAND       = 0x0100, ///< execute the command without sending it on the network
-	CMD_NO_TEST_IF_IN_NETWORK = 0x0200, ///< When enabled, the command will bypass the no-DC_EXEC round if in network
 	CMD_FLAGS_MASK            = 0xFF00, ///< mask for all command flags
 	CMD_ID_MASK               = 0x00FF, ///< mask for the command ID
 };

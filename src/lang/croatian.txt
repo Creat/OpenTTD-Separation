@@ -542,7 +542,8 @@ STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Otvori konzolu
 STR_ABOUT_MENU_AI_DEBUG                                         :Debugiranje UI-ja / skripte igre
 STR_ABOUT_MENU_SCREENSHOT                                       :Slika zaslona
-STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Zumirano u slici zaslona
+STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Zumirano do kraja na slici zaslona
+STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Standardno zumiranje slike zaslona
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Slika zaslona cijele mape
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :O 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Poravnjanje sprite-a
@@ -1560,7 +1561,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Igraj k
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Magični buldožer (uklanja industrije, nepokretne objekte): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Tuneli se mogu ukrštavati međusobno: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Veliki avioni se ne će rušiti (često) na malim zračnim lukama: {ORANGE} {STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Promijeni klimu: {ORANGE} {STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Blagi krajolik
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Subarktički krajolik
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Suptropski krajolik
@@ -1895,6 +1895,10 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Zabranje
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Izbačen si iz igre
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Na ovome poslužitelju varanje nije dopušteno
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Slali ste previše naredbi na server
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Trebalo vam je previše vremena za unošenje lozinke
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Vaše računalo je trebalo previše vremena za spajanje
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Trebalo vam je previše vremena za preuzimanje mape
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Trebalo vam je previše vremena za pridruživanje na server
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :opća greška
@@ -1913,6 +1917,10 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :izbačen od str
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :je pokušao varati
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :poslužitelj je pun
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :slao je previše naredbi
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :lozinka nije zaprimljena na vrijeme
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :opći istek vremena
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :preuzimanje mape je predugo trajalo
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :procesiranje map je predugo trajalo
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Moguć gubitak veze
@@ -2550,6 +2558,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Zapis iz
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licenca
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Postavi parametre
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Prikaži parametre
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Aktiviraj paletu
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Prilagodi paletu izabranog NewGRF-a.{}Učini ovo kada grafike iz ovog NewGRF-a izgledaju ljubičasto tijekom igre.
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Potvrdi promjene
@@ -2626,17 +2635,10 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} se m
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} zahtijeva OpenTTD verziju {STRING} ili noviju.
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :GRF datoteka je dizajnirana za prijevod
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Previše učitanih NewGRF-ova.
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Učitavanjem {2:STRING} kao statičnog NewGRF s {4:STRING} može uzrokovati deharmonizaciju
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Neočekivani sprite
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Nepoznato svojstvo Action 0.
-STR_NEWGRF_ERROR_INVALID_ID                                     :Pokušaj uporabe neispravnog ID-a
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Učitavanjem {1:STRING} kao statičnog NewGRF s {STRING} može uzrokovati deharmonizaciju
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} sadrži neispravan sprite. Svi neispravni grafički znakovi bit će pokazani kao crveni upitnik (?).
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Sadrži višestruke Action 8 unose
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Učitavanje izvan kraja pseudo-spritea.
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Baznom grafičkom setu u uporabi nedostaju neki spriteovi.{}Ažurirajte bazni grafički set
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Zatraženi GRF resursi nisu raspoloživi
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} je isključen od strane {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Pogrešan/nepoznat prikaz formata sprite-a
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} je isključen od strane {STRING}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Oprez!
@@ -2764,6 +2766,29 @@ STR_GOALS_NONE                                                  :{ORANGE}- Nijed
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Ciljevi kompanije:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Klikni na cilj za centriranje središnjeg pogleda na industriju/grad/pločicu. Ctrl+Klik otvara novi prozor s pogledom na lokaciju industrije/grada/pločice
 
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Pitanje
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Poništi
+STR_GOAL_QUESTION_BUTTON_OK                                     :OK
+STR_GOAL_QUESTION_BUTTON_NO                                     :Ne
+STR_GOAL_QUESTION_BUTTON_YES                                    :Da
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Odbij
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Prihvati
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Ignoriraj
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Pokušaj ponovo
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Prethodni
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Sljedeći
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Stani
+STR_GOAL_QUESTION_BUTTON_START                                  :Kreni
+STR_GOAL_QUESTION_BUTTON_GO                                     :Započni
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Nastavi
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Ponovi od početka
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Odgodi
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Odustani
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Zatvori
+
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Subvencije
 STR_SUBSIDIES_OFFERED_TITLE                                     :{BLACK}Ponuđene subvencije za pružanje usluga:
@@ -2875,9 +2900,9 @@ STR_COMPANY_VIEW_COMPANY_VALUE                                  :{GOLD}Vrijednos
 STR_COMPANY_VIEW_SHARES_OWNED_BY                                :{WHITE}({COMMA}% u vlasništvu {COMPANY})
 STR_COMPANY_VIEW_INFRASTRUCTURE                                 :{GOLD}Infrastruktura:
 STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL                            :{WHITE}{COMMA} dijelovi pruge
-STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} dijelovi ceste
-STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} pločice vode
-STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} pločice stanice
+STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD                            :{WHITE}{COMMA} dio ceste
+STR_COMPANY_VIEW_INFRASTRUCTURE_WATER                           :{WHITE}{COMMA} polje vode
+STR_COMPANY_VIEW_INFRASTRUCTURE_STATION                         :{WHITE}{COMMA} polje stanice
 STR_COMPANY_VIEW_INFRASTRUCTURE_AIRPORT                         :{WHITE}{COMMA} aerodromi
 STR_COMPANY_VIEW_INFRASTRUCTURE_NONE                            :{WHITE}Ništa
 
@@ -3122,7 +3147,7 @@ STR_DEPOT_CLONE_SHIP                                            :{BLACK}Kloniraj
 STR_DEPOT_CLONE_AIRCRAFT                                        :{BLACK}Kloniraj zrakoplov
 
 STR_DEPOT_CLONE_TRAIN_DEPOT_INFO                                :{BLACK}Ovo će kupiti kopiju vlaka uključujući sve vagone. Kliknite na ovaj gumb i onda na vlak unutar ili izvan spremišta. Ctrl+Klik će dijeliti naredbe. Shift+Klik prikazuje trošak bez kupnje.
-STR_DEPOT_CLONE_ROAD_VEHICLE_DEPOT_INFO                         :{BLACK}Ovo će kupiti kopiju cestovnog vozila. Klikni na ovaj gumb i onda na cestovno vozilo unutar ili izvan spremišta. CTRL+Klik će dijeliti naredbe. Shift+Klik prikazuje trošak bez kupnje.
+STR_DEPOT_CLONE_ROAD_VEHICLE_DEPOT_INFO                         :{BLACK}Ovo će kupiti kopiju cestovnog vozila. Klikni na ovaj gumb i onda na cestovno vozilo unutar ili izvan spremišta. CTRL+Klik će dijeliti naredbe. Shift+Klik prikazuje procijenjeni trošak bez kupnje.
 STR_DEPOT_CLONE_SHIP_DEPOT_INFO                                 :{BLACK}Ovo će kupiti kopiju broda. Klikni na ovaj gumb i onda na brod unutar ili izvan spremišta. Ctrl+Klik će dijeliti naredbe. Shift+Klik prikazuje trošak bez kupnje.
 STR_DEPOT_CLONE_AIRCRAFT_INFO_HANGAR_WINDOW                     :{BLACK}Ovo će kupiti kopiju zrakoplova. Klikni ovaj gumb i onda na zrakoplov unutar ili izvan hangara. Control+Klik će dijeliti naredbe. Shift+Klik prikazuje trošak bez kupnje.
 
@@ -3581,7 +3606,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Skripta 
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Provjeri zapis Skripte Igre
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Nema prikladne UI za učitavanje.{}Ova UI je samo model i neće ništa učiniti.{}Možete preuzeti nekoliko umjetnih inteligencija pomoću sustava 'Online sadržaji'.
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Jedan od UI igrača se srušio. Molimo vas da prijavite ovo autoru UI sa kopijom slike prozora za debugiranje UI.
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Jedna od pokrenutih skripti se srušila. Molimo vas da prijavite ovo autoru skripte sa kopijom slike prozora za debugiranje UI/skripte igre.
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Prozor za debugiranje UI-ja / skripte igre je dopušten samo za poslužitelj
 
 # AI configuration window

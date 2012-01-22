@@ -16,7 +16,6 @@
 #include "gfx_type.h"
 #include "economy_type.h"
 #include "tile_type.h"
-#include "strings_type.h"
 #include "transport_type.h"
 
 struct Window;
@@ -30,6 +29,7 @@ void ShowGameOptions();
 void ShowGameDifficulty();
 void ShowGameSettings();
 void DrawArrowButtons(int x, int y, Colours button_colour, byte state, bool clickable_left, bool clickable_right);
+void DrawBoolButton(int x, int y, bool state, bool clickable);
 
 /* train_gui.cpp */
 void ShowOrdersWindow(const Vehicle *v);
@@ -53,6 +53,7 @@ void ShowTownDirectory();
 void ShowIndustryDirectory();
 void ShowSubsidiesList();
 void ShowGoalsList();
+void ShowGoalQuestion(uint16 id, uint32 button_mask, const char *question);
 
 void ShowEstimatedCostOrIncome(Money cost, int x, int y);
 

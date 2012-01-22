@@ -17,20 +17,16 @@
 #include "pathfinder/yapf/yapf.hpp"
 #include "news_func.h"
 #include "company_func.h"
-#include "vehicle_gui.h"
 #include "newgrf_sound.h"
 #include "newgrf_text.h"
-#include "group.h"
 #include "strings_func.h"
 #include "viewport_func.h"
-#include "window_func.h"
 #include "vehicle_func.h"
 #include "sound_func.h"
 #include "ai/ai.hpp"
 #include "game/game.hpp"
 #include "newgrf_station.h"
 #include "effectvehicle_func.h"
-#include "gamelog.h"
 #include "network/network.h"
 #include "spritecache.h"
 #include "core/random_func.hpp"
@@ -114,20 +110,6 @@ void CheckTrainsLengths()
 			}
 		}
 	}
-}
-
-/**
- * Update visual effect, power and acceleration caches.
- * Called when a vehicle in the consist enters a different railtype.
- */
-void Train::RailtypeChanged()
-{
-	for (Train *u = this; u != NULL; u = u->Next()) {
-		/* The wagon-is-powered-state should not change, so the weight does not change. */
-		u->UpdateVisualEffect(false);
-	}
-	this->PowerChanged();
-	if (this->IsFrontEngine()) this->UpdateAcceleration();
 }
 
 /**
@@ -996,7 +978,7 @@ static CommandCost CheckTrainAttachment(Train *t)
 				/* A failing callback means everything is okay */
 				StringID error = STR_NULL;
 
-				if (t->GetGRF()->grf_version < 8) {
+				if (head->GetGRF()->grf_version < 8) {
 					if (callback == 0xFD) error = STR_ERROR_INCOMPATIBLE_RAIL_TYPES;
 					if (callback  < 0xFD) error = GetGRFStringID(head->GetGRFID(), 0xD000 + callback);
 					if (callback >= 0x100) ErrorUnknownCallbackResult(head->GetGRFID(), CBID_TRAIN_ALLOW_WAGON_ATTACH, callback);
@@ -1593,9 +1575,6 @@ void ReverseTrainSwapVeh(Train *v, int l, int r)
 		SwapTrainFlags(&a->gv_flags, &a->gv_flags);
 		UpdateStatusAfterSwap(a);
 	}
-
-	/* Update power of the train in case tiles were different rail type. */
-	v->RailtypeChanged();
 }
 
 
@@ -2437,7 +2416,7 @@ public:
 
 		if (skip_first) ++this->index;
 
-		int conditional_depth = 0;
+		int depth = 0;
 
 		do {
 			/* Wrap around. */
@@ -2455,10 +2434,9 @@ public:
 					this->v->current_order = *order;
 					return UpdateOrderDest(this->v, order, 0, true);
 				case OT_CONDITIONAL: {
-					if (conditional_depth > this->v->GetNumOrders()) return false;
 					VehicleOrderID next = ProcessConditionalOrder(order, this->v);
 					if (next != INVALID_VEH_ORDER_ID) {
-						conditional_depth++;
+						depth++;
 						this->index = next;
 						/* Don't increment next, so no break here. */
 						continue;
@@ -2471,7 +2449,8 @@ public:
 			/* Don't increment inside the while because otherwise conditional
 			 * orders can lead to an infinite loop. */
 			++this->index;
-		} while (this->index != this->v->cur_real_order_index);
+			depth++;
+		} while (this->index != this->v->cur_real_order_index && depth < this->v->GetNumOrders());
 
 		return false;
 	}
@@ -3250,7 +3229,7 @@ bool TrainController(Train *v, Vehicle *nomove, bool reverse)
 					v->tile = gp.new_tile;
 
 					if (GetTileRailType(gp.new_tile) != GetTileRailType(gp.old_tile)) {
-						v->First()->RailtypeChanged();
+						v->First()->ConsistChanged(true);
 					}
 
 					v->track = chosen_track;

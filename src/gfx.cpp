@@ -20,7 +20,6 @@
 #include "settings_type.h"
 #include "network/network.h"
 #include "network/network_func.h"
-#include "thread/thread.h"
 #include "window_func.h"
 #include "newgrf_debug.h"
 
@@ -817,6 +816,36 @@ int GetStringHeight(StringID str, int maxw)
  * @return Bounding box for the multi-line string, may be bigger than \a suggestion.
  */
 Dimension GetStringMultiLineBoundingBox(StringID str, const Dimension &suggestion)
+{
+	Dimension box = {suggestion.width, GetStringHeight(str, suggestion.width)};
+	return box;
+}
+
+
+/**
+ * Calculates height of string (in pixels). The string is changed to a multiline string if needed.
+ * @param str string to check
+ * @param maxw maximum string width
+ * @return height of pixels of string when it is drawn
+ */
+int GetStringHeight(const char *str, int maxw)
+{
+	char buffer[DRAW_STRING_BUFFER];
+
+	strecpy(buffer, str, lastof(buffer));
+
+	uint32 tmp = FormatStringLinebreaks(buffer, lastof(buffer), maxw);
+
+	return GetMultilineStringHeight(buffer, GB(tmp, 0, 16), FS_NORMAL);
+}
+
+/**
+ * Calculate string bounding box for multi-line strings.
+ * @param str        String to check.
+ * @param suggestion Suggested bounding box.
+ * @return Bounding box for the multi-line string, may be bigger than \a suggestion.
+ */
+Dimension GetStringMultiLineBoundingBox(const char *str, const Dimension &suggestion)
 {
 	Dimension box = {suggestion.width, GetStringHeight(str, suggestion.width)};
 	return box;

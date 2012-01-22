@@ -1465,7 +1465,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Als Fir
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Magëschen Bulldozer (Industrien ofrappen, onzerstéierbar Objekter): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Tunnellen kënnen sech kräizen: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Jet'en maachen net regelméisseg en Accident op klengen Fluchhäfen: {ORANGE} {STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Klima wiesselen: {ORANGE} {STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Temperéiert Landschaft
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Sub-Arktësch Landschaft
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Sub-Tropësch Landschaft
@@ -2531,17 +2530,10 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} muss
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} brauch OpenTTD Versioun {STRING} oder méi nei
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :GRF Datei déi designed gouf fir ze iwwersetzen
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Zevill NewGRFen gelueden.
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :{2:STRING} als statësch NewGRF lueden mat {4:STRING} kann Desyncs efirrufen
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Onerwaard Sprite
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Onbekannt Action 0 Besëtz
-STR_NEWGRF_ERROR_INVALID_ID                                     :Probéiert eng invalid ID ze benotzen
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :{1:STRING} als statësch NewGRF lueden mat {STRING} kann Desyncs efirrufen
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} huet eng korrupt Sprite. All korrupt Sprites ginn als Fragezeichen (?) duergestallt
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Huet e puer Action 8 Einträg
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Iwwert d'Enn vum pseudo-sprite liesen
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}D'momentan benotzten Grafikset huet e puer Sprites ze mann. {}W.e.g d'Basisgrafikset updaten
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Ugefroten GRF net verfügbar
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} gouf ausgeschalt vun {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Ongültëgen/onbekannten Sprite Layout Format
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} gouf ausgeschalt vun {STRING}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Opgepasst!

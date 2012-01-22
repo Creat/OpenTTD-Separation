@@ -10,9 +10,7 @@
 /** @file game_instance.cpp Implementation of GameInstance. */
 
 #include "../stdafx.h"
-#include "../debug.h"
 #include "../error.h"
-#include "../saveload/saveload.h"
 
 #include "../script/squirrel_class.hpp"
 
@@ -128,6 +126,7 @@ void GameInstance::RegisterAPI()
 	SQGSEventCompanyMerger_Register(this->engine);
 	SQGSEventCompanyNew_Register(this->engine);
 	SQGSEventController_Register(this->engine);
+	SQGSEventGoalQuestionAnswer_Register(this->engine);
 	SQGSEventIndustryClose_Register(this->engine);
 	SQGSEventIndustryOpen_Register(this->engine);
 	SQGSEventStationFirstVehicle_Register(this->engine);

@@ -1,6 +1,6 @@
 OpenTTD readme
-Last updated:    2011-12-24
-Release version: 1.2.0-beta1
+Last updated:    2012-01-07
+Release version: 1.2.0-beta2
 ------------------------------------------------------------------------
 
 
@@ -262,7 +262,7 @@ system:
 		directory if it is your personal directory, i.e. "~/", or when it is the
 		root directory, i.e. "/".
 	2. Your personal directory
-		Windows: C:\My Documents (95, 98, ME)
+		Windows: C:\My Documents\OpenTTD (95, 98, ME)
 		         C:\Documents and Settings\<username>\My Documents\OpenTTD (2000, XP)
 		         C:\Users\<username>\Documents\OpenTTD (Vista, 7)
 		Mac OSX: ~/Documents/OpenTTD

@@ -24,7 +24,6 @@
 #include "fontcache.h"
 #include "currency.h"
 #include "landscape.h"
-#include "newgrf.h"
 #include "newgrf_cargo.h"
 #include "newgrf_house.h"
 #include "newgrf_sound.h"
@@ -419,6 +418,7 @@ static GRFError *DisableGrf(StringID message = STR_NULL, GRFConfig *config = NUL
 	if (message != STR_NULL) {
 		delete config->error;
 		config->error = new GRFError(STR_NEWGRF_ERROR_MSG_FATAL, message);
+		if (config == _cur.grfconfig) config->error->param_value[0] = _cur.nfo_line;
 	}
 
 	return config->error;
@@ -2519,8 +2519,12 @@ static ChangeInfoResult GlobalVarChangeInfo(uint gvid, int numinfo, int prop, By
 				if (lang == NULL) {
 					grfmsg(1, "GlobalVarChangeInfo: Language %d is not known, ignoring", curidx);
 					/* Skip over the data. */
-					while (buf->ReadByte() != 0) {
-						buf->ReadString();
+					if (prop == 0x15) {
+						buf->ReadByte();
+					} else {
+						while (buf->ReadByte() != 0) {
+							buf->ReadString();
+						}
 					}
 					break;
 				}
@@ -3895,7 +3899,7 @@ static ChangeInfoResult RailTypeChangeInfo(uint id, int numinfo, int prop, ByteR
 				int n = buf->ReadByte();
 				for (int j = 0; j != n; j++) {
 					RailTypeLabel label = buf->ReadDWord();
-					RailType rt = GetRailTypeByLabel(BSWAP32(label));
+					RailType rt = GetRailTypeByLabel(BSWAP32(label), false);
 					if (rt != INVALID_RAILTYPE) {
 						switch (prop) {
 							case 0x0E: SetBit(rti->compatible_railtypes, rt);            break;
@@ -3953,6 +3957,11 @@ static ChangeInfoResult RailTypeChangeInfo(uint id, int numinfo, int prop, ByteR
 				rti->maintenance_multiplier = buf->ReadWord();
 				break;
 
+			case 0x1D: // Alternate rail type label list
+				/* Skipped here as this is loaded during reservation stage. */
+				for (int j = buf->ReadByte(); j != 0; j--) buf->ReadDWord();
+				break;
+
 			default:
 				ret = CIR_UNKNOWN;
 				break;
@@ -3966,6 +3975,8 @@ static ChangeInfoResult RailTypeReserveInfo(uint id, int numinfo, int prop, Byte
 {
 	ChangeInfoResult ret = CIR_SUCCESS;
 
+	extern RailtypeInfo _railtypes[RAILTYPE_END];
+
 	if (id + numinfo > RAILTYPE_END) {
 		grfmsg(1, "RailTypeReserveInfo: Rail type %u is invalid, max %u, ignoring", id + numinfo, RAILTYPE_END);
 		return CIR_INVALID_ID;
@@ -3978,7 +3989,7 @@ static ChangeInfoResult RailTypeReserveInfo(uint id, int numinfo, int prop, Byte
 				RailTypeLabel rtl = buf->ReadDWord();
 				rtl = BSWAP32(rtl);
 
-				RailType rt = GetRailTypeByLabel(rtl);
+				RailType rt = GetRailTypeByLabel(rtl, false);
 				if (rt == INVALID_RAILTYPE) {
 					/* Set up new rail type */
 					rt = AllocateRailType(rtl);
@@ -3999,6 +4010,17 @@ static ChangeInfoResult RailTypeReserveInfo(uint id, int numinfo, int prop, Byte
 			case 0x1C: // Maintenance cost factor
 				buf->ReadWord();
 				break;
+
+			case 0x1D: // Alternate rail type label list
+				if (_cur.grffile->railtype_map[id + i] != INVALID_RAILTYPE) {
+					int n = buf->ReadByte();
+					for (int j = 0; j != n; j++) {
+						*_railtypes[_cur.grffile->railtype_map[id + i]].alternate_labels.Append() = BSWAP32(buf->ReadDWord());
+					}
+					break;
+				}
+				grfmsg(1, "RailTypeReserveInfo: Ignoring property 1D for rail type %u because no label was set", id + i);
+				/* FALL THROUGH */
 
 			case 0x0E: // Compatible railtype list
 			case 0x0F: // Powered railtype list
@@ -4139,10 +4161,12 @@ static bool HandleChangeInfoResult(const char *caller, ChangeInfoResult cir, uin
 			grfmsg(0, "%s: Unknown property 0x%02X of feature 0x%02X, disabling", caller, property, feature);
 			/* FALL THROUGH */
 
-		case CIR_INVALID_ID:
+		case CIR_INVALID_ID: {
 			/* No debug message for an invalid ID, as it has already been output */
-			DisableGrf(cir == CIR_INVALID_ID ? STR_NEWGRF_ERROR_INVALID_ID : STR_NEWGRF_ERROR_UNKNOWN_PROPERTY);
+			GRFError *error = DisableGrf(cir == CIR_INVALID_ID ? STR_NEWGRF_ERROR_INVALID_ID : STR_NEWGRF_ERROR_UNKNOWN_PROPERTY);
+			if (cir != CIR_INVALID_ID) error->param_value[1] = property;
 			return true;
+		}
 	}
 }
 
@@ -6107,9 +6131,6 @@ static void GRFLoadError(ByteReader *buf)
 		STR_NEWGRF_ERROR_MSG_FATAL
 	};
 
-	/* For now we can only show one message per newgrf file. */
-	if (_cur.grfconfig->error != NULL) return;
-
 	byte severity   = buf->ReadByte();
 	byte lang       = buf->ReadByte();
 	byte message_id = buf->ReadByte();
@@ -6132,6 +6153,10 @@ static void GRFLoadError(ByteReader *buf)
 		/* This is a fatal error, so make sure the GRF is deactivated and no
 		 * more of it gets loaded. */
 		DisableGrf();
+
+		/* Make sure we show fatal errors, instead of silly infos from before */
+		delete _cur.grfconfig->error;
+		_cur.grfconfig->error = NULL;
 	}
 
 	if (message_id >= lengthof(msgstr) && message_id != 0xFF) {
@@ -6144,6 +6169,9 @@ static void GRFLoadError(ByteReader *buf)
 		return;
 	}
 
+	/* For now we can only show one message per newgrf file. */
+	if (_cur.grfconfig->error != NULL) return;
+
 	GRFError *error = new GRFError(sevstr[severity]);
 
 	if (message_id == 0xFF) {
@@ -6151,7 +6179,7 @@ static void GRFLoadError(ByteReader *buf)
 		if (buf->HasData()) {
 			const char *message = buf->ReadString();
 
-			error->custom_message = TranslateTTDPatchCodes(_cur.grffile->grfid, lang, true, message);
+			error->custom_message = TranslateTTDPatchCodes(_cur.grffile->grfid, lang, true, message, NULL, SCC_RAW_STRING_POINTER);
 		} else {
 			grfmsg(7, "GRFLoadError: No custom message supplied.");
 			error->custom_message = strdup("");
@@ -6170,12 +6198,10 @@ static void GRFLoadError(ByteReader *buf)
 	}
 
 	/* Only two parameter numbers can be used in the string. */
-	uint i = 0;
-	for (; i < 2 && buf->HasData(); i++) {
+	for (uint i = 0; i < lengthof(error->param_value) && buf->HasData(); i++) {
 		uint param_number = buf->ReadByte();
 		error->param_value[i] = _cur.grffile->GetParam(param_number);
 	}
-	error->num_params = i;
 
 	_cur.grfconfig->error = error;
 }

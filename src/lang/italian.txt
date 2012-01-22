@@ -1489,7 +1489,6 @@ STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Compagn
 STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Bulldozer magico (rimuove industrie e oggetti fissi): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}I tunnel possono incrociarsi tra loro: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}I jet non si schiantano (frequentemente) nei piccoli aeroporti: {ORANGE} {STRING}
-STR_CHEAT_SWITCH_CLIMATE                                        :{LTBLUE}Cambia tipo di paesaggio: {ORANGE} {STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Paesaggio 'temperato'
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Paesaggio 'sub-artico'
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Paesaggio 'sub-tropicale'
@@ -1824,6 +1823,10 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Sei stat
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Sei stato espulso dalla partita
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}I trucchi non sono ammessi su questo server
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Stavano venendo inviati troppi comandi al server
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Si è impiegato troppo tempo ad inserire la password
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Il computer ha impiegato troppo tempo ad entrare nella partita
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Il download della mappa ha richiesto troppo tempo
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}L'ingresso al server ha richiesto troppo tempo
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :errore generale
@@ -1842,6 +1845,10 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :espulso dal ser
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :ha provato a usare un trucco
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :server pieno
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :stava inviando troppi comandi
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :nessuna password ricevuta in tempo
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :timeout generico
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :il download della mappa ha richiesto troppo tempo
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :l'elaborazione della mappa ha richiesto troppo tempo
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Possibile perdita di connessione
@@ -2483,6 +2490,7 @@ STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Changelo
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licenza
 
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Imposta parametri
+STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Mostra parametri
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Alterna tavolozze
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Alterna la tavolozza colori utilizzata dal NewGRF selezionato.{}Utilizzare questa impostazione se la grafica di questo NewGRF durante il gioco appare rosa.
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Applica modifiche
@@ -2537,10 +2545,10 @@ STR_SPRITE_ALIGNER_GOTO_TOOLTIP                                 :{BLACK}Va allo 
 STR_SPRITE_ALIGNER_PREVIOUS_BUTTON                              :{BLACK}Precedente
 STR_SPRITE_ALIGNER_PREVIOUS_TOOLTIP                             :{BLACK}Procede al precedente sprite normale, saltanto qualsiasi sprite speciale, di ricoloramento o carattere e tornando all'ultimo se viene raggiunto l'inizio
 STR_SPRITE_ALIGNER_SPRITE_TOOLTIP                               :{BLACK}Rappresentazione dello sprite corrente. L'allineamento viene ignorato in questa casella.
-STR_SPRITE_ALIGNER_MOVE_TOOLTIP                                 :{BLACK}Sposta lo sprite, cambiando gli spiazzamenti X e Y
-STR_SPRITE_ALIGNER_OFFSETS                                      :{BLACK}Spiazzamento X: {NUM}, Y: {NUM}
-STR_SPRITE_ALIGNER_PICKER_BUTTON                                :{BLACK}Raccogli
-STR_SPRITE_ALIGNER_PICKER_TOOLTIP                               :{BLACK}Raccoglie gli sprite da un qualsiasi punto dello schermo
+STR_SPRITE_ALIGNER_MOVE_TOOLTIP                                 :{BLACK}Sposta lo sprite, cambiando i posizionamenti X e Y
+STR_SPRITE_ALIGNER_OFFSETS                                      :{BLACK}Posizionamento X: {NUM}, Y: {NUM}
+STR_SPRITE_ALIGNER_PICKER_BUTTON                                :{BLACK}Scegli
+STR_SPRITE_ALIGNER_PICKER_TOOLTIP                               :{BLACK}Sceglie uno o più sprite da un qualsiasi punto dello schermo
 
 STR_SPRITE_ALIGNER_GOTO_CAPTION                                 :{WHITE}Vai a
 
@@ -2548,8 +2556,8 @@ STR_SPRITE_ALIGNER_GOTO_CAPTION                                 :{WHITE}Vai a
 STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Attenzione: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Errore: {SILVER}{STRING}
-STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Errore fatale: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Si è verificato un errore fatale NewGRF: {}{STRING}
+STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Errore irreversibile: {SILVER}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Si è verificato un errore irreversibile nel NewGRF: {}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} non funziona con la versione di TTDPatch riferita da OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} è per la versione {STRING} di TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} è progettato per essere usato con {STRING}
@@ -2559,17 +2567,17 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} deve
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} richiede OpenTTD versione {STRING} o superiore
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :il file GRF che era progettato per tradurre
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Troppi NewGRF caricati
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Caricare {2:STRING} come NewGRF statico insieme a {4:STRING} può causare errori di sincronizzazione
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Sprite inatteso
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Proprietà sconosciuta per l'azione 0
-STR_NEWGRF_ERROR_INVALID_ID                                     :Tentativo di utilizzare un ID non valido
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Caricare {1:STRING} come NewGRF statico insieme a {STRING} può causare errori di sincronizzazione
+STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Sprite inatteso (sprite {3:NUM})
+STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Proprietà {4:HEX} sconosciuta per l'azione 0 (sprite {3:NUM})
+STR_NEWGRF_ERROR_INVALID_ID                                     :Tentativo di utilizzare un ID non valido (sprite {3:NUM})
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} contiene degli sprite corrotti. Tutti gli sprite corrotti saranno mostrati come punti interrogativi (?) rossi
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Contiene occorrenze multiple dell'azione 8
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lettura oltre la fine dello pseudo-sprite
+STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Contiene occorrenze multiple dell'azione 8 (sprite {3:NUM})
+STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lettura oltre la fine dello pseudo-sprite (sprite {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Nel pacchetto grafico di base attualmente in uso mancano alcuni sprite.{}È consigliabile aggiornare il pacchetto grafico di base
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Risorsa GRF richiesta non disponibile
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} è stato disabilitato da {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Formato di layout dello sprite non valido o sconosciuto
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Risorsa GRF richiesta non disponibile (sprite {3:NUM})
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} è stato disabilitato da {STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Formato di layout dello sprite sconosciuto o non valido (sprite {3:NUM})
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Attenzione!
@@ -2696,6 +2704,29 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 STR_GOALS_NONE                                                  :{ORANGE}- Nessuno -
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Obiettivi della compagnia:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Fare clic su un obiettivo per centrare la visuale principale sull'industria, città o riquadro. CTRL+clic mostra l'industria/città/riquadro in una mini visuale
+
+# Goal question window
+STR_GOAL_QUESTION_CAPTION                                       :{WHITE}Domanda
+
+### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Annulla
+STR_GOAL_QUESTION_BUTTON_OK                                     :OK
+STR_GOAL_QUESTION_BUTTON_NO                                     :No
+STR_GOAL_QUESTION_BUTTON_YES                                    :Sì
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Rifiuta
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Accetta
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Ignora
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Riprova
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Precedente
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Successivo
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Termina
+STR_GOAL_QUESTION_BUTTON_START                                  :Inizia
+STR_GOAL_QUESTION_BUTTON_GO                                     :Vai
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Continua
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Ricomincia
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Rimanda
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Rinuncia
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Chiudi
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Sussidi
@@ -2835,7 +2866,7 @@ STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP                         :{BLACK}Cambia i
 STR_COMPANY_VIEW_BUY_SHARE_BUTTON                               :{BLACK}Compra il 25% delle azioni
 STR_COMPANY_VIEW_SELL_SHARE_BUTTON                              :{BLACK}Vendi il 25% delle azioni
 STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Compra una quota del 25% di questa compagnia. MAIUSC+clic mostra il costo stimato senza comprare azioni
-STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Vende una quota pari al 25% di questa compagnia. MAIUSC+clic mostra il costo stimato senza vendere azioni
+STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Vende una quota pari al 25% di questa compagnia. MAIUSC+clic mostra l'incasso stimato senza vendere azioni
 
 STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Nome della compagnia
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Nome del presidente
@@ -3514,7 +3545,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Script d
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Visualizza il log degli script di gioco
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Impossibile trovare una IA adatta da caricare.{}La IA caricata è solo un abbozzo e resterà semplicemente passiva.{}È possibile scaricare numerose IA tramite il sistema 'Contenuti online'
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Una delle IA in funzione è andata in crash. Si prega di inviare una segnalazione all'autore della IA con uno screenshot della finestra Debug IA
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Uno degli script in funzione è andato in crash. Si prega di inviare una segnalazione all'autore dello script con uno screenshot della finestra Debug IA / GameScript
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}La finestra di debug IA / GameScript è disponibile soltanto per il server
 
 # AI configuration window
