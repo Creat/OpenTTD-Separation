@@ -2530,7 +2530,7 @@ STR_NEWGRF_ERROR_MSG_INFO                                       :{SILVER}{STRING
 STR_NEWGRF_ERROR_MSG_WARNING                                    :{RED}Atención: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_ERROR                                      :{RED}Error: {SILVER}{STRING}
 STR_NEWGRF_ERROR_MSG_FATAL                                      :{RED}Error Fatal: {SILVER}{STRING}
-STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Un error fatal de NewGRF ha ocurrido: {}{STRING}
+STR_NEWGRF_ERROR_FATAL_POPUP                                    :{WHITE}Ha ocurrido un error fatal de NewGRF: {}{STRING}
 STR_NEWGRF_ERROR_VERSION_NUMBER                                 :{1:STRING} no funcionará con la con la versión de TTDPatch reportada por OpenTTD
 STR_NEWGRF_ERROR_DOS_OR_WINDOWS                                 :{1:STRING} es la para la versión {STRING} de TTD
 STR_NEWGRF_ERROR_UNSET_SWITCH                                   :{1:STRING} está diseñado para ser usado con {STRING}
@@ -2540,17 +2540,17 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} debe
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} requiere OpenTTD versión {STRING} o superior
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :El fichero GRF ha sido diseñado para ser traducido
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Demasiados NewGRFs han sido cargados
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Cargar {2:STRING} como NewGRF estático con {4:STRING} puede causar desincronizaciones
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Sprite inesperado
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Acción 0 con propiedad desconocida
-STR_NEWGRF_ERROR_INVALID_ID                                     :Intento de usar un ID incorrecto
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Cargar {1:STRING} como NewGRF estático con {STRING} puede causar desincronizaciones
+STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Sprite inesperado (sprite {3:NUM})
+STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Propiedad de Acción 0 desconocida {4:HEX} (sprite {3:NUM})
+STR_NEWGRF_ERROR_INVALID_ID                                     :Intento de usar una ID inválida (sprite {3:NUM})
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} contiene un sprite corrupto. Todos los sprites corruptos serán mostrados como un interrogante rojo (?)
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Contiene múltiples entradas Action 8
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lectura después del final de un pseudo-sprite
+STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Contiene múltiples entradas de Acción 8 (sprite {3:NUM})
+STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lectura mas allá del fin de un pseudo-sprite (sprite {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Al conjunto de gráficos base actualmente en uso le faltan algunos sprites.{}El conjunto de gráficos base debe ser actualizado
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Recursos GRF requeridos no disponibles
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} fue desactivado por {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Formato de distribución de sprite inválido o desconocido
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Recursos GRF solicitados no disponibles (sprite {3:NUM})
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} fue desactivado por {STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Formato de colocación de sprites inválido o desconocido (sprite {3:NUM})
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}¡Precaución!
@@ -4064,7 +4064,7 @@ STR_SV_STNAME_SOUTH                                             :{STRING} Sur
 STR_SV_STNAME_EAST                                              :{STRING} Este
 STR_SV_STNAME_WEST                                              :{STRING} Oeste
 STR_SV_STNAME_CENTRAL                                           :{STRING} Central
-STR_SV_STNAME_TRANSFER                                          :{STRING} Intercambio
+STR_SV_STNAME_TRANSFER                                          :{STRING} Transferencia
 STR_SV_STNAME_HALT                                              :{STRING} Parada
 STR_SV_STNAME_VALLEY                                            :Valle de {STRING}
 STR_SV_STNAME_HEIGHTS                                           :Cumbres de {STRING}

@@ -2539,17 +2539,17 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} tule
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} vaatii OpenTTD:n version {STRING} tai uudemman
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :GRF-tiedosto jonka se muuntaa
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Liian monta NewGRF:ää on ladattu
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :NewGRF:n {2:STRING} lataaminen staattisena NewGRF:nä {4:STRING}:n kanssa saattaa aiheuttaa nykimistä
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Odottamaton sprite
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Tuntematon Action 0 -ominaisuus
-STR_NEWGRF_ERROR_INVALID_ID                                     :Virheellisen ID:n käyttöyritys
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :NewGRF:n {1:STRING} lataaminen staattisena NewGRF:nä {STRING}:n kanssa saattaa aiheuttaa nykimistä
+STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Odottamaton sprite (sprite {3:NUM})
+STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Tuntematon Action 0-ominaisuus {4:HEX} (sprite {3:NUM})
+STR_NEWGRF_ERROR_INVALID_ID                                     :Yritys käyttää virheellistä ID:tä (sprite {3:NUM})
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} sisältää korruptoituneen spriten. Kaikki korruptoituneet spritet näkyvät punaisina kysymysmerkkeinä (?)
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Sisältää useamman Action 8 -kohdan
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Luku pseudo-spriten ohi
+STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Sisältää useita Action 8-merkintöjä (sprite {3:NUM})
+STR_NEWGRF_ERROR_READ_BOUNDS                                    :Luku pseudo-spriten ohi (sprite {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Käytössä olevasta perusgrafiikkapaketista puuttuu spritejä.{}Ole hyvä ja päivitä perusgrafiikkapaketti
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Pyydetyt GRF-resurssit eivät ole saatavilla
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{4:STRING} poisti käytöstä NewGRF:n {2:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Virheellinen/tuntematon spriten asetteluformaatti
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Pyydetyt GRF-resurssit eivät ole saatavilla (sprite {3:NUM})
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} poisti käytöstä NewGRF:n {1:STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Virheellinen/tuntematon spriten asettelumuoto (sprite {3:NUM})
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Varoitus!

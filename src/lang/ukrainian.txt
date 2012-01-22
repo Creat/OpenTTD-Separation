@@ -1926,6 +1926,8 @@ STR_NETWORK_ERROR_CHEATER                                       :{WHITE}На ц�
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Ви посилали забагато команд серверу
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Ви занадто довго вводили пароль
 STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Ви дуже довго приєднувалися
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Ви дуже довго завантажували мапу
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Ви дуже довго приєднувалися до серверу
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :фатальна помилка
@@ -1944,6 +1946,8 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :відключ�
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :спроба грати нечесно
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :сервер переповнений
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :посилав забагато команд
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :вчасно не отримав пароль
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :мапа дуже довго завантажувалась
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Можлива втрата з'єднання
@@ -2658,17 +2662,10 @@ STR_NEWGRF_ERROR_LOAD_AFTER                                     :{1:STRING} ма
 STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} потребує версію OpenTTD не нижче {STRING}
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :GRF-файл, для якого це призначалось перекласти
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Завантажено забагато NewGRF-файлів
-STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Завантаження {2:STRING} як статичного NewGRF з {4:STRING} може викликати десинхронізацію
-STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Неочікуваний спрайт
-STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Невідома властивість Action 0
-STR_NEWGRF_ERROR_INVALID_ID                                     :Спроба використання невірного ID
+STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Завантаження {1:STRING} як статичного NewGRF з {STRING} може викликати десинхронізацію
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} містить зіпсований спрайт. Усі зіпсовані спрайти будуть показані як червоний знак питання (?)
-STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Містить багато записів Action 8
-STR_NEWGRF_ERROR_READ_BOUNDS                                    :Читання за кінцем псевдоспрайту
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}У базовому наборі графіки, що зараз використовується не вистачає спрайтів.{}Будь-ласка оновіть базовий набір графіки
-STR_NEWGRF_ERROR_GRM_FAILED                                     :Запитуваний GRF ресурс є недоступним
-STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{2:STRING} був вимкнений {4:STRING}
-STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Невірний/невідомий формат розміщення спрайтів
+STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} був вимкнений {STRING}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Обережно!

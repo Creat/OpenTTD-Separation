@@ -418,6 +418,7 @@ static GRFError *DisableGrf(StringID message = STR_NULL, GRFConfig *config = NUL
 	if (message != STR_NULL) {
 		delete config->error;
 		config->error = new GRFError(STR_NEWGRF_ERROR_MSG_FATAL, message);
+		if (config == _cur.grfconfig) config->error->param_value[0] = _cur.nfo_line;
 	}
 
 	return config->error;
@@ -4160,10 +4161,12 @@ static bool HandleChangeInfoResult(const char *caller, ChangeInfoResult cir, uin
 			grfmsg(0, "%s: Unknown property 0x%02X of feature 0x%02X, disabling", caller, property, feature);
 			/* FALL THROUGH */
 
-		case CIR_INVALID_ID:
+		case CIR_INVALID_ID: {
 			/* No debug message for an invalid ID, as it has already been output */
-			DisableGrf(cir == CIR_INVALID_ID ? STR_NEWGRF_ERROR_INVALID_ID : STR_NEWGRF_ERROR_UNKNOWN_PROPERTY);
+			GRFError *error = DisableGrf(cir == CIR_INVALID_ID ? STR_NEWGRF_ERROR_INVALID_ID : STR_NEWGRF_ERROR_UNKNOWN_PROPERTY);
+			if (cir != CIR_INVALID_ID) error->param_value[1] = property;
 			return true;
+		}
 	}
 }
 
@@ -6176,7 +6179,7 @@ static void GRFLoadError(ByteReader *buf)
 		if (buf->HasData()) {
 			const char *message = buf->ReadString();
 
-			error->custom_message = TranslateTTDPatchCodes(_cur.grffile->grfid, lang, true, message);
+			error->custom_message = TranslateTTDPatchCodes(_cur.grffile->grfid, lang, true, message, NULL, SCC_RAW_STRING_POINTER);
 		} else {
 			grfmsg(7, "GRFLoadError: No custom message supplied.");
 			error->custom_message = strdup("");
@@ -6195,12 +6198,10 @@ static void GRFLoadError(ByteReader *buf)
 	}
 
 	/* Only two parameter numbers can be used in the string. */
-	uint i = 0;
-	for (; i < 2 && buf->HasData(); i++) {
+	for (uint i = 0; i < lengthof(error->param_value) && buf->HasData(); i++) {
 		uint param_number = buf->ReadByte();
 		error->param_value[i] = _cur.grffile->GetParam(param_number);
 	}
-	error->num_params = i;
 
 	_cur.grfconfig->error = error;
 }
