@@ -573,7 +573,7 @@ void OrderList::InitializeSeparation()
  * @return the delay setting required for correct separation. */
 Ticks OrderList::SeparateVehicle()
 {
-	if (!this->is_separation_valid || this->current_sep_mode != TTS_MODE_OFF)
+	if (!this->is_separation_valid || this->current_sep_mode == TTS_MODE_OFF)
 		return INVALID_TICKS;
 
 	Ticks result = GetCurrentTickCount() - (this->separation_counter * this->current_separation + this->last_timetable_init);
