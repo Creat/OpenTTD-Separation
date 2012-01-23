@@ -234,6 +234,7 @@
  *  168   23637
  *  169   23816
  *  170   23826
+ *  171   23835
  */
 extern const uint16 SAVEGAME_VERSION = SL_TTSEP_VER; ///< Current savegame version of OpenTTD.
 
@@ -1086,6 +1087,7 @@ static void SlString(void *ptr, size_t length, VarType conv)
 					free(*(char **)ptr);
 					if (len == 0) {
 						*(char **)ptr = NULL;
+						return;
 					} else {
 						*(char **)ptr = MallocT<char>(len + 1); // terminating '\0'
 						ptr = *(char **)ptr;

@@ -419,7 +419,10 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 				assert(new_owner != INVALID_OWNER);
 
 				v->owner = new_owner;
+
+				/* Owner changes, clear cache */
 				v->colourmap = PAL_NONE;
+				v->InvalidateNewGRFCache();
 
 				if (v->IsEngineCountable()) {
 					GroupStatistics::CountEngine(v, 1);
@@ -467,6 +470,9 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 		/* update signals in buffer */
 		UpdateSignalsInBuffer();
 	}
+
+	/* Add airport infrastructure count of the old company to the new one. */
+	if (new_owner != INVALID_OWNER) Company::Get(new_owner)->infrastructure.airport += Company::Get(old_owner)->infrastructure.airport;
 
 	/* convert owner of stations (including deleted ones, but excluding buoys) */
 	Station *st;
