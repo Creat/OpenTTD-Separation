@@ -635,6 +635,7 @@ void OrderList::SetSepSettings(TTSepMode mode, uint32 parameter)
 	case TTS_MODE_AUTO:
 	case TTS_MODE_OFF:
 		/* nothing to do */
+		break;
 
 	default:
 		NOT_REACHED();
