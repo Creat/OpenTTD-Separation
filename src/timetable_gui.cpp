@@ -352,7 +352,13 @@ struct TimetableWindow : Window {
 
 		this->SetWidgetLoweredState(WID_VT_AUTOFILL, HasBit(v->vehicle_flags, VF_AUTOFILL_TIMETABLE));
 
-		bool b = !(_settings_game.order.automatic_timetable_separation && this->vehicle->orders.list->IsCompleteTimetable());
+		bool b;
+
+		if(this->vehicle->orders.list != NULL) {
+			b = !(_settings_game.order.automatic_timetable_separation && this->vehicle->orders.list->IsCompleteTimetable());
+		} else {
+			b = false;
+		}
 		this->SetWidgetsDisabledState(b, WID_VT_TTSEP_SET_PARAMETER, WID_VT_TTSEP_MODE_DROPDOWN, WIDGET_LIST_END);
 
 		/* If we're in auto or off mode, we don't need to set any parameters */
@@ -516,7 +522,7 @@ struct TimetableWindow : Window {
 				const int right_border = r.right - WD_FRAMERECT_RIGHT; // Represents the right border of the separation display frame.
 
 				/* If separation is inactive, we can stop here. */
-				if (!_settings_game.order.automatic_timetable_separation || !this->vehicle->orders.list->IsCompleteTimetable())
+				if (!_settings_game.order.automatic_timetable_separation || (this->vehicle->orders.list == NULL))
 					break;
 
 				/* If the new mode is OFF... */
