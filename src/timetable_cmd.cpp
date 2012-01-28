@@ -251,7 +251,7 @@ CommandCost CmdReinitSeparation(TileIndex tile, DoCommandFlag flags, uint32 p1, 
 	if (ret.Failed()) return ret;
 
 	if (flags & DC_EXEC) {
-		v->SetSepSettings((TTSepMode)GB(p2,0,2), GB(p2,2,29));
+		v->SetSepSettings((TTSepMode)GB(p2,0,3), GB(p2,2,29));
 	}
 
 	return CommandCost();

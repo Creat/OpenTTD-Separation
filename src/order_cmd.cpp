@@ -527,6 +527,18 @@ void OrderList::DebugCheckSanity() const
 			this->num_vehicles, this->timetable_duration);
 }
 
+/** Returns the number of running (i.e. not stopped) vehicles in the shared orders list. */
+int OrderList::GetNumRunningVehicles()
+{
+	int num_running_vehicles = 0;
+
+	for (const Vehicle *v = this->first_shared; v != NULL; v = v->NextShared()) {
+		if (!(v->vehstatus & (VS_STOPPED | VS_CRASHED))) num_running_vehicles++;
+	}
+
+	return num_running_vehicles;
+}
+
 /** (Re-)Initializes Separation if necessary and possible. */
 void OrderList::InitializeSeparation()
 {
@@ -543,11 +555,9 @@ void OrderList::InitializeSeparation()
 	// Calculate separation amount depending on mode of operation.
 	switch (current_sep_mode) {
 	case TTS_MODE_AUTO: {
-		int num_running_vehicles = 0;
+		int num_running_vehicles = this->GetNumRunningVehicles();
+		assert(num_running_vehicles > 0);
 
-		for (const Vehicle *v = this->first_shared; v != NULL; v = v->NextShared()) {
-			if (!(v->vehstatus & (VS_STOPPED | VS_CRASHED))) num_running_vehicles++;
-		}
 		this->current_separation = this->GetTimetableTotalDuration() / num_running_vehicles;
 		break;
 	}
@@ -559,6 +569,17 @@ void OrderList::InitializeSeparation()
 	case TTS_MODE_MAN_T:
 		// separation is set manually -> nothing to do
 		break;
+
+	case TTS_MODE_BUFFERED_AUTO: {
+		int num_running_vehicles = this->GetNumRunningVehicles();
+		assert(num_running_vehicles > 0);
+
+		if(num_running_vehicles > 1)
+			num_running_vehicles--;
+
+		this->current_separation = this->GetTimetableTotalDuration() / num_running_vehicles;
+		break;
+	}
 
 	default:
 		NOT_REACHED();
@@ -605,8 +626,8 @@ TTSepSettings OrderList::GetSepSettings()
  */
 void OrderList::SetSepSettings(TTSepSettings s)
 {
-	uint32 p2 = GB<uint32>(s.mode,0,2);
-	AB<uint32, uint>(p2,2,30, (s.mode == TTS_MODE_MAN_N) ? s.num_veh : s.sep_ticks);
+	uint32 p2 = GB<uint32>(s.mode,0,3);
+	AB<uint32, uint>(p2,3,29, (s.mode == TTS_MODE_MAN_N) ? s.num_veh : s.sep_ticks);
 	DoCommandP(0, this->first_shared->index, p2, CMD_REINIT_SEPARATION);
 }
 
@@ -633,6 +654,7 @@ void OrderList::SetSepSettings(TTSepMode mode, uint32 parameter)
 		break;
 
 	case TTS_MODE_AUTO:
+	case TTS_MODE_BUFFERED_AUTO:
 	case TTS_MODE_OFF:
 		/* nothing to do */
 		break;

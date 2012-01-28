@@ -3594,6 +3594,7 @@ STR_MESSAGE_ESTIMATED_INCOME                                    :{WHITE}Estimate
 STR_TTSEPARATION_AUTO                                           :Auto
 STR_TTSEPARATION_MAN_NUM                                        :Manual Number
 STR_TTSEPARATION_MAN_TIME                                       :Manual Time
+STR_TTSEPARATION_BUFFERED_AUTO                                  :Buffered Auto
 STR_TTSEPARATION_OFF                                            :Off
 STR_TTSEPARATION_APPLY                                          :{BLACK}Apply
 STR_TTSEPARATION_RESET                                          :{BLACK}Reset

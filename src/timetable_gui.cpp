@@ -33,11 +33,12 @@
 
 
 /** Entries for mode selection dropdown list. Order must be identical to the one in #TTSepMode */
-static const StringID TimetableSeparationDropdownOptions[5] = {
+static const StringID TimetableSeparationDropdownOptions[6] = {
 	STR_TTSEPARATION_AUTO,
 	STR_TTSEPARATION_OFF,
 	STR_TTSEPARATION_MAN_TIME,
 	STR_TTSEPARATION_MAN_NUM,
+	STR_TTSEPARATION_BUFFERED_AUTO,
 	INVALID_STRING_ID,
 };
 

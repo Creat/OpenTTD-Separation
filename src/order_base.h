@@ -212,6 +212,10 @@ enum TTSepMode {
 	 *  the timetable simultaneously. The algorithm acts according to this specification regardless of the actual number of
 	 *  running vehicles.*/
 	TTS_MODE_MAN_N,
+
+	/** Timetable separation works in buffered automatic mode that keeps one vehicle waiting at the first stop as
+	 *  reserve for delay compensation and behaves like full automatic otherwise. */
+	TTS_MODE_BUFFERED_AUTO,
 };
 
 struct TTSepSettings {
@@ -227,6 +231,9 @@ struct OrderList : OrderListPool::PoolItem<&_orderlist_pool> {
 private:
 	friend void AfterLoadVehicles(bool part_of_load); ///< For instantiating the shared vehicle chain
 	friend const struct SaveLoad *GetOrderListDescription(); ///< Saving and loading of order lists.
+
+	/** Returns the number of running (i.e. not stopped) vehicles in the shared orders list. */
+	int GetNumRunningVehicles();
 
 	Order *first;                     ///< First order of the order list.
 	VehicleOrderID num_orders;        ///< NOSAVE: How many orders there are in the list.
@@ -387,7 +394,8 @@ public:
 	/** Marks timetable separation invalid so it has to be initialized again. */
 	void MarkSeparationInvalid()
 	{
-		if (current_sep_mode == TTS_MODE_AUTO) this->is_separation_valid = false;
+		if ((this->current_sep_mode == TTS_MODE_AUTO)||(this->current_sep_mode == TTS_MODE_BUFFERED_AUTO))
+			this->is_separation_valid = false;
 	}
 
 	/**
