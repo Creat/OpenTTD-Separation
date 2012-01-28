@@ -1273,7 +1273,7 @@ STR_CONFIG_SETTING_AI_BUILDS_AIRCRAFT                           :{LTBLUE}Désact
 STR_CONFIG_SETTING_AI_BUILDS_SHIPS                              :{LTBLUE}Désactiver les navires pour l'ordinateur{NBSP}: {ORANGE}{STRING}
 
 STR_CONFIG_SETTING_AI_IN_MULTIPLAYER                            :{LTBLUE}Permettre les IA en multi-joueurs{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SCRIPT_MAX_OPCODES                           :{LTBLUE}Nombre d'opcodes avant de suspendre les scripts{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SCRIPT_MAX_OPCODES                           :{LTBLUE}Nombre d'opcodes avant d'interrompre les scripts{NBSP}: {ORANGE}{STRING}
 
 STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :{LTBLUE}Les intervalles de service sont en pourcentage{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_SERVINT_TRAINS                               :{LTBLUE}Intervalle d'entretien par défaut pour les trains{NBSP}: {ORANGE}{STRING} jour{P 0:1 "" s}/%
@@ -1285,51 +1285,51 @@ STR_CONFIG_SETTING_SERVINT_AIRCRAFT_DISABLED                    :{LTBLUE}Interva
 STR_CONFIG_SETTING_SERVINT_SHIPS                                :{LTBLUE}Intervalle d'entretien par défaut pour les navires{NBSP}: {ORANGE}{STRING} jour{P 0:1 "" s}/%
 STR_CONFIG_SETTING_SERVINT_SHIPS_DISABLED                       :{LTBLUE}Intervalle d'entretien par défaut pour les navires{NBSP}: {ORANGE}inactif
 STR_CONFIG_SETTING_NOSERVICE                                    :{LTBLUE}Désactiver l'entretien quand les pannes sont inactives{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_WAGONSPEEDLIMITS                             :{LTBLUE}Activer vitesse limite des wagons{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_WAGONSPEEDLIMITS                             :{LTBLUE}Activer la vitesse limite des wagons{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_DISABLE_ELRAILS                              :{LTBLUE}Désactiver les rails électriques{NBSP}: {ORANGE}{STRING}
 
 STR_CONFIG_SETTING_COLOURED_NEWS_YEAR                           :{LTBLUE}Les journaux en couleur apparaissent en{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_STARTING_YEAR                                :{LTBLUE}Année de départ{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :{LTBLUE}Permettre une économie stable (plus de petits changements){NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :{LTBLUE}Permettre une économie stable (petits changements plus nombreux){NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :{LTBLUE}Permettre d'acheter des actions d'autres compagnies{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :{LTBLUE}Pourcentage du profit de branche à payer dans les systèmes multi-modaux{NBSP}: {ORANGE}{STRING}%
 STR_CONFIG_SETTING_DRAG_SIGNALS_DENSITY                         :{LTBLUE}Espacement des signaux en mode glisser-déposer{NBSP}: {ORANGE}{STRING} case{P 0:1 "" s}
 STR_CONFIG_SETTING_SEMAPHORE_BUILD_BEFORE_DATE                  :{LTBLUE}Construire automatiquement des sémaphores avant{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :{LTBLUE}Activer le GUI des signaux{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :{LTBLUE}Activer l'interface graphique pour les signaux{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_TYPE                          :{LTBLUE}Type de signaux construit par défaut{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_NORMAL                        :Signaux de bloc
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_PBS                           :Signaux de chemin
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_PBSOWAY                       :Signaux de chemin à sens unique
-STR_CONFIG_SETTING_CYCLE_SIGNAL_TYPES                           :{LTBLUE}Cycle de types de signaux{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Signaux de bloc uniquement
-STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Signaux de chemin uniquement
-STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :Tous
+STR_CONFIG_SETTING_CYCLE_SIGNAL_TYPES                           :{LTBLUE}Sélectionner les signaux parmi{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :les signaux de bloc uniquement
+STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :les signaux de chemin uniquement
+STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :tous les signaux
 
 STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Agencement des routes pour les nouvelles villes{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :original
-STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :Meilleures routes
-STR_CONFIG_SETTING_TOWN_LAYOUT_2X2_GRID                         :Grille 2x2
-STR_CONFIG_SETTING_TOWN_LAYOUT_3X3_GRID                         :Grille 3x3
-STR_CONFIG_SETTING_TOWN_LAYOUT_RANDOM                           :Aléatoire
+STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :meilleures routes
+STR_CONFIG_SETTING_TOWN_LAYOUT_2X2_GRID                         :grille 2x2
+STR_CONFIG_SETTING_TOWN_LAYOUT_3X3_GRID                         :grille 3x3
+STR_CONFIG_SETTING_TOWN_LAYOUT_RANDOM                           :aléatoire
 STR_CONFIG_SETTING_ALLOW_TOWN_ROADS                             :{LTBLUE}Autoriser la construction des routes par les villes{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :{LTBLUE}Autoriser la construction des passages à niveau par les villes{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_NOISE_LEVEL                                  :{LTBLUE}Permettre plus d'aéroport par ville, selon les nuisances{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NOISE_LEVEL                                  :{LTBLUE}Permettre plus d'aéroports par ville, selon les nuisances sonores{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_TOWN_FOUNDING                                :{LTBLUE}Fonder des villes en cours de jeu{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TOWN_FOUNDING_FORBIDDEN                      :Interdit
-STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED                        :Autorisé
-STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED_CUSTOM_LAYOUT          :Autorisé, agencement des routes personnalisé
+STR_CONFIG_SETTING_TOWN_FOUNDING_FORBIDDEN                      :interdit
+STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED                        :autorisé
+STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED_CUSTOM_LAYOUT          :autorisé, y compris l'agencement personnalisé des routes
 
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT                         :{LTBLUE}Plantation des arbres durant la partie{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_NONE                    :Nulle part {RED}(les scieries ne fonctionneront plus)
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_RAINFOREST              :Seulement dans les forêts tropicales
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_ALL                     :Partout
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT                         :{LTBLUE}Plantation d'arbres durant la partie{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_NONE                    :nulle part {RED}(les scieries ne fonctionneront plus)
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_RAINFOREST              :seulement dans les forêts tropicales
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_ALL                     :partout
 
 STR_CONFIG_SETTING_TOOLBAR_POS                                  :{LTBLUE}Position de la barre d'outils principale{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_STATUSBAR_POS                                :{LTBLUE}Position de la barre d'état{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_SNAP_RADIUS                                  :{LTBLUE}Rayon d'attraction des fenêtres{NBSP}: {ORANGE}{STRING} pixel{P 0:1 "" s}
 STR_CONFIG_SETTING_SNAP_RADIUS_DISABLED                         :{LTBLUE}Rayon d'attraction des fenêtres{NBSP}: {ORANGE}inactif
-STR_CONFIG_SETTING_SOFT_LIMIT                                   :{LTBLUE}Nombre maximum de fenêtres non-ineffaçables{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SOFT_LIMIT_DISABLED                          :{LTBLUE}Nombre maximum de fenêtres non-ineffaçables{NBSP}: {ORANGE}désactivé
+STR_CONFIG_SETTING_SOFT_LIMIT                                   :{LTBLUE}Nombre maximum de fenêtres non punaisées{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SOFT_LIMIT_DISABLED                          :{LTBLUE}Nombre maximum de fenêtres non punaisées{NBSP}: {ORANGE}désactivé
 STR_CONFIG_SETTING_ZOOM_MIN                                     :{LTBLUE}Zoom avant maximum{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ZOOM_MAX                                     :{LTBLUE}Zoom arrière maximum{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ZOOM_LVL_MIN                                 :4x
@@ -1346,8 +1346,8 @@ STR_CONFIG_SETTING_TOWN_GROWTH_FAST                             :Rapide
 STR_CONFIG_SETTING_TOWN_GROWTH_VERY_FAST                        :Très rapide
 STR_CONFIG_SETTING_LARGER_TOWNS                                 :{LTBLUE}Proportion des villes qui deviendront des métropoles{NBSP}: {ORANGE}1 sur {STRING}
 STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :{LTBLUE}Proportion des villes qui deviendront des métropoles{NBSP}: {ORANGE}Aucune
-STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :{LTBLUE}Multiplicateur de taille de ville initial{NBSP}: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MODIFIED_ROAD_REBUILD                        :{LTBLUE}Retirer les éléments absurdes pendant la reconstruction des routes{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :{LTBLUE}Multiplicateur initial pour la taille des métropoles{NBSP}: {ORANGE}{STRING}
+STR_CONFIG_SETTING_MODIFIED_ROAD_REBUILD                        :{LTBLUE}Retirer les éléments absurdes lors de la construction des routes{NBSP}: {ORANGE}{STRING}
 
 STR_CONFIG_SETTING_GUI                                          :{ORANGE}Interface
 STR_CONFIG_SETTING_CONSTRUCTION                                 :{ORANGE}Construction
@@ -1359,7 +1359,7 @@ STR_CONFIG_SETTING_DISPLAY_OPTIONS                              :{ORANGE}Options
 STR_CONFIG_SETTING_INTERACTION                                  :{ORANGE}Interaction
 STR_CONFIG_SETTING_CONSTRUCTION_SIGNALS                         :{ORANGE}Signaux
 STR_CONFIG_SETTING_STATIONS_CARGOHANDLING                       :{ORANGE}Gestion des cargaisons
-STR_CONFIG_SETTING_AI_NPC                                       :{ORANGE}Intelligence Artificielle
+STR_CONFIG_SETTING_AI_NPC                                       :{ORANGE}Intelligence artificielle
 STR_CONFIG_SETTING_VEHICLES_AUTORENEW                           :{ORANGE}Renouvellement automatique
 STR_CONFIG_SETTING_VEHICLES_SERVICING                           :{ORANGE}Entretien
 STR_CONFIG_SETTING_VEHICLES_ROUTING                             :{ORANGE}Routage
@@ -1370,14 +1370,14 @@ STR_CONFIG_SETTING_ECONOMY_SCRIPTS                              :{ORANGE}Scripts
 
 STR_CONFIG_SETTING_PATHFINDER_OPF                               :Original
 STR_CONFIG_SETTING_PATHFINDER_NPF                               :NPF
-STR_CONFIG_SETTING_PATHFINDER_YAPF_RECOMMENDED                  :YAPF {BLUE}(Recommandé)
+STR_CONFIG_SETTING_PATHFINDER_YAPF_RECOMMENDED                  :YAPF {BLUE}(recommandé)
 
 STR_CONFIG_SETTING_PATHFINDER_FOR_TRAINS                        :{LTBLUE}Recherche de chemin des trains{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_PATHFINDER_FOR_ROAD_VEHICLES                 :{LTBLUE}Recherche de chemin des véhicules routiers{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS                         :{LTBLUE}Recherche de chemin des navires{NBSP}: {ORANGE}{STRING}
 STR_CONFIG_SETTING_REVERSE_AT_SIGNALS                           :{LTBLUE}Demi-tour automatique aux signaux{NBSP}: {ORANGE}{STRING}
 
-STR_CONFIG_SETTING_QUERY_CAPTION                                :{WHITE}Changer valeur du paramètre
+STR_CONFIG_SETTING_QUERY_CAPTION                                :{WHITE}Changer la valeur du paramètre
 
 # Config errors
 STR_CONFIG_ERROR                                                :{WHITE}Erreur dans le fichier de configuration...
@@ -1397,25 +1397,25 @@ STR_CONFIG_ERROR_INVALID_SAVEGAME_COMPRESSION_ALGORITHM         :{WHITE}... le f
 # Intro window
 STR_INTRO_CAPTION                                               :{WHITE}OpenTTD {REV}
 
-STR_INTRO_NEW_GAME                                              :{BLACK}Nouvelle Partie
-STR_INTRO_LOAD_GAME                                             :{BLACK}Charger une Partie
+STR_INTRO_NEW_GAME                                              :{BLACK}Nouvelle partie
+STR_INTRO_LOAD_GAME                                             :{BLACK}Charger une partie
 STR_INTRO_PLAY_SCENARIO                                         :{BLACK}Jouer un scénario
 STR_INTRO_PLAY_HEIGHTMAP                                        :{BLACK}Jouer une carte d'altitude
 STR_INTRO_SCENARIO_EDITOR                                       :{BLACK}Éditeur de scénario
-STR_INTRO_MULTIPLAYER                                           :{BLACK}Mode Multijoueur
+STR_INTRO_MULTIPLAYER                                           :{BLACK}Mode multijoueurs
 
 STR_INTRO_GAME_OPTIONS                                          :{BLACK}Options
 STR_INTRO_DIFFICULTY                                            :{BLACK}Difficulté ({STRING})
-STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Options Avancées
+STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Options avancées
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}Paramètres NewGRF
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Vérifier le contenu en ligne
 STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}Configuration d'IA et de jeu
 STR_INTRO_QUIT                                                  :{BLACK}Quitter
 
-STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Démarrer une nouvelle partie. Ctrl-clic pour passer la configuration du terrain
-STR_INTRO_TOOLTIP_LOAD_GAME                                     :{BLACK}Charger une partie sauvée
-STR_INTRO_TOOLTIP_PLAY_HEIGHTMAP                                :{BLACK}Démarrer une nouvelle partie, utilisant une carte d'altitude comme paysage
-STR_INTRO_TOOLTIP_PLAY_SCENARIO                                 :{BLACK}Démarrer une nouvelle partie à partir d'un scénario
+STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Démarrer une nouvelle partie. Ctrl-clic pour passer outre la configuration du terrain
+STR_INTRO_TOOLTIP_LOAD_GAME                                     :{BLACK}Charger une partie sauvegardée
+STR_INTRO_TOOLTIP_PLAY_HEIGHTMAP                                :{BLACK}Démarrer une nouvelle partie utilisant une carte d'altitude comme paysage
+STR_INTRO_TOOLTIP_PLAY_SCENARIO                                 :{BLACK}Démarrer une nouvelle partie à partir d'un scénario personnalisé
 STR_INTRO_TOOLTIP_SCENARIO_EDITOR                               :{BLACK}Créer un monde/scénario de jeu personnalisé
 STR_INTRO_TOOLTIP_MULTIPLAYER                                   :{BLACK}Démarrer une partie multijoueurs
 
@@ -1426,17 +1426,17 @@ STR_INTRO_TOOLTIP_TOYLAND_LANDSCAPE                             :{BLACK}Sélecti
 
 STR_INTRO_TOOLTIP_GAME_OPTIONS                                  :{BLACK}Afficher les options du jeu
 STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}Afficher les options de niveau de difficulté
-STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Configurer les options avancées
+STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Afficher les options avancées
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Afficher la configuration des NewGRF
-STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Vérifier les contenus à télécharger nouveaux et mis à jour
+STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Vérifier les contenus nouveaux ou mis à jour téléchargeables
 STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Afficher la configuration d'IA et de jeu
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Quitter OpenTTD
 
-STR_INTRO_TRANSLATION                                           :{BLACK}Il manque {NUM} chaine{P "" s} dans cette traduction. Merci d'aider à rendre OpenTTD meilleur en vous inscrivant comme traducteur. Voir readme.txt pour les details.
+STR_INTRO_TRANSLATION                                           :{BLACK}Il manque {NUM} chaine{P "" s} dans cette traduction. Merci d'aider à améliorer OpenTTD en vous inscrivant comme traducteur. Voir readme.txt pour les details.
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Quitter
-STR_QUIT_ARE_YOU_SURE_YOU_WANT_TO_EXIT_OPENTTD                  :{YELLOW}Êtes vous sur de vouloir quitter OpenTTD et retourner à {STRING}{NBSP}?
+STR_QUIT_ARE_YOU_SURE_YOU_WANT_TO_EXIT_OPENTTD                  :{YELLOW}Êtes-vous sûr de vouloir quitter OpenTTD et retourner à {STRING}{NBSP}?
 STR_QUIT_YES                                                    :{BLACK}Oui
 STR_QUIT_NO                                                     :{BLACK}Non
 
@@ -1455,21 +1455,21 @@ STR_OSNAME_SUNOS                                                :SunOS
 # Abandon game
 STR_ABANDON_GAME_CAPTION                                        :{WHITE}Abandonner la partie
 STR_ABANDON_GAME_QUERY                                          :{YELLOW}Êtes-vous sûr de vouloir abandonner cette partie{NBSP}?
-STR_ABANDON_SCENARIO_QUERY                                      :{YELLOW}Voulez-vous vraiment quitter ce scénario{NBSP}?
+STR_ABANDON_SCENARIO_QUERY                                      :{YELLOW}Êtes-vous sûr de vouloir quitter ce scénario{NBSP}?
 
 # Cheat window
 STR_CHEATS                                                      :{WHITE}Triches
-STR_CHEATS_TOOLTIP                                              :{BLACK}Les cases à cocher indiquent que vous avez déjà utilisé cette triche auparavant
+STR_CHEATS_TOOLTIP                                              :{BLACK}Les cases à cocher montrent si vous avez déjà utilisé cette triche auparavant
 STR_CHEATS_WARNING                                              :{BLACK}Attention{NBSP}! Vous êtes sur le point de trahir vos adversaires. Gardez en tête qu'une telle honte sera gardée en mémoire pour l'éternité
 STR_CHEAT_MONEY                                                 :{LTBLUE}Augmenter l'argent de {CURRENCY_LONG}
 STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Jouer en tant que compagnie{NBSP}: {ORANGE}{COMMA}
-STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Bulldozer magique (enlèvement industries et objets fixes){NBSP}: {ORANGE}{STRING}
+STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Bulldozer magique (enlèvement des industries et des objets fixes){NBSP}: {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Les tunnels peuvent se croiser{NBSP}: {ORANGE}{STRING}
-STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Les jets ne s'écrasent plus (fréquemment) sur les petits aéroports{NBSP}: {ORANGE} {STRING}
+STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Les jets ne s'écraseront plus (aussi fréquemment) sur les petits aéroports{NBSP}: {ORANGE} {STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Environnement 'Tempéré'
 STR_CHEAT_SWITCH_CLIMATE_SUB_ARCTIC_LANDSCAPE                   :Environnement 'Arctique'
 STR_CHEAT_SWITCH_CLIMATE_SUB_TROPICAL_LANDSCAPE                 :Environnement 'Tropical'
-STR_CHEAT_SWITCH_CLIMATE_TOYLAND_LANDSCAPE                      :Environnement 'Jouets'
+STR_CHEAT_SWITCH_CLIMATE_TOYLAND_LANDSCAPE                      :Environnement 'Monde des jouets'
 STR_CHEAT_CHANGE_DATE                                           :{LTBLUE}Changer la date{NBSP}: {ORANGE}{DATE_SHORT}
 STR_CHEAT_CHANGE_DATE_QUERY_CAPT                                :{WHITE}Modifier l'année courante
 STR_CHEAT_SETUP_PROD                                            :{LTBLUE}Permettre la modification des valeurs de production{NBSP}: {ORANGE}{STRING}
@@ -1481,7 +1481,7 @@ STR_LIVERY_GENERAL_TOOLTIP                                      :{BLACK}Montrer 
 STR_LIVERY_TRAIN_TOOLTIP                                        :{BLACK}Montrer les livrées de trains
 STR_LIVERY_ROAD_VEHICLE_TOOLTIP                                 :{BLACK}Montrer les livrées de véhicules routiers
 STR_LIVERY_SHIP_TOOLTIP                                         :{BLACK}Montrer les livrées de navires
-STR_LIVERY_AIRCRAFT_TOOLTIP                                     :{BLACK}Montrer les livrées des aéronefs
+STR_LIVERY_AIRCRAFT_TOOLTIP                                     :{BLACK}Montrer les livrées d'aéronefs
 STR_LIVERY_PRIMARY_TOOLTIP                                      :{BLACK}Choisir la couleur primaire de la livrée sélectionnée
 STR_LIVERY_SECONDARY_TOOLTIP                                    :{BLACK}Choisir la couleur secondaire de la livrée sélectionnée
 STR_LIVERY_PANEL_TOOLTIP                                        :{BLACK}Sélectionner la livrée à modifier, ou plusieurs par Ctrl-clic. Cliquer sur la case pour en intervertir l'utilisation
@@ -1494,9 +1494,9 @@ STR_LIVERY_MONORAIL                                             :Locomotive Mono
 STR_LIVERY_MAGLEV                                               :Locomotive Maglev
 STR_LIVERY_DMU                                                  :DMU
 STR_LIVERY_EMU                                                  :EMU
-STR_LIVERY_PASSENGER_WAGON_STEAM                                :Voiture (Vapeur)
+STR_LIVERY_PASSENGER_WAGON_STEAM                                :Voiture (vapeur)
 STR_LIVERY_PASSENGER_WAGON_DIESEL                               :Voiture (Diesel)
-STR_LIVERY_PASSENGER_WAGON_ELECTRIC                             :Voiture (Electrique)
+STR_LIVERY_PASSENGER_WAGON_ELECTRIC                             :Voiture (électrique)
 STR_LIVERY_PASSENGER_WAGON_MONORAIL                             :Voiture (Monorail)
 STR_LIVERY_PASSENGER_WAGON_MAGLEV                               :Voiture (Maglev)
 STR_LIVERY_FREIGHT_WAGON                                        :Wagon
@@ -1520,21 +1520,21 @@ STR_FACE_MALE_TOOLTIP                                           :{BLACK}Choisir 
 STR_FACE_FEMALE_BUTTON                                          :{BLACK}Femme
 STR_FACE_FEMALE_TOOLTIP                                         :{BLACK}Choisir un visage féminin
 STR_FACE_NEW_FACE_BUTTON                                        :{BLACK}Nouveau visage
-STR_FACE_NEW_FACE_TOOLTIP                                       :{BLACK}Génère un visage au hasard
+STR_FACE_NEW_FACE_TOOLTIP                                       :{BLACK}Générer un visage au hasard
 STR_FACE_ADVANCED                                               :{BLACK}Avancé
 STR_FACE_ADVANCED_TOOLTIP                                       :{BLACK}Sélection avancée du visage
 STR_FACE_SIMPLE                                                 :{BLACK}Simple
 STR_FACE_SIMPLE_TOOLTIP                                         :{BLACK}Sélection simple du visage
 STR_FACE_LOAD                                                   :{BLACK}Charger
-STR_FACE_LOAD_TOOLTIP                                           :{BLACK}Charger visage favori
+STR_FACE_LOAD_TOOLTIP                                           :{BLACK}Charger le visage favori
 STR_FACE_LOAD_DONE                                              :{WHITE}Votre visage favori a été chargé depuis le fichier de configuration d'OpenTTD.
-STR_FACE_FACECODE                                               :{BLACK}No. de visage
+STR_FACE_FACECODE                                               :{BLACK}N° de visage
 STR_FACE_FACECODE_TOOLTIP                                       :{BLACK}Voir et/ou définir le numéro de visage
 STR_FACE_FACECODE_CAPTION                                       :{WHITE}Voir et/ou définir le numéro de visage
 STR_FACE_FACECODE_SET                                           :{WHITE}Le nouveau numéro de visage a été défini
-STR_FACE_FACECODE_ERR                                           :{WHITE}Impossible de définir le numéro de visage - doit être un nombre entre 0 et 4.294.967.295{NBSP}!
+STR_FACE_FACECODE_ERR                                           :{WHITE}Impossible de définir le numéro de visage - doit être un nombre entre 0 et 4{NBSP}294{NBSP}967{NBSP}295{NBSP}!
 STR_FACE_SAVE                                                   :{BLACK}Enregistrer
-STR_FACE_SAVE_TOOLTIP                                           :{BLACK}Enregistrer visage favori
+STR_FACE_SAVE_TOOLTIP                                           :{BLACK}Enregistrer le visage favori
 STR_FACE_SAVE_DONE                                              :{WHITE}Ce visage sera enregistré comme favori dans le fichier de configuration d'OpenTTD.
 STR_FACE_EUROPEAN                                               :{BLACK}Européen
 STR_FACE_SELECT_EUROPEAN                                        :{BLACK}Choisir les visages européens
@@ -1546,7 +1546,7 @@ STR_FACE_MOUSTACHE_EARRING_TOOLTIP                              :{BLACK}Activer 
 STR_FACE_HAIR                                                   :Cheveux{NBSP}:
 STR_FACE_HAIR_TOOLTIP                                           :{BLACK}Modifier les cheveux
 STR_FACE_EYEBROWS                                               :Yeux{NBSP}:
-STR_FACE_EYEBROWS_TOOLTIP                                       :{BLACK}Modifier les yeux
+STR_FACE_EYEBROWS_TOOLTIP                                       :{BLACK}Modifier les yeux et les sourcils
 STR_FACE_EYECOLOUR                                              :Couleur des yeux{NBSP}:
 STR_FACE_EYECOLOUR_TOOLTIP                                      :{BLACK}Modifier la couleur des yeux
 STR_FACE_GLASSES                                                :Lunettes{NBSP}:
@@ -1568,19 +1568,19 @@ STR_FACE_EARRING                                                :Boucle d'oreill
 STR_FACE_TIE_EARRING_TOOLTIP                                    :{BLACK}Modifier la cravate ou la boucle d'oreille
 
 # Network server list
-STR_NETWORK_SERVER_LIST_CAPTION                                 :{WHITE}Multijoueur
+STR_NETWORK_SERVER_LIST_CAPTION                                 :{WHITE}Multijoueurs
 STR_NETWORK_SERVER_LIST_CONNECTION                              :{BLACK}Connexion{NBSP}:
 STR_NETWORK_SERVER_LIST_CONNECTION_TOOLTIP                      :{BLACK}Choisir entre un jeu sur Internet ou sur le réseau local
 STR_NETWORK_SERVER_LIST_LAN                                     :LAN
 STR_NETWORK_SERVER_LIST_INTERNET                                :Internet
 STR_NETWORK_SERVER_LIST_PLAYER_NAME                             :{BLACK}Nom du joueur{NBSP}:
-STR_NETWORK_SERVER_LIST_ENTER_NAME_TOOLTIP                      :{BLACK}Ceci est le nom avec lequel les autres joueurs pourront vous identifier
+STR_NETWORK_SERVER_LIST_ENTER_NAME_TOOLTIP                      :{BLACK}Ceci est le nom sous lequel vous serez connu des autres joueurs
 
 STR_NETWORK_SERVER_LIST_GAME_NAME                               :{BLACK}Nom
 STR_NETWORK_SERVER_LIST_GAME_NAME_TOOLTIP                       :{BLACK}Nom de la partie
 STR_NETWORK_SERVER_LIST_GENERAL_ONLINE                          :{BLACK}{COMMA}/{COMMA} - {COMMA}/{COMMA}
 STR_NETWORK_SERVER_LIST_CLIENTS_CAPTION                         :{BLACK}Clients
-STR_NETWORK_SERVER_LIST_CLIENTS_CAPTION_TOOLTIP                 :{BLACK}Clients en ligne / clients max{}Compagnies en ligne / compagnies max
+STR_NETWORK_SERVER_LIST_CLIENTS_CAPTION_TOOLTIP                 :{BLACK}Clients en ligne / clients max.{}Compagnies en ligne / compagnies max.
 STR_NETWORK_SERVER_LIST_MAP_SIZE_SHORT                          :{BLACK}{COMMA}x{COMMA}
 STR_NETWORK_SERVER_LIST_MAP_SIZE_CAPTION                        :{BLACK}Taille
 STR_NETWORK_SERVER_LIST_MAP_SIZE_CAPTION_TOOLTIP                :{BLACK}Taille de la carte{}Cliquer pour trier par surface
@@ -1590,9 +1590,9 @@ STR_NETWORK_SERVER_LIST_YEARS_CAPTION                           :{BLACK}Années
 STR_NETWORK_SERVER_LIST_YEARS_CAPTION_TOOLTIP                   :{BLACK}Nombre d'années{}écoulées dans le jeu
 STR_NETWORK_SERVER_LIST_INFO_ICONS_TOOLTIP                      :{BLACK}Langue, version du serveur, etc.
 
-STR_NETWORK_SERVER_LIST_CLICK_GAME_TO_SELECT                    :{BLACK}Cliquer sur une partie de la liste pour la sélectionner
-STR_NETWORK_SERVER_LIST_LAST_JOINED_SERVER                      :{BLACK}Le dernier serveur utilisé{NBSP}:
-STR_NETWORK_SERVER_LIST_CLICK_TO_SELECT_LAST                    :{BLACK}Cliquer pour choisir le dernier serveur utilisé
+STR_NETWORK_SERVER_LIST_CLICK_GAME_TO_SELECT                    :{BLACK}Cliquer sur une partie dans la liste pour la sélectionner
+STR_NETWORK_SERVER_LIST_LAST_JOINED_SERVER                      :{BLACK}Dernier serveur utilisé{NBSP}:
+STR_NETWORK_SERVER_LIST_CLICK_TO_SELECT_LAST                    :{BLACK}Cliquer pour réutiliser le dernier serveur
 
 STR_NETWORK_SERVER_LIST_GAME_INFO                               :{SILVER}INFOS SUR LE SERVEUR
 STR_NETWORK_SERVER_LIST_CLIENTS                                 :{SILVER}Clients{NBSP}: {WHITE}{COMMA} / {COMMA} - {COMMA} / {COMMA}
@@ -1606,7 +1606,7 @@ STR_NETWORK_SERVER_LIST_CURRENT_DATE                            :{SILVER}Date co
 STR_NETWORK_SERVER_LIST_PASSWORD                                :{SILVER}Protégée par mot de passe{NBSP}!
 STR_NETWORK_SERVER_LIST_SERVER_OFFLINE                          :{SILVER}SERVEUR HORS-LIGNE
 STR_NETWORK_SERVER_LIST_SERVER_FULL                             :{SILVER}SERVEUR PLEIN
-STR_NETWORK_SERVER_LIST_VERSION_MISMATCH                        :{SILVER}VERSION NON CORRESPONDANTE
+STR_NETWORK_SERVER_LIST_VERSION_MISMATCH                        :{SILVER}VERSIONS NON IDENTIQUES
 STR_NETWORK_SERVER_LIST_GRF_MISMATCH                            :{SILVER}NEWGRF REQUIS
 
 STR_NETWORK_SERVER_LIST_JOIN_GAME                               :{BLACK}Rejoindre la partie
@@ -1614,11 +1614,11 @@ STR_NETWORK_SERVER_LIST_REFRESH                                 :{BLACK}Actualis
 STR_NETWORK_SERVER_LIST_REFRESH_TOOLTIP                         :{BLACK}Actualiser les infos sur le serveur
 
 STR_NETWORK_SERVER_LIST_FIND_SERVER                             :{BLACK}Trouver un serveur
-STR_NETWORK_SERVER_LIST_FIND_SERVER_TOOLTIP                     :{BLACK}Cherche sur le réseau un serveur
+STR_NETWORK_SERVER_LIST_FIND_SERVER_TOOLTIP                     :{BLACK}Chercher un serveur sur le réseau
 STR_NETWORK_SERVER_LIST_ADD_SERVER                              :{BLACK}Ajouter un serveur
-STR_NETWORK_SERVER_LIST_ADD_SERVER_TOOLTIP                      :{BLACK}Ajouter à la liste un serveur où le jeu cherchera toujours des parties en cours
+STR_NETWORK_SERVER_LIST_ADD_SERVER_TOOLTIP                      :{BLACK}Ajouter un serveur à la liste de ceux parmi lesquels des parties en cours seront toujours cherchées
 STR_NETWORK_SERVER_LIST_START_SERVER                            :{BLACK}Démarrer le serveur
-STR_NETWORK_SERVER_LIST_START_SERVER_TOOLTIP                    :{BLACK}Démarre son propre serveur, sur cet ordinateur
+STR_NETWORK_SERVER_LIST_START_SERVER_TOOLTIP                    :{BLACK}Démarrer son propre serveur, sur cet ordinateur-ci
 
 STR_NETWORK_SERVER_LIST_PLAYER_NAME_OSKTITLE                    :{BLACK}Entrer votre nom
 STR_NETWORK_SERVER_LIST_ENTER_IP                                :{BLACK}Saisir l'adresse IP du serveur
@@ -1627,7 +1627,7 @@ STR_NETWORK_SERVER_LIST_ENTER_IP                                :{BLACK}Saisir l
 STR_NETWORK_START_SERVER_CAPTION                                :{WHITE}Commencer une nouvelle partie
 
 STR_NETWORK_START_SERVER_NEW_GAME_NAME                          :{BLACK}Nom de la partie{NBSP}:
-STR_NETWORK_START_SERVER_NEW_GAME_NAME_TOOLTIP                  :{BLACK}Le nom de la partie sera affiché aux autres joueurs dans le menu de sélection de partie multijoueur
+STR_NETWORK_START_SERVER_NEW_GAME_NAME_TOOLTIP                  :{BLACK}Les autres joueurs trouveront le nom de la partie dans le menu de sélection d'une partie multijoueurs
 STR_NETWORK_START_SERVER_SET_PASSWORD                           :{BLACK}Choisir le mot de passe
 STR_NETWORK_START_SERVER_PASSWORD_TOOLTIP                       :{BLACK}Protéger votre partie avec un mot de passe si vous ne souhaitez pas que d'autres l'utilisent
 
@@ -1658,7 +1658,7 @@ STR_NETWORK_LANG_BULGARIAN                                      :Bulgare
 STR_NETWORK_LANG_CHINESE                                        :Chinois
 STR_NETWORK_LANG_CZECH                                          :Tchèque
 STR_NETWORK_LANG_DANISH                                         :Danois
-STR_NETWORK_LANG_DUTCH                                          :Hollandais
+STR_NETWORK_LANG_DUTCH                                          :Néerlandais
 STR_NETWORK_LANG_ESPERANTO                                      :Espéranto
 STR_NETWORK_LANG_FINNISH                                        :Finlandais
 STR_NETWORK_LANG_HUNGARIAN                                      :Hongrois
@@ -1706,9 +1706,9 @@ STR_NETWORK_GAME_LOBBY_STATIONS                                 :{SILVER}Station
 STR_NETWORK_GAME_LOBBY_PLAYERS                                  :{SILVER}Joueurs{NBSP}: {WHITE}{STRING}
 
 STR_NETWORK_GAME_LOBBY_NEW_COMPANY                              :{BLACK}Nouvelle compagnie
-STR_NETWORK_GAME_LOBBY_NEW_COMPANY_TOOLTIP                      :{BLACK}Crée une nouvelle compagnie
+STR_NETWORK_GAME_LOBBY_NEW_COMPANY_TOOLTIP                      :{BLACK}Créer une nouvelle compagnie
 STR_NETWORK_GAME_LOBBY_SPECTATE_GAME                            :{BLACK}Observer une partie
-STR_NETWORK_GAME_LOBBY_SPECTATE_GAME_TOOLTIP                    :{BLACK}Permet d'observer une partie en tant que spectateur
+STR_NETWORK_GAME_LOBBY_SPECTATE_GAME_TOOLTIP                    :{BLACK}Observer une partie en tant que spectateur
 STR_NETWORK_GAME_LOBBY_JOIN_COMPANY                             :{BLACK}Rejoindre la compagnie
 STR_NETWORK_GAME_LOBBY_JOIN_COMPANY_TOOLTIP                     :{BLACK}Aider à gérer cette compagnie
 
@@ -1757,15 +1757,15 @@ STR_NETWORK_GIVE_MONEY_CAPTION                                  :{WHITE}Entrer l
 # Network set password
 STR_COMPANY_PASSWORD_CANCEL                                     :{BLACK}Ne pas sauver le mot de passe entré
 STR_COMPANY_PASSWORD_OK                                         :{BLACK}Donner un nouveau mot de passe à la compagnie
-STR_COMPANY_PASSWORD_CAPTION                                    :{WHITE}Mot de passe de compagnie
-STR_COMPANY_PASSWORD_MAKE_DEFAULT                               :{BLACK}Mot de passe de compagnie par défaut
+STR_COMPANY_PASSWORD_CAPTION                                    :{WHITE}Mot de passe de la compagnie
+STR_COMPANY_PASSWORD_MAKE_DEFAULT                               :{BLACK}Mot de passe par défaut de la compagnie
 STR_COMPANY_PASSWORD_MAKE_DEFAULT_TOOLTIP                       :{BLACK}Utiliser ce mot de passe de compagnie comme défaut pour les nouvelles compagnies
 
 # Network company info join/password
 STR_COMPANY_VIEW_JOIN                                           :{BLACK}Rejoindre
 STR_COMPANY_VIEW_JOIN_TOOLTIP                                   :{BLACK}Rejoindre et jouer dans cette compagnie
 STR_COMPANY_VIEW_PASSWORD                                       :{BLACK}Mot de passe
-STR_COMPANY_VIEW_PASSWORD_TOOLTIP                               :{BLACK}Permet de protéger par mot de passe votre compagnie pour empêcher des utilisateurs non-autorisés de rejoindre
+STR_COMPANY_VIEW_PASSWORD_TOOLTIP                               :{BLACK}Permet de protéger par mot de passe votre compagnie pour empêcher des utilisateurs non autorisés de rejoindre
 STR_COMPANY_VIEW_SET_PASSWORD                                   :{BLACK}Choisir le mot de passe de la compagnie
 
 # Network chat
@@ -1793,17 +1793,17 @@ STR_NETWORK_ERROR_SERVER_START                                  :{WHITE}Le serve
 STR_NETWORK_ERROR_CLIENT_START                                  :{WHITE}Connexion échouée
 STR_NETWORK_ERROR_TIMEOUT                                       :{WHITE}La connexion #{NUM} a dépassé le temps d'attente
 STR_NETWORK_ERROR_SERVER_ERROR                                  :{WHITE}Une erreur de protocole a été détectée et la connexion a été fermée
-STR_NETWORK_ERROR_WRONG_REVISION                                :{WHITE}La révision de ce client ne correspond pas à celle du serveur
+STR_NETWORK_ERROR_WRONG_REVISION                                :{WHITE}L'identifiant de révision de ce client ne correspond pas à celui du serveur
 STR_NETWORK_ERROR_WRONG_PASSWORD                                :{WHITE}Mot de passe incorrect
 STR_NETWORK_ERROR_SERVER_FULL                                   :{WHITE}Le serveur est complet
-STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Vous êtes bannis de ce serveur
+STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Vous êtes banni de ce serveur
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Vous avez été exclu de la partie
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Tricher n'est pas autorisé sur ce serveur
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Vous envoyiez trop de commandes au serveur
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Vous avez mis trop de temps pour entrer le mot de passe
 STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Votre ordinateur a mis trop de temps pour rejoindre
 STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Le téléchargement de la carte a mis trop de temps
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Vous avez mis trop de temps à rejoindre le serveur
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Vous avez mis trop de temps pour rejoindre le serveur
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :erreur générale
@@ -1820,16 +1820,16 @@ STR_NETWORK_ERROR_CLIENT_WRONG_PASSWORD                         :mot de passe de
 STR_NETWORK_ERROR_CLIENT_COMPANY_MISMATCH                       :mauvais company-id dans DoCommand
 STR_NETWORK_ERROR_CLIENT_KICKED                                 :exclu par le serveur
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :a tenté de tricher
-STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :Serveur complet
+STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :serveur complet
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :envoyait trop de commandes
 STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :aucun mot de passe reçu dans les temps
 STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :délai dépassé
 STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :télécharger la carte a pris trop de temps
-STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :traitement de la carte a pris trop de temps
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :le traitement de la carte a pris trop de temps
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Possible perte de connexion
-STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION                    :{WHITE}Aucune donnée reçue du serveur depuis {NUM} seconde{P "" s}
+STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION                    :{WHITE}Aucunes données reçues du serveur depuis {NUM} seconde{P "" s}
 
 # Network related errors
 STR_NETWORK_SERVER_MESSAGE                                      :*** {1:STRING}
@@ -1839,7 +1839,7 @@ STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_1                  :Partie toujours
 STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_2                  :Partie toujours suspendue ({STRING}, {STRING})
 STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_3                  :Partie toujours suspendue ({STRING}, {STRING}, {STRING})
 STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_4                  :La partie est toujours en pause ({STRING}, {STRING}, {STRING}, {STRING})
-STR_NETWORK_SERVER_MESSAGE_GAME_UNPAUSED                        :Partie reprise ({STRING})
+STR_NETWORK_SERVER_MESSAGE_GAME_UNPAUSED                        :Reprise de la partie ({STRING})
 STR_NETWORK_SERVER_MESSAGE_GAME_REASON_NOT_ENOUGH_PLAYERS       :nombre de joueurs
 STR_NETWORK_SERVER_MESSAGE_GAME_REASON_CONNECTING_CLIENTS       :connexion de clients
 STR_NETWORK_SERVER_MESSAGE_GAME_REASON_MANUAL                   :manuel
@@ -1864,19 +1864,19 @@ STR_CONTENT_TYPE_CAPTION                                        :{BLACK}Type
 STR_CONTENT_TYPE_CAPTION_TOOLTIP                                :{BLACK}Type de contenu
 STR_CONTENT_NAME_CAPTION                                        :{BLACK}Nom
 STR_CONTENT_NAME_CAPTION_TOOLTIP                                :{BLACK}Nom du contenu
-STR_CONTENT_MATRIX_TOOLTIP                                      :{BLACK}Cliquer sur une ligne pour voir les détails{}Cocher la case pour le sélectionner pour être télécharger
+STR_CONTENT_MATRIX_TOOLTIP                                      :{BLACK}Cliquer sur une ligne pour voir les détails{}Cocher la case comme pré-sélection pour le téléchargement
 STR_CONTENT_SELECT_ALL_CAPTION                                  :{BLACK}Sélectionner tout
-STR_CONTENT_SELECT_ALL_CAPTION_TOOLTIP                          :{BLACK}Marquer tous les contenus pour être téléchargés
+STR_CONTENT_SELECT_ALL_CAPTION_TOOLTIP                          :{BLACK}Marquer tous les contenus comme étant à télécharger
 STR_CONTENT_SELECT_UPDATES_CAPTION                              :{BLACK}Sélectionner les mises à jour
-STR_CONTENT_SELECT_UPDATES_CAPTION_TOOLTIP                      :{BLACK}Marquer tous les contenus qui sont une mise à jour du contenu existant pour être téléchargés
+STR_CONTENT_SELECT_UPDATES_CAPTION_TOOLTIP                      :{BLACK}Marquer tous les contenus qui sont une mise à jour du contenu existant comme étant à télécharger
 STR_CONTENT_UNSELECT_ALL_CAPTION                                :{BLACK}Désélectionner tout
-STR_CONTENT_UNSELECT_ALL_CAPTION_TOOLTIP                        :{BLACK}Marquer tous les contenus pour ne pas être téléchargés
-STR_CONTENT_FILTER_TITLE                                        :{BLACK}Filtre sur tag/nom{NBSP}:
+STR_CONTENT_UNSELECT_ALL_CAPTION_TOOLTIP                        :{BLACK}Marquer tous les contenus comme étant à ne pas télécharger
+STR_CONTENT_FILTER_TITLE                                        :{BLACK}Filtre sur l'étiquette/le nom{NBSP}:
 STR_CONTENT_OPEN_URL                                            :{BLACK}Visiter le site web
 STR_CONTENT_OPEN_URL_TOOLTIP                                    :{BLACK}Visiter le site web pour ce contenu
 STR_CONTENT_DOWNLOAD_CAPTION                                    :{BLACK}Télécharger
 STR_CONTENT_DOWNLOAD_CAPTION_TOOLTIP                            :{BLACK}Démarrer le téléchargement du contenu choisi
-STR_CONTENT_TOTAL_DOWNLOAD_SIZE                                 :{SILVER}Taille de téléchargement total{NBSP}: {WHITE}{BYTES}
+STR_CONTENT_TOTAL_DOWNLOAD_SIZE                                 :{SILVER}Taille totale du téléchargement{NBSP}: {WHITE}{BYTES}
 STR_CONTENT_DETAIL_TITLE                                        :{SILVER}INFORMATION DE CONTENU
 STR_CONTENT_DETAIL_SUBTITLE_UNSELECTED                          :{SILVER}Vous n'avez pas sélectionné ceci pour être téléchargé
 STR_CONTENT_DETAIL_SUBTITLE_SELECTED                            :{SILVER}Vous avez sélectionné ceci pour être téléchargé
@@ -1892,7 +1892,7 @@ STR_CONTENT_DETAIL_TYPE                                         :{SILVER}Type{NB
 STR_CONTENT_DETAIL_FILESIZE                                     :{SILVER}Taille{NBSP}: {WHITE}{BYTES}
 STR_CONTENT_DETAIL_SELECTED_BECAUSE_OF                          :{SILVER}Sélectionné à cause de{NBSP}: {WHITE}{STRING}
 STR_CONTENT_DETAIL_DEPENDENCIES                                 :{SILVER}Dépendances{NBSP}: {WHITE}{STRING}
-STR_CONTENT_DETAIL_TAGS                                         :{SILVER}Tags{NBSP}: {WHITE}{STRING}
+STR_CONTENT_DETAIL_TAGS                                         :{SILVER}Étiquettes{NBSP}: {WHITE}{STRING}
 STR_CONTENT_NO_ZLIB                                             :{WHITE}OpenTTD est compilé sans «{NBSP}zlib{NBSP}»...
 STR_CONTENT_NO_ZLIB_SUB                                         :{WHITE}... télécharger du contenu est impossible{NBSP}!
 
@@ -1904,7 +1904,7 @@ STR_CONTENT_TYPE_AI_LIBRARY                                     :{G=f}Bibliothè
 STR_CONTENT_TYPE_SCENARIO                                       :{G=m}Scénario
 STR_CONTENT_TYPE_HEIGHTMAP                                      :{G=f}Carte d'altitude
 STR_CONTENT_TYPE_BASE_SOUNDS                                    :{G=m2}Sons de base
-STR_CONTENT_TYPE_BASE_MUSIC                                     :{G=m2}Musiques de base
+STR_CONTENT_TYPE_BASE_MUSIC                                     :{G=m2}Musique de base
 STR_CONTENT_TYPE_GAME_SCRIPT                                    :Script de jeu
 STR_CONTENT_TYPE_GS_LIBRARY                                     :Bibliothèque GS
 
@@ -1929,16 +1929,16 @@ STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Non, qui
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Options de transparence
-STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Transparence des noms de station. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_TREES_TOOLTIP                                   :{BLACK}Transparence des arbres. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_HOUSES_TOOLTIP                                  :{BLACK}Transparence des maisons. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_INDUSTRIES_TOOLTIP                              :{BLACK}Transparence des industries. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_BUILDINGS_TOOLTIP                               :{BLACK}Transparence des éléments constructibles tels que stations, dépôts, points de contrôle et caténaire. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_BRIDGES_TOOLTIP                                 :{BLACK}Transparence des ponts. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_STRUCTURES_TOOLTIP                              :{BLACK}Transparence des structures telles que phares et antennes. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_CATENARY_TOOLTIP                                :{BLACK}Transparence des caténaires. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_LOADING_TOOLTIP                                 :{BLACK}Transparence pour les indicateurs de chargement. Ctrl-clic pour vérrouiller
-STR_TRANSPARENT_INVISIBLE_TOOLTIP                               :{BLACK}Basculer transparence/invisibilité
+STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Transparence des noms de station. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_TREES_TOOLTIP                                   :{BLACK}Transparence des arbres. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_HOUSES_TOOLTIP                                  :{BLACK}Transparence des maisons. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_INDUSTRIES_TOOLTIP                              :{BLACK}Transparence des industries. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_BUILDINGS_TOOLTIP                               :{BLACK}Transparence des éléments constructibles tels que stations, dépôts, points de contrôle et caténaire. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_BRIDGES_TOOLTIP                                 :{BLACK}Transparence des ponts. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_STRUCTURES_TOOLTIP                              :{BLACK}Transparence des structures telles que phares et antennes. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_CATENARY_TOOLTIP                                :{BLACK}Transparence des caténaires. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_LOADING_TOOLTIP                                 :{BLACK}Transparence pour les indicateurs de chargement. Ctrl-clic pour verrouiller
+STR_TRANSPARENT_INVISIBLE_TOOLTIP                               :{BLACK}Basculer entre transparence et invisibilité des objets
 
 # Base for station construction window(s)
 STR_STATION_BUILD_COVERAGE_AREA_TITLE                           :{BLACK}Afficher la zone couverte
@@ -2680,6 +2680,9 @@ STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Cliquer 
 
 # Goal question window
 STR_GOAL_QUESTION_CAPTION_QUESTION                              :Question
+STR_GOAL_QUESTION_CAPTION_INFORMATION                           :Information
+STR_GOAL_QUESTION_CAPTION_WARNING                               :Attention
+STR_GOAL_QUESTION_CAPTION_ERROR                                 :Erreur
 
 ### Start of Goal Question button list
 STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Annuler
