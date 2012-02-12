@@ -52,7 +52,16 @@ static uint LoadGrfFile(const char *filename, uint load_index, int file_index)
 
 	DEBUG(sprite, 2, "Reading grf-file '%s'", filename);
 
-	while (LoadNextSprite(load_index, file_index, sprite_id)) {
+	byte container_ver = GetGRFContainerVersion();
+	if (container_ver == 0) usererror("Base grf '%s' is corrupt", filename);
+	ReadGRFSpriteOffsets(container_ver);
+	if (container_ver >= 2) {
+		/* Read compression. */
+		byte compression = FioReadByte();
+		if (compression != 0) usererror("Unsupported compression format");
+	}
+
+	while (LoadNextSprite(load_index, file_index, sprite_id, container_ver)) {
 		load_index++;
 		sprite_id++;
 		if (load_index >= MAX_SPRITES) {
@@ -80,11 +89,20 @@ static void LoadGrfFileIndexed(const char *filename, const SpriteID *index_tbl, 
 
 	DEBUG(sprite, 2, "Reading indexed grf-file '%s'", filename);
 
+	byte container_ver = GetGRFContainerVersion();
+	if (container_ver == 0) usererror("Base grf '%s' is corrupt", filename);
+	ReadGRFSpriteOffsets(container_ver);
+	if (container_ver >= 2) {
+		/* Read compression. */
+		byte compression = FioReadByte();
+		if (compression != 0) usererror("Unsupported compression format");
+	}
+
 	while ((start = *index_tbl++) != END) {
 		uint end = *index_tbl++;
 
 		do {
-			bool b = LoadNextSprite(start, file_index, sprite_id);
+			bool b = LoadNextSprite(start, file_index, sprite_id, container_ver);
 			assert(b);
 			sprite_id++;
 		} while (++start <= end);
@@ -119,7 +137,7 @@ void CheckExternalFiles()
 		/* Not all files were loaded successfully, see which ones */
 		add_pos += seprintf(add_pos, last, "Trying to load graphics set '%s', but it is incomplete. The game will probably not run correctly until you properly install this set or select another one. See section 4.1 of readme.txt.\n\nThe following files are corrupted or missing:\n", used_set->name);
 		for (uint i = 0; i < GraphicsSet::NUM_FILES; i++) {
-			MD5File::ChecksumResult res = used_set->files[i].CheckMD5(BASESET_DIR);
+			MD5File::ChecksumResult res = GraphicsSet::CheckMD5(&used_set->files[i], BASESET_DIR);
 			if (res != MD5File::CR_MATCH) add_pos += seprintf(add_pos, last, "\t%s is %s (%s)\n", used_set->files[i].filename, res == MD5File::CR_MISMATCH ? "corrupt" : "missing", used_set->files[i].missing_warning);
 		}
 		add_pos += seprintf(add_pos, last, "\n");
@@ -132,7 +150,7 @@ void CheckExternalFiles()
 		assert_compile(SoundsSet::NUM_FILES == 1);
 		/* No need to loop each file, as long as there is only a single
 		 * sound file. */
-		add_pos += seprintf(add_pos, last, "\t%s is %s (%s)\n", sounds_set->files->filename, sounds_set->files->CheckMD5(BASESET_DIR) == MD5File::CR_MISMATCH ? "corrupt" : "missing", sounds_set->files->missing_warning);
+		add_pos += seprintf(add_pos, last, "\t%s is %s (%s)\n", sounds_set->files->filename, SoundsSet::CheckMD5(sounds_set->files, BASESET_DIR) == MD5File::CR_MISMATCH ? "corrupt" : "missing", sounds_set->files->missing_warning);
 	}
 
 	if (add_pos != error_msg) ShowInfoF("%s", error_msg);
@@ -262,21 +280,46 @@ bool GraphicsSet::FillSetDetails(IniFile *ini, const char *path, const char *ful
 	return ret;
 }
 
-
 /**
- * Calculate and check the MD5 hash of the supplied filename.
- * @param subdir The sub directory to get the files from
+ * Calculate and check the MD5 hash of the supplied GRF.
+ * @param file The file get the hash of.
+ * @param subdir The sub directory to get the files from.
  * @return
  * - #CR_MATCH if the MD5 hash matches
  * - #CR_MISMATCH if the MD5 does not match
  * - #CR_NO_FILE if the file misses
  */
-MD5File::ChecksumResult MD5File::CheckMD5(Subdirectory subdir) const
+/* static */ MD5File::ChecksumResult GraphicsSet::CheckMD5(const MD5File *file, Subdirectory subdir)
+{
+	size_t size = 0;
+	FILE *f = FioFOpenFile(file->filename, "rb", subdir, &size);
+	if (f == NULL) return MD5File::CR_NO_FILE;
+
+	size_t max = GRFGetSizeOfDataSection(f);
+
+	FioFCloseFile(f);
+
+	return file->CheckMD5(subdir, max);
+}
+
+
+/**
+ * Calculate and check the MD5 hash of the supplied filename.
+ * @param subdir The sub directory to get the files from
+ * @param max_size Only calculate the hash for this many bytes from the file start.
+ * @return
+ * - #CR_MATCH if the MD5 hash matches
+ * - #CR_MISMATCH if the MD5 does not match
+ * - #CR_NO_FILE if the file misses
+ */
+MD5File::ChecksumResult MD5File::CheckMD5(Subdirectory subdir, size_t max_size) const
 {
 	size_t size;
 	FILE *f = FioFOpenFile(this->filename, "rb", subdir, &size);
 
 	if (f == NULL) return CR_NO_FILE;
+
+	size = min(size, max_size);
 
 	Md5 checksum;
 	uint8 buffer[1024];

@@ -361,7 +361,7 @@ STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Fremde Stations
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Vollständige Animation
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Vollständige Detailansicht
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Transparenz für Gebäude
-STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparenz für Stationsnamen
+STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparenz für Schilder
 ############ range ends here
 
 ############ range for file menu starts
@@ -1129,7 +1129,7 @@ STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :{LTBLUE}Erlaubt
 STR_CONFIG_SETTING_IMPROVEDLOAD                                 :{LTBLUE}Verbessertes Beladeverfahren nutzen: {ORANGE}{STRING}
 STR_CONFIG_SETTING_GRADUAL_LOADING                              :{LTBLUE}Fahrzeuge schrittweise beladen: {ORANGE}{STRING}
 STR_CONFIG_SETTING_INFLATION                                    :{LTBLUE}Inflation: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SELECTGOODS                                  :{LTBLUE}Industrien beliefern nur Stationen mit passendem Transport: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SELECTGOODS                                  :{LTBLUE}Stationen werden nur mit Fracht beliefert, wenn ein Fahrzeug sie von dort abholt: {ORANGE}{STRING}
 STR_CONFIG_SETTING_MAX_BRIDGE_LENGTH                            :{LTBLUE}Maximale Brückenlänge: {ORANGE}{STRING} Feld{P 0:1 "" er}
 STR_CONFIG_SETTING_MAX_TUNNEL_LENGTH                            :{LTBLUE}Maximale Tunnellänge: {ORANGE}{STRING} Feld{P 0:1 "" er}
 STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD             :{LTBLUE}Manueller Bau von Rohstoffindustrien: {ORANGE}{STRING}
@@ -1416,7 +1416,7 @@ STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Ein neue
 STR_INTRO_TOOLTIP_LOAD_GAME                                     :{BLACK}Ein gespeichertes Spiel laden
 STR_INTRO_TOOLTIP_PLAY_HEIGHTMAP                                :{BLACK}Ein neues Spiel mit Reliefkarte als Landschaft starten
 STR_INTRO_TOOLTIP_PLAY_SCENARIO                                 :{BLACK}Starte ein neues Spiel basierend auf einem Szenario
-STR_INTRO_TOOLTIP_SCENARIO_EDITOR                               :{BLACK}Eine eigene Spielwelt / eigenes Szenario erstellen
+STR_INTRO_TOOLTIP_SCENARIO_EDITOR                               :{BLACK}Eine eigene Karte oder Szenario erstellen
 STR_INTRO_TOOLTIP_MULTIPLAYER                                   :{BLACK}Mehrspieler-Spiel beginnen
 
 STR_INTRO_TOOLTIP_TEMPERATE                                     :{BLACK}Landschaft mit gemäßigtem Klima auswählen
@@ -1929,7 +1929,7 @@ STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Nein, Op
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Transparenzeinstellungen
-STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Transparenz für Stationsschilder einstellen. Strg+Klick, um Umschalten zu verhindern bzw. wieder zu erlauben
+STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Transparenz für Schilder einstellen. Strg+Klick, um Umschalten zu verhindern bzw. wieder zu erlauben
 STR_TRANSPARENT_TREES_TOOLTIP                                   :{BLACK}Transparenz für Bäume einstellen. Strg+Klick, um Umschalten zu verhindern bzw. wieder zu erlauben
 STR_TRANSPARENT_HOUSES_TOOLTIP                                  :{BLACK}Transparenz für Häuser einstellen. Strg+Klick, um Umschalten zu verhindern bzw. wieder zu erlauben
 STR_TRANSPARENT_INDUSTRIES_TOOLTIP                              :{BLACK}Transparenz für Industrien einstellen. Strg+Klick, um Umschalten zu verhindern bzw. wieder zu erlauben
@@ -2140,7 +2140,7 @@ STR_OBJECT_CLASS_TRNS                                           :Sendemasten
 
 # Tree planting window (last two for SE only)
 STR_PLANT_TREE_CAPTION                                          :{WHITE}Bäume
-STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Wähle die zu pflanzende Baumart
+STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Wähle die zu pflanzende Baumart. Wenn auf dem Feld schon ein Baum steht, wird eine zufällige Baumart gepflanzt
 STR_TREES_RANDOM_TYPE                                           :{BLACK}Zufällige Baumart
 STR_TREES_RANDOM_TYPE_TOOLTIP                                   :{BLACK}Zufällige Baumart pflanzen. Shift schaltet zwischen Bauen und Kostenvoranschlag um
 STR_TREES_RANDOM_TREES_BUTTON                                   :{BLACK}Zufällige Bäume
@@ -2496,7 +2496,7 @@ STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Anzahl 
 # NewGRF textfile window
 STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF - Readme von {STRING}
 STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF Änderungen von {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF Lizenz von {STRING}
+STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF-Lizenz von {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspiziere - {STRING}
@@ -3521,7 +3521,7 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Skript
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Überprüfe die Aufzeichnungen des Skripts
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Keine passende KI gefunden.{}Diese KI ist ein Platzhalter und wird nichts tun.{}KIs können im Hauptmenü als Erweiterung heruntergeladen werden
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Eine der laufenden KIs oder ein Skript ist abgestürzt. Es wäre nett, den Fehler dem Autor der KI oder des Skripts mittels eines Screenshots vom Debug-Fenster unter Angabe der OpenTTD- Version und der KI- bzw. Skript-Versionsnummer zu melden
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Eine der laufenden KIs oder ein Skript ist abgestürzt. Der Fehler sollte dem Autor der KI oder des Skripts mittels eines Screenshots vom Debug-Fenster unter Angabe der OpenTTD- Version und der KI- bzw. Skript-Versionsnummer gemeldet werden.
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Debugfenster für KI oder Skripte ist nur auf dem Server verfügbar
 
 # AI configuration window

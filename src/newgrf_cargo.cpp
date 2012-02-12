@@ -100,24 +100,29 @@ uint16 GetCargoCallback(CallbackID callback, uint32 param1, uint32 param2, const
 	return group->GetCallbackResult();
 }
 
-
+/**
+ * Translate a GRF-local cargo slot/bitnum into a CargoID.
+ * @param cargo   GRF-local cargo slot/bitnum.
+ * @param grffile Originating GRF file.
+ * @param usebit  Defines the meaning of \a cargo for GRF version < 7.
+ *                If true, then \a cargo is a bitnum. If false, then \a cargo is a cargoslot.
+ *                For GRF version >= 7 \a cargo is always a translated cargo bit.
+ * @return CargoID or CT_INVALID if the cargo is not available.
+ */
 CargoID GetCargoTranslation(uint8 cargo, const GRFFile *grffile, bool usebit)
 {
-	/* Pre-version 7 uses the 'climate dependent' ID, i.e. cargo is the cargo ID */
-	if (grffile->grf_version < 7) {
-		if (!usebit) return cargo;
-		/* Else the cargo value is a 'climate independent' 'bitnum' */
-		if (HasBit(_cargo_mask, cargo)) return GetCargoIDByBitnum(cargo);
+	/* Pre-version 7 uses the 'climate dependent' ID in callbacks and properties, i.e. cargo is the cargo ID */
+	if (grffile->grf_version < 7 && !usebit) return cargo;
+
+	/* Other cases use (possibly translated) cargobits */
+
+	if (grffile->cargo_max > 0) {
+		/* ...and the cargo is in bounds, then get the cargo ID for
+		 * the label */
+		if (cargo < grffile->cargo_max) return GetCargoIDByLabel(grffile->cargo_list[cargo]);
 	} else {
-		/* If the GRF contains a translation table... */
-		if (grffile->cargo_max > 0) {
-			/* ...and the cargo is in bounds, then get the cargo ID for
-			 * the label */
-			if (cargo < grffile->cargo_max) return GetCargoIDByLabel(grffile->cargo_list[cargo]);
-		} else {
-			/* Else the cargo value is a 'climate independent' 'bitnum' */
-			if (HasBit(_cargo_mask, cargo)) return GetCargoIDByBitnum(cargo);
-		}
+		/* Else the cargo value is a 'climate independent' 'bitnum' */
+		return GetCargoIDByBitnum(cargo);
 	}
 	return CT_INVALID;
 }

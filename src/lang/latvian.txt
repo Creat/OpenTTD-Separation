@@ -219,25 +219,25 @@ STR_UNITS_HEIGHT_IMPERIAL                                       :{COMMA} pēdas
 STR_UNITS_HEIGHT_SI                                             :{COMMA} m
 
 # Common window strings
-STR_LIST_FILTER_OSKTITLE                                        :{BLACK}Ievadiet filtra virkni
-STR_LIST_FILTER_TOOLTIP                                         :{BLACK}Ievadiet atslēgvārdu, lai filtrētu sarakstu
+STR_LIST_FILTER_OSKTITLE                                        :{BLACK}Ievadīt filtra virkni
+STR_LIST_FILTER_TOOLTIP                                         :{BLACK}Ievadīt atslēgvārdu, lai filtrētu sarakstu
 
-STR_TOOLTIP_SORT_ORDER                                          :{BLACK}Izvēlieties kārtošanas secību (dilstošs/augošs)
-STR_TOOLTIP_SORT_CRITERIA                                       :{BLACK}Izvēlieties kārtošanas kritēriju
-STR_TOOLTIP_FILTER_CRITERIA                                     :{BLACK}Izvēlieties atlasīšanas nosacījumus
+STR_TOOLTIP_SORT_ORDER                                          :{BLACK}Izvēlēties kārtošanas secību (dilstoša/augoša)
+STR_TOOLTIP_SORT_CRITERIA                                       :{BLACK}Izvēlēties kārtošanas kritēriju
+STR_TOOLTIP_FILTER_CRITERIA                                     :{BLACK}Izvēlēties filtrēšanas nosacījumus
 STR_BUTTON_SORT_BY                                              :{BLACK}Kārtot pēc
 STR_BUTTON_LOCATION                                             :{BLACK}Atrašanās vieta
 STR_BUTTON_RENAME                                               :{BLACK}Pārdēvēt
 
 STR_TOOLTIP_CLOSE_WINDOW                                        :{BLACK}Aizvērt logu
 STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS                              :{BLACK}Loga virsraksts - vilkt šo, lai pārvietotu logu
-STR_TOOLTIP_SHADE                                               :{BLACK}Aizēnot logu — rādīt tikai nosaukumu
+STR_TOOLTIP_SHADE                                               :{BLACK}Aizēnot logu - rādīt tikai virsrakstu
 STR_TOOLTIP_DEBUG                                               :{BLACK}Rādīt NewGRF atkļūdošanas informāciju
 STR_TOOLTIP_STICKY                                              :{BLACK}Atzīmēt šo logu kā neaizveramu ar "Aizvērt visus logus" taustiņu
 STR_TOOLTIP_RESIZE                                              :{BLACK}Klikšķināt un vilkt, lai mainītu šī loga lielumu
 STR_TOOLTIP_TOGGLE_LARGE_SMALL_WINDOW                           :{BLACK}Pārslēgties starp lielu/mazu loga izmēru
-STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST                            :{BLACK}Ritjosla — ritina sarakstu augšup/lejup
-STR_TOOLTIP_HSCROLL_BAR_SCROLLS_LIST                            :{BLACK}Ritjosla — ritina sarakstu pa kreisi/labi
+STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST                            :{BLACK}Ritjosla - ritina sarakstu augšup/lejup
+STR_TOOLTIP_HSCROLL_BAR_SCROLLS_LIST                            :{BLACK}Ritjosla - ritina sarakstu pa kreisi/pa labi
 STR_TOOLTIP_DEMOLISH_BUILDINGS_ETC                              :{BLACK}Nojaukt celtnes u.c. objektus no zemes pleķa. Ctrl iezīmē diagonālu laukumu. Shift pārslēdz nojaukšanu/izmaksu tāmes attēlošanu
 
 # Query window
@@ -739,13 +739,13 @@ STR_NEWS_MESSAGES_FULL                                          :Pilns
 STR_NEWS_MESSAGE_TYPES                                          :{BLACK}Ziņojumu veidi:
 STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OWN              :{YELLOW}Spēlētaja stacijā ierodas pirmais transporta līdzeklis
 STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OTHER            :{YELLOW}Sāncenša stacijā ierodas pirmais transporta līdzeklis
-STR_NEWS_MESSAGE_TYPE_ACCIDENTS_DISASTERS                       :{YELLOW}Negadījumi / avārijas
+STR_NEWS_MESSAGE_TYPE_ACCIDENTS_DISASTERS                       :{YELLOW}Negadījumi / katastrofas
 STR_NEWS_MESSAGE_TYPE_COMPANY_INFORMATION                       :{YELLOW}Uzņēmuma informācija
 STR_NEWS_MESSAGE_TYPE_INDUSTRY_OPEN                             :{YELLOW}Ražotņu atklāšana
 STR_NEWS_MESSAGE_TYPE_INDUSTRY_CLOSE                            :{YELLOW}Ražotņu slēgšana
 STR_NEWS_MESSAGE_TYPE_ECONOMY_CHANGES                           :{YELLOW}Ekonomikas izmaiņas
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_COMPANY        :{YELLOW}Ražošanas izmaiņas uzņēmuma apkalpotajās rūpnīcās
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_OTHER          :{YELLOW}Ražošanas izmaiņas konkurentu apkalpotajās rūpnīcās
+STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_COMPANY        :{YELLOW}Ražīguma izmaiņas uzņēmuma apkalpotajās ražotnēs
+STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_OTHER          :{YELLOW}Ražīguma izmaiņas konkurentu apkalpotajās ražotnēs
 STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_UNSERVED                 :{YELLOW}Citas ražošanas apjomu izmaiņas
 STR_NEWS_MESSAGE_TYPE_ADVICE_INFORMATION_ON_COMPANY             :{YELLOW}Padomi / informācija par uzņēmuma transporta līdzekļiem
 STR_NEWS_MESSAGE_TYPE_NEW_VEHICLES                              :{YELLOW}Jauni transportlīdzekļi
@@ -755,13 +755,13 @@ STR_NEWS_MESSAGE_TYPE_GENERAL_INFORMATION                       :{YELLOW}Vispār
 
 STR_NEWS_CUSTOM_ITEM                                            :{BIG_FONT}{BLACK}{STRING}
 
-STR_NEWS_FIRST_TRAIN_ARRIVAL                                    :{BIG_FONT}{BLACK}Iedzīvotāji svin svētkus . . .{}Pirmais vilciens ierodas {STATION}!
-STR_NEWS_FIRST_BUS_ARRIVAL                                      :{BIG_FONT}{BLACK}Pilsētnieki svin . . .{}Pirmais autobuss ierodas {STATION}!
-STR_NEWS_FIRST_TRUCK_ARRIVAL                                    :{BIG_FONT}{BLACK}Pilsētnieki svin . . .{}Pirmā kravas automašīna ierodas {STATION}!
-STR_NEWS_FIRST_PASSENGER_TRAM_ARRIVAL                           :{BIG_FONT}{BLACK}Pilsoņi līksmo . . .{}Pirmais pasažieru tramvajs ierodas {STATION}!
-STR_NEWS_FIRST_CARGO_TRAM_ARRIVAL                               :{BIG_FONT}{BLACK}Pilsoņi līksmo . . .{}Pirmais kravas tramvajs ierodas {STATION}!
-STR_NEWS_FIRST_SHIP_ARRIVAL                                     :{BIG_FONT}{BLACK}Pilsētnieki svin . . .{}Pirmais kuģis ierodas {STATION}!
-STR_NEWS_FIRST_AIRCRAFT_ARRIVAL                                 :{BIG_FONT}{BLACK}Iedzīvotāji svin svētkus . . .{}Pirmais lidaparāts ierodas {STATION}!
+STR_NEWS_FIRST_TRAIN_ARRIVAL                                    :{BIG_FONT}{BLACK}Pilsētnieki līksmo . . .{}Pirmais vilciens ierodas {STATION}!
+STR_NEWS_FIRST_BUS_ARRIVAL                                      :{BIG_FONT}{BLACK}Pilsētnieki līksmo . . .{}Pirmais autobuss ierodas {STATION}!
+STR_NEWS_FIRST_TRUCK_ARRIVAL                                    :{BIG_FONT}{BLACK}Pilsētnieki līksmo . . .{}Pirmā kravas automašīna ierodas {STATION}!
+STR_NEWS_FIRST_PASSENGER_TRAM_ARRIVAL                           :{BIG_FONT}{BLACK}Pilsētnieki līksmo . . .{}Pirmais pasažieru tramvajs ierodas {STATION}!
+STR_NEWS_FIRST_CARGO_TRAM_ARRIVAL                               :{BIG_FONT}{BLACK}Pilsētnieki līksmo . . .{}Pirmais kravas tramvajs ierodas {STATION}!
+STR_NEWS_FIRST_SHIP_ARRIVAL                                     :{BIG_FONT}{BLACK}Pilsētnieki līksmo . . .{}Pirmais kuģis ierodas {STATION}!
+STR_NEWS_FIRST_AIRCRAFT_ARRIVAL                                 :{BIG_FONT}{BLACK}Pilsētnieki līksmo . . .{}Pirmais lidaparāts ierodas {STATION}!
 
 STR_NEWS_TRAIN_CRASH                                            :{BIG_FONT}{BLACK}Vilciena avārija!{}{COMMA} mirušie
 STR_NEWS_ROAD_VEHICLE_CRASH_DRIVER                              :{BIG_FONT}{BLACK}Autotransporta avārija!{}Vadītājs mirst uzreiz pēc sadursmes ar vilcienu.
@@ -769,7 +769,7 @@ STR_NEWS_ROAD_VEHICLE_CRASH                                     :{BIG_FONT}{BLAC
 STR_NEWS_AIRCRAFT_CRASH                                         :{BIG_FONT}{BLACK}Lidmašīna nogāzusies!{}{COMMA} iet bojā ugunī {STATION}
 STR_NEWS_PLANE_CRASH_OUT_OF_FUEL                                :{BIG_FONT}{BLACK}Lidaparāta avārija!{}Lidaparātam beidzās degviela, {COMMA} bojāgājušie!
 
-STR_NEWS_DISASTER_ZEPPELIN                                      :{BIG_FONT}{BLACK}Dirižabļa nelaimes gadījums {STATION}!
+STR_NEWS_DISASTER_ZEPPELIN                                      :{BIG_FONT}{BLACK}Dirižabļa katastrofa {STATION}!
 STR_NEWS_DISASTER_SMALL_UFO                                     :{BIG_FONT}{BLACK}Autotransports ir gājis bojā sadursmē ar 'NLO'!
 STR_NEWS_DISASTER_AIRPLANE_OIL_REFINERY                         :{BIG_FONT}{BLACK}Naftas rūpnīcas sprādziens netālu no {TOWN}!
 STR_NEWS_DISASTER_HELICOPTER_FACTORY                            :{BIG_FONT}{BLACK}Netālu no {TOWN} mīklainos apstākļos iznīcināta rūpnīca!
@@ -795,7 +795,7 @@ STR_NEWS_INDUSTRY_PLANTED                                       :{BIG_FONT}{BLAC
 
 STR_NEWS_INDUSTRY_CLOSURE_GENERAL                               :{BIG_FONT}{BLACK}{STRING} paziņo par tūlītēju darbības pārtraukšanu!
 STR_NEWS_INDUSTRY_CLOSURE_SUPPLY_PROBLEMS                       :{BIG_FONT}{BLACK}Piegādes problēmas {STRING} izraisa tūlītēju darbības pārtraukšanu!
-STR_NEWS_INDUSTRY_CLOSURE_LACK_OF_TREES                         :{BIG_FONT}{BLACK}Tuvumā esošo koku iztrūkums izraisa {STRING} tūlītēju darbības pārtraukšanu!
+STR_NEWS_INDUSTRY_CLOSURE_LACK_OF_TREES                         :{BIG_FONT}{BLACK}Tuvumā esošu koku trūkums ir iemesls paziņojumam par draudošu {STRING} darbības slēgšanu!
 
 STR_NEWS_EURO_INTRODUCTION                                      :{BIG_FONT}{BLACK}Eiropas naudas apvienība!{}{}Eiro ir ieviests, kā vienīgā valūta jūsu valstī!
 STR_NEWS_BEGIN_OF_RECESSION                                     :{BIG_FONT}{BLACK}Krīze pasaulē!{}{}Finanšu eksperti ekonomikai paredz sliktākos attīstības scenārijus!
@@ -908,8 +908,8 @@ STR_GAME_OPTIONS_MEASURING_UNITS_SI                             :SI
 
 STR_GAME_OPTIONS_ROAD_VEHICLES_FRAME                            :{BLACK}Autotransporta līdzekļi
 STR_GAME_OPTIONS_ROAD_VEHICLES_DROPDOWN_TOOLTIP                 :{BLACK}Ceļa braucamās puses izvēle
-STR_GAME_OPTIONS_ROAD_VEHICLES_DROPDOWN_LEFT                    :brauc pa kreiso pusi
-STR_GAME_OPTIONS_ROAD_VEHICLES_DROPDOWN_RIGHT                   :brauc pa labo pusi
+STR_GAME_OPTIONS_ROAD_VEHICLES_DROPDOWN_LEFT                    :Brauc pa kreiso pusi
+STR_GAME_OPTIONS_ROAD_VEHICLES_DROPDOWN_RIGHT                   :Brauc pa labo pusi
 
 STR_GAME_OPTIONS_TOWN_NAMES_FRAME                               :{BLACK}Pilsētu nosaukumi
 STR_GAME_OPTIONS_TOWN_NAMES_DROPDOWN_TOOLTIP                    :{BLACK}Pilsētu nosaukumu stila izvēle
@@ -982,19 +982,19 @@ STR_CURRENCY_WINDOW                                             :{WHITE}Pielāgo
 STR_CURRENCY_EXCHANGE_RATE                                      :{LTBLUE}Maiņas kurss: {ORANGE}{CURRENCY_LONG} = £ {COMMA}
 STR_CURRENCY_DECREASE_EXCHANGE_RATE_TOOLTIP                     :{BLACK}Samazināt savas valūtas vienību daudzumu attiecībā pret vienu mārciņu (£)
 STR_CURRENCY_INCREASE_EXCHANGE_RATE_TOOLTIP                     :{BLACK}Palielināt savas valūtas vienību daudzumu attiecībā pret vienu mārciņu (£)
-STR_CURRENCY_SET_EXCHANGE_RATE_TOOLTIP                          :{BLACK}Uzstādiet savas valūtas maiņas kursu pret vienu mārciņu (£)
+STR_CURRENCY_SET_EXCHANGE_RATE_TOOLTIP                          :{BLACK}Uzstādīt savas valūtas maiņas kursu pret vienu mārciņu (£)
 
 STR_CURRENCY_SEPARATOR                                          :{LTBLUE}Atdalītājs: {ORANGE}{STRING}
-STR_CURRENCY_SET_CUSTOM_CURRENCY_SEPARATOR_TOOLTIP              :{BLACK}Uzstādiet savas valūtas atdalītājsimbolu
+STR_CURRENCY_SET_CUSTOM_CURRENCY_SEPARATOR_TOOLTIP              :{BLACK}Uzstādīt savas valūtas atdalītājsimbolu
 
 STR_CURRENCY_PREFIX                                             :{LTBLUE}Priedēklis: {ORANGE}{STRING}
-STR_CURRENCY_SET_CUSTOM_CURRENCY_PREFIX_TOOLTIP                 :{BLACK}Uzstādiet priedēkli savai valūtai
+STR_CURRENCY_SET_CUSTOM_CURRENCY_PREFIX_TOOLTIP                 :{BLACK}Uzstādīt priedēkli savai valūtai
 STR_CURRENCY_SUFFIX                                             :{LTBLUE}Piedēklis: {ORANGE}{STRING}
-STR_CURRENCY_SET_CUSTOM_CURRENCY_SUFFIX_TOOLTIP                 :{BLACK}Uzstādiet piedēkli savai valūtai
+STR_CURRENCY_SET_CUSTOM_CURRENCY_SUFFIX_TOOLTIP                 :{BLACK}Uzstādīt piedēkli savai valūtai
 
 STR_CURRENCY_SWITCH_TO_EURO                                     :{LTBLUE}Pāriet uz eiro: {ORANGE}{NUM}
 STR_CURRENCY_SWITCH_TO_EURO_NEVER                               :{LTBLUE}Pāriet uz eiro: {ORANGE}nekad
-STR_CURRENCY_SET_CUSTOM_CURRENCY_TO_EURO_TOOLTIP                :{BLACK}Uzstādiet gadu, kad pāriet uz eiro
+STR_CURRENCY_SET_CUSTOM_CURRENCY_TO_EURO_TOOLTIP                :{BLACK}Uzstādīt gadu, kad pāriet uz eiro
 STR_CURRENCY_DECREASE_CUSTOM_CURRENCY_TO_EURO_TOOLTIP           :{BLACK}Pāriet uz eiro agrāk
 STR_CURRENCY_INCREASE_CUSTOM_CURRENCY_TO_EURO_TOOLTIP           :{BLACK}Pāriet uz eiro vēlāk
 
@@ -1041,7 +1041,7 @@ STR_NUM_VERY_LOW                                                :Ļoti zems
 STR_NUM_LOW                                                     :Zems
 STR_NUM_NORMAL                                                  :Normāls
 STR_NUM_HIGH                                                    :Augsts
-STR_NUM_CUSTOM                                                  :Pielāgotie
+STR_NUM_CUSTOM                                                  :Pielāgots
 STR_NUM_CUSTOM_NUMBER                                           :Pielāgots ({NUM})
 
 STR_VARIETY_NONE                                                :Nav
@@ -1137,7 +1137,7 @@ STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD             :{LTBLUE}Svarīg
 STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NONE        :nav
 STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NORMAL      :kā citas ražotnes
 STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_PROSPECTING :ienesīga
-STR_CONFIG_SETTING_INDUSTRY_PLATFORM                            :{LTBLUE}Līdzens laukums ap rūpnīcām: {ORANGE}{STRING} lauciņ{P š i u}
+STR_CONFIG_SETTING_INDUSTRY_PLATFORM                            :{LTBLUE}Līdzens laukums ap ražotnēm: {ORANGE}{STRING} lauciņ{P š i u}
 STR_CONFIG_SETTING_MULTIPINDTOWN                                :{LTBLUE}Atļaut vairākas līdzīgas ražotnes vienā pilsētā : {ORANGE}{STRING}
 STR_CONFIG_SETTING_SIGNALSIDE                                   :{LTBLUE}Rādīt signālus braukšanas pusē: {ORANGE}{STRING}
 STR_CONFIG_SETTING_SHOWFINANCES                                 :{LTBLUE}Gada beigās rādīt finanšu pārskatu: {ORANGE}{STRING}
@@ -1146,11 +1146,11 @@ STR_CONFIG_SETTING_STOP_LOCATION                                :{LTBLUE}Pēc no
 STR_CONFIG_SETTING_STOP_LOCATION_NEAR_END                       :beigu tuvumā
 STR_CONFIG_SETTING_STOP_LOCATION_MIDDLE                         :vidū
 STR_CONFIG_SETTING_STOP_LOCATION_FAR_END                        :tālākajā galā
-STR_CONFIG_SETTING_ROAD_VEHICLE_QUEUEING                        :{LTBLUE}Autotransporta rindas (ar kvantu efektiem): {ORANGE}{STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_QUEUEING                        :{LTBLUE}Autotransporta rindas (ar daudzuma efektiem): {ORANGE}{STRING}
 STR_CONFIG_SETTING_AUTOSCROLL                                   :{LTBLUE}Bīdīt logu, kad peles kursors atrodas tā malā: {ORANGE}{STRING}
 STR_CONFIG_SETTING_BRIBE                                        :{LTBLUE}Atļaut vietējo varas iestāžu piekukuļošanu: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ALLOW_EXCLUSIVE                              :{LTBLUE}Atļaut pirkt pārvadājumu izņēmuma tiesības: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_FUND_BUILDINGS                         :{LTBLUE}Ļaut ēku finansēšanu: {ORANGE}{STRING}
+STR_CONFIG_SETTING_ALLOW_FUND_BUILDINGS                         :{LTBLUE}Atļaut ēku finansēšanu: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ALLOW_FUND_ROAD                              :{LTBLUE}Atļaut finansēt vietējo ceļu atjaunošanu: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ALLOW_GIVE_MONEY                             :{LTBLUE}Atļaut pārsūtīt naudu citiem uzņēmumiem: {ORANGE}{STRING}
 STR_CONFIG_SETTING_FREIGHT_TRAINS                               :{LTBLUE}Svara koeficients kravām, lai simulētu smagus vilcienus: {ORANGE}{STRING}
@@ -1464,7 +1464,7 @@ STR_CHEATS_TOOLTIP                                              :{BLACK}Atzīmē
 STR_CHEATS_WARNING                                              :{BLACK}Brīdinājums! Jūs gatavojieties nodot savus biedrus konkurentus. Iegaumējiet, ka šādu pazemojumu viņi atcerēsies uz mūžīgiem laikiem.
 STR_CHEAT_MONEY                                                 :{LTBLUE}Palielināt naudas līdzekļus par {CURRENCY_LONG}
 STR_CHEAT_CHANGE_COMPANY                                        :{LTBLUE}Spēlēt kā uzņēmumam: {ORANGE}{COMMA}
-STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Maģiskais buldozers (nojauc industrijas, nenojaucamos): {ORANGE}{STRING}
+STR_CHEAT_EXTRA_DYNAMITE                                        :{LTBLUE}Burvju buldozers (nojauc ražotnes, nepārvietojamus objektus): {ORANGE}{STRING}
 STR_CHEAT_CROSSINGTUNNELS                                       :{LTBLUE}Tuneļi drīkst krustoties: {ORANGE}{STRING}
 STR_CHEAT_NO_JETCRASH                                           :{LTBLUE}Reaktīvās lidmašīnas mazajās lidostās neavarēs (bieži): {ORANGE}{STRING}
 STR_CHEAT_SWITCH_CLIMATE_TEMPERATE_LANDSCAPE                    :Mērenais klimats
@@ -1485,7 +1485,7 @@ STR_LIVERY_SHIP_TOOLTIP                                         :{BLACK}Rādīt 
 STR_LIVERY_AIRCRAFT_TOOLTIP                                     :{BLACK}Rādīt lidaparātu krāsu identitāti
 STR_LIVERY_PRIMARY_TOOLTIP                                      :{BLACK}Izvēlēties primāro krāsu atlasītajai identitātei
 STR_LIVERY_SECONDARY_TOOLTIP                                    :{BLACK}Izvēlēties sekundāro krāsu atlasītajai identitātei
-STR_LIVERY_PANEL_TOOLTIP                                        :{BLACK}Izvēlieties kuru identitāti mainīt, vai vairākas ar Ctrl+klikšķi. Klikšķināt uz rūtiņas, lai pārslēgtu identitātes izmantošanu
+STR_LIVERY_PANEL_TOOLTIP                                        :{BLACK}Izvēlēties kuru identitāti mainīt, vai vairākas ar Ctrl+klikšķi. Klikšķināt uz rūtiņas, lai pārslēgtu identitātes izmantošanu
 
 STR_LIVERY_DEFAULT                                              :Standarta pajūgs
 STR_LIVERY_STEAM                                                :Tvaika lokomotīve
@@ -1621,8 +1621,8 @@ STR_NETWORK_SERVER_LIST_ADD_SERVER_TOOLTIP                      :{BLACK}Pievieno
 STR_NETWORK_SERVER_LIST_START_SERVER                            :{BLACK}Palaist serveri
 STR_NETWORK_SERVER_LIST_START_SERVER_TOOLTIP                    :{BLACK}Palaist jūsu personīgo serveri
 
-STR_NETWORK_SERVER_LIST_PLAYER_NAME_OSKTITLE                    :{BLACK}Ievadiet savu vārdu
-STR_NETWORK_SERVER_LIST_ENTER_IP                                :{BLACK}Ievadiet servera adresi
+STR_NETWORK_SERVER_LIST_PLAYER_NAME_OSKTITLE                    :{BLACK}Ievadīt savu vārdu
+STR_NETWORK_SERVER_LIST_ENTER_IP                                :{BLACK}Ievadīt servera adresi
 
 # Start new multiplayer server
 STR_NETWORK_START_SERVER_CAPTION                                :{WHITE}Sākt jaunu vairākspēlētāju spēli
@@ -1646,7 +1646,7 @@ STR_NETWORK_START_SERVER_NUMBER_OF_SPECTATORS_TOOLTIP           :{BLACK}Ierobež
 STR_NETWORK_START_SERVER_LANGUAGE_SPOKEN                        :{BLACK}Valoda, kurā runā:
 STR_NETWORK_START_SERVER_LANGUAGE_TOOLTIP                       :{BLACK}Citi lietotāji zinās, kurā valodā tiek runāts uz servera
 
-STR_NETWORK_START_SERVER_NEW_GAME_NAME_OSKTITLE                 :{BLACK}Ievadiet tīkla spēles nosaukumu
+STR_NETWORK_START_SERVER_NEW_GAME_NAME_OSKTITLE                 :{BLACK}Ievadīt tīkla spēles nosaukumu
 
 # Network game languages
 ############ Leave those lines in this order!!
@@ -1780,7 +1780,7 @@ STR_NETWORK_CHAT_TO_COMPANY                                     :[Komanda] Uz {S
 STR_NETWORK_CHAT_CLIENT                                         :[Privāti] {STRING}: {WHITE}{STRING}
 STR_NETWORK_CHAT_TO_CLIENT                                      :[Privāti] Uz {STRING}: {WHITE}{STRING}
 STR_NETWORK_CHAT_ALL                                            :[Visiem] {STRING}: {WHITE}{STRING}
-STR_NETWORK_CHAT_OSKTITLE                                       :{BLACK}Ievadiet tekstu tīkla tērzēšanai
+STR_NETWORK_CHAT_OSKTITLE                                       :{BLACK}Ievadīt tekstu tīkla tērzēšanai
 
 # Network messages
 STR_NETWORK_ERROR_NOTAVAILABLE                                  :{WHITE}Neviena tīkla iekārta nav atrasta vai kompilēta bez ENABLE_NETWORK
@@ -1823,6 +1823,7 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :serveris jūs i
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :mēģināja blēdīties
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :serveris pilns
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :sūtīja pārak daudz rīkojumu
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :parole nav saņemta laikā
 STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :vispārējā noildze
 STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :kartes lejupielāde bija pārāk ilga
 STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :kartes apstrāde bija pārāk ilga
@@ -1867,7 +1868,7 @@ STR_CONTENT_NAME_CAPTION_TOOLTIP                                :{BLACK}Satura n
 STR_CONTENT_MATRIX_TOOLTIP                                      :{BLACK}Klikšķiniet uz līnijas lai redzētu detaļas{}Klikšķiniet kvadrātā, lai iezīmētu to lejupielādei
 STR_CONTENT_SELECT_ALL_CAPTION                                  :{BLACK}Atlasīt visu
 STR_CONTENT_SELECT_ALL_CAPTION_TOOLTIP                          :{BLACK}Atzīmēt visu saturu lejupielādei
-STR_CONTENT_SELECT_UPDATES_CAPTION                              :{BLACK}Atlasiet uzlabojumus
+STR_CONTENT_SELECT_UPDATES_CAPTION                              :{BLACK}Atlasīt uzlabojumus
 STR_CONTENT_SELECT_UPDATES_CAPTION_TOOLTIP                      :{BLACK}Atzīmējiet visu saturu lejupielādei, lai, tas ir uzlabojums esošajam saturam
 STR_CONTENT_UNSELECT_ALL_CAPTION                                :{BLACK}Atcelt visa atlasi
 STR_CONTENT_UNSELECT_ALL_CAPTION_TOOLTIP                        :{BLACK}Atzīmēt visu saturu lejupielādei
@@ -1980,11 +1981,11 @@ STR_RAIL_NAME_MAGLEV                                            :Maglevs
 
 # Rail depot construction window
 STR_BUILD_DEPOT_TRAIN_ORIENTATION_CAPTION                       :{WHITE}Vilcienu depo orientācija
-STR_BUILD_DEPOT_TRAIN_ORIENTATION_TOOLTIP                       :{BLACK}Izvēlieties vilcienu depo orientāciju
+STR_BUILD_DEPOT_TRAIN_ORIENTATION_TOOLTIP                       :{BLACK}Izvēlēties vilcienu depo virzienu
 
 # Rail waypoint construction window
 STR_WAYPOINT_CAPTION                                            :{WHITE}Ceļapunkts
-STR_WAYPOINT_GRAPHICS_TOOLTIP                                   :{BLACK}Izvēlieties kontrolpunkta veidu
+STR_WAYPOINT_GRAPHICS_TOOLTIP                                   :{BLACK}Izvēlēties pieturas punkta veidu
 
 # Rail station construction window
 STR_STATION_BUILD_RAIL_CAPTION                                  :{WHITE}Dzelzceļa stacijas izvēle
@@ -2029,9 +2030,9 @@ STR_SELECT_BRIDGE_SELECTION_TOOLTIP                             :{BLACK}Tiltu iz
 STR_SELECT_BRIDGE_INFO                                          :{GOLD}{STRING},{} {VELOCITY} {WHITE}{CURRENCY_LONG}
 STR_SELECT_BRIDGE_SCENEDIT_INFO                                 :{GOLD}{STRING},{} {VELOCITY}
 STR_BRIDGE_NAME_SUSPENSION_STEEL                                :Vanšu, tērauda
-STR_BRIDGE_NAME_GIRDER_STEEL                                    :Tērauda spraišļu
-STR_BRIDGE_NAME_CANTILEVER_STEEL                                :Konsole, tērauda
-STR_BRIDGE_NAME_SUSPENSION_CONCRETE                             :Piekartilts, betona
+STR_BRIDGE_NAME_GIRDER_STEEL                                    :Siju, tērauda
+STR_BRIDGE_NAME_CANTILEVER_STEEL                                :Izgriežamais, tērauda
+STR_BRIDGE_NAME_SUSPENSION_CONCRETE                             :Vanšu, betona
 STR_BRIDGE_NAME_WOODEN                                          :Koka
 STR_BRIDGE_NAME_CONCRETE                                        :Betona
 STR_BRIDGE_NAME_TUBULAR_STEEL                                   :Cauruļveida, tērauda
@@ -2045,7 +2046,7 @@ STR_ROAD_TOOLBAR_TOOLTIP_BUILD_ROAD_SECTION                     :{BLACK}Ceļu b�
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAMWAY_SECTION                  :{BLACK}Tramvaja sliežu būves izvēle. Ctrl pārslēdz tramvaja sliežu būvniecību/demolēšanu. Shift pārslēdz būvēšanu/izmaksu tāmes rādīšanu
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_AUTOROAD                         :{BLACK}Būvēt ceļu automātiskā ceļa režīmā. Ctrl pārslēdz ceļu būvēšanu/demolēšanu. Shift pārslēdz būvēšanu/izmaksu tāmes rādīšanu
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_AUTOTRAM                         :{BLACK}Būvēt tramvaja sliedes ar Autotram paņēmienu. Ctrl pārslēdz tramvaja sliežu būvēšanu/nojaukšanu. Shift pārslēdz būvēšanu/izmaksu tāmes rādīšanu
-STR_ROAD_TOOLBAR_TOOLTIP_BUILD_ROAD_VEHICLE_DEPOT               :{BLACK}Būvēt automašīnu depo (automašīnu pirkšanai un apkopei). Shift pārslēdz būvēšanu/izmaksu tāmes rādīšanu
+STR_ROAD_TOOLBAR_TOOLTIP_BUILD_ROAD_VEHICLE_DEPOT               :{BLACK}Būvēt autotransporta depo (autotransporta līdzekļu pirkšanai un apkopei). Shift pārslēdz būvēšanu/izmaksu tāmes rādīšanu
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAM_VEHICLE_DEPOT               :{BLACK}Būvēt tramvaju depo (tramvaju pirkšanai un apkopei). Shift pārslēdz būvēšanu/izmaksu tāmes rādīšanu
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_BUS_STATION                      :{BLACK}Būvēt autobusa pieturu. Ctrl aktivē staciju apvienošanu. Shift pārslēdz būvēšanu/izmaksu tāmes rādīšanu
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_PASSENGER_TRAM_STATION           :{BLACK}Būvēt pasažieru tramvaja pieturu. Ctrl iespējo staciju apvienošanu. Shift pārslēdz būvēšanu/izmaksu tāmes rādīšanu
@@ -2100,7 +2101,7 @@ STR_TOOLBAR_AIRCRAFT_BUILD_AIRPORT_TOOLTIP                      :{BLACK}Būvēt 
 
 # Airport construction window
 STR_STATION_BUILD_AIRPORT_CAPTION                               :{WHITE}Lidostas izvēle
-STR_STATION_BUILD_AIRPORT_TOOLTIP                               :{BLACK}Izvēlieties lidostas izmēru/veidu
+STR_STATION_BUILD_AIRPORT_TOOLTIP                               :{BLACK}Izvēlēties lidostas lielumu/veidu
 STR_STATION_BUILD_AIRPORT_CLASS_LABEL                           :{BLACK}Lidostas klase
 STR_STATION_BUILD_AIRPORT_LAYOUT_NAME                           :{BLACK}{NUM}. izkārtojums
 
@@ -2140,7 +2141,7 @@ STR_OBJECT_CLASS_TRNS                                           :Raidītāji
 
 # Tree planting window (last two for SE only)
 STR_PLANT_TREE_CAPTION                                          :{WHITE}Koki
-STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Izvēlieties koka veidu stādīšanai
+STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Izvēlēties koka veidu stādīšanai. Ja plāksne jau ir koks, tas pievienos vairāk jauktu veidu kokus neatkarīgi no izvēlētā veida
 STR_TREES_RANDOM_TYPE                                           :{BLACK}Nejauši izvēlēta veida koki
 STR_TREES_RANDOM_TYPE_TOOLTIP                                   :{BLACK}Izvietot nejaušus kokus. Shift pārslēdz būve/rādīt izmaksu tāmi
 STR_TREES_RANDOM_TREES_BUTTON                                   :{BLACK}Nejauši koki
@@ -2148,7 +2149,7 @@ STR_TREES_RANDOM_TREES_TOOLTIP                                  :{BLACK}Stādīt
 
 # Land generation window (SE)
 STR_TERRAFORM_TOOLBAR_LAND_GENERATION_CAPTION                   :{WHITE}Zemes radīšana
-STR_TERRAFORM_TOOLTIP_PLACE_ROCKY_AREAS_ON_LANDSCAPE            :{BLACK}Ainavā novietot akmeņainus apgabalus
+STR_TERRAFORM_TOOLTIP_PLACE_ROCKY_AREAS_ON_LANDSCAPE            :{BLACK}Ainavā novietot akmeņainus apvidus
 STR_TERRAFORM_TOOLTIP_DEFINE_DESERT_AREA                        :{BLACK}Norādīt tuksneša platību.{}Aizturēt Ctrl, lai to noņemtu
 STR_TERRAFORM_TOOLTIP_INCREASE_SIZE_OF_LAND_AREA                :{BLACK}Palielināt zemes apgabalu pazemināšanai/paaugstināšanai
 STR_TERRAFORM_TOOLTIP_DECREASE_SIZE_OF_LAND_AREA                :{BLACK}Samazināt zemes apgabalu pazemināšanai/paaugstināšanai
@@ -2170,7 +2171,7 @@ STR_FOUND_TOWN_MANY_RANDOM_TOWNS                                :{BLACK}Daudz ne
 STR_FOUND_TOWN_RANDOM_TOWNS_TOOLTIP                             :{BLACK}Pāklāt karti ar nejauši izvietotām pilsētām
 
 STR_FOUND_TOWN_NAME_TITLE                                       :{YELLOW} Pilsētas nosaukums:
-STR_FOUND_TOWN_NAME_EDITOR_TITLE                                :{BLACK}Ievadiet pilsētas nosaukumu
+STR_FOUND_TOWN_NAME_EDITOR_TITLE                                :{BLACK}Ievadīt pilsētas nosaukumu
 STR_FOUND_TOWN_NAME_EDITOR_HELP                                 :{BLACK}Klikšķināt, lai ievadītu pilsētas nosaukumu
 STR_FOUND_TOWN_NAME_RANDOM_BUTTON                               :{BLACK}Gadījuma nosaukums
 STR_FOUND_TOWN_NAME_RANDOM_TOOLTIP                              :{BLACK}Radīt jaunu gadījuma nosaukumu
@@ -2185,7 +2186,7 @@ STR_FOUND_TOWN_CITY                                             :{BLACK}Lielpils
 STR_FOUND_TOWN_CITY_TOOLTIP                                     :{BLACK}Lielpilsētas attīstās ātrāk kā pilsētas{}Atkarībā no iestatījumiem, dibināšanas brīdī tās ir lielākas
 
 STR_FOUND_TOWN_ROAD_LAYOUT                                      :{YELLOW}Pilsētas ceļu izskats:
-STR_FOUND_TOWN_SELECT_TOWN_ROAD_LAYOUT                          :{BLACK}Uzslēgt pilsētas ceļa izskatu
+STR_FOUND_TOWN_SELECT_TOWN_ROAD_LAYOUT                          :{BLACK}Atlasīt šajā pilsētā lietojamo ceļu izkārtojumu
 STR_FOUND_TOWN_SELECT_LAYOUT_ORIGINAL                           :{BLACK}Sākotnējs
 STR_FOUND_TOWN_SELECT_LAYOUT_BETTER_ROADS                       :{BLACK}Labāks ceļš
 STR_FOUND_TOWN_SELECT_LAYOUT_2X2_GRID                           :{BLACK}2x2 režģis
@@ -2208,10 +2209,10 @@ STR_INDUSTRY_CARGOES_CARGO_CAPTION                              :{WHITE}'{STRING
 STR_INDUSTRY_CARGOES_PRODUCERS                                  :{WHITE}Ražojošās ražotnes
 STR_INDUSTRY_CARGOES_CUSTOMERS                                  :{WHITE}Patērējošās ražotnes
 STR_INDUSTRY_CARGOES_HOUSES                                     :{WHITE}Mājas
-STR_INDUSTRY_CARGOES_INDUSTRY_TOOLTIP                           :{BLACK}Klikšķināt uz rūpnīcas lai redzētu tās piegādātājus un patērētājus
+STR_INDUSTRY_CARGOES_INDUSTRY_TOOLTIP                           :{BLACK}Klikšķināt uz ražotnes, lai redzētu tās piegādātājus un patērētājus
 STR_INDUSTRY_CARGOES_CARGO_TOOLTIP                              :{BLACK}{STRING}{}Klikšķināt uz kravas, lai redzētu tās piegādātājus un patērētājus
-STR_INDUSTRY_DISPLAY_CHAIN                                      :{BLACK}Parādīt ķēdi
-STR_INDUSTRY_DISPLAY_CHAIN_TOOLTIP                              :{BLACK}Parādīt kravas ražošanas un pieņemšanas rūpnīcas
+STR_INDUSTRY_DISPLAY_CHAIN                                      :{BLACK}Rādīt ķēdi
+STR_INDUSTRY_DISPLAY_CHAIN_TOOLTIP                              :{BLACK}Rādīt kravas ražošanas un pieņemšanas ražotnes
 STR_INDUSTRY_CARGOES_NOTIFY_SMALLMAP                            :{BLACK}Piesaistīt minikartei
 STR_INDUSTRY_CARGOES_NOTIFY_SMALLMAP_TOOLTIP                    :{BLACK}Izvēlēties arī minikartē attēlotās rūpnīcas
 
@@ -2359,7 +2360,7 @@ STR_SAVELOAD_DETAIL_NOT_AVAILABLE                               :{BLACK}Nav piee
 STR_SAVELOAD_DETAIL_COMPANY_INDEX                               :{SILVER}{COMMA}: {WHITE}{STRING}
 STR_SAVELOAD_DETAIL_GRFSTATUS                                   :{SILVER}NewGRF: {WHITE}{STRING}
 
-STR_SAVELOAD_OSKTITLE                                           :{BLACK}Ievadiet saglabātās spēles nosaukumu
+STR_SAVELOAD_OSKTITLE                                           :{BLACK}Ievadīt saglabātās spēles nosaukumu
 
 # World generation
 STR_MAPGEN_WORLD_GENERATION_CAPTION                             :{WHITE}Pasaules radīšana
@@ -2372,7 +2373,7 @@ STR_MAPGEN_SNOW_LINE_HEIGHT                                     :{BLACK}Sniega l
 STR_MAPGEN_SNOW_LINE_UP                                         :{BLACK}Paaugstināt sniega līnijas augstumu
 STR_MAPGEN_SNOW_LINE_DOWN                                       :{BLACK}Pazemināt sniega līnijas augstumu
 STR_MAPGEN_RANDOM_SEED                                          :{BLACK}Nejaušs sākums:
-STR_MAPGEN_RANDOM_SEED_HELP                                     :{BLACK}Noklikšķiniet,lai ievadītu nejaušu sākumu
+STR_MAPGEN_RANDOM_SEED_HELP                                     :{BLACK}Uzklikšķināt, lai ievadītu nejaušu sākumu
 STR_MAPGEN_RANDOM                                               :{BLACK}Nejaušs
 STR_MAPGEN_RANDOM_HELP                                          :{BLACK}Mainīt apvidus radīšanā izmantoto nejaušo sākumu
 STR_MAPGEN_LAND_GENERATOR                                       :{BLACK}Zemes radītājs:
@@ -2401,7 +2402,7 @@ STR_MAPGEN_HEIGHTMAP_NAME                                       :{BLACK}Augstumu
 STR_MAPGEN_HEIGHTMAP_SIZE_LABEL                                 :{BLACK}Lielums:
 STR_MAPGEN_HEIGHTMAP_SIZE                                       :{ORANGE}{NUM} x {NUM}
 
-STR_MAPGEN_RANDOM_SEED_OSKTITLE                                 :{BLACK}Ievadiet nejaušu sākumu
+STR_MAPGEN_RANDOM_SEED_OSKTITLE                                 :{BLACK}Ievadīt nejaušu sākumu
 STR_MAPGEN_SNOW_LINE_QUERY_CAPT                                 :{WHITE}Mainīt sniega līnijas augstumu
 STR_MAPGEN_START_DATE_QUERY_CAPT                                :{WHITE}Mainīt sākšanas gadu
 
@@ -2443,7 +2444,7 @@ STR_NEWGRF_FILTER_TITLE                                         :{ORANGE}Filtra 
 STR_NEWGRF_SETTINGS_PRESET_LIST_TOOLTIP                         :{BLACK}Ielādēt izvēlēto iepriekšiestatījumu
 STR_NEWGRF_SETTINGS_PRESET_SAVE                                 :{BLACK}Saglabāt iepriekšiestatījumu
 STR_NEWGRF_SETTINGS_PRESET_SAVE_TOOLTIP                         :{BLACK}Saglabāt šo sarakstu kā iepriekšiestatījumu
-STR_NEWGRF_SETTINGS_PRESET_SAVE_QUERY                           :{BLACK}Ievadiet iepriekšiestatījuma nosaukumu
+STR_NEWGRF_SETTINGS_PRESET_SAVE_QUERY                           :{BLACK}Ievadīt iepriekšiestatījuma nosaukumu
 STR_NEWGRF_SETTINGS_PRESET_DELETE                               :{BLACK}Dzēst iepriekšiestatījumu
 STR_NEWGRF_SETTINGS_PRESET_DELETE_TOOLTIP                       :{BLACK}Dzēst šobrīd atlasīto iepriekšiestatījumu
 STR_NEWGRF_SETTINGS_ADD                                         :{BLACK}Pievienot
@@ -2463,7 +2464,7 @@ STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Skatīt 
 STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Izmaiņu žurnāls
 STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licence
 
-STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Iest. parametrus
+STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Iestatīt parametrus
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Rādīt parametrus
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Iespējot paleti
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}Mainīt atlasītā New GRF paleti.{}Tas jādara ja NewGRF grafika izskatās sārta
@@ -2513,15 +2514,15 @@ STR_NEWGRF_INSPECT_QUERY_CAPTION                                :{WHITE}NewGRF m
 # Sprite aligner window
 STR_SPRITE_ALIGNER_CAPTION                                      :{WHITE}Gariņa līdzināšana {COMMA} ({STRING})
 STR_SPRITE_ALIGNER_NEXT_BUTTON                                  :{BLACK}Nākamais gariņš
-STR_SPRITE_ALIGNER_NEXT_TOOLTIP                                 :{BLACK}Pāriet uz nākamo normālo objektu, izlaižot pseido/pārkrāsotu/fonta objektu
+STR_SPRITE_ALIGNER_NEXT_TOOLTIP                                 :{BLACK}Pāriet uz nākamo parasto gariņu, izlaižot visus pseido/pārkrāsotos/fonta gariņus
 STR_SPRITE_ALIGNER_GOTO_BUTTON                                  :{BLACK}Iet pie gariņa
-STR_SPRITE_ALIGNER_GOTO_TOOLTIP                                 :{BLACK}Iet pie dotā objekta. Ja tas nav normāls objekts, tad pāriet pie nākamā
-STR_SPRITE_ALIGNER_PREVIOUS_BUTTON                              :{BLACK}Iepriekšējais objekts
-STR_SPRITE_ALIGNER_PREVIOUS_TOOLTIP                             :{BLACK}Iet pie iepriekšējā normālā objekta, izlaižot visus pseido/pārkrāsotus/fonta objektus
+STR_SPRITE_ALIGNER_GOTO_TOOLTIP                                 :{BLACK}Iet pie dotā gariņa. Ja tas nav parastais gariņš, tad pāriet pie nākamā
+STR_SPRITE_ALIGNER_PREVIOUS_BUTTON                              :{BLACK}Iepriekšējais gariņš
+STR_SPRITE_ALIGNER_PREVIOUS_TOOLTIP                             :{BLACK}Iet pie iepriekšējā parastā gariņa, izlaižot visus pseido/pārkrāsotos/fonta gariņus
 STR_SPRITE_ALIGNER_SPRITE_TOOLTIP                               :{BLACK}Izvēlētā objekta attēlojums. To attēlojot, izkārtojums ir ignorēts
-STR_SPRITE_ALIGNER_MOVE_TOOLTIP                                 :{BLACK}Pārvietot objektu, lai mainītu X un Y vērtības
+STR_SPRITE_ALIGNER_MOVE_TOOLTIP                                 :{BLACK}Pārvietot gariņu, lai mainītu X un Y vērtības
 STR_SPRITE_ALIGNER_OFFSETS                                      :{BLACK}X garums: {NUM}, Y garums: {NUM}
-STR_SPRITE_ALIGNER_PICKER_BUTTON                                :{BLACK}Paņemiet gariņu
+STR_SPRITE_ALIGNER_PICKER_BUTTON                                :{BLACK}Paņemt gariņu
 STR_SPRITE_ALIGNER_PICKER_TOOLTIP                               :{BLACK}Paņemiet gariņu no jebkuras vietas ekrānā
 
 STR_SPRITE_ALIGNER_GOTO_CAPTION                                 :{WHITE}Iet pie gariņa
@@ -2545,8 +2546,10 @@ STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :GRF fails radī
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Ir ielādēti pārāk daudzi NewGRF
 STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Ielādē {1:STRING} kā statisks NewGRF {STRING} var radīt desinhronizāciju
 STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Neparedzēts gariņš (gariņš {3:NUM})
+STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Nezināma Action 0 īpašība {4:HEX} (gariņš {3:NUM})
 STR_NEWGRF_ERROR_INVALID_ID                                     :Mēģinājums izmantot nederīgu ID (gariņš {3:NUM})
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} satur bojātu gariņu. Visi bojātie gariņi tiks parādīti ar sarkanu jautājuma zīmi (?)
+STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Satur vairākus Action 8 ierakstus (gariņš {3:NUM})
 STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lasīt aiz pseidogariņa beigām (gariņš {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Pašreiz lietotajā pamata grafikas pakā iztrūkst daļa materiāla.{}Lūdzu atjaunojiet pamata grafikas paku
 STR_NEWGRF_ERROR_GRM_FAILED                                     :Pieprasītie GRF resursi nav pieejami (gariņš {3:NUM})
@@ -2607,7 +2610,7 @@ STR_EDIT_SIGN_CAPTION                                           :{WHITE}Labot z�
 STR_EDIT_SIGN_NEXT_SIGN_TOOLTIP                                 :{BLACK}Doties uz nākamo zīmi
 STR_EDIT_SIGN_PREVIOUS_SIGN_TOOLTIP                             :{BLACK}Doties uz iepriekšējo zīmi
 
-STR_EDIT_SIGN_SIGN_OSKTITLE                                     :{BLACK}Ievadiet zīmes nosaukumu
+STR_EDIT_SIGN_SIGN_OSKTITLE                                     :{BLACK}Ievadīt zīmes nosaukumu
 
 # Town directory window
 STR_TOWN_DIRECTORY_CAPTION                                      :{WHITE}Pilsētas
@@ -2718,8 +2721,8 @@ STR_SUBSIDIES_SUBSIDISED_FROM_TO                                :{ORANGE}{STRING
 STR_SUBSIDIES_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                :{BLACK}Klikšķināt uz servisa, lai iecentrētu skatu uz rūpnīcu/pilsētu. Ctrl+klikšķis atvērs jaunu skatu lauku uz pilsētu/rūpnīcu
 
 # Station list window
-STR_STATION_LIST_TOOLTIP                                        :{BLACK}Staciju nosaukumi - klikšķiniet uz nosaukuma, lai centrētu galveno skatu uz staciju. Ctrl+klikšķis atvērs jaunu skatu lauku uz staciju.
-STR_STATION_LIST_USE_CTRL_TO_SELECT_MORE                        :{BLACK}Turiet nospiestu CTRL, lai izvēlētos vairākus
+STR_STATION_LIST_TOOLTIP                                        :{BLACK}Staciju nosaukumi - klikšķināt uz nosaukuma, lai centrētu galveno skatu uz staciju. Ctrl+klikšķis atvērs jaunu skatvietu pie stacijas
+STR_STATION_LIST_USE_CTRL_TO_SELECT_MORE                        :{BLACK}Aizturēt Ctrl, lai izvēlētos vairākus
 STR_STATION_LIST_CAPTION                                        :{WHITE}{COMPANY} - {COMMA} Stacij{P a as u}
 STR_STATION_LIST_STATION                                        :{YELLOW}{STATION} {STATION_FEATURES}
 STR_STATION_LIST_WAYPOINT                                       :{YELLOW}{WAYPOINT}
@@ -2758,7 +2761,7 @@ STR_STATION_VIEW_CENTER_TOOLTIP                                 :{BLACK}Centrēt
 STR_STATION_VIEW_RENAME_TOOLTIP                                 :{BLACK}Pārdēvēt staciju
 
 STR_STATION_VIEW_SCHEDULED_TRAINS_TOOLTIP                       :{BLACK}Rādīt vilcienus, kuru rīkojumu sarakstos ir šī stacija
-STR_STATION_VIEW_SCHEDULED_ROAD_VEHICLES_TOOLTIP                :{BLACK}Rādīt mašīnas, kuru rīkojumu sarakstos ir šī stacija
+STR_STATION_VIEW_SCHEDULED_ROAD_VEHICLES_TOOLTIP                :{BLACK}Rādīt autotransporta līdzekļus, kuru rīkojumu sarakstos ir šī stacija
 STR_STATION_VIEW_SCHEDULED_AIRCRAFT_TOOLTIP                     :{BLACK}Rādīt lidaparātus, kuru rīkojumu sarakstos ir šī stacija
 STR_STATION_VIEW_SCHEDULED_SHIPS_TOOLTIP                        :{BLACK}Rādīt kuģus, kuru rīkojumu sarakstos ir šī stacija
 
@@ -2767,7 +2770,7 @@ STR_STATION_VIEW_RENAME_STATION_CAPTION                         :Pārdēvēt sta
 # Waypoint/buoy view window
 STR_WAYPOINT_VIEW_CAPTION                                       :{WHITE}{WAYPOINT}
 STR_WAYPOINT_VIEW_CENTER_TOOLTIP                                :{BLACK}Centrēt galveno skatu uz maršruta punktu. Ctrl+Klikšķis atvērs skatu uz maršruta punktu jaunā skatulaukā
-STR_WAYPOINT_VIEW_CHANGE_WAYPOINT_NAME                          :{BLACK}Pārdēvēt ceļapunktu
+STR_WAYPOINT_VIEW_CHANGE_WAYPOINT_NAME                          :{BLACK}Mainīt pieturas punkta nosaukumu
 STR_BUOY_VIEW_CENTER_TOOLTIP                                    :{BLACK}Centrēt galveno skatu uz boju. Ctrl+klikšķis atvērs skatu uz boju jaunā skatulaukā
 STR_BUOY_VIEW_CHANGE_BUOY_NAME                                  :{BLACK}Mainīt bojas nosaukumu
 
@@ -2875,7 +2878,7 @@ STR_INDUSTRY_DIRECTORY_NONE.kas                                 :{G=f}{ORANGE}- 
 STR_INDUSTRY_DIRECTORY_ITEM                                     :{ORANGE}{INDUSTRY}{BLACK} ({CARGO_LONG}{STRING}){YELLOW} ({COMMA}% pārvadāti)
 STR_INDUSTRY_DIRECTORY_ITEM_TWO                                 :{ORANGE}{INDUSTRY}{BLACK} ({CARGO_LONG}{STRING}/{CARGO_LONG}{STRING}){YELLOW} ({COMMA}%/{COMMA}% pārvadāti)
 STR_INDUSTRY_DIRECTORY_ITEM_NOPROD                              :{ORANGE}{INDUSTRY}
-STR_INDUSTRY_DIRECTORY_LIST_CAPTION                             :{BLACK}Ražotņu nosaukumi — klikšķiniet uz nosaukuma, lai centrētu skatu uz ražotni. Ctrl+klikšķis atvērs jaunu skatu lauku uz rūpnīcu
+STR_INDUSTRY_DIRECTORY_LIST_CAPTION                             :{BLACK}Ražotņu nosaukumi - klikšķināt uz nosaukuma, lai centrētu skatu uz ražotni. Ctrl+klikšķis atvērs jaunu skatvietu pie ražotnes
 
 # Industry view
 STR_INDUSTRY_VIEW_CAPTION                                       :{WHITE}{INDUSTRY}
@@ -2901,14 +2904,14 @@ STR_CONFIG_GAME_PRODUCTION                                      :{WHITE}Mainīt 
 STR_CONFIG_GAME_PRODUCTION_LEVEL                                :{WHITE}Izmainīt ražošanas līmeni (procentos, līdz 800%)
 
 # Vehicle lists
-STR_VEHICLE_LIST_TRAIN_CAPTION                                  :{WHITE}{STRING} - {COMMA} Vilcien{P s i a}
-STR_VEHICLE_LIST_ROAD_VEHICLE_CAPTION                           :{WHITE}{STRING} - {COMMA} Autotransporta līdzek{P lis ļi ļu}
-STR_VEHICLE_LIST_SHIP_CAPTION                                   :{WHITE}{STRING} - {COMMA} Kuģ{P is i u}
-STR_VEHICLE_LIST_AIRCRAFT_CAPTION                               :{WHITE}{STRING} - {COMMA} Lidaparāts
+STR_VEHICLE_LIST_TRAIN_CAPTION                                  :{WHITE}{STRING} - {COMMA} vilcien{P s i u}
+STR_VEHICLE_LIST_ROAD_VEHICLE_CAPTION                           :{WHITE}{STRING} - {COMMA} autotransporta līdzek{P lis ļi ļu}
+STR_VEHICLE_LIST_SHIP_CAPTION                                   :{WHITE}{STRING} - {COMMA} kuģ{P is i u}
+STR_VEHICLE_LIST_AIRCRAFT_CAPTION                               :{WHITE}{STRING} - {COMMA} lidaparāt{P s i u}
 
 STR_VEHICLE_LIST_TRAIN_LIST_TOOLTIP                             :{BLACK}Vilcieni - klik uz vilciena priekš informācijas
 STR_VEHICLE_LIST_ROAD_VEHICLE_TOOLTIP                           :{BLACK}Autotransporta līdzekļi - klikšķināt uz transportlīdzekļa, lai iegūtu informāciju
-STR_VEHICLE_LIST_SHIP_TOOLTIP                                   :{BLACK}Kuģi - uzspied uz kuģa priekš informācijas
+STR_VEHICLE_LIST_SHIP_TOOLTIP                                   :{BLACK}Kuģi - klikšķināt uz kuģa, lai iegūtu informāciju
 STR_VEHICLE_LIST_AIRCRAFT_TOOLTIP                               :{BLACK}Lidaparāts - klikšķināt uz lidaparāta, lai iegūtu informāciju
 
 STR_VEHICLE_LIST_PROFIT_THIS_YEAR_LAST_YEAR                     :{TINY_FONT}{BLACK}Peļņa šogad: {CURRENCY_LONG} (pērn: {CURRENCY_LONG})
@@ -2981,11 +2984,11 @@ STR_PURCHASE_INFO_COST                                          :{BLACK}Cena: {G
 STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Svars: {GOLD}{WEIGHT_SHORT} ({WEIGHT_SHORT})
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Cena: {GOLD}{CURRENCY_LONG}{BLACK} Ātrums: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Ietilpība: {GOLD}{CARGO_LONG}, {CARGO_LONG}
-STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Motor-vagoni: {GOLD}+{POWER}zs{BLACK} Svars: {GOLD}+{WEIGHT_SHORT}
+STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Motorvagoni: {GOLD}+{POWER}zs{BLACK} Svars: {GOLD}+{WEIGHT_SHORT}
 STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Pielāgojams uz: {GOLD}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Visi kravu veidi
 STR_PURCHASE_INFO_ALL_BUT                                       :Visu izņemot {GOLD}
-STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Maksimus. Vilcēja piepūle: {GOLD}{FORCE}
+STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Maksimālais vilces spēks: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Apgabas: {GOLD}{COMMA} lauciņi
 
 STR_BUY_VEHICLE_TRAIN_LIST_TOOLTIP                              :{BLACK}Vilciena vagonu atlasīšanas saraksts - klikšķināt uz transportlīdzekļa, lai iegūtu informāciju
@@ -3029,7 +3032,7 @@ STR_DEPOT_VEHICLE_TOOLTIP                                       :{BLACK}{ENGINE}
 STR_DEPOT_VEHICLE_TOOLTIP_CHAIN                                 :{BLACK}{NUM} transportlīdzek{P lis ļi ļu}{STRING}
 STR_DEPOT_VEHICLE_TOOLTIP_CARGO                                 :{}{CARGO_LONG} ({CARGO_SHORT})
 
-STR_DEPOT_TRAIN_LIST_TOOLTIP                                    :{BLACK}Vilcieni — velciet sastāva daļu, lai pievienotu/atvienotu no vilciena; klikšķiniet uz vilciena, lai iegūtu informāciju. Turiet piespiestu Ctrl, lai attiecinātu abas funkcijas sekojošajai ķēdei
+STR_DEPOT_TRAIN_LIST_TOOLTIP                                    :{BLACK}Vilcieni - villkt sastāva daļu, lai pievienotu/atvienotu no vilciena. Klikšķināt uz vilciena, lai iegūtu informāciju. Turēt piespiestu Ctrl, lai attiecinātu abas funkcijas sekojošajai ķēdei
 STR_DEPOT_ROAD_VEHICLE_LIST_TOOLTIP                             :{BLACK}Transportlīdzekļi - uzklikšķināt uz transportlīdzekļa, lai uzzinātu vairāk
 STR_DEPOT_SHIP_LIST_TOOLTIP                                     :{BLACK}Kuģi - uzklikšķināt uz kuģa, lai uzzinātu vairāk
 STR_DEPOT_AIRCRAFT_LIST_TOOLTIP                                 :{BLACK}Lidaparāti - uzklikšķināt uz lidaparāta, lai uzzinātu vairāk
@@ -3095,7 +3098,7 @@ STR_DEPOT_SELL_CONFIRMATION_TEXT                                :{YELLOW}Jūs gr
 
 # Engine preview window
 STR_ENGINE_PREVIEW_CAPTION                                      :{WHITE}Ziņojums no transportlīdzekļu ražotāja
-STR_ENGINE_PREVIEW_MESSAGE                                      :{GOLD}Mēs tikko esam izstrādājuši jaunu transportlīdzekli — {STRING}. Vai esat ieinteresēts iegūt izņēmuma tiesības izmantot šo transportu uz vienu gadu, lai mēs varētu to izmēģināt pirms tas kļūst pieejams visiem?
+STR_ENGINE_PREVIEW_MESSAGE                                      :{GOLD}Mēs tikko esam izstrādājuši jaunu transportlīdzekli - {STRING}. Vai esat ieinteresēts iegūt izņēmuma tiesības izmantot šo transportu uz vienu gadu, lai mēs varētu to izmēģināt pirms tas kļūst pieejams visiem?
 STR_ENGINE_PREVIEW_RAILROAD_LOCOMOTIVE                          :dzelzceļa lokomotīve
 STR_ENGINE_PREVIEW_ROAD_VEHICLE                                 :automobilis
 STR_ENGINE_PREVIEW_AIRCRAFT                                     :lidmašīna
@@ -3453,7 +3456,7 @@ STR_TIMETABLE_TITLE                                             :{WHITE}{VEHICLE
 STR_TIMETABLE_ORDER_VIEW                                        :{BLACK}Rīkojumi
 STR_TIMETABLE_ORDER_VIEW_TOOLTIP                                :{BLACK}Pārslēgt uz rīkojumu skatu
 
-STR_TIMETABLE_TOOLTIP                                           :{BLACK}Saraksts - uzklikšķiniet uz norīkojuma, lai to atlasītu
+STR_TIMETABLE_TOOLTIP                                           :{BLACK}Saraksts - uzklikšķināt uz norīkojuma, lai to atlasītu
 
 STR_TIMETABLE_NO_TRAVEL                                         :Bez braukšanas
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Ceļot (automātiski; iegrafikosies līdz ar nākamo pašrocīgo rīkojumu)
@@ -3474,7 +3477,7 @@ STR_TIMETABLE_STATUS_NOT_STARTED                                :{BLACK}Šis sar
 STR_TIMETABLE_STATUS_START_AT                                   :{BLACK}Šis saraksts sāksies {STRING}
 
 STR_TIMETABLE_STARTING_DATE                                     :{BLACK}Sākuma datums
-STR_TIMETABLE_STARTING_DATE_TOOLTIP                             :{BLACK}Izvēlēties starta datumu šim grafikam
+STR_TIMETABLE_STARTING_DATE_TOOLTIP                             :{BLACK}Izvēlēties sākuma datumu šim sarakstam
 
 STR_TIMETABLE_CHANGE_TIME                                       :{BLACK}Mainīt laiku
 STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Mainīt iezīmētajam maršrutam nepieciešamo laiku
@@ -3545,7 +3548,7 @@ STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}Nolaist 
 STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}GameScript
 STR_AI_CONFIG_AI                                                :{SILVER}MI
 
-STR_AI_CONFIG_CHANGE                                            :{BLACK}Izvēlieties {STRING}
+STR_AI_CONFIG_CHANGE                                            :{BLACK}Izvēlēties {STRING}
 STR_AI_CONFIG_CHANGE_NONE                                       :
 STR_AI_CONFIG_CHANGE_AI                                         :MI
 STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :GameScript
@@ -3554,8 +3557,7 @@ STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Konfigur
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Konfigurēt skripta parametrus
 
 # Available AIs window
-STR_AI_LIST_CAPTION                                             :{WHITE}Pieejams {STRING}
-STR_AI_LIST_CAPTION.kas                                         :{G=f}{WHITE}Pieejama {STRING}
+STR_AI_LIST_CAPTION                                             :{WHITE}Pieejamie {STRING}
 STR_AI_LIST_CAPTION_AI                                          :MI
 STR_AI_LIST_CAPTION_GAMESCRIPT                                  :GameScripts
 STR_AI_LIST_TOOLTIP                                             :{BLACK}Uzklikšķināt, lai izvēlētos skriptu
@@ -3567,14 +3569,14 @@ STR_AI_LIST_URL                                                 :{BLACK}URL: {ST
 STR_AI_LIST_ACCEPT                                              :{BLACK}Apstiprināt
 STR_AI_LIST_ACCEPT_TOOLTIP                                      :{BLACK}Izvēlēties izcelto skriptu
 STR_AI_LIST_CANCEL                                              :{BLACK}Atcelt
-STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Nemainiet skriptu
+STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Nemainīt skriptu
 
 # AI Parameters
-STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parametri
+STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} parametri
 STR_AI_SETTINGS_CAPTION_AI                                      :MI
 STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :GameScript
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Aizvērt
-STR_AI_SETTINGS_RESET                                           :{BLACK}Pārspiest
+STR_AI_SETTINGS_RESET                                           :{BLACK}Atiestatīt
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Aptuvenais dienu skaits, līdz palaist šo MI pēc iepriekšējā: {ORANGE}{STRING}
 
@@ -3713,8 +3715,8 @@ STR_ERROR_INDUSTRY_TOO_CLOSE                                    :{WHITE}... pār
 STR_ERROR_MUST_FOUND_TOWN_FIRST                                 :{WHITE}... vispirms ir jāuzceļ pilsētu
 STR_ERROR_ONLY_ONE_ALLOWED_PER_TOWN                             :{WHITE}... pilsētā atļauts tikai viens(a)
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{WHITE}... atļauts būvēt tikai pilsētās ar iedzīvotāju skaitu vismaz 1200
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... var celt tikai mežu apgabalos
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... var celt tikai tuksnešainos apgabalos
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... var celt tikai mežu apvidos
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... var celt tikai tuksnešu apvidos
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... var celt tikai pilsētās
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... Var celt tikai zemos apgabalos
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... var tikt izvietots tikai pie kartes malām

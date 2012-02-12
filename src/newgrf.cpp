@@ -73,10 +73,6 @@ static uint32 _ttdpatch_flags[8];
 /** Indicates which are the newgrf features currently loaded ingame */
 GRFLoadedFeatures _loaded_newgrf_features;
 
-enum GrfDataType {
-	GDT_SOUND,
-};
-
 static const uint MAX_SPRITEGROUP = UINT8_MAX; ///< Maximum GRF-local ID for a spritegroup.
 
 /** Temporary data during loading of GRFs */
@@ -101,11 +97,10 @@ public:
 	GRFFile *grffile;         ///< Currently processed GRF file.
 	GRFConfig *grfconfig;     ///< Config of the currently processed GRF file.
 	uint32 nfo_line;          ///< Currently processed pseudo sprite number in the GRF.
+	byte grf_container_ver;   ///< Container format of the current GRF file.
 
 	/* Kind of return values when processing certain actions */
 	int skip_sprites;         ///< Number of psuedo sprites to skip before processing the next one. (-1 to skip to end of file)
-	byte data_blocks;         ///< Number of binary include sprites to read before processing the next pseudo sprite.
-	GrfDataType data_type;    ///< Type of the binary include sprites to read.
 
 	/* Currently referenceable spritegroups */
 	SpriteGroup *spritegroups[MAX_SPRITEGROUP + 1];
@@ -115,7 +110,6 @@ public:
 	{
 		this->nfo_line = 0;
 		this->skip_sprites = 0;
-		this->data_blocks = 0;
 
 		for (uint i = 0; i < GSF_END; i++) {
 			this->spritesets[i].clear();
@@ -290,15 +284,35 @@ static const uint MAX_STATIONS = 256;
 
 /** Temporary engine data used when loading only */
 struct GRFTempEngineData {
+	/** Summary state of refitability properties */
+	enum Refittability {
+		UNSET    =  0,  ///< No properties assigned. Default refit masks shall be activated.
+		EMPTY,          ///< GRF defined vehicle as not-refittable. The vehicle shall only carry the default cargo.
+		NONEMPTY,       ///< GRF defined the vehicle as refittable. If the refitmask is empty after translation (cargotypes not available), disable the vehicle.
+	};
+
 	uint16 cargo_allowed;
 	uint16 cargo_disallowed;
 	RailTypeLabel railtypelabel;
-	const GRFFile *refitmask_grf; ///< GRF providing the cargo translation table for the refitmask.
-	bool refitmask_valid;    ///< Did the newgrf set any refittability property? If not, default refittability will be applied.
+	const GRFFile *defaultcargo_grf; ///< GRF defining the cargo translation table to use if the default cargo is the 'first refittable'.
+	Refittability refittability;     ///< Did the newgrf set any refittability property? If not, default refittability will be applied.
 	bool prop27_set;         ///< Did the NewGRF set property 27 (misc flags)?
 	uint8 rv_max_speed;      ///< Temporary storage of RV prop 15, maximum speed in mph/0.8
 	uint32 ctt_include_mask; ///< Cargo types always included in the refit mask.
 	uint32 ctt_exclude_mask; ///< Cargo types always excluded from the refit mask.
+
+	/**
+	 * Update the summary refittability on setting a refittability property.
+	 * @param non_empty true if the GRF sets the vehicle to be refittable.
+	 */
+	void UpdateRefittability(bool non_empty)
+	{
+		if (non_empty) {
+			this->refittability = NONEMPTY;
+		} else if (this->refittability == UNSET) {
+			this->refittability = EMPTY;
+		}
+	}
 };
 
 static GRFTempEngineData *_gted;  ///< Temporary engine data used during NewGRF loading
@@ -824,6 +838,20 @@ static bool ReadSpriteLayout(ByteReader *buf, uint num_building_sprites, bool us
 }
 
 /**
+ * Translate the refit mask.
+ */
+static uint32 TranslateRefitMask(uint32 refit_mask)
+{
+	uint32 result = 0;
+	uint8 bit;
+	FOR_EACH_SET_BIT(bit, refit_mask) {
+		CargoID cargo = GetCargoTranslation(bit, _cur.grffile, true);
+		if (cargo != CT_INVALID) SetBit(result, cargo);
+	}
+	return result;
+}
+
+/**
  * Converts TTD(P) Base Price pointers into the enum used by OTTD
  * See http://wiki.ttdpatch.net/tiki-index.php?page=BaseCosts
  * @param base_pointer TTD(P) Base Price Pointer
@@ -1004,6 +1032,7 @@ static ChangeInfoResult RailVehicleChangeInfo(uint engine, int numinfo, int prop
 				break;
 
 			case 0x15: { // Cargo type
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				uint8 ctype = buf->ReadByte();
 
 				if (ctype == 0xFF) {
@@ -1083,11 +1112,13 @@ static ChangeInfoResult RailVehicleChangeInfo(uint engine, int numinfo, int prop
 				ei->refit_cost = buf->ReadByte();
 				break;
 
-			case 0x1D: // Refit cargo
-				ei->refit_mask = buf->ReadDWord();
-				_gted[e->index].refitmask_valid = true;
-				_gted[e->index].refitmask_grf = _cur.grffile;
+			case 0x1D: { // Refit cargo
+				uint32 mask = buf->ReadDWord();
+				_gted[e->index].UpdateRefittability(mask != 0);
+				ei->refit_mask = TranslateRefitMask(mask);
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				break;
+			}
 
 			case 0x1E: // Callback
 				ei->callback_mask = buf->ReadByte();
@@ -1146,12 +1177,13 @@ static ChangeInfoResult RailVehicleChangeInfo(uint engine, int numinfo, int prop
 
 			case 0x28: // Cargo classes allowed
 				_gted[e->index].cargo_allowed = buf->ReadWord();
-				_gted[e->index].refitmask_valid = true;
+				_gted[e->index].UpdateRefittability(_gted[e->index].cargo_allowed != 0);
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				break;
 
 			case 0x29: // Cargo classes disallowed
 				_gted[e->index].cargo_disallowed = buf->ReadWord();
-				_gted[e->index].refitmask_valid = true;
+				_gted[e->index].UpdateRefittability(false);
 				break;
 
 			case 0x2A: // Long format introduction date (days since year 0)
@@ -1165,12 +1197,13 @@ static ChangeInfoResult RailVehicleChangeInfo(uint engine, int numinfo, int prop
 			case 0x2C:   // CTT refit include list
 			case 0x2D: { // CTT refit exclude list
 				uint8 count = buf->ReadByte();
+				_gted[e->index].UpdateRefittability(prop == 0x2C && count != 0);
+				if (prop == 0x2C) _gted[e->index].defaultcargo_grf = _cur.grffile;
 				while (count--) {
 					CargoID ctype = GetCargoTranslation(buf->ReadByte(), _cur.grffile);
 					if (ctype == CT_INVALID) continue;
 					SetBit(prop == 0x2C ? _gted[e->index].ctt_include_mask : _gted[e->index].ctt_exclude_mask, ctype);
 				}
-				_gted[e->index].refitmask_valid = true;
 				break;
 			}
 
@@ -1232,6 +1265,7 @@ static ChangeInfoResult RoadVehicleChangeInfo(uint engine, int numinfo, int prop
 				break;
 
 			case 0x10: { // Cargo type
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				uint8 ctype = buf->ReadByte();
 
 				if (ctype == 0xFF) {
@@ -1270,11 +1304,13 @@ static ChangeInfoResult RoadVehicleChangeInfo(uint engine, int numinfo, int prop
 				_gted[e->index].rv_max_speed = buf->ReadByte();
 				break;
 
-			case 0x16: // Cargoes available for refitting
-				ei->refit_mask = buf->ReadDWord();
-				_gted[e->index].refitmask_valid = true;
-				_gted[e->index].refitmask_grf = _cur.grffile;
+			case 0x16: { // Cargoes available for refitting
+				uint32 mask = buf->ReadDWord();
+				_gted[e->index].UpdateRefittability(mask != 0);
+				ei->refit_mask = TranslateRefitMask(mask);
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				break;
+			}
 
 			case 0x17: // Callback mask
 				ei->callback_mask = buf->ReadByte();
@@ -1303,12 +1339,13 @@ static ChangeInfoResult RoadVehicleChangeInfo(uint engine, int numinfo, int prop
 
 			case 0x1D: // Cargo classes allowed
 				_gted[e->index].cargo_allowed = buf->ReadWord();
-				_gted[e->index].refitmask_valid = true;
+				_gted[e->index].UpdateRefittability(_gted[e->index].cargo_allowed != 0);
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				break;
 
 			case 0x1E: // Cargo classes disallowed
 				_gted[e->index].cargo_disallowed = buf->ReadWord();
-				_gted[e->index].refitmask_valid = true;
+				_gted[e->index].UpdateRefittability(false);
 				break;
 
 			case 0x1F: // Long format introduction date (days since year 0)
@@ -1340,12 +1377,13 @@ static ChangeInfoResult RoadVehicleChangeInfo(uint engine, int numinfo, int prop
 			case 0x24:   // CTT refit include list
 			case 0x25: { // CTT refit exclude list
 				uint8 count = buf->ReadByte();
+				_gted[e->index].UpdateRefittability(prop == 0x24 && count != 0);
+				if (prop == 0x24) _gted[e->index].defaultcargo_grf = _cur.grffile;
 				while (count--) {
 					CargoID ctype = GetCargoTranslation(buf->ReadByte(), _cur.grffile);
 					if (ctype == CT_INVALID) continue;
 					SetBit(prop == 0x24 ? _gted[e->index].ctt_include_mask : _gted[e->index].ctt_exclude_mask, ctype);
 				}
-				_gted[e->index].refitmask_valid = true;
 				break;
 			}
 
@@ -1403,6 +1441,7 @@ static ChangeInfoResult ShipVehicleChangeInfo(uint engine, int numinfo, int prop
 				break;
 
 			case 0x0C: { // Cargo type
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				uint8 ctype = buf->ReadByte();
 
 				if (ctype == 0xFF) {
@@ -1433,11 +1472,13 @@ static ChangeInfoResult ShipVehicleChangeInfo(uint engine, int numinfo, int prop
 				svi->sfx = buf->ReadByte();
 				break;
 
-			case 0x11: // Cargoes available for refitting
-				ei->refit_mask = buf->ReadDWord();
-				_gted[e->index].refitmask_valid = true;
-				_gted[e->index].refitmask_grf = _cur.grffile;
+			case 0x11: { // Cargoes available for refitting
+				uint32 mask = buf->ReadDWord();
+				_gted[e->index].UpdateRefittability(mask != 0);
+				ei->refit_mask = TranslateRefitMask(mask);
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				break;
+			}
 
 			case 0x12: // Callback mask
 				ei->callback_mask = buf->ReadByte();
@@ -1466,12 +1507,13 @@ static ChangeInfoResult ShipVehicleChangeInfo(uint engine, int numinfo, int prop
 
 			case 0x18: // Cargo classes allowed
 				_gted[e->index].cargo_allowed = buf->ReadWord();
-				_gted[e->index].refitmask_valid = true;
+				_gted[e->index].UpdateRefittability(_gted[e->index].cargo_allowed != 0);
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				break;
 
 			case 0x19: // Cargo classes disallowed
 				_gted[e->index].cargo_disallowed = buf->ReadWord();
-				_gted[e->index].refitmask_valid = true;
+				_gted[e->index].UpdateRefittability(false);
 				break;
 
 			case 0x1A: // Long format introduction date (days since year 0)
@@ -1499,12 +1541,13 @@ static ChangeInfoResult ShipVehicleChangeInfo(uint engine, int numinfo, int prop
 			case 0x1E:   // CTT refit include list
 			case 0x1F: { // CTT refit exclude list
 				uint8 count = buf->ReadByte();
+				_gted[e->index].UpdateRefittability(prop == 0x1E && count != 0);
+				if (prop == 0x1E) _gted[e->index].defaultcargo_grf = _cur.grffile;
 				while (count--) {
 					CargoID ctype = GetCargoTranslation(buf->ReadByte(), _cur.grffile);
 					if (ctype == CT_INVALID) continue;
 					SetBit(prop == 0x1E ? _gted[e->index].ctt_include_mask : _gted[e->index].ctt_exclude_mask, ctype);
 				}
-				_gted[e->index].refitmask_valid = true;
 				break;
 			}
 
@@ -1589,11 +1632,13 @@ static ChangeInfoResult AircraftVehicleChangeInfo(uint engine, int numinfo, int 
 				avi->sfx = buf->ReadByte();
 				break;
 
-			case 0x13: // Cargoes available for refitting
-				ei->refit_mask = buf->ReadDWord();
-				_gted[e->index].refitmask_valid = true;
-				_gted[e->index].refitmask_grf = _cur.grffile;
+			case 0x13: { // Cargoes available for refitting
+				uint32 mask = buf->ReadDWord();
+				_gted[e->index].UpdateRefittability(mask != 0);
+				ei->refit_mask = TranslateRefitMask(mask);
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				break;
+			}
 
 			case 0x14: // Callback mask
 				ei->callback_mask = buf->ReadByte();
@@ -1614,12 +1659,13 @@ static ChangeInfoResult AircraftVehicleChangeInfo(uint engine, int numinfo, int 
 
 			case 0x18: // Cargo classes allowed
 				_gted[e->index].cargo_allowed = buf->ReadWord();
-				_gted[e->index].refitmask_valid = true;
+				_gted[e->index].UpdateRefittability(_gted[e->index].cargo_allowed != 0);
+				_gted[e->index].defaultcargo_grf = _cur.grffile;
 				break;
 
 			case 0x19: // Cargo classes disallowed
 				_gted[e->index].cargo_disallowed = buf->ReadWord();
-				_gted[e->index].refitmask_valid = true;
+				_gted[e->index].UpdateRefittability(false);
 				break;
 
 			case 0x1A: // Long format introduction date (days since year 0)
@@ -1637,12 +1683,13 @@ static ChangeInfoResult AircraftVehicleChangeInfo(uint engine, int numinfo, int 
 			case 0x1D:   // CTT refit include list
 			case 0x1E: { // CTT refit exclude list
 				uint8 count = buf->ReadByte();
+				_gted[e->index].UpdateRefittability(prop == 0x1D && count != 0);
+				if (prop == 0x1D) _gted[e->index].defaultcargo_grf = _cur.grffile;
 				while (count--) {
 					CargoID ctype = GetCargoTranslation(buf->ReadByte(), _cur.grffile);
 					if (ctype == CT_INVALID) continue;
 					SetBit(prop == 0x1D ? _gted[e->index].ctt_include_mask : _gted[e->index].ctt_exclude_mask, ctype);
 				}
-				_gted[e->index].refitmask_valid = true;
 				break;
 			}
 
@@ -2796,6 +2843,10 @@ static ChangeInfoResult CargoChangeInfo(uint cid, int numinfo, int prop, ByteRea
 
 			case 0x1A: // Bitmask of callbacks to use
 				cs->callback_mask = buf->ReadByte();
+				break;
+
+			case 0x1D: // Vehicle capacity muliplier
+				cs->multiplier = max<uint16>(1u, buf->ReadWord());
 				break;
 
 			default:
@@ -4335,7 +4386,7 @@ static void NewSpriteSet(ByteReader *buf)
 
 	for (int i = 0; i < num_sets * num_ents; i++) {
 		_cur.nfo_line++;
-		LoadNextSprite(_cur.spriteid++, _cur.file_index, _cur.nfo_line);
+		LoadNextSprite(_cur.spriteid++, _cur.file_index, _cur.nfo_line, _cur.grf_container_ver);
 	}
 }
 
@@ -5428,16 +5479,16 @@ static void GraphicsNew(ByteReader *buf)
 		/* Special not-TTDP-compatible case used in openttd.grf
 		 * Missing shore sprites and initialisation of SPR_SHORE_BASE */
 		grfmsg(2, "GraphicsNew: Loading 10 missing shore sprites from extra grf.");
-		LoadNextSprite(SPR_SHORE_BASE +  0, _cur.file_index, _cur.nfo_line++); // SLOPE_STEEP_S
-		LoadNextSprite(SPR_SHORE_BASE +  5, _cur.file_index, _cur.nfo_line++); // SLOPE_STEEP_W
-		LoadNextSprite(SPR_SHORE_BASE +  7, _cur.file_index, _cur.nfo_line++); // SLOPE_WSE
-		LoadNextSprite(SPR_SHORE_BASE + 10, _cur.file_index, _cur.nfo_line++); // SLOPE_STEEP_N
-		LoadNextSprite(SPR_SHORE_BASE + 11, _cur.file_index, _cur.nfo_line++); // SLOPE_NWS
-		LoadNextSprite(SPR_SHORE_BASE + 13, _cur.file_index, _cur.nfo_line++); // SLOPE_ENW
-		LoadNextSprite(SPR_SHORE_BASE + 14, _cur.file_index, _cur.nfo_line++); // SLOPE_SEN
-		LoadNextSprite(SPR_SHORE_BASE + 15, _cur.file_index, _cur.nfo_line++); // SLOPE_STEEP_E
-		LoadNextSprite(SPR_SHORE_BASE + 16, _cur.file_index, _cur.nfo_line++); // SLOPE_EW
-		LoadNextSprite(SPR_SHORE_BASE + 17, _cur.file_index, _cur.nfo_line++); // SLOPE_NS
+		LoadNextSprite(SPR_SHORE_BASE +  0, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_STEEP_S
+		LoadNextSprite(SPR_SHORE_BASE +  5, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_STEEP_W
+		LoadNextSprite(SPR_SHORE_BASE +  7, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_WSE
+		LoadNextSprite(SPR_SHORE_BASE + 10, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_STEEP_N
+		LoadNextSprite(SPR_SHORE_BASE + 11, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_NWS
+		LoadNextSprite(SPR_SHORE_BASE + 13, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_ENW
+		LoadNextSprite(SPR_SHORE_BASE + 14, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_SEN
+		LoadNextSprite(SPR_SHORE_BASE + 15, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_STEEP_E
+		LoadNextSprite(SPR_SHORE_BASE + 16, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_EW
+		LoadNextSprite(SPR_SHORE_BASE + 17, _cur.file_index, _cur.nfo_line++, _cur.grf_container_ver); // SLOPE_NS
 		if (_loaded_newgrf_features.shore == SHORE_REPLACE_NONE) _loaded_newgrf_features.shore = SHORE_REPLACE_ONLY_NEW;
 		return;
 	}
@@ -5476,7 +5527,7 @@ static void GraphicsNew(ByteReader *buf)
 
 	for (; num > 0; num--) {
 		_cur.nfo_line++;
-		LoadNextSprite(replace == 0 ? _cur.spriteid++ : replace++, _cur.file_index, _cur.nfo_line);
+		LoadNextSprite(replace == 0 ? _cur.spriteid++ : replace++, _cur.file_index, _cur.nfo_line, _cur.grf_container_ver);
 	}
 
 	if (type == 0x0D) _loaded_newgrf_features.shore = SHORE_REPLACE_ACTION_5;
@@ -5726,7 +5777,7 @@ static void CfgApply(ByteReader *buf)
 
 	/* Preload the next sprite */
 	size_t pos = FioGetPos();
-	uint16 num = FioReadWord();
+	uint32 num = _cur.grf_container_ver >= 2 ? FioReadDword() : FioReadWord();
 	uint8 type = FioReadByte();
 	byte *preload_sprite = NULL;
 
@@ -6070,7 +6121,7 @@ static void SpriteReplace(ByteReader *buf)
 		for (uint j = 0; j < num_sprites; j++) {
 			int load_index = first_sprite + j;
 			_cur.nfo_line++;
-			LoadNextSprite(load_index, _cur.file_index, _cur.nfo_line); // XXX
+			LoadNextSprite(load_index, _cur.file_index, _cur.nfo_line, _cur.grf_container_ver); // XXX
 
 			/* Shore sprites now located at different addresses.
 			 * So detect when the old ones get replaced. */
@@ -6814,42 +6865,12 @@ static void DefineGotoLabel(ByteReader *buf)
 	grfmsg(2, "DefineGotoLabel: GOTO target with label 0x%02X", label->label);
 }
 
-/* Action 0x11 */
-static void GRFSound(ByteReader *buf)
-{
-	/* <11> <num>
-	 *
-	 * W num      Number of sound files that follow */
-
-	uint16 num = buf->ReadWord();
-
-	_cur.data_blocks = num;
-	_cur.data_type   = GDT_SOUND;
-
-	if (_cur.grffile->sound_offset == 0) {
-		_cur.grffile->sound_offset = GetNumSounds();
-		_cur.grffile->num_sounds = num;
-	}
-}
-
-/* Action 0x11 (SKIP) */
-static void SkipAct11(ByteReader *buf)
-{
-	/* <11> <num>
-	 *
-	 * W num      Number of sound files that follow */
-
-	_cur.skip_sprites = buf->ReadWord();
-
-	grfmsg(3, "SkipAct11: Skipping %d sprites", _cur.skip_sprites);
-}
-
-static void ImportGRFSound(ByteReader *buf)
+static void ImportGRFSound()
 {
 	const GRFFile *file;
 	SoundEntry *sound = AllocateSound();
-	uint32 grfid = buf->ReadDWord();
-	SoundID sound_id = buf->ReadWord();
+	uint32 grfid = FioReadDword();
+	SoundID sound_id = FioReadWord();
 
 	file = GetFileByGRFID(grfid);
 	if (file == NULL || file->sound_offset == 0) {
@@ -6871,102 +6892,106 @@ static void ImportGRFSound(ByteReader *buf)
 	sound->priority = 0;
 }
 
-/* 'Action 0xFE' */
-static void GRFImportBlock(ByteReader *buf)
+static void LoadGRFSound(size_t offs)
 {
-	if (_cur.data_blocks == 0) {
-		grfmsg(2, "GRFImportBlock: Unexpected import block, skipping");
-		return;
-	}
+	SoundEntry *sound = AllocateSound();
 
-	_cur.data_blocks--;
+	/* Set default volume and priority */
+	sound->volume = 0x80;
+	sound->priority = 0;
 
-	/* XXX 'Action 0xFE' isn't really specified. It is only mentioned for
-	 * importing sounds, so this is probably all wrong... */
-	if (buf->ReadByte() != _cur.data_type) {
-		grfmsg(1, "GRFImportBlock: Import type mismatch");
-	}
-
-	switch (_cur.data_type) {
-		case GDT_SOUND: ImportGRFSound(buf); break;
-		default: NOT_REACHED();
+	if (offs != SIZE_MAX) {
+		/* Sound is present in the NewGRF. */
+		sound->file_slot = _cur.file_index;
+		sound->file_offset = offs;
+		sound->grf_container_ver = _cur.grf_container_ver;
 	}
 }
 
-static void LoadGRFSound(ByteReader *buf)
+/* Action 0x11 */
+static void GRFSound(ByteReader *buf)
 {
-	/* Allocate a sound entry. This is done even if the data is not loaded
-	 * so that the indices used elsewhere are still correct. */
-	SoundEntry *sound = AllocateSound();
+	/* <11> <num>
+	 *
+	 * W num      Number of sound files that follow */
 
-	if (buf->ReadDWord() != BSWAP32('RIFF')) {
-		grfmsg(1, "LoadGRFSound: Missing RIFF header");
-		return;
+	uint16 num = buf->ReadWord();
+
+	if (_cur.grffile->sound_offset == 0) {
+		_cur.grffile->sound_offset = GetNumSounds();
+		_cur.grffile->num_sounds = num;
 	}
 
-	uint32 total_size = buf->ReadDWord();
-	if (total_size > buf->Remaining()) {
-		grfmsg(1, "LoadGRFSound: RIFF was truncated");
-		return;
-	}
+	for (int i = 0; i < num; i++) {
+		_cur.nfo_line++;
 
-	if (buf->ReadDWord() != BSWAP32('WAVE')) {
-		grfmsg(1, "LoadGRFSound: Invalid RIFF type");
-		return;
-	}
+		size_t offs = FioGetPos();
 
-	while (total_size >= 8) {
-		uint32 tag  = buf->ReadDWord();
-		uint32 size = buf->ReadDWord();
-		total_size -= 8;
-		if (total_size < size) {
-			grfmsg(1, "LoadGRFSound: Invalid RIFF");
-			return;
+		uint32 len = _cur.grf_container_ver >= 2 ? FioReadDword() : FioReadWord();
+		byte type = FioReadByte();
+
+		if (_cur.grf_container_ver >= 2 && type == 0xFD) {
+			/* Reference to sprite section. */
+			if (len != 4) {
+				grfmsg(1, "GRFSound: Invalid sprite section import");
+				FioSkipBytes(len);
+			} else {
+				uint32 id = FioReadDword();
+				if (_cur.stage == GLS_INIT) LoadGRFSound(GetGRFSpriteOffset(id));
+			}
+			continue;
 		}
-		total_size -= size;
 
-		switch (tag) {
-			case ' tmf': // 'fmt '
-				/* Audio format, must be 1 (PCM) */
-				if (size < 16 || buf->ReadWord() != 1) {
-					grfmsg(1, "LoadGRFSound: Invalid audio format");
-					return;
+		if (type != 0xFF) {
+			grfmsg(1, "GRFSound: Unexpected RealSprite found, skipping");
+			FioSkipBytes(7);
+			SkipSpriteData(type, num - 8);
+			continue;
+		}
+
+		byte action = FioReadByte();
+		switch (action) {
+			case 0xFF:
+				/* Allocate sound only in init stage. */
+				if (_cur.stage == GLS_INIT) {
+					if (_cur.grf_container_ver >= 2) {
+						grfmsg(1, "GRFSound: Inline sounds are not supported for container version >= 2");
+					} else {
+						LoadGRFSound(offs);
+					}
 				}
-				sound->channels = buf->ReadWord();
-				sound->rate = buf->ReadDWord();
-				buf->ReadDWord();
-				buf->ReadWord();
-				sound->bits_per_sample = buf->ReadWord();
-
-				/* The rest will be skipped */
-				size -= 16;
+				FioSkipBytes(len - 1); // <type> is not included in the length for pseudo-sprites.
 				break;
 
-			case 'atad': // 'data'
-				sound->file_size   = size;
-				sound->file_offset = FioGetPos() - buf->Remaining();
-				sound->file_slot   = _cur.file_index;
-
-				/* Set default volume and priority */
-				sound->volume = 0x80;
-				sound->priority = 0;
-
-				grfmsg(2, "LoadGRFSound: channels %u, sample rate %u, bits per sample %u, length %u", sound->channels, sound->rate, sound->bits_per_sample, size);
-				return; // the fmt chunk has to appear before data, so we are finished
+			case 0xFE:
+				if (_cur.stage == GLS_ACTIVATION) {
+					/* XXX 'Action 0xFE' isn't really specified. It is only mentioned for
+					 * importing sounds, so this is probably all wrong... */
+					if (FioReadByte() != 0) grfmsg(1, "GRFSound: Import type mismatch");
+					ImportGRFSound();
+				} else {
+					FioSkipBytes(len - 1);
+				}
+				break;
 
 			default:
-				/* Skip unknown chunks */
+				grfmsg(1, "GRFSound: Unexpected Action %x found, skipping", action);
+				FioSkipBytes(len - 1);
 				break;
 		}
-
-		/* Skip rest of chunk */
-		for (; size > 0; size--) buf->ReadByte();
 	}
+}
 
-	grfmsg(1, "LoadGRFSound: RIFF does not contain any sound data");
+/* Action 0x11 (SKIP) */
+static void SkipAct11(ByteReader *buf)
+{
+	/* <11> <num>
+	 *
+	 * W num      Number of sound files that follow */
 
-	/* Clear everything that was read */
-	MemSetT(sound, 0);
+	_cur.skip_sprites = buf->ReadWord();
+
+	grfmsg(3, "SkipAct11: Skipping %d sprites", _cur.skip_sprites);
 }
 
 /** Action 0x12 */
@@ -6995,7 +7020,7 @@ static void LoadFontGlyph(ByteReader *buf)
 		for (uint c = 0; c < num_char; c++) {
 			if (size < FS_END) SetUnicodeGlyph(size, base_char + c, _cur.spriteid);
 			_cur.nfo_line++;
-			LoadNextSprite(_cur.spriteid++, _cur.file_index, _cur.nfo_line);
+			LoadNextSprite(_cur.spriteid++, _cur.file_index, _cur.nfo_line, _cur.grf_container_ver);
 		}
 	}
 }
@@ -7571,36 +7596,6 @@ static void StaticGRFInfo(ByteReader *buf)
 	HandleNodes(buf, _tags_root);
 }
 
-/** 'Action 0xFF' */
-static void GRFDataBlock(ByteReader *buf)
-{
-	/* <FF> <name_len> <name> '\0' <data> */
-
-	if (_cur.data_blocks == 0) {
-		grfmsg(2, "GRFDataBlock: unexpected data block, skipping");
-		return;
-	}
-
-	uint8 name_len = buf->ReadByte();
-	const char *name = reinterpret_cast<const char *>(buf->Data());
-	buf->Skip(name_len);
-
-	/* Test string termination */
-	if (buf->ReadByte() != 0) {
-		grfmsg(2, "GRFDataBlock: Name not properly terminated");
-		return;
-	}
-
-	grfmsg(2, "GRFDataBlock: block name '%s'...", name);
-
-	_cur.data_blocks--;
-
-	switch (_cur.data_type) {
-		case GDT_SOUND: LoadGRFSound(buf); break;
-		default: NOT_REACHED();
-	}
-}
-
 /**
  * Set the current NewGRF as unsafe for static use
  * @param buf Unused.
@@ -8101,44 +8096,16 @@ static void CalculateRefitMasks()
 		EngineID engine = e->index;
 		EngineInfo *ei = &e->info;
 		bool only_defaultcargo; ///< Set if the vehicle shall carry only the default cargo
-		const uint8 *cargo_map_for_first_refittable = NULL;
 
 		/* Did the newgrf specify any refitting? If not, use defaults. */
-		if (_gted[engine].refitmask_valid) {
+		if (_gted[engine].refittability != GRFTempEngineData::UNSET) {
 			uint32 mask = 0;
 			uint32 not_mask = 0;
-			uint32 xor_mask = 0;
+			uint32 xor_mask = ei->refit_mask;
 
 			/* If the original masks set by the grf are zero, the vehicle shall only carry the default cargo.
 			 * Note: After applying the translations, the vehicle may end up carrying no defined cargo. It becomes unavailable in that case. */
-			only_defaultcargo = (ei->refit_mask == 0 && _gted[engine].cargo_allowed == 0 && _gted[engine].ctt_include_mask == 0);
-
-			const GRFFile *file = _gted[engine].refitmask_grf;
-			if (file == NULL) file = e->GetGRF();
-			if (file != NULL && file->grf_version >= 8 && file->cargo_max != 0) {
-				cargo_map_for_first_refittable = file->cargo_map;
-			}
-
-			if (ei->refit_mask != 0) {
-				if (file != NULL && file->cargo_max != 0) {
-					/* Apply cargo translation table to the refit mask */
-					uint num_cargo = min(32, file->cargo_max);
-					for (uint i = 0; i < num_cargo; i++) {
-						if (!HasBit(ei->refit_mask, i)) continue;
-
-						CargoID c = GetCargoIDByLabel(file->cargo_list[i]);
-						if (c == CT_INVALID) continue;
-
-						SetBit(xor_mask, c);
-					}
-				} else {
-					/* No cargo table, so use the cargo bitnum values */
-					const CargoSpec *cs;
-					FOR_ALL_CARGOSPECS(cs) {
-						if (HasBit(ei->refit_mask, cs->bitnum)) SetBit(xor_mask, cs->Index());
-					}
-				}
-			}
+			only_defaultcargo = _gted[engine].refittability == GRFTempEngineData::EMPTY;
 
 			if (_gted[engine].cargo_allowed != 0) {
 				/* Build up the list of cargo types from the set cargo classes. */
@@ -8185,6 +8152,16 @@ static void CalculateRefitMasks()
 		/* Check if this engine's cargo type is valid. If not, set to the first refittable
 		 * cargo type. Finally disable the vehicle, if there is still no cargo. */
 		if (ei->cargo_type == CT_INVALID && ei->refit_mask != 0) {
+			/* Figure out which CTT to use for the default cargo, if it is 'first refittable'. */
+			const uint8 *cargo_map_for_first_refittable = NULL;
+			{
+				const GRFFile *file = _gted[engine].defaultcargo_grf;
+				if (file == NULL) file = e->GetGRF();
+				if (file != NULL && file->grf_version >= 8 && file->cargo_max != 0) {
+					cargo_map_for_first_refittable = file->cargo_map;
+				}
+			}
+
 			if (cargo_map_for_first_refittable != NULL) {
 				/* Use first refittable cargo from cargo translation table */
 				byte best_local_slot = 0xFF;
@@ -8594,7 +8571,7 @@ static void DecodeSpecialSprite(byte *buf, uint num, GrfLoadingStage stage)
 		/* 0x0E */ { NULL,     SafeGRFInhibit, NULL,       GRFInhibit,     GRFInhibit,        GRFInhibit, },
 		/* 0x0F */ { NULL,     GRFUnsafe, NULL,            FeatureTownName, NULL,             NULL, },
 		/* 0x10 */ { NULL,     NULL,      DefineGotoLabel, NULL,           NULL,              NULL, },
-		/* 0x11 */ { SkipAct11,GRFUnsafe, SkipAct11,       SkipAct11,      SkipAct11,         GRFSound, },
+		/* 0x11 */ { SkipAct11,GRFUnsafe, SkipAct11,       GRFSound,       SkipAct11,         GRFSound, },
 		/* 0x12 */ { SkipAct12, SkipAct12, SkipAct12,      SkipAct12,      SkipAct12,         LoadFontGlyph, },
 		/* 0x13 */ { NULL,     NULL,      NULL,            NULL,           NULL,              TranslateGRFStrings, },
 		/* 0x14 */ { StaticGRFInfo, NULL, NULL,            NULL,           NULL,              NULL, },
@@ -8623,11 +8600,9 @@ static void DecodeSpecialSprite(byte *buf, uint num, GrfLoadingStage stage)
 		byte action = bufp->ReadByte();
 
 		if (action == 0xFF) {
-			grfmsg(7, "DecodeSpecialSprite: Handling data block in stage %d", stage);
-			GRFDataBlock(bufp);
+			grfmsg(2, "DecodeSpecialSprite: Unexpected data block, skipping");
 		} else if (action == 0xFE) {
-			grfmsg(7, "DecodeSpecialSprite: Handling import block in stage %d", stage);
-			GRFImportBlock(bufp);
+			grfmsg(2, "DecodeSpecialSprite: Unexpected import block, skipping");
 		} else if (action >= lengthof(handlers)) {
 			grfmsg(7, "DecodeSpecialSprite: Skipping unknown action 0x%02X", action);
 		} else if (handlers[action][stage] == NULL) {
@@ -8643,6 +8618,32 @@ static void DecodeSpecialSprite(byte *buf, uint num, GrfLoadingStage stage)
 }
 
 
+/** Signature of a container version 2 GRF. */
+extern const byte _grf_cont_v2_sig[8] = {'G', 'R', 'F', 0x82, 0x0D, 0x0A, 0x1A, 0x0A};
+
+/**
+ * Get the container version of the currently opened GRF file.
+ * @return Container version of the GRF file or 0 if the file is corrupt/no GRF file.
+ */
+byte GetGRFContainerVersion()
+{
+	size_t pos = FioGetPos();
+
+	if (FioReadWord() == 0) {
+		/* Check for GRF container version 2, which is identified by the bytes
+		 * '47 52 46 82 0D 0A 1A 0A' at the start of the file. */
+		for (uint i = 0; i < lengthof(_grf_cont_v2_sig); i++) {
+			if (FioReadByte() != _grf_cont_v2_sig[i]) return 0; // Invalid format
+		}
+
+		return 2;
+	}
+
+	/* Container version 1 has no header, rewind to start. */
+	FioSeekTo(pos, SEEK_SET);
+	return 1;
+}
+
 /**
  * Load a particular NewGRF.
  * @param config     The configuration of the to be loaded NewGRF.
@@ -8653,7 +8654,6 @@ static void DecodeSpecialSprite(byte *buf, uint num, GrfLoadingStage stage)
 void LoadNewGRFFile(GRFConfig *config, uint file_index, GrfLoadingStage stage, Subdirectory subdir)
 {
 	const char *filename = config->filename;
-	uint16 num;
 
 	/* A .grf file is activated only if it was active when the game was
 	 * started.  If a game is loaded, only its active .grfs will be
@@ -8687,10 +8687,35 @@ void LoadNewGRFFile(GRFConfig *config, uint file_index, GrfLoadingStage stage, S
 
 	DEBUG(grf, 2, "LoadNewGRFFile: Reading NewGRF-file '%s'", filename);
 
+	_cur.grf_container_ver = GetGRFContainerVersion();
+	if (_cur.grf_container_ver == 0) {
+		DEBUG(grf, 7, "LoadNewGRFFile: Custom .grf has invalid format");
+		return;
+	}
+
+	if (stage == GLS_INIT || stage == GLS_ACTIVATION) {
+		/* We need the sprite offsets in the init stage for NewGRF sounds
+		 * and in the activation stage for real sprites. */
+		ReadGRFSpriteOffsets(_cur.grf_container_ver);
+	} else {
+		/* Skip sprite section offset if present. */
+		if (_cur.grf_container_ver >= 2) FioReadDword();
+	}
+
+	if (_cur.grf_container_ver >= 2) {
+		/* Read compression value. */
+		byte compression = FioReadByte();
+		if (compression != 0) {
+			DEBUG(grf, 7, "LoadNewGRFFile: Unsupported compression format");
+			return;
+		}
+	}
+
 	/* Skip the first sprite; we don't care about how many sprites this
 	 * does contain; newest TTDPatches and George's longvehicles don't
 	 * neither, apparently. */
-	if (FioReadWord() == 4 && FioReadByte() == 0xFF) {
+	uint32 num = _cur.grf_container_ver >= 2 ? FioReadDword() : FioReadWord();
+	if (num == 4 && FioReadByte() == 0xFF) {
 		FioReadDword();
 	} else {
 		DEBUG(grf, 7, "LoadNewGRFFile: Custom .grf has invalid format");
@@ -8701,7 +8726,7 @@ void LoadNewGRFFile(GRFConfig *config, uint file_index, GrfLoadingStage stage, S
 
 	ReusableBuffer<byte> buf;
 
-	while ((num = FioReadWord()) != 0) {
+	while ((num = (_cur.grf_container_ver >= 2 ? FioReadDword() : FioReadWord())) != 0) {
 		byte type = FioReadByte();
 		_cur.nfo_line++;
 
@@ -8723,8 +8748,13 @@ void LoadNewGRFFile(GRFConfig *config, uint file_index, GrfLoadingStage stage, S
 				break;
 			}
 
-			FioSkipBytes(7);
-			SkipSpriteData(type, num - 8);
+			if (_cur.grf_container_ver >= 2 && type == 0xFD) {
+				/* Reference to data section. Container version >= 2 only. */
+				FioSkipBytes(num);
+			} else {
+				FioSkipBytes(7);
+				SkipSpriteData(type, num - 8);
+			}
 		}
 
 		if (_cur.skip_sprites > 0) _cur.skip_sprites--;

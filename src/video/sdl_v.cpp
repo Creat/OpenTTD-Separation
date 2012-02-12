@@ -277,13 +277,17 @@ bool VideoDriver_SDL::ClaimMousePointer()
 }
 
 struct VkMapping {
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+	SDL_Keycode vk_from;
+#else
 	uint16 vk_from;
+#endif
 	byte vk_count;
 	byte map_to;
 };
 
 #define AS(x, z) {x, 0, z}
-#define AM(x, y, z, w) {x, y - x, z}
+#define AM(x, y, z, w) {x, (byte)(y - x), z}
 
 static const VkMapping _vk_mapping[] = {
 	/* Pageup stuff + up/down */
@@ -469,6 +473,13 @@ static int PollEvent()
 			CreateMainSurface(w, h);
 			break;
 		}
+		case SDL_VIDEOEXPOSE: {
+			/* Force a redraw of the entire screen. Note
+			 * that SDL 1.2 seems to do this automatically
+			 * in most cases, but 1.3 / 2.0 does not. */
+		        _num_dirty_rects = MAX_DIRTY_RECTS + 1;
+			break;
+		}
 	}
 	return -1;
 }
@@ -547,14 +558,22 @@ void VideoDriver_SDL::MainLoop()
 		if (_exit_game) break;
 
 		mod = SDL_CALL SDL_GetModState();
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+		keys = SDL_CALL SDL_GetKeyboardState(&numkeys);
+#else
 		keys = SDL_CALL SDL_GetKeyState(&numkeys);
+#endif
 #if defined(_DEBUG)
 		if (_shift_pressed)
 #else
 		/* Speedup when pressing tab, except when using ALT+TAB
 		 * to switch to another application */
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+		if (keys[SDL_SCANCODE_TAB] && (mod & KMOD_ALT) == 0)
+#else
 		if (keys[SDLK_TAB] && (mod & KMOD_ALT) == 0)
-#endif
+#endif /* SDL_VERSION_ATLEAST(1, 3, 0) */
+#endif /* defined(_DEBUG) */
 		{
 			if (!_networking && _game_mode != GM_MENU) _fast_forward |= 2;
 		} else if (_fast_forward & 2) {
@@ -574,11 +593,17 @@ void VideoDriver_SDL::MainLoop()
 
 			/* determine which directional keys are down */
 			_dirkeys =
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+				(keys[SDL_SCANCODE_LEFT]  ? 1 : 0) |
+				(keys[SDL_SCANCODE_UP]    ? 2 : 0) |
+				(keys[SDL_SCANCODE_RIGHT] ? 4 : 0) |
+				(keys[SDL_SCANCODE_DOWN]  ? 8 : 0);
+#else
 				(keys[SDLK_LEFT]  ? 1 : 0) |
 				(keys[SDLK_UP]    ? 2 : 0) |
 				(keys[SDLK_RIGHT] ? 4 : 0) |
 				(keys[SDLK_DOWN]  ? 8 : 0);
-
+#endif
 			if (old_ctrl_pressed != _ctrl_pressed) HandleCtrlChanged();
 
 			/* The gameloop is the part that can run asynchroniously. The rest

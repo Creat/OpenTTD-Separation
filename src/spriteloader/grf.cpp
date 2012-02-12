@@ -17,9 +17,20 @@
 #include "table/strings.h"
 #include "../error.h"
 #include "../core/math_func.hpp"
+#include "../core/alloc_type.hpp"
+#include "../core/bitmath_func.hpp"
 #include "grf.hpp"
 
 extern const byte _palmap_w2d[];
+
+/** The different colour components a sprite can have. */
+enum SpriteColourComponent {
+	SCC_RGB   = 1 << 0, ///< Sprite has RGB.
+	SCC_ALPHA = 1 << 1, ///< Sprite has alpha.
+	SCC_PAL   = 1 << 2, ///< Sprite has palette data.
+	SCC_MASK  = SCC_RGB | SCC_ALPHA | SCC_PAL, ///< Mask of valid colour bits.
+};
+DECLARE_ENUM_AS_BIT_SET(SpriteColourComponent)
 
 /**
  * We found a corrupted sprite. This means that the sprite itself
@@ -41,30 +52,24 @@ static bool WarnCorruptSprite(uint8 file_slot, size_t file_pos, int line)
 	return false;
 }
 
-bool SpriteLoaderGrf::LoadSprite(SpriteLoader::Sprite *sprite, uint8 file_slot, size_t file_pos, SpriteType sprite_type)
+/**
+ * Decode the image data of a single sprite.
+ * @param[in,out] sprite Filled with the sprite image data.
+ * @param file_slot File slot.
+ * @param file_pos File position.
+ * @param sprite_type Type of the sprite we're decoding.
+ * @param num Size of the decompressed sprite.
+ * @param type Type of the encoded sprite.
+ * @param zoom_lvl Requested zoom level.
+ * @param colour_fmt Colour format of the sprite.
+ * @param container_format Container format of the GRF this sprite is in.
+ * @return True if the sprite was successfully loaded.
+ */
+bool DecodeSingleSprite(SpriteLoader::Sprite *sprite, uint8 file_slot, size_t file_pos, SpriteType sprite_type, int64 num, byte type, ZoomLevel zoom_lvl, byte colour_fmt, byte container_format)
 {
-	/* Open the right file and go to the correct position */
-	FioSeekToFile(file_slot, file_pos);
-
-	/* Read the size and type */
-	int num = FioReadWord();
-	byte type = FioReadByte();
-
-	/* Type 0xFF indicates either a colourmap or some other non-sprite info; we do not handle them here */
-	if (type == 0xFF) return false;
-
-	sprite->height = FioReadByte();
-	sprite->width  = FioReadWord();
-	sprite->x_offs = FioReadWord();
-	sprite->y_offs = FioReadWord();
-
-	/* 0x02 indicates it is a compressed sprite, so we can't rely on 'num' to be valid.
-	 *  In case it is uncompressed, the size is 'num' - 8 (header-size). */
-	num = (type & 0x02) ? sprite->width * sprite->height : num - 8;
-
-	byte *dest_orig = AllocaM(byte, num);
+	AutoFreePtr<byte> dest_orig(MallocT<byte>(num));
 	byte *dest = dest_orig;
-	const int dest_size = num;
+	const int64 dest_size = num;
 
 	/* Read the file, which has some kind of compression */
 	while (num > 0) {
@@ -95,91 +100,224 @@ bool SpriteLoaderGrf::LoadSprite(SpriteLoader::Sprite *sprite, uint8 file_slot, 
 
 	if (num != 0) return WarnCorruptSprite(file_slot, file_pos, __LINE__);
 
-	sprite->AllocateData(sprite->width * sprite->height * ZOOM_LVL_BASE * ZOOM_LVL_BASE);
+	sprite->AllocateData(zoom_lvl, sprite->width * sprite->height);
+
+	/* Convert colour depth to pixel size. */
+	int bpp = 0;
+	if (colour_fmt & SCC_RGB)   bpp += 3; // Has RGB data.
+	if (colour_fmt & SCC_ALPHA) bpp++;    // Has alpha data.
+	if (colour_fmt & SCC_PAL)   bpp++;    // Has palette data.
 
 	/* When there are transparency pixels, this format has another trick.. decode it */
 	if (type & 0x08) {
 		for (int y = 0; y < sprite->height; y++) {
 			bool last_item = false;
 			/* Look up in the header-table where the real data is stored for this row */
-			int offset = (dest_orig[y * 2 + 1] << 8) | dest_orig[y * 2];
+			int offset;
+			if (container_format >= 2 && dest_size > UINT16_MAX) {
+				offset = (dest_orig[y * 4 + 3] << 24) | (dest_orig[y * 4 + 2] << 16) | (dest_orig[y * 4 + 1] << 8) | dest_orig[y * 4];
+			} else {
+				offset = (dest_orig[y * 2 + 1] << 8) | dest_orig[y * 2];
+			}
 
 			/* Go to that row */
 			dest = dest_orig + offset;
 
 			do {
-				if (dest + 2 > dest_orig + dest_size) {
+				if (dest + (container_format >= 2 && sprite->width > 256 ? 4 : 2) > dest_orig + dest_size) {
 					return WarnCorruptSprite(file_slot, file_pos, __LINE__);
 				}
 
 				SpriteLoader::CommonPixel *data;
-				/* Read the header:
-				 *  0 .. 14  - length
-				 *  15       - last_item
-				 *  16 .. 31 - transparency bytes */
-				last_item  = ((*dest) & 0x80) != 0;
-				int length =  (*dest++) & 0x7F;
-				int skip   =   *dest++;
+				/* Read the header. */
+				int length, skip;
+				if (container_format >= 2 && sprite->width > 256) {
+					/*  0 .. 14  - length
+					 *  15       - last_item
+					 *  16 .. 31 - transparency bytes */
+					last_item = (dest[1] & 0x80) != 0;
+					length    = ((dest[1] & 0x7F) << 8) | dest[0];
+					skip      = (dest[3] << 8) | dest[2];
+					dest += 4;
+				} else {
+					/*  0 .. 6  - length
+					 *  7       - last_item
+					 *  8 .. 15 - transparency bytes */
+					last_item  = ((*dest) & 0x80) != 0;
+					length =  (*dest++) & 0x7F;
+					skip   =   *dest++;
+				}
 
 				data = &sprite->data[y * sprite->width + skip];
 
-				if (skip + length > sprite->width || dest + length > dest_orig + dest_size) {
+				if (skip + length > sprite->width || dest + length * bpp > dest_orig + dest_size) {
 					return WarnCorruptSprite(file_slot, file_pos, __LINE__);
 				}
 
 				for (int x = 0; x < length; x++) {
-					switch (sprite_type) {
-						case ST_NORMAL: data->m = _palette_remap_grf[file_slot] ? _palmap_w2d[*dest] : *dest; break;
-						case ST_FONT:   data->m = min(*dest, 2u); break;
-						default:        data->m = *dest; break;
+					if (colour_fmt & SCC_RGB) {
+						data->r = *dest++;
+						data->g = *dest++;
+						data->b = *dest++;
 					}
-					dest++;
+					data->a = (colour_fmt & SCC_ALPHA) ? *dest++ : 0xFF;
+					if (colour_fmt & SCC_PAL) {
+						switch (sprite_type) {
+							case ST_NORMAL: data->m = _palette_remap_grf[file_slot] ? _palmap_w2d[*dest] : *dest; break;
+							case ST_FONT:   data->m = min(*dest, 2u); break;
+							default:        data->m = *dest; break;
+						}
+						/* Magic blue. */
+						if (colour_fmt == SCC_PAL && *dest == 0) data->a = 0x00;
+						dest++;
+					}
 					data++;
 				}
 			} while (!last_item);
 		}
 	} else {
-		if (dest_size < sprite->width * sprite->height) {
+		if (dest_size < sprite->width * sprite->height * bpp) {
 			return WarnCorruptSprite(file_slot, file_pos, __LINE__);
 		}
 
-		if (dest_size > sprite->width * sprite->height) {
+		if (dest_size > sprite->width * sprite->height * bpp) {
 			static byte warning_level = 0;
-			DEBUG(sprite, warning_level, "Ignoring %i unused extra bytes from the sprite from %s at position %i", dest_size - sprite->width * sprite->height, FioGetFilename(file_slot), (int)file_pos);
+			DEBUG(sprite, warning_level, "Ignoring " OTTD_PRINTF64 " unused extra bytes from the sprite from %s at position %i", dest_size - sprite->width * sprite->height * bpp, FioGetFilename(file_slot), (int)file_pos);
 			warning_level = 6;
 		}
 
 		dest = dest_orig;
 
 		for (int i = 0; i < sprite->width * sprite->height; i++) {
-			switch (sprite_type) {
-				case ST_NORMAL: sprite->data[i].m = _palette_remap_grf[file_slot] ? _palmap_w2d[dest[i]] : dest[i]; break;
-				case ST_FONT:   sprite->data[i].m = min(dest[i], 2u); break;
-				default:        sprite->data[i].m = dest[i]; break;
+			byte *pixel = &dest[i * bpp];
+
+			if (colour_fmt & SCC_RGB) {
+				sprite->data[i].r = *pixel++;
+				sprite->data[i].g = *pixel++;
+				sprite->data[i].b = *pixel++;
+			}
+			sprite->data[i].a = (colour_fmt & SCC_ALPHA) ? *pixel++ : 0xFF;
+			if (colour_fmt & SCC_PAL) {
+				switch (sprite_type) {
+					case ST_NORMAL: sprite->data[i].m = _palette_remap_grf[file_slot] ? _palmap_w2d[*pixel] : *pixel; break;
+					case ST_FONT:   sprite->data[i].m = min(*pixel, 2u); break;
+					default:        sprite->data[i].m = *pixel; break;
+				}
+				/* Magic blue. */
+				if (colour_fmt == SCC_PAL && *pixel == 0) sprite->data[i].a = 0x00;
+				pixel++;
 			}
 		}
-	}
-
-	if (ZOOM_LVL_BASE != 1 && sprite_type == ST_NORMAL) {
-		/* Simple scaling, back-to-front so that no intermediate buffers are needed. */
-		int width  = sprite->width  * ZOOM_LVL_BASE;
-		int height = sprite->height * ZOOM_LVL_BASE;
-		for (int y = height - 1; y >= 0; y--) {
-			for (int x = width - 1; x >= 0; x--) {
-				sprite->data[y * width + x] = sprite->data[y / ZOOM_LVL_BASE * sprite->width + x / ZOOM_LVL_BASE];
-			}
-		}
-
-		sprite->width  *= ZOOM_LVL_BASE;
-		sprite->height *= ZOOM_LVL_BASE;
-		sprite->x_offs *= ZOOM_LVL_BASE;
-		sprite->y_offs *= ZOOM_LVL_BASE;
-	}
-
-	/* Make sure to mark all transparent pixels transparent on the alpha channel too */
-	for (int i = 0; i < sprite->width * sprite->height; i++) {
-		if (sprite->data[i].m != 0) sprite->data[i].a = 0xFF;
 	}
 
 	return true;
+}
+
+uint8 LoadSpriteV1(SpriteLoader::Sprite *sprite, uint8 file_slot, size_t file_pos, SpriteType sprite_type, bool load_32bpp)
+{
+	/* Check the requested colour depth. */
+	if (load_32bpp) return 0;
+
+	/* Open the right file and go to the correct position */
+	FioSeekToFile(file_slot, file_pos);
+
+	/* Read the size and type */
+	int num = FioReadWord();
+	byte type = FioReadByte();
+
+	/* Type 0xFF indicates either a colourmap or some other non-sprite info; we do not handle them here */
+	if (type == 0xFF) return 0;
+
+	ZoomLevel zoom_lvl = (sprite_type == ST_NORMAL) ? ZOOM_LVL_OUT_4X : ZOOM_LVL_NORMAL;
+
+	sprite[zoom_lvl].height = FioReadByte();
+	sprite[zoom_lvl].width  = FioReadWord();
+	sprite[zoom_lvl].x_offs = FioReadWord();
+	sprite[zoom_lvl].y_offs = FioReadWord();
+
+	/* 0x02 indicates it is a compressed sprite, so we can't rely on 'num' to be valid.
+	 * In case it is uncompressed, the size is 'num' - 8 (header-size). */
+	num = (type & 0x02) ? sprite[zoom_lvl].width * sprite[zoom_lvl].height : num - 8;
+
+	if (DecodeSingleSprite(&sprite[zoom_lvl], file_slot, file_pos, sprite_type, num, type, zoom_lvl, SCC_PAL, 1)) return 1 << zoom_lvl;
+
+	return 0;
+}
+
+uint8 LoadSpriteV2(SpriteLoader::Sprite *sprite, uint8 file_slot, size_t file_pos, SpriteType sprite_type, bool load_32bpp)
+{
+	static const ZoomLevel zoom_lvl_map[6] = {ZOOM_LVL_OUT_4X, ZOOM_LVL_NORMAL, ZOOM_LVL_OUT_2X, ZOOM_LVL_OUT_8X, ZOOM_LVL_OUT_16X, ZOOM_LVL_OUT_32X};
+
+	/* Is the sprite not present/stripped in the GRF? */
+	if (file_pos == SIZE_MAX) return 0;
+
+	/* Open the right file and go to the correct position */
+	FioSeekToFile(file_slot, file_pos);
+
+	uint32 id = FioReadDword();
+
+	uint8 loaded_sprites = 0;
+	do {
+		int64 num = FioReadDword();
+		size_t start_pos = FioGetPos();
+		byte type = FioReadByte();
+
+		/* Type 0xFF indicates either a colourmap or some other non-sprite info; we do not handle them here. */
+		if (type == 0xFF) return 0;
+
+		byte colour = type & SCC_MASK;
+		byte zoom = FioReadByte();
+
+		if (colour != 0 && (load_32bpp ? colour != SCC_PAL : colour == SCC_PAL) && (sprite_type == ST_NORMAL ? zoom < lengthof(zoom_lvl_map) : zoom == 0)) {
+			ZoomLevel zoom_lvl = (sprite_type == ST_NORMAL) ? zoom_lvl_map[zoom] : ZOOM_LVL_NORMAL;
+
+			if (HasBit(loaded_sprites, zoom_lvl)) {
+				/* We already have this zoom level, skip sprite. */
+				DEBUG(sprite, 1, "Ignoring duplicate zoom level sprite %u from %s", id, FioGetFilename(file_slot));
+				FioSkipBytes(num - 2);
+				continue;
+			}
+
+			sprite[zoom_lvl].height = FioReadWord();
+			sprite[zoom_lvl].width  = FioReadWord();
+			sprite[zoom_lvl].x_offs = FioReadWord();
+			sprite[zoom_lvl].y_offs = FioReadWord();
+
+			/* Mask out colour information. */
+			type = type & ~SCC_MASK;
+
+			/* Convert colour depth to pixel size. */
+			int bpp = 0;
+			if (colour & SCC_RGB)   bpp += 3; // Has RGB data.
+			if (colour & SCC_ALPHA) bpp++;    // Has alpha data.
+			if (colour & SCC_PAL)   bpp++;    // Has palette data.
+
+			/* For chunked encoding we store the decompressed size in the file,
+			 * otherwise we can calculate it from the image dimensions. */
+			uint decomp_size = (type & 0x08) ? FioReadDword() : sprite[zoom_lvl].width * sprite[zoom_lvl].height * bpp;
+
+			bool valid = DecodeSingleSprite(&sprite[zoom_lvl], file_slot, file_pos, sprite_type, decomp_size, type, zoom_lvl, colour, 2);
+			if (FioGetPos() != start_pos + num) {
+				WarnCorruptSprite(file_slot, file_pos, __LINE__);
+				return 0;
+			}
+
+			if (valid) SetBit(loaded_sprites, zoom_lvl);
+		} else {
+			/* Not the wanted zoom level or colour depth, continue searching. */
+			FioSkipBytes(num - 2);
+		}
+
+	} while (FioReadDword() == id);
+
+	return loaded_sprites;
+}
+
+uint8 SpriteLoaderGrf::LoadSprite(SpriteLoader::Sprite *sprite, uint8 file_slot, size_t file_pos, SpriteType sprite_type, bool load_32bpp)
+{
+	if (this->container_ver >= 2) {
+		return LoadSpriteV2(sprite, file_slot, file_pos, sprite_type, load_32bpp);
+	} else {
+		return LoadSpriteV1(sprite, file_slot, file_pos, sprite_type, load_32bpp);
+	}
 }

@@ -362,7 +362,7 @@ STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Vis motstanders
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Fullstending animasjon
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Maks detaljer
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Gjennomsiktige bygninger
-STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Gjennomsiktige stasjonsnavn
+STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Gjennomsiktige skilt
 ############ range ends here
 
 ############ range for file menu starts
@@ -1930,7 +1930,7 @@ STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Nei, avs
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Instillinger for gjennomsiktighet
-STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Gjennomsiktighet for stasjonsskilt. Ctrl+klikk for å låse
+STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Veksle mellom gjennomsiktighet for skilt. Ctrl+klikk for å låse
 STR_TRANSPARENT_TREES_TOOLTIP                                   :{BLACK}Gjennomsiktighet for trær. Ctrl+klikk for å låse
 STR_TRANSPARENT_HOUSES_TOOLTIP                                  :{BLACK}Gjennomsiktighet for hus. Ctrl+klikk for å låse
 STR_TRANSPARENT_INDUSTRIES_TOOLTIP                              :{BLACK}Gjennomsiktighet for industrier. Ctrl+klikk for å låse
@@ -2141,7 +2141,7 @@ STR_OBJECT_CLASS_TRNS                                           :Radiosendere
 
 # Tree planting window (last two for SE only)
 STR_PLANT_TREE_CAPTION                                          :{WHITE}Trær
-STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Velg typen tre som skal plantes
+STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Velg typen tre som skal plantes. Hvis feltet allerede har et tre, vil dette plante flere typer trær uavhengig av den valgte typen
 STR_TREES_RANDOM_TYPE                                           :{BLACK}Trær av tilfeldig type
 STR_TREES_RANDOM_TYPE_TOOLTIP                                   :{BLACK}Plasser trær av tilfeldig type. Shift slår av/på kostnadsestimat
 STR_TREES_RANDOM_TREES_BUTTON                                   :{BLACK}Tilfeldige trær

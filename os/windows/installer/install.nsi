@@ -2,8 +2,8 @@
 !define APPV_MAJOR 1
 !define APPV_MINOR 2
 !define APPV_MAINT 0
-!define APPV_BUILD 2
-!define APPV_EXTRA "-beta3"
+!define APPV_BUILD 3
+!define APPV_EXTRA "-beta4"
 
 !define APPNAME "OpenTTD"   ; Define application name
 !define APPVERSION "${APPV_MAJOR}.${APPV_MINOR}.${APPV_MAINT}${APPV_EXTRA}"  ; Define application version
@@ -281,17 +281,17 @@ SectionEnd
 Section "Download OpenMSX (free music set)" Section5
 	SetOverwrite try
 
-	NSISdl::download "http://binaries.openttd.org/installer/openmsx-${OPENMSX_BASE_VERSION}.7z" "$INSTDIR\gm\openmsx.7z"
+	NSISdl::download "http://binaries.openttd.org/installer/openmsx-${OPENMSX_BASE_VERSION}.7z" "$INSTDIR\baseset\openmsx.7z"
 	Pop $R0 ;Get the return value
 	StrCmp $R0 "success" +3
 		MessageBox MB_OK "Downloading of OpenMSX failed"
 		Goto Done
 
 	; Let's extract the files
-	SetOutPath "$INSTDIR\gm\"
-	NSIS7z::Extract "$INSTDIR\gm\openmsx.7z"
+	SetOutPath "$INSTDIR\baseset\"
+	NSIS7z::Extract "$INSTDIR\baseset\openmsx.7z"
 
-	Delete "$INSTDIR\gm\openmsx.7z"
+	Delete "$INSTDIR\baseset\openmsx.7z"
 	SetOutPath "$INSTDIR\"
 Done:
 

@@ -16,8 +16,10 @@
 
 /** Sprite loader for graphics coming from a (New)GRF. */
 class SpriteLoaderGrf : public SpriteLoader {
+	byte container_ver;
 public:
-	bool LoadSprite(SpriteLoader::Sprite *sprite, uint8 file_slot, size_t file_pos, SpriteType sprite_type);
+	SpriteLoaderGrf(byte container_ver) : container_ver(container_ver) {}
+	uint8 LoadSprite(SpriteLoader::Sprite *sprite, uint8 file_slot, size_t file_pos, SpriteType sprite_type, bool load_32bpp);
 };
 
 #endif /* SPRITELOADER_GRF_HPP */
