@@ -357,7 +357,7 @@ STR_SORT_BY_RANGE                                               :Rozsah
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Pauza
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Zrýchliť priebeh hry
 STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Nastavenia
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Uložiť hru, opustiť hru, ukončiť OpenTTD
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Uložiť hru, opustiť hru, ukončiť
 STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Zobraziť mapu
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Zobraziť zoznam miest
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Zobraziť dotácie
@@ -384,7 +384,7 @@ STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Informá
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Prepnúť panely nástrojov
 
 # Extra tooltips for the scenario editor toolbar
-STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Uložiť scenár, nahrať scenár, opustiť editor scenáru, koniec
+STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Uložiť scenár, nahrať scenár, opustiť editor scenára, koniec
 STR_SCENEDIT_TOOLBAR_OPENTTD                                    :{YELLOW}OpenTTD
 STR_SCENEDIT_TOOLBAR_SCENARIO_EDITOR                            :{YELLOW}Editor scenárov
 STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD    :{BLACK}Posunúť začiatok o rok dozadu
@@ -404,7 +404,7 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Uložiť scená
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Nahrať scenár
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Uložiť výškovú mapu
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Nahrať výškovú mapu
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Ukončiť editor
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Ukončiť editor scenára
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
 STR_SCENEDIT_FILE_MENU_QUIT                                     :Koniec
 ############ range for SE file menu starts
@@ -424,7 +424,7 @@ STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Značky a mená
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Plná animácia
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Plné detaily
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Priesvitné budovy
-STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Priesvitné názvy staníc
+STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Priesvitné názvy
 ############ range ends here
 
 ############ range for file menu starts
@@ -1477,7 +1477,7 @@ STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Rozšír
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}Nastavenia NewGRF
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Skontrolovať online obsah
 STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}Umelá inteligencia / Nastavenia hry
-STR_INTRO_QUIT                                                  :{BLACK}Ukončiť
+STR_INTRO_QUIT                                                  :{BLACK}Koniec
 
 STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Spustiť novú hru. Ctrl+klik preskočí nastavenie mapy
 STR_INTRO_TOOLTIP_LOAD_GAME                                     :{BLACK}Nahrať uloženú hru
@@ -1497,7 +1497,7 @@ STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Zobrazi�
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Zobraziť NewGRF nastavenia
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Skontrolovať nový a aktualizovaný obsah pre stiahnutie
 STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Zobraz umelú inteligenciu a nastavenia hry
-STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Ukončiť OpenTTD
+STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Ukončiť 'OpenTTD'
 
 STR_INTRO_TRANSLATION                                           :{BLACK}V preklade chýba {NUM} v{P eta ety iet}. Prosím pomôžte urobiť OpenTTD lepším a prihláste sa ako prekladateľ. Viac detailov v readme.txt
 
@@ -1868,9 +1868,9 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Bol si v
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Cheatovanie nie je povolene na tomto serveri
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Posielali ste priveľa príkazov serveru
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Príliš dlho si zadával heslo
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Počítač vstupoval príliš dlho
-STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Mapa sa sťahovala príliš dlho
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Príliš dlho si vstupoval na server
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Tvoj počítač sa príliš pomaly pripájal na server
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Tvoj počítač sťahoval mapu príliš dlho
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Tvoj počítač sa príliš dlho pripájal na server
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :generalna chyba
@@ -2013,8 +2013,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Vyp.
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Zap.
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Nezvýrazňovať oblasť pokrytia stavanej plochy
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Zobraziť oblasť pokrytia stavanej plochy
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Prijíma: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Dodáva: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Prijíma: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Dodáva: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Spojiť stanicu
@@ -2117,7 +2117,7 @@ STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAM_VEHICLE_DEPOT               :{BLACK}Postavi�
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_BUS_STATION                      :{BLACK}Postaviť autobusovú zastávku. Ctrl+klik umožní spájanie zastávok
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_PASSENGER_TRAM_STATION           :{BLACK}Postaviť osobnú električkovú stanicu
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRUCK_LOADING_BAY                :{BLACK}Postaviť vykládku
-STR_ROAD_TOOLBAR_TOOLTIP_BUILD_CARGO_TRAM_STATION               :{BLACK}Postavit nákladnú elektrickovú stanicu
+STR_ROAD_TOOLBAR_TOOLTIP_BUILD_CARGO_TRAM_STATION               :{BLACK}Postaviť nákladnú električkovú stanicu. CTRL umožní.... SHIFT ukáže náklady na stavbu
 STR_ROAD_TOOLBAR_TOOLTIP_TOGGLE_ONE_WAY_ROAD                    :{BLACK}Prepnút stavbu jednosmerných ciest
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_ROAD_BRIDGE                      :{BLACK}Postaviť cestný most
 STR_ROAD_TOOLBAR_TOOLTIP_BUILD_TRAMWAY_BRIDGE                   :{BLACK}Postaviť most pre električky
@@ -2524,11 +2524,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Nižšie
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Posunút vybraný NewGRF súbor v zozname nižšie
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Zoznam inštalovaných NewGRF súborov.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Zobraz čítajma
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Log zmien
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licencia
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Nastavit parametre
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Ukázať parametre
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Prepnúť paletu
@@ -2559,11 +2554,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Nastavi�
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parameter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Počet parametrov: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF "čítajma" {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF log zmien {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF licencia {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Kontrola - {STRING}
@@ -2799,7 +2789,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Prijíma
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Zobraziť zoznam prijímaného nákladu
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Prijíma: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Prijíma: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Hodnotenie
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Zobraziť hodnotenia stanice
@@ -3044,9 +3034,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Hmotnos�
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Cena: {GOLD}{CURRENCY_LONG}{BLACK} Rýchlosť: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Kapacita: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Poháňané vagóny: {GOLD}+{POWER}{BLACK} Hmotnosť: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Prestavatelne na: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Prestavatelne na: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Všetky druhy nákladu
-STR_PURCHASE_INFO_ALL_BUT                                       :Všetko okrem {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Všetko okrem {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Max. trakčná sila: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Dosah: {GOLD}{COMMA} políčok
 
@@ -3293,7 +3283,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Profit t
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Spoľahlivosť: {LTBLUE}{COMMA}%  {BLACK}Poruchy od posledného servisu: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Vyrobený: {LTBLUE}{NUM}{BLACK} Cena: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapacita: {LTBLUE}Žiadna
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapacita: {LTBLUE}Žiadna{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Kapacita: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Kapacita: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Kapacita: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3544,6 +3534,8 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Zmenit d
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Vymazat cas
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Vymazať dĺžku trvania označeného príkazu
 
+
+
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Reset meskania
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Vynulovať počítadlo meškania, takže vozidlo pôjde presne
 
@@ -3638,6 +3630,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Zavrieť
 STR_AI_SETTINGS_RESET                                           :{BLACK}Resetovať
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Koľko dní prejde od spustenia predchádzajúcej umelej inteligencie k naštartovaniu novej: {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} "čítajma" {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} log zmien {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} licencia {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Zobraz čítajma
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Log zmien
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licencia
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}

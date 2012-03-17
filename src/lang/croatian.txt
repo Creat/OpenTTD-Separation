@@ -389,7 +389,7 @@ STR_SORT_BY_RANGE                                               :Domet
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Zaustavi igru
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Premotaj igru naprijed
 STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Postavke
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Spremi igru, napusti igru, prekini igru
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Spremi igru, napusti igru, izađi
 STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Prikaži kartu, dodatni pogled ili popis znakova
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Prikaži popis gradova
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Prikaži subvencije
@@ -412,11 +412,11 @@ STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Izgradi 
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Otvori alatnu traku za krajolik kako bi spustio/izdignuo zemlju, posadio drveće, itd.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Pokaži prozor za zvuk/glazbu
 STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Pokaži zadnju poruku/vijest, pokaži postavke poruka
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Podaci o zemlji, konzola, debug UI, snimke ekrana, o OpenTTD-u
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Podaci o zemlji, konzola, debug skripte, snimke ekrana, o OpenTTD-u
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Promijeni alatne trake
 
 # Extra tooltips for the scenario editor toolbar
-STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Spremi scenarij, učitaj scenarij, napusti uređivanje scenarija, završi
+STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Spremi scenarij, učitaj scenarij, napusti uređivanje scenarija, izađi
 STR_SCENEDIT_TOOLBAR_OPENTTD                                    :{YELLOW}OpenTTD
 STR_SCENEDIT_TOOLBAR_SCENARIO_EDITOR                            :{YELLOW}Uređivanje scenarija
 STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD    :{BLACK}Pomakni početni datum 1 godinu unatrag
@@ -436,16 +436,16 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Spremi scenarij
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Učitaj scenarij
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Spremi visinsku mapu
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Učitaj visinsku kartu
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Završi s uređivanjem
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Odustani od uređivanja scenarija
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
-STR_SCENEDIT_FILE_MENU_QUIT                                     :Završi
+STR_SCENEDIT_FILE_MENU_QUIT                                     :Izlaz
 ############ range for SE file menu starts
 
 ############ range for settings menu starts
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Postavke igre
 STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Postavke težine
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Napredne postavke
-STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :UI / postavke igre
+STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :Postavke UI-ja/Skripte igre
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :Postavke za NewGRF
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Postavke prozirnosti
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Prikaži imena gradova
@@ -463,6 +463,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Prozirni znakov
 STR_FILE_MENU_SAVE_GAME                                         :Spremi igru
 STR_FILE_MENU_LOAD_GAME                                         :Učitaj igru
 STR_FILE_MENU_QUIT_GAME                                         :Napusti igru
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Izlaz
 ############ range ends here
 
@@ -540,7 +541,7 @@ STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :Povijest poruka
 STR_ABOUT_MENU_LAND_BLOCK_INFO                                  :Podaci o zemljištu
 STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Otvori konzolu
-STR_ABOUT_MENU_AI_DEBUG                                         :Debugiranje UI-ja / skripte igre
+STR_ABOUT_MENU_AI_DEBUG                                         :Debugiranje UI-ja/Skripte igre
 STR_ABOUT_MENU_SCREENSHOT                                       :Slika zaslona
 STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Zumirano do kraja na slici zaslona
 STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Standardno zumiranje slike zaslona
@@ -1504,8 +1505,8 @@ STR_INTRO_DIFFICULTY                                            :{BLACK}Težina 
 STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Napredne postavke
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}NewGRF Postavke
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Provjeri online sadržaj
-STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}UI / postavke igre
-STR_INTRO_QUIT                                                  :{BLACK}Završi
+STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}Postavke UI-ja/Skripte igre
+STR_INTRO_QUIT                                                  :{BLACK}Izlaz
 
 STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Započni novu igru. Ctrl+klik preskače konfiguriranje karte
 STR_INTRO_TOOLTIP_LOAD_GAME                                     :{BLACK}Učitaj spremljenu igru
@@ -1524,13 +1525,13 @@ STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}Prikaži
 STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Prikaži napredne postavke
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Prikaži postavke NewGRF
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Provjeri novi i nadograđeni sadržaj za preuzimanje
-STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Prikaži UI i postavke igre
-STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Završi 'OpenTTD'
+STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Prikaži postavke UI-ja/Skripte igre
+STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Izzađi it 'OpenTTD'-a
 
 STR_INTRO_TRANSLATION                                           :{BLACK}Ovom prijevodu nedostaje {NUM} slijed. Molimo, pomognite učiniti OpenTTD boljim tako da se prijavite kao prevoditelj. Pogledajte readme.txt za detalje.
 
 # Quit window
-STR_QUIT_CAPTION                                                :{WHITE}Prekid
+STR_QUIT_CAPTION                                                :{WHITE}Izlaz
 STR_QUIT_ARE_YOU_SURE_YOU_WANT_TO_EXIT_OPENTTD                  :{YELLOW}Jesi li siguran da želiš napustiti OpenTTD i vratiti se u {STRING}e?
 STR_QUIT_YES                                                    :{BLACK}Da
 STR_QUIT_NO                                                     :{BLACK}Ne
@@ -1896,9 +1897,9 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Izbačen
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Na ovome poslužitelju varanje nije dopušteno
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Slali ste previše naredbi na server
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Trebalo vam je previše vremena za unošenje lozinke
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Vaše računalo je trebalo previše vremena za spajanje
-STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Trebalo vam je previše vremena za preuzimanje mape
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Trebalo vam je previše vremena za pridruživanje na server
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Vaše računalo je presporo za držanje koraka sa serverom
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Vašem računalu je trebalo previše vremena za preuzimanje mape
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Vašem računalu je trebalo previše vremena za pridruživanje na server
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :opća greška
@@ -2041,8 +2042,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Isključ
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Uključeno
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Nemoj označiti područje koje pokriva željeno mjesto
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Označi područje koje pokriva željeno mjesto
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Prihvaća: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Zalihe: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Prihvaća: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Zalihe: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Spoji postaju
@@ -2552,11 +2553,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK} Pomakni
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Pomakni odabranu NewGRF datoteku dolje na listi
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Popis instaliranih NewGRF datoteka.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Pogledaj "pročitaj me" datoteku
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Zapis izmjena
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licenca
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Postavi parametre
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Prikaži parametre
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Aktiviraj paletu
@@ -2587,11 +2583,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Namjesti
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parametar {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Broj parametara: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF "pročitaj me" datoteka od {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF zapis izmjena od {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF licenca od {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Pregledaj - {STRING}
@@ -2827,7 +2818,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Prihvaća
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Pokaži popis tereta koji se prihvaća
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Prihvaća: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Prihvaća: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Ocjene
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Pokaži ocjene postaje
@@ -3072,9 +3063,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Težina:
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Trošak: {GOLD}{CURRENCY_LONG}{BLACK} Brzina: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Nosivost: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK} Pokretni vagoni:.{GOLD}+{POWER}{BLACK} Težina: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Prenamjenjivo u: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Prenamjenjivo u: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Sve vrste tereta
-STR_PURCHASE_INFO_ALL_BUT                                       :Sve osim {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Sve osim {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK} Maks. vučni napor: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Domet: {GOLD}{COMMA} pločica
 
@@ -3321,7 +3312,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Dobit ov
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Pouzdanost: {LTBLUE}{COMMA}%  {BLACK}Broj kvarova od posljednjeg servisa: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Izgrađen: {LTBLUE}{NUM}{BLACK} Vrijednost: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Nosivost: {LTBLUE}Ništa
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Nosivost: {LTBLUE}Ništa{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Nosivost: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Nosivost: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Nosivost: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3468,7 +3459,7 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Idi do najbliž
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Idi do najbližeg hangara
 STR_ORDER_CONDITIONAL                                           :Uvjetovani skok na naredbu
 STR_ORDER_SHARE                                                 :Dijeli naredbe
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Umetni novu naredbu prije označene naredbe, ili dodaj na kraj liste. Ctrl određuje naredbe stanice 'napuni do kraja bilo koji teret', naredbe prolazni točki 'non-stop', a naredbe depoa 'servisiraj'. 'Dijeli naredbe' ili Ctrl dozvoljava da ovo vozilo dijeli naredbe sa odabranim vozilom. Klik na vozilo kopira naredbe tog vozila.
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Umetni novu naredbu prije označene naredbe, ili dodaj na kraj liste. Ctrl određuje naredbe stanice 'napuni do kraja bilo koji teret', naredbe prolaznih točki 'non-stop', a naredbe depoa 'servisiraj'. 'Dijeli naredbe' ili Ctrl dozvoljava da ovo vozilo dijeli naredbe sa odabranim vozilom. Klik na vozilo kopira naredbe tog vozila. Naredba depoa isključuje automatsko servisiranje vozila.
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Pokaži sva vozila koja dijele ovaj raspored.
 
@@ -3548,7 +3539,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Vozni re
 STR_TIMETABLE_NO_TRAVEL                                         :Nema putovanja
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Putovanje (automatsko; prema rasporedu sljedeće ručno određene naredbe)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Putovanje (izvan voznog reda)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Putuj uz najviše {2:VELOCITY} (not timetabled)
 STR_TIMETABLE_TRAVEL_FOR                                        :Putovanje za {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Putuj prema {STRING} uz najviše {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :i boravak za {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :i putovanje za {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} dan{P "" a a}
@@ -3571,6 +3564,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Promijen
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Obriši vrijeme
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Obriši vrijeme potrebno za označenu naredbu
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Izmijeni limit brzine
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Izmijeni maksimalnu putnu brzinu za označenu naredbu
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Izbriši limit brzine
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Izbriši maksimalnu putnu brzinu za označenu naredbu
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Poništi brojač kašnjenja
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Resetiraj brojač kašnjenja, kako bi vozilo stiglo na vrijeme
@@ -3596,7 +3595,7 @@ STR_DATE_YEAR_TOOLTIP                                           :{BLACK}Odaberi 
 
 
 # AI debug window
-STR_AI_DEBUG                                                    :{WHITE}Debugiranje UI-ja / skripte igre
+STR_AI_DEBUG                                                    :{WHITE}Debugiranje UI-ja/Skripte igre
 STR_AI_DEBUG_NAME_AND_VERSION                                   :{BLACK}{STRING} (v{NUM})
 STR_AI_DEBUG_NAME_TOOLTIP                                       :{BLACK}Ime skripte
 STR_AI_DEBUG_SETTINGS                                           :{BLACK}Postavke
@@ -3616,11 +3615,11 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Skripta 
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Provjeri zapis Skripte Igre
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Nema prikladne UI za učitavanje.{}Ova UI je samo model i neće ništa učiniti.{}Možete preuzeti nekoliko umjetnih inteligencija pomoću sustava 'Online sadržaji'.
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Jedna od pokrenutih skripti se srušila. Molimo vas da prijavite ovo autoru skripte sa kopijom slike prozora za debugiranje UI/skripte igre.
-STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Prozor za debugiranje UI-ja / skripte igre je dopušten samo za poslužitelj
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Jedna od pokrenutih skripti se srušila. Molimo vas da prijavite ovo autoru skripte sa slikom prozora za debugiranje UI-ja/Skripte igre.
+STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Prozor za debugiranje UI-ja/Skripte igre je dopušten samo za poslužitelj
 
 # AI configuration window
-STR_AI_CONFIG_CAPTION                                           :{WHITE}Konfiguracija UI-ja / igre
+STR_AI_CONFIG_CAPTION                                           :{WHITE}Konfiguracija UI-ja/Skripte igre
 STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Skripta Igre koja će biti učitana u sljedećoj igri
 STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}UI-jevi koji će biti učitani u sljedećoj igri
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Ljudski igrač
@@ -3666,6 +3665,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Zatvori
 STR_AI_SETTINGS_RESET                                           :{BLACK}Resetiraj
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Broj dana za start ovog UI-ja nakon prethodnog (otprilike): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} "pročitaj me" datoteka od {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} zapis izmjena od {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} licenca od {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Pogledaj "pročitaj me" datoteku
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Zapis izmjena
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licenca
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4546,6 +4555,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
@@ -4580,6 +4590,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

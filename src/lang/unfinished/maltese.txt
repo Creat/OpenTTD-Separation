@@ -261,6 +261,7 @@ STR_TOOLBAR_TOOLTIP_FUND_CONSTRUCTION_OF_NEW                    :{BLACK}Ibni ind
 ############ range ends here
 
 ############ range for file menu starts
+STR_FILE_MENU_SEPARATOR                                         :
 ############ range ends here
 
 ############ range for map menu starts
@@ -656,16 +657,12 @@ STR_NEWGRF_SETTINGS_ADD_FILE_TOOLTIP                            :{BLACK}Żid il-
 STR_NEWGRF_SETTINGS_RESCAN_FILES                                :{BLACK}Erga' sskanja il-fajls
 STR_NEWGRF_SETTINGS_RESCAN_FILES_TOOLTIP                        :{BLACK}Aġġorna l-lista tal-fajls NewGRF disponibbli
 
-# Additional textfiles accompanying NewGRFs
-
 
 
 
 STR_NEWGRF_SETTINGS_INCOMPATIBLE                                :{RED}Ma jaqblux ma din il-verzjoni ta' OpenTTD
 
 # NewGRF parameters window
-
-# NewGRF textfile window
 
 # NewGRF inspect window
 
@@ -707,6 +704,10 @@ STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<industrija inv
 
 
 # Goal window
+
+# Goal question window
+
+### Start of Goal Question button list
 
 # Subsidies window
 
@@ -881,12 +882,20 @@ STR_ORDER_IMPLICIT                                              :(Awtomatiku)
 
 STR_TIMETABLE_TOOLTIP                                           :{BLACK}Skeda - agħfas fuq ordni biex tagħzilha.
 
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Патуваат со најмногу {2:VELOCITY} (не е време-Увезени)
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :патуваат за {STRING} со најмногу {VELOCITY}
 
 STR_TIMETABLE_TOTAL_TIME                                        :{BLACK}Din l-iskeda ser iddum {STRING} biex titlesta
 
 
 
 
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Промена на брзина
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Промена на Максимална брзина од означената цел
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Јасно брзина
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Исчисти ја Максимална брзина од означената цел
 
 
 
@@ -909,6 +918,14 @@ STR_TIMETABLE_TOTAL_TIME                                        :{BLACK}Din l-is
 
 
 # AI Parameters
+
+
+# Textfile window
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} лиценца за {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Прикажи ги чита-ми
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Промени се најавите
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Лиценца
+
 
 # Vehicle loading indicators
 
@@ -1294,6 +1311,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

@@ -424,6 +424,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Läbipaistvad s
 STR_FILE_MENU_SAVE_GAME                                         :Salvesta mäng
 STR_FILE_MENU_LOAD_GAME                                         :Laadi mäng
 STR_FILE_MENU_QUIT_GAME                                         :Lahku mängust
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Välju
 ############ range ends here
 
@@ -2002,8 +2003,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Väljas
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Sees
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Lülita välja jaama mõjupiirkonna näitamine
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Lülita sisse jaama mõjupiirkonna näitamine
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Võtab vastu: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Tarnib: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Võtab vastu: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Tarnib: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Liida jaamale
@@ -2513,11 +2514,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Liiguta 
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}NewGRF-faili liigutamine loendis alla
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}NewGRF failidest nimekiri installeerimata. Parameetrite muutmiseks klõpsa failil.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Vaata abi
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Muudatuste logi
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Litsents
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Vali parameetrid
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Näita parameetreid
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Vaheta paletti
@@ -2548,11 +2544,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Säti k�
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parameeter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Parameetrite arv: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}{STRING} NewGRF abi.
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF muudatuste logi {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF litsents {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspekteeri- {STRING}
@@ -2788,7 +2779,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Võtab vastu
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Näita vastuvõetavate veoste nimistut
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Võtab vastu: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Võtab vastu: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Hinnangud
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Näita jaamahinnangut
@@ -3033,9 +3024,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Mass: {G
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Hind: {GOLD}{CURRENCY_LONG}{BLACK} Tippkiirus: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Kandevõime: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Kiirendavad vagunid: {GOLD}+{POWER}{BLACK} Mass: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Ümberseadistatav: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Ümberseadistatav: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Kõik kaubatüübid
-STR_PURCHASE_INFO_ALL_BUT                                       :Kõik, välja arvatud {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Kõik, välja arvatud {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Suurim veojõud: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Tegevusradius: {GOLD}{COMMA} ruutu
 
@@ -3282,7 +3273,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Kasum se
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Tehnoseisund: {LTBLUE}{COMMA}%  {BLACK}Rikkeid eelmisest hooldusest: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Valmistatud: {LTBLUE}{NUM}{BLACK} Väärtus: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Mahutavus: {LTBLUE}Pole
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Mahutavus: {LTBLUE}Pole{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Kandevõime: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Kandevõime: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Kandevõime: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3509,7 +3500,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Sõidupl
 STR_TIMETABLE_NO_TRAVEL                                         :Sõitu pole
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Reisi (automaatne; ajakava järgmise manuaalse käsu järgi)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Sõitmine (sõiduplaanita)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Reisi kõike suurema {2:VELOCITY} (ei ole ajastatud)
 STR_TIMETABLE_TRAVEL_FOR                                        :Sõida {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Reisi selleks {STRING} kõige rohkema {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :ja oota {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :ja sõida {STRING} jaoks
 STR_TIMETABLE_DAYS                                              :{COMMA} päev{P "" a}
@@ -3532,6 +3525,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Muuda, k
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Tühista aeg
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Tühista esile tõstetud sihtpunkti ajaperiood
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Muuda kiirusepiirangut
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Muuda maksimum reisikiirust valitud järjekorras
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Tühjenda kiiruselimiit
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Tühjenda maksimum reisikiirus valitud järjekorras
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Tühista hilinemisloendur
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Tühista hilinemisloendur, et sõiduk ei jääks hiljaks
@@ -3627,6 +3626,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Sulge
 STR_AI_SETTINGS_RESET                                           :{BLACK}Nulli
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Päevade arv eelmise tehismõistuse alustamisest pärast mida antud tehismõistus alustab (umbkaudne): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} {STRING} abi.
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} muudatuste logi {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} litsents {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Vaata abi
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Muudatuste logi
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Litsents
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4504,6 +4513,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

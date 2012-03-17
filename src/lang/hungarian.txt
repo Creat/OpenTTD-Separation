@@ -356,7 +356,7 @@ STR_SORT_BY_RANGE                                               :Hatótávolság
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Játék szüneteltetése
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Játék gyorsítása
 STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Beállítások
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Játék mentése, kilépés a játékból, kilépés
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Játék mentése, játék elhagyása, kilépés
 STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Térkép
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Településlista mutatása
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Támogatások megjelenítése
@@ -379,11 +379,11 @@ STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Repülő
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Nyisd meg a tájrendező ablakot a talaj emeléséhez vagy süllyesztéséhez, faültetéshez, stb.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Hang/zene beállításai
 STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Legutóbbi üzenet/újsághír, üzenetek beállításai
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Terület-információ, konzol, MI nyomonkövetés, képmentések, az OpenTTD-ről
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Terület-információ, konzol, MI/Játékszkript nyomkövetés, képmentések, az OpenTTD-ről
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Eszköztár váltás
 
 # Extra tooltips for the scenario editor toolbar
-STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Pálya betöltése, mentése, kilépés a szerkesztőből, kilépés
+STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Pálya betöltése, mentése, pályaszerkesztő elhagyása, kilépés
 STR_SCENEDIT_TOOLBAR_OPENTTD                                    :{YELLOW}OpenTTD
 STR_SCENEDIT_TOOLBAR_SCENARIO_EDITOR                            :{YELLOW}Pályaszerkesztő
 STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD    :{BLACK}A kezdődátum hátrébb állítása egy évvel
@@ -403,7 +403,7 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Pálya mentése
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Pálya betöltése
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Magasságtérkép mentése
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Magasságtérkép betöltése
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Kilépés a szerkesztőből
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Pályaszerkesztő elhagyása
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
 STR_SCENEDIT_FILE_MENU_QUIT                                     :Kilépés
 ############ range for SE file menu starts
@@ -430,6 +430,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Átlátszó fel
 STR_FILE_MENU_SAVE_GAME                                         :Játék mentése
 STR_FILE_MENU_LOAD_GAME                                         :Játék betöltése
 STR_FILE_MENU_QUIT_GAME                                         :Kilépés a játékból
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Kilépés
 ############ range ends here
 
@@ -1864,9 +1865,9 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Ki lett�
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Ez a szerver nem engedi a csalást
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Túl sok parancsot küldtél a szervernek
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Túl sokáig tartott a jelszó beírása
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}A számítógépednek túl sok időbe tartott csatlakozni
-STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Túl sokáig tartott a térkép letöltése
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Túl sokáig tartott a szerverhez való csatlakozás
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}A számítógéped túl lassú, hogy tartsa a szerver sebességét
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Túl sokáig tartott a térkép letöltése a számítógépednek
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Túl sokáig tartott a szerverhez való csatlakozása a számítógépednek
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :általános hiba
@@ -1988,7 +1989,7 @@ STR_CONTENT_ERROR_COULD_NOT_EXTRACT                             :{WHITE}Nem sike
 STR_MISSING_GRAPHICS_SET_CAPTION                                :{WHITE}Hiányzó grafikus alapcsomag
 STR_MISSING_GRAPHICS_SET_MESSAGE                                :{BLACK}Az OpenTTD-nek egy grafikus alapcsomagra van szüksége a működéshez, de nem található grafikus alapcsomag. Engedélyezed az OpenTTD-nek, hogy letöltse és telepítse a grafikus alapcsomagot?
 STR_MISSING_GRAPHICS_YES_DOWNLOAD                               :{BLACK}Igen, a grafikai alapcsomag letöltése
-STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Nem, az OpenTTD bezárása
+STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Nem, kilépés az OpenTTD-ből
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Átlátszósági beállítások
@@ -2009,8 +2010,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Ki
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Be
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Az állomással lefedett terület elrejtése
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Az állomással lefedett terület mutatása (vonzáskörzet)
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Elfogad:{GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Termel: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Elfogad:{GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Termel: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Állomás egyesítése
@@ -2520,11 +2521,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Le
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}A kiválasztott NewGRF-et lefelé mozgatja a listán
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}A feltelepített NewGRF-ek listája.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Readme megtekintése
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Változások listája
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licenc
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Paraméterek beállítása
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Paraméterek megjelenítése
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Palettaváltás
@@ -2555,11 +2551,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Összes 
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Paraméter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Paraméterek száma: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}{STRING} NewGRF readme-je
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}A(z) {STRING} NewGRF változásainak listája
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}A(z) {STRING} NewGRF licence
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Megtekintés - {STRING}
@@ -2795,7 +2786,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Elfogadás
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Az elfogadott áruk listájának mutatása
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Elfogad:{WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Elfogad:{WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Vélemény
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Vélemény megmutatása az állomásról
@@ -3040,9 +3031,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Súly: {
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Ár: {GOLD}{CURRENCY_LONG}{BLACK} Sebesség: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Kapacitás: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Meghajtott vagonok: {GOLD}+{POWER}{BLACK} Súly: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Átalakítható: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Átalakítható: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Minden rakomány típusra
-STR_PURCHASE_INFO_ALL_BUT                                       :Mindenre, kivéve {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Mindenre, kivéve {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Maximális vonóerő: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Hatótávolság: {GOLD}{COMMA} mező
 
@@ -3289,7 +3280,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Idei has
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Megbízhatóság: {LTBLUE}{COMMA}%  {BLACK}Lerobbanások az utolsó javítás óta: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Vásárlás éve: {LTBLUE}{NUM}{BLACK} Érték: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapacitás: {LTBLUE}Nincs
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapacitás: {LTBLUE}Nincs{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Kapacitás: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Kapacitás: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Kapacitás: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3353,7 +3344,7 @@ STR_REFIT_AIRCRAFT_REFIT_TOOLTIP                                :{BLACK}Repülő
 
 # Order view
 STR_ORDERS_CAPTION                                              :{WHITE}{VEHICLE} menetrendje
-STR_ORDERS_TIMETABLE_VIEW                                       :{BLACK}Menetrend
+STR_ORDERS_TIMETABLE_VIEW                                       :{BLACK}Nézetváltás
 STR_ORDERS_TIMETABLE_VIEW_TOOLTIP                               :{BLACK}Átkapcsolás menetrendi nézetre
 
 STR_ORDERS_LIST_TOOLTIP                                         :{BLACK}Menetrend - kattints egy célpontra a kijelöléséhez. Ctrl+Kattintással az utasítás helyszínére görget
@@ -3436,7 +3427,7 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Legközelebbi j
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Legközelebbi hangárba
 STR_ORDER_CONDITIONAL                                           :Feltételes ugrás
 STR_ORDER_SHARE                                                 :Menetrend megosztása
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Új utasítás beillesztése a kijelölt utasítás elé vagy a lista végére. Ctrl+Kattintás állomásoknál 'bármiből teljes rakományra vár'-t, ellenőrző pontoknál 'Non-stop'-ot, járműtelepeknél 'Javításra menj' parancsot ad a célponthoz. 'Menetrend megosztása' esetén a jármű megosztja az utasításait a kiválasztott járművel.
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Új utasítás beillesztése a kijelölt utasítás elé vagy a lista végére. Ctrl+Kattintás állomásoknál 'bármiből teljes rakományra vár'-t, ellenőrző pontoknál 'Non-stop'-ot, járműtelepeknél 'Javításra menj' parancsot ad a célponthoz. 'Menetrend megosztása' esetén a jármű megosztja az utasításait a kiválasztott járművel. Ha járműtelep szerepel a menetrendben, kikapcsolja az automatikus javításokat
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Megmutatja az összes járművet, amik megosztják ezt a menetrendet
 
@@ -3479,7 +3470,7 @@ STR_ORDER_NO_UNLOAD_FULL_LOAD                                   :(Ki nem rakodá
 STR_ORDER_NO_UNLOAD_FULL_LOAD_ANY                               :(Ki nem rakodás és bármiből teljes berakodás)
 STR_ORDER_NO_UNLOAD_NO_LOAD                                     :(Nincs ki- és berakodás)
 
-STR_ORDER_AUTO_REFIT                                            :(Átalakítás {STRING} rakományra)
+STR_ORDER_AUTO_REFIT                                            :(Átalakítás {STRING} szállítására)
 STR_ORDER_FULL_LOAD_REFIT                                       :(Kirakodás, mindenből teljes berakodás és átalakítás {STRING} rakományra)
 STR_ORDER_FULL_LOAD_ANY_REFIT                                   :(Kirakodás, bármiből teljes berakodás és átalakítás {STRING} rakományra)
 STR_ORDER_UNLOAD_REFIT                                          :(Kirakodás, rakományfelvétel és átalakítás {STRING} rakományra)
@@ -3508,17 +3499,19 @@ STR_INVALID_ORDER                                               :{RED} (Hibás u
 
 # Time table window
 STR_TIMETABLE_TITLE                                             :{WHITE}{VEHICLE} várakozási és menetidői
-STR_TIMETABLE_ORDER_VIEW                                        :{BLACK}Menetrend
+STR_TIMETABLE_ORDER_VIEW                                        :{BLACK}Nézetváltás
 STR_TIMETABLE_ORDER_VIEW_TOOLTIP                                :{BLACK}Átkapcsolás a menetrend utasítástáblájára
 
 STR_TIMETABLE_TOOLTIP                                           :{BLACK}Menetrend - egy utasítás kijelöléshez kattints rá
 
-STR_TIMETABLE_NO_TRAVEL                                         :Nincs utazás
-STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Megy (automata; menetrend a következő kézi utasítás alapján)
+STR_TIMETABLE_NO_TRAVEL                                         :Nincs menet
+STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Menet (automata; menetrend a következő kézi utasítás alapján)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Következő célpontig a menetidő időzítetlen
-STR_TIMETABLE_TRAVEL_FOR                                        :Következő célpontig rendelkezésre álló menetidő: {STRING}
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Menet {2:VELOCITY} max. sebességgel (nincs menetrend)
+STR_TIMETABLE_TRAVEL_FOR                                        :Menetidő: {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Menetidő: {STRING} {VELOCITY} max. sebességgel
 STR_TIMETABLE_STAY_FOR                                          :állomásra és maradj ott {STRING}ig
-STR_TIMETABLE_AND_TRAVEL_FOR                                    :és menj {STRING}
+STR_TIMETABLE_AND_TRAVEL_FOR                                    :és a menetidő: {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} nap
 STR_TIMETABLE_TICKS                                             :{COMMA} tick
 
@@ -3539,6 +3532,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}A kijel�
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Idő törlése
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}A kijelölt menetrendi sorhoz tartozó végrehajtási idő törlése
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Sebességkorlátozás megváltoztatása
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Kijelölt utasítás sebességkorlátozásának megváltoztatása
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Sebességkorlátozás törlése
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Sebességkorlátozás törlése a kijelölt utasításból
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Késés nullázása
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Késés-számláló nullázása, azaz a jármű pontos lesz
@@ -3634,6 +3633,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Bezárá
 STR_AI_SETTINGS_RESET                                           :{BLACK}Visszaállítás
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Az előző MI indításától eltelt napok száma ezen MI indításáig (megközelítőleg): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} {STRING} readme-je
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}A(z) {STRING} {STRING} változásainak listája
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}A(z) {STRING} {STRING} licence
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Readme megtekintése
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Változások listája
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licenc
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4518,6 +4527,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
@@ -4552,6 +4562,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

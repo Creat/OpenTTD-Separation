@@ -295,7 +295,7 @@ STR_SORT_BY_RANGE                                               :Rekkevidde
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Pause
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Dobbel hastighet på spelet
 STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Instillingar
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Lagre, avbryt eller avslutt spelet
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Lagre, avbryt spel, avslutt OpenTTD
 STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Syne kart, ekstra tilleggsvindauge eller skiltliste
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Syne byoversikt
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Syne subsidiar
@@ -342,7 +342,7 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Lagre scenario
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Last inn scenario
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Lagre høgdekart
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Last inn høgdekart
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Avslutt redigeringsprogram
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Avbryt redigeringsprogram
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
 STR_SCENEDIT_FILE_MENU_QUIT                                     :Avslutt
 ############ range for SE file menu starts
@@ -369,6 +369,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Gjennomsiktige 
 STR_FILE_MENU_SAVE_GAME                                         :Lagre spel
 STR_FILE_MENU_LOAD_GAME                                         :Last inn spel
 STR_FILE_MENU_QUIT_GAME                                         :Avslutt noverande spel
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Avslutt OpenTTD
 ############ range ends here
 
@@ -1801,6 +1802,10 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Du er ba
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Du vart kasta ut frå spelet
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Juksing er forbode på denne tenaren
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Du sende for mange kommandoar til serveren
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Du bruka for lang tid på å angje passord.
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Datamaskina di er for treig til å halde følge med tjenaren.
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Datamaskina di bruka for lang tid på å laste ned kartet
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Datamaskina di bruka for lang tid på å koble til tjenaren.
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :generell feil
@@ -1819,6 +1824,10 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :kasta ut av ten
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :freista å jukse
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :tenaren er full
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :sende for mange kommandoar
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :mottok inkje passord i tide
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :generelt tidsavbrot
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :nedlasting av kart tok for lang tid
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :prosessering av kartet tok for lang tid
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Mogleg tilkoblingsbrot
@@ -1918,11 +1927,11 @@ STR_CONTENT_ERROR_COULD_NOT_EXTRACT                             :{WHITE}Kunne ik
 STR_MISSING_GRAPHICS_SET_CAPTION                                :{WHITE}Manglande grafikk
 STR_MISSING_GRAPHICS_SET_MESSAGE                                :{BLACK}OpenTTD krever grafikk for å fungere, men finn han ikkje. Tillet du OpenTTD å laste ned og installere denne grafikken?
 STR_MISSING_GRAPHICS_YES_DOWNLOAD                               :{BLACK}Ja, last ned grafikken.
-STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Nei, avslutt OpenTTD.
+STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Nei, avslutt OpenTTD
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Gjennomsynsval
-STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Byt gjennomsyn for stasjonssktilt. Ctrl+klikk for å låsa.
+STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Byt gjennomsyn for stasjonssktilt. Ctrl+klikk for å låsa
 STR_TRANSPARENT_TREES_TOOLTIP                                   :{BLACK}Byt gjennomsyn for tre. Ctrl+klikk for å låsa.
 STR_TRANSPARENT_HOUSES_TOOLTIP                                  :{BLACK}Byt gjennomsyn for hus. Ctrl+klikk for å låsa.
 STR_TRANSPARENT_INDUSTRIES_TOOLTIP                              :{BLACK}Byt gjennomsyn for industriar. Ctrl+klikk for å låsa.
@@ -1939,8 +1948,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Av
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}På
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Gøym dekningsområdet til den foreslåtte plasseringa
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Syne dekningsområdet til den foreslåtte plasseringa
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Godtek: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Forsyningar: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Godtek: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Forsyningar: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Spleisa stasjonen
@@ -2133,7 +2142,7 @@ STR_OBJECT_CLASS_TRNS                                           :Radiosendarar
 
 # Tree planting window (last two for SE only)
 STR_PLANT_TREE_CAPTION                                          :{WHITE}Tre
-STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Vel typen tre som skal plantast
+STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Vel typen tre som skal plantast. Om ruta allereie har eit tre, vil dette leggje til fleire tre av ulike typar uavhengig av den valde typen
 STR_TREES_RANDOM_TYPE                                           :{BLACK}Tre av tilfeldig type
 STR_TREES_RANDOM_TYPE_TOOLTIP                                   :{BLACK}Plasser tre av tilfeldig type. Skift vekslar mellom byggjing/syning av prisoverslag.
 STR_TREES_RANDOM_TREES_BUTTON                                   :{BLACK}Tilfeldige tre
@@ -2450,11 +2459,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Flytt ne
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Flytt den valde NewGRF-fila nedover lista
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Ei liste over NewGRF-filene som er installert.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Vis lesmeg
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Endringslogg
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Lisens
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Set parametrar
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Vis parametrar
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Syne/gøym palett
@@ -2485,11 +2489,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Set alle
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parameter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Antal parametrar: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF lesmeg for {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF endringslogg for {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF lisens for {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspiser - {STRING}
@@ -2534,9 +2533,16 @@ STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} Tren
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :GRF fila den var laga for å omsetje
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :For mange NewGRF-er lasta inn.
 STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Å laste inn {1:STRING} som statisk NewGRF med {STRING} kan forårsaka synkroniseringsfeil.
+STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Uventa sprite (sprite {3:NUM})
+STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Ukjend handling 0 eigenskap {4:HEX} (sprite {3:NUM})
+STR_NEWGRF_ERROR_INVALID_ID                                     :Forsøk på å bruke ugyldig ID (sprite {3:NUM})
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} inneheld øydelagd grafikk. All øydelagd grafikk vil bli vist som raude spørsmålsteikn (?).
+STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Inneheld fleire tilfelle av handling 8 (sprite {3:NUM})
+STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lest forbi slutten av pseudo-sprite (sprite {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Det nåværande grafikksettet manglar ein del bilete.{}Vennligst oppdater grafikksettet.
+STR_NEWGRF_ERROR_GRM_FAILED                                     :Etterspurde GRF-ressursar ikkje tilgjengeleg (sprite {3:NUM})
 STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} vart deaktivert av {STRING}
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Ugyldig/ukjend sprite layout-format (sprite {3:NUM})
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Åtvaring!
@@ -2666,6 +2672,9 @@ STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Klikk p�
 
 # Goal question window
 STR_GOAL_QUESTION_CAPTION_QUESTION                              :Spørsmål
+STR_GOAL_QUESTION_CAPTION_INFORMATION                           :Informasjon
+STR_GOAL_QUESTION_CAPTION_WARNING                               :Åtvaring
+STR_GOAL_QUESTION_CAPTION_ERROR                                 :Feil
 
 ### Start of Goal Question button list
 STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Avbryt
@@ -2715,7 +2724,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Aksepterer
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Syne liste over godtekne varer
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Godtek: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Godtek: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Vurderingar
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Syne stasjonsvurdering
@@ -2824,8 +2833,8 @@ STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP                         :{BLACK}Byt namn
 
 STR_COMPANY_VIEW_BUY_SHARE_BUTTON                               :{BLACK}Kjøp 25{NBSP}% av aksjane i firmaet
 STR_COMPANY_VIEW_SELL_SHARE_BUTTON                              :{BLACK}Sel 25{NBSP}% av aksjane i firmaet
-STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Kjøp 25{NBSP}% av aksjane i firmaet. Skift-klikk viser prisoverslag utan å kjøpe aksjar.
-STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Sel 25{NBSP}% av aksjane i firmaet. Skift-klikk viser prisoverslag utan å selje aksjar.
+STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Kjøp 25{NBSP}% av aksjane i firmaet. Skift-klikk viser prisoverslag utan å kjøpe aksjar
+STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Sel 25{NBSP}% av aksjane i firmaet. Skift-klikk viser prisoverslag utan å selje aksjar
 
 STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Firmanamn
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Namnet til sjefen
@@ -2960,9 +2969,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Vekt: {G
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Kostnad: {GOLD}{CURRENCY_LONG}{BLACK} Hastigheit: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Kapasitet: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Lokomotivvogner: {GOLD}+{POWER}{BLACK} Vekt: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Ombyggbart til: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Ombyggbart til: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Alle varetypar
-STR_PURCHASE_INFO_ALL_BUT                                       :Alt utanom {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Alt utanom {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Maks. trekkraft: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Rekkevidde: {GOLD}{COMMA} ruter
 
@@ -3045,7 +3054,7 @@ STR_DEPOT_CLONE_SHIP                                            :{BLACK}Klon ski
 STR_DEPOT_CLONE_AIRCRAFT                                        :{BLACK}Klon luftfartøy
 
 STR_DEPOT_CLONE_TRAIN_DEPOT_INFO                                :{BLACK}Dette vil lage ein kopi av eit lokomotiv inkludert alle vognene. Klikk på denne knappen og etter det på eit anna tog. Ctrl+klikk deler ordrane. Skift+klikk syner prisoverslag utan å kjøpe.
-STR_DEPOT_CLONE_ROAD_VEHICLE_DEPOT_INFO                         :{BLACK}Dette vil lage ein kopi av eit køyretøy. Klikk denne knappen og etter det på eit anna køyretøy. Ctrl+klikk deler ordrane. Skift+klikk syner prisoverslag utan å kjøpe.
+STR_DEPOT_CLONE_ROAD_VEHICLE_DEPOT_INFO                         :{BLACK}Dette vil lage ein kopi av eit køyretøy. Klikk denne knappen og etter det på eit køyretyg inni eller utanfor garasjen. Ctrl+klikk deler ordrane. Skift+klikk syner prisoverslag utan å kjøpe
 STR_DEPOT_CLONE_SHIP_DEPOT_INFO                                 :{BLACK}Dette vil laga ein kopi av eit skip. Klikk på denne knappen og etter det på eit anna skip. Ctrl+klikk deler ordrane. Skift+klikk syner prisoverslag utan å kjøpe.
 STR_DEPOT_CLONE_AIRCRAFT_INFO_HANGAR_WINDOW                     :{BLACK}Dette vil lage ein kopi av eit luftfartøy. Klikk denne knappen og etter det på eit anna luftfartøy. Ctrl+klikk deler ordrane. Skift+klikk syner prisoverslag utan å kjøpe.
 
@@ -3209,7 +3218,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Overskud
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Pålitelegheit: {LTBLUE}{COMMA}{NBSP}%  {BLACK}Havari sidan sist vedlikehald: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Bygd: {LTBLUE}{NUM}{BLACK} Verdi: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapasitet: {LTBLUE}Ingen
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapasitet: {LTBLUE}Ingen{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Kapasitet: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Kapasitet: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Kapasitet:{LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3356,7 +3365,7 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Køyr til næra
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Gå til næraste hangar
 STR_ORDER_CONDITIONAL                                           :Betinga ordrehopp
 STR_ORDER_SHARE                                                 :Del ordrar
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Set inn ein ny ordre før den valde ordren, eller legg til i slutten av lista. Ctrl gjer ordren 'full last, einkvar varetype', kontrollpunktordre 'direkte' og verkstadsordre 'vedlikehald'. 'Del ordre' eller Ctrl let dette køyretyget dele ordrer med det valde køyretyget. Ved å klikke på eit køyretyg, kopierast ordrene frå dette køyretyget.
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Set inn ein ny ordre før den valde ordren, eller legg til i slutten av lista. Ctrl gjer ordren 'full last, einkvar varetype', kontrollpunktordre 'direkte' og verkstadsordre 'vedlikehald'. 'Del ordre' eller Ctrl let dette køyretyget dele ordrer med det valde køyretyget. Ved å klikke på eit køyretyg, kopierast ordrene frå dette køyretyget. Ein verkstadsordre slår av automatisk vedlikehald av kjøyretyget
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Syne alle køyretøy som delar denne ruteplanen
 
@@ -3436,7 +3445,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Rutetabe
 STR_TIMETABLE_NO_TRAVEL                                         :Ingen reise
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Reis (automatisk; blir sett på ruteplan med neste manuelle ordre)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Reis (ikkje på rutetabell)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Reis med maks {2:VELOCITY} (utan rutetabell)
 STR_TIMETABLE_TRAVEL_FOR                                        :Reis i {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Reis i {STRING} med maks {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :og bli værande i {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :og reis i {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} dag{P "" ar}
@@ -3459,6 +3470,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Byt tida
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Fjern Tid
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Fjern tida den merka ordra skal bruke
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Byt fartsgrense
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Byt maks reisehastigheit for den merka ordra
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Fjern fartsgrense
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Fjern maks reisehastigheit for den merka ordra
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Still attende teljaren for forseining
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Still attende teljaren for forseining, slik at køyretøyet vert presis
@@ -3554,6 +3571,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Lukk
 STR_AI_SETTINGS_RESET                                           :{BLACK}Tilbakestill
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Antall dagar denne AIen skal starte etter den førre (ca): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} lesmeg for {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} endringslogg for {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} lisens for {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Vis lesmeg
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Endringslogg
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Lisens
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}{NBSP}%{UP_ARROW}
@@ -4397,6 +4424,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
@@ -4431,6 +4459,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

@@ -174,6 +174,7 @@ struct TimetableWindow : Window {
 	uint deparr_time_width;               ///< The width of the departure/arrival time
 	uint deparr_abbr_width;               ///< The width of the departure/arrival abbreviation
 	Scrollbar *vscroll;
+	bool query_is_speed_query; ///< The currently open query window is a speed query and not a time query.
 	TTSepSettings new_sep_settings;       ///< Contains new separation settings.
 	VehicleTimetableWidgets query_widget; ///< Required to determinate source of input query
 
@@ -334,9 +335,12 @@ struct TimetableWindow : Window {
 					disable = order == NULL || ((!order->IsType(OT_GOTO_STATION) || (order->GetNonStopType() & ONSF_NO_STOP_AT_DESTINATION_STATION)) && !order->IsType(OT_CONDITIONAL));
 				}
 			}
+			bool disable_speed = disable || selected % 2 != 1 || v->type == VEH_AIRCRAFT;
 
 			this->SetWidgetDisabledState(WID_VT_CHANGE_TIME, disable);
 			this->SetWidgetDisabledState(WID_VT_CLEAR_TIME, disable);
+			this->SetWidgetDisabledState(WID_VT_CHANGE_SPEED, disable_speed);
+			this->SetWidgetDisabledState(WID_VT_CLEAR_SPEED, disable_speed);
 			this->SetWidgetDisabledState(WID_VT_SHARED_ORDER_LIST, !v->IsOrderListShared());
 
 			this->EnableWidget(WID_VT_START_DATE);
@@ -346,6 +350,8 @@ struct TimetableWindow : Window {
 			this->DisableWidget(WID_VT_START_DATE);
 			this->DisableWidget(WID_VT_CHANGE_TIME);
 			this->DisableWidget(WID_VT_CLEAR_TIME);
+			this->DisableWidget(WID_VT_CHANGE_SPEED);
+			this->DisableWidget(WID_VT_CLEAR_SPEED);
 			this->DisableWidget(WID_VT_RESET_LATENESS);
 			this->DisableWidget(WID_VT_AUTOFILL);
 			this->DisableWidget(WID_VT_SHARED_ORDER_LIST);
@@ -420,11 +426,12 @@ struct TimetableWindow : Window {
 							string = STR_TIMETABLE_NOT_TIMETABLEABLE;
 							colour = ((i == selected) ? TC_SILVER : TC_GREY) | TC_NO_SHADE;
 						} else if (order->travel_time == 0) {
-							string = STR_TIMETABLE_TRAVEL_NOT_TIMETABLED;
+							string = order->max_speed != UINT16_MAX ? STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED : STR_TIMETABLE_TRAVEL_NOT_TIMETABLED;
 						} else {
 							SetTimetableParams(0, 1, order->travel_time);
-							string = STR_TIMETABLE_TRAVEL_FOR;
+							string = order->max_speed != UINT16_MAX ? STR_TIMETABLE_TRAVEL_FOR_SPEED : STR_TIMETABLE_TRAVEL_FOR;
 						}
+						SetDParam(2, order->max_speed);
 
 						DrawString(rtl ? r.left + WD_FRAMERECT_LEFT : middle, rtl ? middle : r.right - WD_FRAMERECT_LEFT, y, string, colour);
 
@@ -588,14 +595,14 @@ struct TimetableWindow : Window {
 		}
 	}
 
-	static inline uint32 PackTimetableArgs(const Vehicle *v, uint selected)
+	static inline uint32 PackTimetableArgs(const Vehicle *v, uint selected, bool speed)
 	{
 		uint order_number = (selected + 1) / 2;
-		uint is_journey   = (selected % 2 == 1) ? 1 : 0;
+		ModifyTimetableFlags mtf = (selected % 2 == 1) ? (speed ? MTF_TRAVEL_SPEED : MTF_TRAVEL_TIME) : MTF_WAIT_TIME;
 
 		if (order_number >= v->GetNumOrders()) order_number = 0;
 
-		return v->index | (order_number << 20) | (is_journey << 28);
+		return v->index | (order_number << 20) | (mtf << 28);
 	}
 
 	virtual void OnClick(Point pt, int widget, int click_count)
@@ -638,13 +645,40 @@ struct TimetableWindow : Window {
 				}
 
 				this->query_widget = WID_VT_CHANGE_TIME;
+				this->query_is_speed_query = false;
 				ShowQueryString(current, STR_TIMETABLE_CHANGE_TIME, 31, this, CS_NUMERAL, QSF_NONE);
 				break;
 			}
 
-			case WID_VT_CLEAR_TIME: { // Clear waiting time button.
-				uint32 p1 = PackTimetableArgs(v, this->sel_index);
+			case WID_VT_CHANGE_SPEED: { // Change max speed button.
+				int selected = this->sel_index;
+				VehicleOrderID real = (selected + 1) / 2;
+
+				if (real >= v->GetNumOrders()) real = 0;
+
+				StringID current = STR_EMPTY;
+				const Order *order = v->GetOrder(real);
+				if (order != NULL) {
+					if (order->max_speed != UINT16_MAX) {
+						SetDParam(0, ConvertKmhishSpeedToDisplaySpeed(order->max_speed));
+						current = STR_JUST_INT;
+					}
+				}
+
+				this->query_is_speed_query = true;
+				ShowQueryString(current, STR_TIMETABLE_CHANGE_SPEED, 31, this, CS_NUMERAL, QSF_NONE);
+				break;
+			}
+
+			case WID_VT_CLEAR_TIME: { // Clear waiting time.
+				uint32 p1 = PackTimetableArgs(v, this->sel_index, false);
 				DoCommandP(0, p1, 0, CMD_CHANGE_TIMETABLE | CMD_MSG(STR_ERROR_CAN_T_TIMETABLE_VEHICLE));
+				break;
+			}
+
+			case WID_VT_CLEAR_SPEED: { // Clear max speed button.
+				uint32 p1 = PackTimetableArgs(v, this->sel_index, true);
+				DoCommandP(0, p1, UINT16_MAX, CMD_CHANGE_TIMETABLE | CMD_MSG(STR_ERROR_CAN_T_TIMETABLE_VEHICLE));
 				break;
 			}
 
@@ -703,12 +737,16 @@ struct TimetableWindow : Window {
 		case WID_VT_CHANGE_TIME: {
 			const Vehicle *v = this->vehicle;
 
-			uint32 p1 = PackTimetableArgs(v, this->sel_index);
+		uint32 p1 = PackTimetableArgs(v, this->sel_index, this->query_is_speed_query);
 
-			uint64 time = strtoul(str, NULL, 10);
-			if (!_settings_client.gui.timetable_in_ticks) time *= DAY_TICKS;
+		uint64 val = StrEmpty(str) ? 0 : strtoul(str, NULL, 10);
+		if (this->query_is_speed_query) {
+			val = ConvertDisplaySpeedToKmhishSpeed(val);
+		} else {
+			if (!_settings_client.gui.timetable_in_ticks) val *= DAY_TICKS;
+		}
 
-			uint32 p2 = minu(time, UINT16_MAX);
+		uint32 p2 = minu(val, UINT16_MAX);
 
 			DoCommandP(0, p1, p2, CMD_CHANGE_TIMETABLE | CMD_MSG(STR_ERROR_CAN_T_TIMETABLE_VEHICLE));
 			break;
@@ -789,6 +827,10 @@ static const NWidgetPart _nested_timetable_widgets[] = {
 			NWidget(NWID_VERTICAL, NC_EQUALSIZE),
 				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_CHANGE_TIME), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_CHANGE_TIME, STR_TIMETABLE_WAIT_TIME_TOOLTIP),
 				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_CLEAR_TIME), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_CLEAR_TIME, STR_TIMETABLE_CLEAR_TIME_TOOLTIP),
+			EndContainer(),
+			NWidget(NWID_VERTICAL, NC_EQUALSIZE),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_CHANGE_SPEED), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_CHANGE_SPEED, STR_TIMETABLE_CHANGE_SPEED_TOOLTIP),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_CLEAR_SPEED), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_CLEAR_SPEED, STR_TIMETABLE_CLEAR_SPEED_TOOLTIP),
 			EndContainer(),
 			NWidget(NWID_VERTICAL, NC_EQUALSIZE),
 				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VT_START_DATE), SetResize(1, 0), SetFill(1, 1), SetDataTip(STR_TIMETABLE_STARTING_DATE, STR_TIMETABLE_STARTING_DATE_TOOLTIP),

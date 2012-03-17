@@ -695,11 +695,11 @@ STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Budowa l
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Zmiana terenu, podwyższanie/obniżanie lądu, sadzenie drzew, itp.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Pokaż okno dźwięk/muzyka
 STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Pokaż ostatnią wiadomość/ogłoszenie, pokaż ustawienia wiadomości
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Informacje o terenie, konsola, ustawienia SI, zrzut ekranu, o grze OpenTTD
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Informacje o terenie, konsola, debugowanie skryptów, zrzut ekranu, o grze OpenTTD
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Przełącz paski narzędzi
 
 # Extra tooltips for the scenario editor toolbar
-STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Zapis scenariusza, wczytanie scenariusza, wyjście z edytora, wyjście
+STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Zapis scenariusza, wczytanie scenariusza, opuść edytor, wyjście
 STR_SCENEDIT_TOOLBAR_OPENTTD                                    :{YELLOW}OpenTTD
 STR_SCENEDIT_TOOLBAR_SCENARIO_EDITOR                            :{YELLOW}Edytor scenariuszy
 STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD    :{BLACK}Zmień datę początkową do tyłu o 1 rok
@@ -719,7 +719,7 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Zapisz scenariu
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Wczytaj scenariusz
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Zapisz mapę wysokości
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Wczytaj mapę wysokości
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Wyjdź z edytora
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Opuść edytor scenariuszy
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
 STR_SCENEDIT_FILE_MENU_QUIT                                     :Wyjście
 ############ range for SE file menu starts
@@ -728,7 +728,7 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :Wyjście
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Opcje gry
 STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Ustawienia trudności
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Ustawienia zaawanasowane
-STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :SI / Ustawienia gry
+STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :Ustawienia SI / Game Script
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :Ustawienia NewGRF
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Opcje przeźroczystości
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Wyświetlanie nazw miast
@@ -746,6 +746,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Przeźroczyste 
 STR_FILE_MENU_SAVE_GAME                                         :Zapisz grę
 STR_FILE_MENU_LOAD_GAME                                         :Wczytaj grę
 STR_FILE_MENU_QUIT_GAME                                         :Opuść grę
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Wyjście
 ############ range ends here
 
@@ -823,7 +824,7 @@ STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :Poprzednie wiad
 STR_ABOUT_MENU_LAND_BLOCK_INFO                                  :Informacje o terenie
 STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Przełącz konsolę
-STR_ABOUT_MENU_AI_DEBUG                                         :Debugowanie SI / GameScript
+STR_ABOUT_MENU_AI_DEBUG                                         :Debugowanie SI / Game Script
 STR_ABOUT_MENU_SCREENSHOT                                       :Zrzut ekranu
 STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Pełne przybliżenie na screenshocie
 STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Screenshot z przybliżeniem domyślnym
@@ -1788,7 +1789,7 @@ STR_INTRO_DIFFICULTY                                            :{BLACK}Trudnoś
 STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Ustawienia zaawansowane
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}Ustawienia NewGRF
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Sprawdź dodatki online
-STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}SI / Ustawienia gry
+STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}Ustawienia SI/Game Script
 STR_INTRO_QUIT                                                  :{BLACK}Wyjście
 
 STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Rozpocznij nową grę. Ctrl+klik pomija konfigurowanie mapy
@@ -1808,7 +1809,7 @@ STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}Wyświet
 STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Wyświetl ustawienia zaawansowane
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Wyświetl ustawienia NewGRF
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Poszukaj nowych lub zaktualizowanych dodatków do pobrania
-STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Wyświetla SI oraz ustawienia gry
+STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Pokaż ustawienia SI / Game Script
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Wyjdź z 'OpenTTD'
 
 STR_INTRO_TRANSLATION                                           :{BLACK}Tej wersji językowej brakuje jeszcze {NUM} wpis{P "" y ów}. Możesz pomóc ulepszyć nam OpenTTD rejestrując się jako tłumacz. Szczegóły znajdziesz w pliku readme.txt.
@@ -2180,9 +2181,9 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Zostałe
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Ułatwienia są niedozwolone na tym serwerze
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Wysyłano zbyt dużo komend na serwer
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Zbyt długo wprowadzałeś hasło
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Twój komputer zbyt długo probował się połączyć
-STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Pobieranie mapy trwało zbyt długo
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Zbyt długo łączyłeś się do serwera
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Twój komputer jest zbyt wolny, by nadążyć za serwerem
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Twój komputer zbyt długo pobierał mapę
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Twój komputer zbyt długo łączył się z serwerem
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :błąd ogólny
@@ -2325,8 +2326,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Wył.
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Wł.
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Nie podświetlaj zasięgu projektowanej stacji
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Podświetl zasięg projektowanej stacji
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Akceptuje: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Zasoby: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Akceptuje: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Zasoby: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Połącz stację
@@ -2836,11 +2837,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Na dół
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Przesuń zaznaczony plik NewGRF na dół listy
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Lista zainstalowanych plików NewGRF.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Odczytaj plik readme
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Lista zmian
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licencja
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Ustaw parametry
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Pokaż parametry
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Zmień paletę
@@ -2871,11 +2867,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Przywró
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parametr {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Liczba parametrów: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}'CzytajTo' dla {STRING} NewGRF
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}Zmiany w NewGRF dla {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}Licencja dla {STRING} NewGRF
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Zbadaj - {STRING}
@@ -3111,7 +3102,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Akceptuje
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Pokaż listę akceptowanych ładunków
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Akceptuje: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Akceptuje: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Oceny
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Pokaż ocenę stacji
@@ -3356,9 +3347,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Waga: {G
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Koszt: {GOLD}{CURRENCY_LONG}{BLACK} Prędkość: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Pojemność: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Moc: {GOLD}+{POWER}{BLACK} Waga: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Można przebudować na: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Można przystosować do: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Wszystkie typy ładunków
-STR_PURCHASE_INFO_ALL_BUT                                       :Wszystko oprócz {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Wszystko oprócz {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Max. Siła Pociągowa: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Zasięg: {GOLD}{COMMA} pól
 
@@ -3611,7 +3602,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Zysk w t
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Niezawodność: {LTBLUE}{COMMA}%  {BLACK}Awarie od ostatniego serwisowania: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Zakupiony: {LTBLUE}{NUM}{BLACK} Wartość: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Pojemność: {LTBLUE}Żadna
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Pojemność: {LTBLUE}Żadna{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Ładowność: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Ładowność: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Ładowność: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3758,7 +3749,7 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Jedź do najbli
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Lec do najblizszego hangaru
 STR_ORDER_CONDITIONAL                                           :Warunkowy skok poleceń
 STR_ORDER_SHARE                                                 :Współdzielenie poleceń
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Wstaw nowe polecenie na końcu listy lub przed zaznaczonym poleceniem. Ctrl ustawia polecenia stacji na 'pełen załadunek dowolnego towaru', polecenia pkt. orientacyjnych na 'bez zatrzymywania się', a polecenia zajezdni na 'serwisuj'. 'Współdzielenie poleceń' lub Ctrl pozwala na dzielenie poleceń z wybranym pojazdem. Kliknięcie pojazdu kopiuje jego polecenia
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Wstaw nowe polecenie na końcu listy lub przed zaznaczonym poleceniem. Ctrl ustawia polecenia stacji na 'pełen załadunek dowolnego towaru', polecenia pkt. orientacyjnych na 'bez zatrzymywania się', a polecenia zajezdni na 'serwisuj'. 'Współdzielenie poleceń' lub Ctrl pozwala na dzielenie poleceń z wybranym pojazdem. Kliknięcie pojazdu kopiuje jego polecenia. Polecenie zajezdni wyłącza automatyczne serwisowanie pojazdu
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Pokaż wszystkie pojazdy współdzielące te polecenia
 
@@ -3838,7 +3829,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Rozkład
 STR_TIMETABLE_NO_TRAVEL                                         :Nie podróżuje
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Podróż (automatycznie; zaplanowana przez następny ręczny rozkaz)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Przejazd (bez ustalonego czasu)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Podróżuj z maksymalną prędkością {2:VELOCITY} (poza rozkładem)
 STR_TIMETABLE_TRAVEL_FOR                                        :Przejazd przez {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Podróżuj przez {STRING} z maksymalną prędkością {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :i zostań tam przez {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :i podróżuje przez{STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} d{P zień ni ni}
@@ -3861,6 +3854,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Zmień i
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Usuń czas
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Usuń ilość czasu przeznaczoną na zaznaczone zadanie
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Zmień Limit Prędkości
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Zmień maksymalną prędkość podróży wybranego polecenia
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Wyczyść Limit Prędkości
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Wyczyść maksymalną prędkość podróży wybranego polecenia
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Wyzeruj spóźnienia
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Wyzeruj licznik spóźnienia, aby pojazd podróżował zgodnie z rozkładem jazdy
@@ -3886,7 +3885,7 @@ STR_DATE_YEAR_TOOLTIP                                           :{BLACK}Wybierz 
 
 
 # AI debug window
-STR_AI_DEBUG                                                    :{WHITE}Debugowanie SI / GameScript
+STR_AI_DEBUG                                                    :{WHITE}Debugowanie SI / Game Script
 STR_AI_DEBUG_NAME_AND_VERSION                                   :{BLACK}{STRING} (v{NUM})
 STR_AI_DEBUG_NAME_TOOLTIP                                       :{BLACK}Nazwa skryptu
 STR_AI_DEBUG_SETTINGS                                           :{BLACK}Ustawienia
@@ -3907,11 +3906,11 @@ STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Sprawdź
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Nie znaleziono SI do wczytania.{}SI jest nieaktywne i nic nie robi.{}Możesz ściągnąć SI z 'Dodatki Online' w głównym menu gry
 STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Jeden z uruchomionych skryptów przestał działać. Prosimy o zgłoszenie tego autorowi skryptu dołączając zrzut ekranu okna debugowania SI / GameScript
-STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Okno debugowania SI / GameScript jest dostępne tylko na serwerze
+STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Okno debugowania SI / Game Script jest dostępne tylko na serwerze
 
 # AI configuration window
-STR_AI_CONFIG_CAPTION                                           :{WHITE}Konfiguracja SI / gry
-STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Skrypt gry, który zostanie załadowany podczas kolejnej gry
+STR_AI_CONFIG_CAPTION                                           :{WHITE}Konfiguracja SI / Game Script
+STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Game Script, który zostanie załadowany dla następnej gry
 STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}SI, które zostaną załadowane podczas kolejnej gry
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Ludzki gracz
 STR_AI_CONFIG_RANDOM_AI                                         :Losowe SI
@@ -3922,13 +3921,13 @@ STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Przesuń
 STR_AI_CONFIG_MOVE_DOWN                                         :{BLACK}Przesuń w dół
 STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}Przesuń wybraną SI w dół listy
 
-STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}GameScript
+STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}Game Script
 STR_AI_CONFIG_AI                                                :{SILVER}SI
 
 STR_AI_CONFIG_CHANGE                                            :{BLACK}Wybierz {STRING}
 STR_AI_CONFIG_CHANGE_NONE                                       :
 STR_AI_CONFIG_CHANGE_AI                                         :SI
-STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :Skrypt gry
+STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :Game Script
 STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Wczytaj kolejny skrypt
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Konfiguruj
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Konfiguruj parametry skryptu
@@ -3936,7 +3935,7 @@ STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Konfigur
 # Available AIs window
 STR_AI_LIST_CAPTION                                             :{WHITE}Dostępny {STRING}
 STR_AI_LIST_CAPTION_AI                                          :Gracze SI
-STR_AI_LIST_CAPTION_GAMESCRIPT                                  :Skrypt gry
+STR_AI_LIST_CAPTION_GAMESCRIPT                                  :Game Script'y
 STR_AI_LIST_TOOLTIP                                             :{BLACK}Kliknij, aby wybrać skrypt
 
 STR_AI_LIST_AUTHOR                                              :{BLACK}Autor: {STRING}
@@ -3951,11 +3950,21 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Nie zmie
 # AI Parameters
 STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parametry
 STR_AI_SETTINGS_CAPTION_AI                                      :SI
-STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Skrypt gry
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Game Script
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Zamknij
 STR_AI_SETTINGS_RESET                                           :{BLACK}Resetuj
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Liczba dni, które odczekuje SI przed aktywacją po uruchomieniu poprzedniego (zwiększ lub zmniejsz): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}'CzytajTo' dla {STRING} {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}Zmiany w {STRING} dla {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}Licencja dla {STRING} {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Odczytaj plik readme
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Lista zmian
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licencja
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4835,6 +4844,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
@@ -4869,6 +4879,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

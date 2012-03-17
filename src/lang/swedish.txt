@@ -293,7 +293,7 @@ STR_SORT_BY_RANGE                                               :Räckvidd
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Pausa spelet
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Snabbspola spelet
 STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Inställningar
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Spara spelet, avbryt spelet, avsluta spelet
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Spara spelet, avsluta spelet, avsluta
 STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Visa karta, extra vyfönster eller skyltlista
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Visa lista över städer
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Visa subventioner
@@ -320,7 +320,7 @@ STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Markinfo
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Byt verktygsrad
 
 # Extra tooltips for the scenario editor toolbar
-STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Spara scenario, öppna scenario, avbryt scenarioeditor, avsluta
+STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Spara scenario, öppna scenario, avsluta scenarioeditor, avsluta OpenTTD
 STR_SCENEDIT_TOOLBAR_OPENTTD                                    :{YELLOW}OpenTTD
 STR_SCENEDIT_TOOLBAR_SCENARIO_EDITOR                            :{YELLOW}Scenarioeditor
 STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD    :{BLACK}Flytta startdatumet 1 år bakåt
@@ -340,7 +340,7 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Spara scenario
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Öppna scenario
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Spara höjdkarta
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Ladda höjdkarta
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Avsluta editor
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Avsluta scenarioeditor
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
 STR_SCENEDIT_FILE_MENU_QUIT                                     :Avsluta
 ############ range for SE file menu starts
@@ -360,13 +360,14 @@ STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Motståndarnas 
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Full animering
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Full detaljnivå
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Genomskinliga byggnader
-STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Genomskinliga stationsskyltar
+STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Genomskinliga skyltar
 ############ range ends here
 
 ############ range for file menu starts
 STR_FILE_MENU_SAVE_GAME                                         :Spara spelet
 STR_FILE_MENU_LOAD_GAME                                         :Ladda ett spel
 STR_FILE_MENU_QUIT_GAME                                         :Avsluta spelet
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Avsluta
 ############ range ends here
 
@@ -447,6 +448,7 @@ STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Visa/dölj kons
 STR_ABOUT_MENU_AI_DEBUG                                         :Felsökning av AI / spelskript
 STR_ABOUT_MENU_SCREENSHOT                                       :Skärmdump
 STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Fullt inzoomad skärmdump
+STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Normalt inzoomad skärmdump
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Skärmdump av hela kartan
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Om 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Justering av spriteobjekt
@@ -1434,7 +1436,7 @@ STR_INTRO_TRANSLATION                                           :{BLACK}Den här
 
 # Quit window
 STR_QUIT_CAPTION                                                :{WHITE}Avsluta
-STR_QUIT_ARE_YOU_SURE_YOU_WANT_TO_EXIT_OPENTTD                  :{YELLOW}Vill du verkligen avsluta spelet och återvända till {STRING}?
+STR_QUIT_ARE_YOU_SURE_YOU_WANT_TO_EXIT_OPENTTD                  :{YELLOW}Vill du verkligen avsluta OpenTTD och återvända till {STRING}?
 STR_QUIT_YES                                                    :{BLACK}Ja
 STR_QUIT_NO                                                     :{BLACK}Nej
 
@@ -1798,6 +1800,10 @@ STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Du är b
 STR_NETWORK_ERROR_KICKED                                        :{WHITE}Du blev utkastad från spelet
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Fusk är inte tillåtet på denna server
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Du skickade för många kommandon till servern
+STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Du tog för lång tid på dig att mata in löserondet
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Din dator tog för lång tid på sig för att ansluta
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Du tog för lång tid på dig att ladda ner kartan
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Du tog för lång tid på dig att ansluta till servern
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :allmänt fel
@@ -1816,6 +1822,10 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :utkastad av ser
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :försökte fuska
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :servern är full
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :skickade för många kommandon
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :inget lösenord togs emot i tid
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :generell timeout
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :nedladdning av kartan tog för lång tid
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :bearbetning av kartan tog för lång tid
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Anslutningen har troligtvis försvunnit
@@ -1919,7 +1929,7 @@ STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Nej, avs
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Genomskinlighetsinställningar
-STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Växla genomskinlighet för stationsskyltar. Ctrl+klick för att låsa
+STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Växla genomskinlighet för skyltar. Ctrl+klick för att låsa
 STR_TRANSPARENT_TREES_TOOLTIP                                   :{BLACK}Växla genomskinlighet för träd. Ctrl+klick för att låsa
 STR_TRANSPARENT_HOUSES_TOOLTIP                                  :{BLACK}Växla genomskinlighet för byggnader. Ctrl+klick för att låsa
 STR_TRANSPARENT_INDUSTRIES_TOOLTIP                              :{BLACK}Växla genomskinlighet för industrier. Ctrl+klick för att låsa
@@ -1936,8 +1946,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Av
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}På
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Markera inte upptagningsområde för stationen
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Markera stationens upptagningsområde
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Accepterar: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Tillhandahåller: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Accepterar: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Tillhandahåller: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Slå ihop stationer
@@ -2060,9 +2070,9 @@ STR_STATION_BUILD_BUS_ORIENTATION                               :{WHITE}Riktinin
 STR_STATION_BUILD_BUS_ORIENTATION_TOOLTIP                       :{BLACK}Välj riktning för busshållplats
 STR_STATION_BUILD_TRUCK_ORIENTATION                             :{WHITE}Riktning för lastbrygga
 STR_STATION_BUILD_TRUCK_ORIENTATION_TOOLTIP                     :{BLACK}Välj riktning för lastbrygga
-STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION                    :{WHITE}Riktning för passagerarspårvagn
+STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION                    :{WHITE}Riktning för passagerarspårvagnsstation
 STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION_TOOLTIP            :{BLACK}Välj passagerarspårvagnsstationens orientering
-STR_STATION_BUILD_CARGO_TRAM_ORIENTATION                        :{WHITE}Riktning för godsspårvagn
+STR_STATION_BUILD_CARGO_TRAM_ORIENTATION                        :{WHITE}Riktning för godspårvagnsstation
 STR_STATION_BUILD_CARGO_TRAM_ORIENTATION_TOOLTIP                :{BLACK}Välj godsspårvagnsstationens orientering
 
 # Waterways toolbar (last two for SE only)
@@ -2130,7 +2140,7 @@ STR_OBJECT_CLASS_TRNS                                           :Sändare
 
 # Tree planting window (last two for SE only)
 STR_PLANT_TREE_CAPTION                                          :{WHITE}Träd
-STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Välj trädtyp att plantera
+STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Välj trädtyp att plantera. Om rutan redan har ett träd, kommer ytterliggare träd att vara av slumpmässig typ oberoende av vilken trädtyp som valts
 STR_TREES_RANDOM_TYPE                                           :{BLACK}Träd av slumpvald typ
 STR_TREES_RANDOM_TYPE_TOOLTIP                                   :{BLACK}Placera träd av slumpvald typ. Shift växlar mellan att placera träd/visa beräknad kostnad
 STR_TREES_RANDOM_TREES_BUTTON                                   :{BLACK}Slumpmässigt träd
@@ -2447,11 +2457,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Flytta n
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Flytta ner den markerade NewGRF-filen i listan
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}En lista med installerade NewGRF-filer.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Visa manual
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Ändringshistorik
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licens
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Parametrar
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Visa parametrar
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Byt palett
@@ -2482,11 +2487,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Återst�
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parameter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Antal parametrar: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE} NewGRF-manual för {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}Ändringshistorik för NewGRF {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}Licens för NewGRF{STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspektera - {STRING}
@@ -2722,7 +2722,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Accepterar
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Visa lista över accepterat gods
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accepterar: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accepterar: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Värderingar
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Visa stationens klassificering
@@ -2967,9 +2967,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Vikt: {G
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Kostnad: {GOLD}{CURRENCY_LONG}{BLACK} Hastighet: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Kapacitet: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Motoriserade vagnar: {GOLD}+{POWER}{BLACK} Vikt: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Anpassningsbar till: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Anpassningsbar till: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Alla typer av last
-STR_PURCHASE_INFO_ALL_BUT                                       :Allt utom {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Allt utom {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Maximal Dragkraft: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Räckvidd: {GOLD}{COMMA} rutor
 
@@ -3216,7 +3216,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Vinst de
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Tillförlitlighet: {LTBLUE}{COMMA}%  {BLACK}Motorstopp sedan senaste servicen: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Bygt: {LTBLUE}{NUM}{BLACK} Värde: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapacitet: {LTBLUE}Ingen
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapacitet: {LTBLUE}Ingen{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Kapacitet: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Kapacitet: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Kapacitet: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3363,7 +3363,7 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Åk till närms
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Åk till närmsta hangar
 STR_ORDER_CONDITIONAL                                           :Conditional order jump
 STR_ORDER_SHARE                                                 :Dela order
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Infoga ny order före markerad order, eller lägg till i slutet av listan. Håll in Ctrl för att välja 'full last någon frakttyp' vid stationer, 'åk non-stop via' vid riktmärken, och 'service' vid tågdepåer. Använd knappen 'Dela order' eller Ctrl+klicka på fordon för att dela order från annat fordon
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Infoga ny order före markerad order, eller lägg till i slutet av listan. Håll in Ctrl för att välja 'full last någon frakttyp' vid stationer, 'åk non-stop via' vid riktmärken, och 'service' vid tågdepåer. Använd knappen 'Dela order' eller Ctrl+klicka på fordon för att dela order från annat fordon. En depåorder stänger av automatisk service av fordonet
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Visa alla fordon som har samma schema
 
@@ -3443,7 +3443,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Tidtabel
 STR_TIMETABLE_NO_TRAVEL                                         :Ingen resa
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Restid (automatisk; tidtabellen baseras på nästa manuella order)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Restid (inte angiven)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Res högst i {2:VELOCITY} (not timetabled)
 STR_TIMETABLE_TRAVEL_FOR                                        :Res i {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Res i {STRING} med högsta hastighet {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :och stanna i {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :och res i {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} dag{P "" ar}
@@ -3466,6 +3468,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Ändra h
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Rensa tid
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Rensa tiden för markerad order
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Ändra hastighetsgräns
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Ändra hastighetsgräns för markerad order
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Rensa hastighetsgräns
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Rensa hastighetsgräns för markerad order
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Rensa räknaren för sen ankomst
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Nollställ räknaren för sen ankomst så att fordonet kommer i tid
@@ -3561,6 +3569,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Stäng
 STR_AI_SETTINGS_RESET                                           :{BLACK}Återställ
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Ungefärligt antal dagar som denna datorspelare startar efter föregående datorspelare: {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE} {STRING}-manual för {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}Ändringshistorik för {STRING} {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}Licens för {STRING}{STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Visa manual
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Ändringshistorik
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licens
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4438,6 +4456,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

@@ -15,6 +15,10 @@
  * functions may still be available if you return an older API version
  * in GetAPIVersion() in info.nut.
  *
+ * \b 1.3.0
+ *
+ * 1.3.0 is not yet released. The following changes are not set in stone yet.
+ *
  * \b 1.2.0
  *
  * 1.2.0 is not yet released. The following changes are not set in stone yet.
@@ -58,6 +62,7 @@
  *     like CONFIG_RANDOM.
  * \li AIEvent has all its types renamed from AI_ET_ prefix to just ET_ prefix,
  *     like ET_SUBSIDY_OFFER.
+ * \li AIOrder has all its types renamed from AIOF_ prefix to just OF_ prefix.
  *
  * API removals:
  * \li AICompany::GetCompanyValue, use AICompany::GetQuarterlyCompanyValue instead.

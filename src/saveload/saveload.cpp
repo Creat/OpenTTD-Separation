@@ -235,6 +235,9 @@
  *  169   23816
  *  170   23826
  *  171   23835
+ *  172   23947
+ *  173   23967   1.2.0-RC1
+ *  174   23973   1.2.x
  */
 extern const uint16 SAVEGAME_VERSION = SL_TTSEP_VER; ///< Current savegame version of OpenTTD.
 

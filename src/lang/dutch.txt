@@ -316,11 +316,11 @@ STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Bouw vli
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Open de landschapsbalk om land te verhogen/verlagen, bomen te planten, etc.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Toon geluid/muziekscherm
 STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Toon laatste (nieuws)bericht, toon berichtinstellingen
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Landinformatie, console, AI-debug, screenshots, over OpenTTD
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Landinformatie, console, script-debug, screenshots, over OpenTTD
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Verwissel knoppenbalk
 
 # Extra tooltips for the scenario editor toolbar
-STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Sla scenario op, open scenario, scenario-editor verlaten, afsluiten
+STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Sla scenario op, laad scenario, scenario-editor verlaten, afsluiten
 STR_SCENEDIT_TOOLBAR_OPENTTD                                    :{YELLOW}OpenTTD
 STR_SCENEDIT_TOOLBAR_SCENARIO_EDITOR                            :{YELLOW}Scenario-editor
 STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD    :{BLACK}Zet startdatum 1 jaar terug
@@ -340,7 +340,7 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Scenario opslaa
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Scenario openen
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Hoogtekaart opslaan
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Laad hoogtekaart
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Sluit editor
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Sluit scenario editor
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
 STR_SCENEDIT_FILE_MENU_QUIT                                     :Afsluiten
 ############ range for SE file menu starts
@@ -349,7 +349,7 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :Afsluiten
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Spelopties
 STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Moeilijkheidsgraad
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Geavanceerde instellingen
-STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :AI / Spel instellingen
+STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :AI/Game script instellingen
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :NewGRF instellingen
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Doorzichtigheidsopties
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Toon plaatsnamen
@@ -360,13 +360,14 @@ STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Toon tegenstand
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Alle animaties
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Alle details
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Transparante gebouwen
-STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparante stationsborden
+STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparante borden
 ############ range ends here
 
 ############ range for file menu starts
 STR_FILE_MENU_SAVE_GAME                                         :Spel opslaan
 STR_FILE_MENU_LOAD_GAME                                         :Spel laden
 STR_FILE_MENU_QUIT_GAME                                         :Verlaat spel
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Afsluiten
 ############ range ends here
 
@@ -444,7 +445,7 @@ STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :Berichtengeschi
 STR_ABOUT_MENU_LAND_BLOCK_INFO                                  :Landinformatie
 STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Schakel console aan/uit
-STR_ABOUT_MENU_AI_DEBUG                                         :AI / GameScript debug
+STR_ABOUT_MENU_AI_DEBUG                                         :AI/Game Script debug
 STR_ABOUT_MENU_SCREENSHOT                                       :Screenshot
 STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Ingezoomd screenshot
 STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Screenshot met standaard zoom
@@ -1408,7 +1409,7 @@ STR_INTRO_DIFFICULTY                                            :{BLACK}Moeilijk
 STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Geavanceerde instellingen
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}NewGRF-instellingen
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Online inhoud zoeken
-STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}AI / Spel Instellingen
+STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}AI/Spel script Instellingen
 STR_INTRO_QUIT                                                  :{BLACK}Afsluiten
 
 STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Start een nieuw spel. Ctrl+klik slaat de kaartconfiguratie over
@@ -1428,7 +1429,7 @@ STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}Toon moe
 STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Toon geavanceerde instellingen
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Toon NewGRF-instellingen
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Zoeken naar nieuwe en aangepaste inhoud om te downloaden
-STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Toon AI en spel instellingen
+STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Toon AI/Game script instellingen
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Verlaat 'OpenTTD'
 
 STR_INTRO_TRANSLATION                                           :{BLACK}Deze vertaling mist {NUM} tekst{P "" en}. Help aub om OpenTTD beter te maken door je al vertaler aan te melden. Zie readme.txt voor details.
@@ -1800,9 +1801,9 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Je bent 
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Valsspelen is niet toegestaan op deze server
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Je stuurde te veel commando's naar de server
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Het invoeren van het wachtwoord duurde te lang
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Het duurde te lang totdat uw computer zich aanmeldde
-STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Het duurde je te lang om de kaart te downloaden
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Het duurde je te lang om met de server te verbinden
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Het duurde jouw computer te lang totdat uw computer zich aanmeldde
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Het duurde jouw computer te lang om de kaart te downloaden
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Het duurde jouw computer te lang om met de server te verbinden
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :algemene fout
@@ -1945,8 +1946,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Uit
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Aan
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Markeer het dekkingsgebied van de voorgestelde locatie niet
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Markeer het dekkingsgebied van de voorgestelde locatie
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Accepteert: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Biedt aan: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Accepteert: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Biedt aan: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Station samenvoegen
@@ -2456,11 +2457,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Naar ben
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Verplaats het geselecteerde NewGRF-bestand naar beneden in de lijst
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Een lijst van de NewGRF-bestanden die zijn geïnstalleerd.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Bekijk leesme
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Wijzigingen
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licentie
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Stel parameters in
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Laat parameters zien
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Palet omzetten
@@ -2491,11 +2487,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Zet alle
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parameter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Aantal parameters: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF leesme van {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF wijzigingen van {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF licentie van {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspecteer - {STRING}
@@ -2731,7 +2722,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Accepteert
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Laat lijst van gevraagde goederen zien
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accepteert: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accepteert: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Rangen
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Bekijk stationsreputaties
@@ -2976,9 +2967,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Gewicht:
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Kosten: {GOLD}{CURRENCY_LONG}{BLACK} Snelheid: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Capaciteit: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Aangedreven wagons: {GOLD}+{POWER}{BLACK} Gewicht: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Om te bouwen voor: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Om te bouwen voor: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Alle vrachttypen
-STR_PURCHASE_INFO_ALL_BUT                                       :Alles behalve {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Alles behalve {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Max. trekkracht: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Bereik: {GOLD}{COMMA} tegels
 
@@ -3225,7 +3216,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Winst di
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Betrouwbaarheid: {LTBLUE}{COMMA}%  {BLACK}Aantal keren motorpech sinds laatste onderhoud: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Gebouwd: {LTBLUE}{NUM}{BLACK} Waarde: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Capaciteit: {LTBLUE}Geen
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Capaciteit: {LTBLUE}Geen{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Capaciteit: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Capaciteit: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Capaciteit: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3372,7 +3363,7 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Ga naar dichtst
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Ga naar dichtstbijzijnde hangar
 STR_ORDER_CONDITIONAL                                           :Conditionele order sprong
 STR_ORDER_SHARE                                                 :Orders delen
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Voeg een nieuwe order in voor de geselecteerde order, of voeg het toe aan het eind van de lijst. Ctrl+klik maakt stationsorders "Eén soort vracht volledig laden", controlepost-orders "Ga non-stop via" en depot-orders "Onderhoud bij". "Orders delen" of Ctrl laat dit voertuig de orders delen met het geselecteerde voertuig. Klikken op een voertuig kopieert de orders van dat voertuig
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Voeg een nieuwe order in voor de geselecteerde order, of voeg het toe aan het eind van de lijst. Ctrl+klik maakt stationsorders "Eén soort vracht volledig laden", controlepost-orders "Ga non-stop via" en depot-orders "Onderhoud bij". "Orders delen" of Ctrl laat dit voertuig de orders delen met het geselecteerde voertuig. Klikken op een voertuig kopieert de orders van dat voertuig. Een depot order schakelt automatisch onderhoud van een voertuig uit.
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Toon alle voertuigen met dezelfde gedeelde orders
 
@@ -3452,7 +3443,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Dienstre
 STR_TIMETABLE_NO_TRAVEL                                         :Niet rijden
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Rijd (automatisch; volgens dienstregeling bij volgende handmatige bestemming)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Reis (geen dienstregeling)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Reis met maximaal {2:VELOCITY} (geen tijdschema)
 STR_TIMETABLE_TRAVEL_FOR                                        :Reis naar {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Reis {STRING} met maximaal {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :en blijf voor {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :en rijd naar {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} dag{P "" en}
@@ -3475,6 +3468,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Verander
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Verwijder tijd
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Verwijder de tijdsduur die de geselecteerde order mag duren
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Wijzig Maximum Snelheid
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Wijzig de maximum snelheid voor de gekozen order
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Verwijder Snelheidslimiet
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Verwijder de maximum snelheid van de gekozen order
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Reset vertragingsteller
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Reset de vertragingsteller zodat het voertuig op tijd is
@@ -3500,7 +3499,7 @@ STR_DATE_YEAR_TOOLTIP                                           :{BLACK}Selectee
 
 
 # AI debug window
-STR_AI_DEBUG                                                    :{WHITE}AI / GameScript Debug
+STR_AI_DEBUG                                                    :{WHITE}AI/Game Script Debug
 STR_AI_DEBUG_NAME_AND_VERSION                                   :{BLACK}{STRING} (v{NUM})
 STR_AI_DEBUG_NAME_TOOLTIP                                       :{BLACK}Naam van het script
 STR_AI_DEBUG_SETTINGS                                           :{BLACK}Instellingen
@@ -3520,12 +3519,12 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Game Scr
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Controleer het Game Script log
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Geen geschikte AI gevonden. {} Deze AI is een 'dummy' en voert niets uit.{}Verschillende AI's kunnen worden gedownload via het 'Online Content' systeem
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Eén van de actieve scripts is vastgelopen. Meld dit a.u.b. bij de auteur van dit script met een schermprint van het AI / GameScript Debugscherm
-STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}AI / GameScript debugvenster is alleen beschikbaar voor de server
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Eén van de actieve scripts is vastgelopen. Meld dit a.u.b. bij de auteur van dit script met een schermprint van het AI/Spel script Debugscherm
+STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}AI/Spel script debugvenster is alleen beschikbaar voor de server
 
 # AI configuration window
-STR_AI_CONFIG_CAPTION                                           :{WHITE}AI / Spel configuratie
-STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Het GameScript dat in het volgende spel geladen wordt
+STR_AI_CONFIG_CAPTION                                           :{WHITE}AI/Spel script configuratie
+STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Het Game Script dat in het volgende spel geladen wordt
 STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}De AI's die in het volgende spel geladen worden
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Menselijke speler
 STR_AI_CONFIG_RANDOM_AI                                         :Willekeurige AI
@@ -3536,13 +3535,13 @@ STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Geselect
 STR_AI_CONFIG_MOVE_DOWN                                         :{BLACK}Omlaag verplaatsen
 STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}De geselecteerde AI naar omlaag verplaatsen in de lijst
 
-STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}GameScript
+STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}Game Script
 STR_AI_CONFIG_AI                                                :{SILVER}AI's
 
 STR_AI_CONFIG_CHANGE                                            :{BLACK}Kies{STRING}
 STR_AI_CONFIG_CHANGE_NONE                                       :
 STR_AI_CONFIG_CHANGE_AI                                         :AI
-STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :GameScript
+STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :Game Script
 STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Laad een ander script
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Configureer
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configureer de parameters van het script
@@ -3550,7 +3549,7 @@ STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configur
 # Available AIs window
 STR_AI_LIST_CAPTION                                             :{WHITE}Beschikbaar {STRING}
 STR_AI_LIST_CAPTION_AI                                          :AI's
-STR_AI_LIST_CAPTION_GAMESCRIPT                                  :GameScripts
+STR_AI_LIST_CAPTION_GAMESCRIPT                                  :Game Scripts
 STR_AI_LIST_TOOLTIP                                             :{BLACK}Klik om een script te selecteren
 
 STR_AI_LIST_AUTHOR                                              :{BLACK}Auteur: {STRING}
@@ -3565,11 +3564,21 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Script n
 # AI Parameters
 STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
-STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :GameScript
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Game Script
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Sluiten
 STR_AI_SETTINGS_RESET                                           :{BLACK}Herstellen
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Aantal dagen dat deze AI start na de vorige (ongeveer): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} leesme van {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} wijzigingen van {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} licentie van {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Bekijk leesme
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Wijzigingen
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licentie
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4413,6 +4422,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
@@ -4447,6 +4457,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

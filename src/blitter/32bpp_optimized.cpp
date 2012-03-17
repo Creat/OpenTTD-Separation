@@ -215,7 +215,7 @@ Sprite *Blitter_32bppOptimized::Encode(SpriteLoader::Sprite *sprite, AllocatorPr
 	Colour *dst_px_orig[ZOOM_LVL_COUNT];
 
 	/* interleaved stream of 'm' channel and 'n' channel
-	 * 'n' is number if following pixels with the same alpha channel class
+	 * 'n' is number of following pixels with the same alpha channel class
 	 * there are 3 classes: 0, 255, others
 	 *
 	 * it has to be stored in one stream so fewer registers are used -
@@ -337,6 +337,7 @@ Sprite *Blitter_32bppOptimized::Encode(SpriteLoader::Sprite *sprite, AllocatorPr
 	dest_sprite->y_offs = sprite->y_offs;
 
 	SpriteData *dst = (SpriteData *)dest_sprite->data;
+	memset(dst, 0, sizeof(*dst));
 
 	for (ZoomLevel z = zoom_min; z <= zoom_max; z++) {
 		dst->offset[z][0] = z == zoom_min ? 0 : lengths[z - 1][1] + dst->offset[z - 1][1];

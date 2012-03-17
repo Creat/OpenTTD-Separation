@@ -293,7 +293,7 @@ STR_SORT_BY_RANGE                                               :Range
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Pause game
 STR_TOOLBAR_TOOLTIP_FORWARD                                     :{BLACK}Fast forward the game
 STR_TOOLBAR_TOOLTIP_OPTIONS                                     :{BLACK}Options
-STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Save game, abandon game, quit
+STR_TOOLBAR_TOOLTIP_SAVE_GAME_ABANDON_GAME                      :{BLACK}Save game, abandon game, exit
 STR_TOOLBAR_TOOLTIP_DISPLAY_MAP                                 :{BLACK}Display map, extra viewport or list of signs
 STR_TOOLBAR_TOOLTIP_DISPLAY_TOWN_DIRECTORY                      :{BLACK}Display town directory
 STR_TOOLBAR_TOOLTIP_DISPLAY_SUBSIDIES                           :{BLACK}Display subsidies
@@ -316,11 +316,11 @@ STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Build ai
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Open the landscaping toolbar to raise/lower land, plant trees, etc.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Show sound/music window
 STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Show last message/news report, show message options
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Land area information, console, AI debug, screenshots, about OpenTTD
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Land area information, console, script debug, screenshots, about OpenTTD
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Switch toolbars
 
 # Extra tooltips for the scenario editor toolbar
-STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Save scenario, load scenario, abandon scenario editor, quit
+STR_SCENEDIT_TOOLBAR_TOOLTIP_SAVE_SCENARIO_LOAD_SCENARIO        :{BLACK}Save scenario, load scenario, abandon scenario editor, exit
 STR_SCENEDIT_TOOLBAR_OPENTTD                                    :{YELLOW}OpenTTD
 STR_SCENEDIT_TOOLBAR_SCENARIO_EDITOR                            :{YELLOW}Scenario Editor
 STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD    :{BLACK}Move the starting date backward 1 year
@@ -340,16 +340,16 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Save scenario
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Load scenario
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Save heightmap
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Load heightmap
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Quit editor
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Abandon scenario editor
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
-STR_SCENEDIT_FILE_MENU_QUIT                                     :Quit
+STR_SCENEDIT_FILE_MENU_QUIT                                     :Exit
 ############ range for SE file menu starts
 
 ############ range for settings menu starts
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Game options
 STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Difficulty settings
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Advanced settings
-STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :AI / Game settings
+STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :AI/Game script settings
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :NewGRF settings
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Transparency options
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Town names displayed
@@ -367,6 +367,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparent sig
 STR_FILE_MENU_SAVE_GAME                                         :Save game
 STR_FILE_MENU_LOAD_GAME                                         :Load game
 STR_FILE_MENU_QUIT_GAME                                         :Abandon game
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Exit
 ############ range ends here
 
@@ -444,7 +445,7 @@ STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :Message history
 STR_ABOUT_MENU_LAND_BLOCK_INFO                                  :Land area information
 STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Toggle console
-STR_ABOUT_MENU_AI_DEBUG                                         :AI / GameScript debug
+STR_ABOUT_MENU_AI_DEBUG                                         :AI/Game script debug
 STR_ABOUT_MENU_SCREENSHOT                                       :Screenshot
 STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Zoomed in screenshot
 STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Default zoom screenshot
@@ -1408,8 +1409,8 @@ STR_INTRO_DIFFICULTY                                            :{BLACK}Difficul
 STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Advanced Settings
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}NewGRF Settings
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Check Online Content
-STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}AI / Game Settings
-STR_INTRO_QUIT                                                  :{BLACK}Quit
+STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}AI/Game Script Settings
+STR_INTRO_QUIT                                                  :{BLACK}Exit
 
 STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Start a new game. Ctrl+Click skips map configuration
 STR_INTRO_TOOLTIP_LOAD_GAME                                     :{BLACK}Load a saved game
@@ -1428,13 +1429,13 @@ STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}Display 
 STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Display advanced settings
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Display NewGRF settings
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Check for new and updated content to download
-STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Display AI and Game settings
-STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Quit 'OpenTTD'
+STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Display AI/Game script settings
+STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Exit 'OpenTTD'
 
 STR_INTRO_TRANSLATION                                           :{BLACK}This translation misses {NUM} string{P "" s}. Please help make OpenTTD better by signing up as translator. See readme.txt for details.
 
 # Quit window
-STR_QUIT_CAPTION                                                :{WHITE}Quit
+STR_QUIT_CAPTION                                                :{WHITE}Exit
 STR_QUIT_ARE_YOU_SURE_YOU_WANT_TO_EXIT_OPENTTD                  :{YELLOW}Are you sure you want to exit OpenTTD and return to {STRING}?
 STR_QUIT_YES                                                    :{BLACK}Yes
 STR_QUIT_NO                                                     :{BLACK}No
@@ -1800,9 +1801,9 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}You were
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Cheating is not allowed on this server
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}You were sending too many commands to the server
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}You took too long to enter the password
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Your computer took too long to join
-STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}You took too long to download the map
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}You took too long to join the server
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Your computer is too slow to keep up with the server
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Your computer took too long to download the map
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Your computer took too long to join the server
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :general error
@@ -1924,7 +1925,7 @@ STR_CONTENT_ERROR_COULD_NOT_EXTRACT                             :{WHITE}Could no
 STR_MISSING_GRAPHICS_SET_CAPTION                                :{WHITE}Missing graphics
 STR_MISSING_GRAPHICS_SET_MESSAGE                                :{BLACK}OpenTTD requires graphics to function but none could be found. Do you allow OpenTTD to download and install these graphics?
 STR_MISSING_GRAPHICS_YES_DOWNLOAD                               :{BLACK}Yes, download the graphics
-STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}No, quit OpenTTD
+STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}No, exit OpenTTD
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Transparency Options
@@ -1945,8 +1946,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Off
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}On
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Don't highlight coverage area of proposed site
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Highlight coverage area of proposed site
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Accepts: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Supplies: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Accepts: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Supplies: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Join station
@@ -2456,11 +2457,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Move Dow
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Move the selected NewGRF file down the list
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}A list of the NewGRF files that are installed.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}View readme
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Changelog
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}License
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Set parameters
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Show parameters
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Toggle palette
@@ -2491,11 +2487,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Set all 
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parameter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Number of parameters: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF readme of {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF changelog of {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF license of {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspect - {STRING}
@@ -2731,7 +2722,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Accepts
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Show list of accepted cargo
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accepts: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accepts: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Ratings
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Show station ratings
@@ -2976,9 +2967,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Weight: 
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Cost: {GOLD}{CURRENCY_LONG}{BLACK} Speed: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Capacity: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Powered Wagons: {GOLD}+{POWER}{BLACK} Weight: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Refittable to: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Refittable to: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :All cargo types
-STR_PURCHASE_INFO_ALL_BUT                                       :All but {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :All but {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Max. Tractive Effort: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Range: {GOLD}{COMMA} tiles
 
@@ -3225,7 +3216,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Profit t
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Reliability: {LTBLUE}{COMMA}%  {BLACK}Breakdowns since last service: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Built: {LTBLUE}{NUM}{BLACK} Value: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Capacity: {LTBLUE}None
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Capacity: {LTBLUE}None{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Capacity: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Capacity: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Capacity: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3372,7 +3363,7 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Go to nearest d
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Go to nearest hangar
 STR_ORDER_CONDITIONAL                                           :Conditional order jump
 STR_ORDER_SHARE                                                 :Share orders
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Insert a new order before the highlighted order, or add to end of list. Ctrl makes station orders 'full load any cargo', waypoint orders 'non-stop' and depot orders 'service'. 'Share orders' or Ctrl lets this vehicle share orders with the selected vehicle. Clicking a vehicle copies the orders from that vehicle
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Insert a new order before the highlighted order, or add to end of list. Ctrl makes station orders 'full load any cargo', waypoint orders 'non-stop' and depot orders 'service'. 'Share orders' or Ctrl lets this vehicle share orders with the selected vehicle. Clicking a vehicle copies the orders from that vehicle. A depot order disables automatic servicing of the vehicle
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Show all vehicles that share this schedule
 
@@ -3452,7 +3443,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Timetabl
 STR_TIMETABLE_NO_TRAVEL                                         :No travel
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Travel (automatic; timetabled by next manual order)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Travel (not timetabled)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Travel with at most {2:VELOCITY} (not timetabled)
 STR_TIMETABLE_TRAVEL_FOR                                        :Travel for {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Travel for {STRING} with at most {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :and stay for {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :and travel for {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} day{P "" s}
@@ -3475,6 +3468,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Change t
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Clear Time
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Clear the amount of time for the highlighted order
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Change Speed Limit
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Change the maximum travel speed of the highlighted order
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Clear Speed Limit
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Clear the maximum travel speed of the highlighted order
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Reset Late Counter
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Reset the lateness counter, so the vehicle will be on time
@@ -3500,7 +3499,7 @@ STR_DATE_YEAR_TOOLTIP                                           :{BLACK}Select y
 
 
 # AI debug window
-STR_AI_DEBUG                                                    :{WHITE}AI / GameScript Debug
+STR_AI_DEBUG                                                    :{WHITE}AI/Game Script Debug
 STR_AI_DEBUG_NAME_AND_VERSION                                   :{BLACK}{STRING} (v{NUM})
 STR_AI_DEBUG_NAME_TOOLTIP                                       :{BLACK}Name of the script
 STR_AI_DEBUG_SETTINGS                                           :{BLACK}Settings
@@ -3520,12 +3519,12 @@ STR_AI_GAME_SCRIPT                                              :{BLACK}Game Scr
 STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Check the Game Script log
 
 STR_ERROR_AI_NO_AI_FOUND                                        :No suitable AI found to load.{}This AI is a dummy AI and won't do anything.{}You can download several AIs via the 'Online Content' system
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}One of the running AIs crashed. Please report this to the AI author with a screenshot of the AI Debug Window
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}One of the running scripts crashed. Please report this to the script author with a screenshot of the AI/Game Script Debug Window
 STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}AI / GameScript Debug window is only available for the server
 
 # AI configuration window
-STR_AI_CONFIG_CAPTION                                           :{WHITE}AI / Game Configuration
-STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}The GameScript that will be loaded in the next game
+STR_AI_CONFIG_CAPTION                                           :{WHITE}AI/Game Script Configuration
+STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}The Game Script that will be loaded in the next game
 STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}The AIs that will be loaded in the next game
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Human player
 STR_AI_CONFIG_RANDOM_AI                                         :Random AI
@@ -3536,13 +3535,13 @@ STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Move sel
 STR_AI_CONFIG_MOVE_DOWN                                         :{BLACK}Move Down
 STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}Move selected AI down in the list
 
-STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}GameScript
+STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}Game Script
 STR_AI_CONFIG_AI                                                :{SILVER}AIs
 
 STR_AI_CONFIG_CHANGE                                            :{BLACK}Select {STRING}
 STR_AI_CONFIG_CHANGE_NONE                                       :
 STR_AI_CONFIG_CHANGE_AI                                         :AI
-STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :GameScript
+STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :Game Script
 STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Load another script
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Configure
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configure the parameters of the Script
@@ -3550,7 +3549,7 @@ STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configur
 # Available AIs window
 STR_AI_LIST_CAPTION                                             :{WHITE}Available {STRING}
 STR_AI_LIST_CAPTION_AI                                          :AIs
-STR_AI_LIST_CAPTION_GAMESCRIPT                                  :GameScripts
+STR_AI_LIST_CAPTION_GAMESCRIPT                                  :Game Scripts
 STR_AI_LIST_TOOLTIP                                             :{BLACK}Click to select a script
 
 STR_AI_LIST_AUTHOR                                              :{BLACK}Author: {STRING}
@@ -3565,11 +3564,21 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Don't ch
 # AI Parameters
 STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parameters
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
-STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :GameScript
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Game Script
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Close
 STR_AI_SETTINGS_RESET                                           :{BLACK}Reset
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Number of days to start this AI after the previous one (give or take): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} readme of {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} changelog of {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} license of {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}View readme
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Changelog
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}License
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4413,6 +4422,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
@@ -4447,6 +4457,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

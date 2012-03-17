@@ -746,6 +746,7 @@ STR_NEWS_MESSAGE_TYPE_CHANGES_OF_CARGO_ACCEPTANCE               :{YELLOW}受入�
 STR_NEWS_MESSAGE_TYPE_SUBSIDIES                                 :{YELLOW}助成金
 STR_NEWS_MESSAGE_TYPE_GENERAL_INFORMATION                       :{YELLOW}一般情報
 
+
 STR_NEWS_FIRST_TRAIN_ARRIVAL                                    :{BIG_FONT}{BLACK}{STATION}に初めて列車が到着！{}住民から歓声が湧き上がっている模様。
 STR_NEWS_FIRST_BUS_ARRIVAL                                      :{BIG_FONT}{BLACK}{STATION}に初めてバスが到着！{}住民から歓声が湧き上がっている模様。
 STR_NEWS_FIRST_TRUCK_ARRIVAL                                    :{BIG_FONT}{BLACK}{STATION}に初めてトラックが到着！{}住民から歓声が湧き上がっている模様。
@@ -1358,6 +1359,8 @@ STR_CONFIG_SETTING_REVERSE_AT_SIGNALS                           :{LTBLUE}信号�
 
 STR_CONFIG_SETTING_QUERY_CAPTION                                :{WHITE}設定を変更します
 
+# Config errors
+
 # Intro window
 STR_INTRO_CAPTION                                               :{WHITE}OpenTTD {REV}
 
@@ -1890,8 +1893,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}切
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}入
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}駅の受入れる地域をハイライトしません
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}駅の受入れる地域をハイライトします
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}受入れ貨物：{GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}供給: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}受入れ貨物：{GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}供給: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}駅を統合
@@ -2373,8 +2376,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}下へ
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}選択したNewGRFファイルを下へ移動します
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}インストールしたNewGRFファイルのリストです。設定を変更するにはファイルをクリックします。
 
-# Additional textfiles accompanying NewGRFs
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}パラメータの設定
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}パレットを切り替える
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}選択したパレットを切り替えます。{}（この NewGRF のスプライトがピンクになってしまうとき、この操作を試します。）
@@ -2404,8 +2405,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}すべ�
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :パラメーター{NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}パラメータの数: {ORANGE}{NUM}
-
-# NewGRF textfile window
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}検査する - {STRING}
@@ -2563,6 +2562,12 @@ STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_NEW_BUILDINGS                :{YELLOW}町内�
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_EXCLUSIVE_TRANSPORT          :{YELLOW}一年間の独占的運送権を購入します。{}町議会は乗客や貨物があなたの交通会社の運送経路の使用のみを制御します。{}価格：{CURRENCY_LONG}
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_BRIBE                        :{YELLOW}町議会間の評価を高めるに買収する。注意：露見された場合は処罰が厳しいです！{}価格：{CURRENCY_LONG}
 
+# Goal window
+
+# Goal question window
+
+### Start of Goal Question button list
+
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}助成金
 STR_SUBSIDIES_OFFERED_TITLE                                     :{BLACK}次の運送経路に助成金を提案：
@@ -2591,7 +2596,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}（{1:S
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}受入れ貨物
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}受入れる貨物のリストを表示します
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}受入れ貨物：{WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}受入れ貨物：{WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}評価
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}駅の評価を表示します
@@ -2816,9 +2821,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}重量�
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}価格：{GOLD}{CURRENCY_LONG}{BLACK}　最大速度：{GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}収容能力：{GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}動力貨車：{GOLD}+{POWER}{BLACK}　重量：{GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}再装備の貨物種類：{GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}再装備の貨物種類：{GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :すべて
-STR_PURCHASE_INFO_ALL_BUT                                       :{GOLD}を除いてすべて
+STR_PURCHASE_INFO_ALL_BUT                                       :{CARGO_LIST}を除いてすべて
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}最大牽引力：{GOLD}{FORCE}
 
 STR_BUY_VEHICLE_TRAIN_LIST_TOOLTIP                              :{BLACK}列車のリスト - 情報を見るには列車をクリックします
@@ -3060,7 +3065,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}今年�
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}信頼度：{LTBLUE}{COMMA}%　{BLACK}修理後の故障：{LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE}　{BLACK}購入年：{LTBLUE}{NUM}{BLACK}　現在価値：{LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}容量： {LTBLUE}なし
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}容量： {LTBLUE}なし{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}収容能力：{LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}収容能力：{LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}収容能力：{LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3252,6 +3257,7 @@ STR_ORDER_STOP_LOCATION_NEAR_END                                :[手前に止�
 STR_ORDER_STOP_LOCATION_MIDDLE                                  :[中間に止まる]
 STR_ORDER_STOP_LOCATION_FAR_END                                 :[奥に止まる]
 
+
 STR_ORDER_CONDITIONAL_UNCONDITIONAL                             :指令{COMMA}に飛ぶ
 STR_ORDER_CONDITIONAL_NUM                                       :{1:STRING} が {3:COMMA}{2:STRING}時、指令{0:COMMA}に飛ぶ
 STR_ORDER_CONDITIONAL_TRUE_FALSE                                :{1:STRING}{2:STRING}時、指令{0:COMMA}に飛ぶ
@@ -3291,6 +3297,8 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}選択�
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}時間を消去
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}選択した指令の実行時間を消去します
+
+
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}遅刻回数をリセット
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}遅刻回数をリセットして、車両が定刻になります
@@ -3347,6 +3355,7 @@ STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}選択�
 STR_AI_CONFIG_MOVE_DOWN                                         :{BLACK}下にします
 STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}選択したAIの順位を下げる
 
+
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}設定
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}AI のパラメータを設定します
 
@@ -3366,6 +3375,10 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}AI を�
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}閉じる
 STR_AI_SETTINGS_RESET                                           :{BLACK}リセット
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
+
+
+# Textfile window
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}

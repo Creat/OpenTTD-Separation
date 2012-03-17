@@ -250,7 +250,7 @@ public:
 		 * textfile; Window numbers:
 		 *   - 0 = #NewGRFTextfileWidgets
 		 */
-		WC_NEWGRF_TEXTFILE = ::WC_NEWGRF_TEXTFILE,
+		WC_TEXTFILE = ::WC_TEXTFILE,
 
 
 		/**
@@ -843,6 +843,7 @@ public:
 		WID_AIC_CHANGE                       = ::WID_AIC_CHANGE,                       ///< Select another AI button.
 		WID_AIC_CONFIGURE                    = ::WID_AIC_CONFIGURE,                    ///< Change AI settings button.
 		WID_AIC_CLOSE                        = ::WID_AIC_CLOSE,                        ///< Close window button.
+		WID_AIC_TEXTFILE                     = ::WID_AIC_TEXTFILE,                     ///< Open Script readme, changelog (+1) or license (+2).
 		WID_AIC_CONTENT_DOWNLOAD             = ::WID_AIC_CONTENT_DOWNLOAD,             ///< Download content button.
 	};
 
@@ -1671,14 +1672,6 @@ public:
 		WID_NP_DESCRIPTION                   = ::WID_NP_DESCRIPTION,                   ///< Multi-line description of a parameter.
 	};
 
-	/** Widgets of the #NewGRFTextfileWindow class. */
-	enum NewGRFTextfileWidgets {
-		WID_NT_CAPTION                       = ::WID_NT_CAPTION,                       ///< The caption of the window.
-		WID_NT_BACKGROUND                    = ::WID_NT_BACKGROUND,                    ///< Panel to draw the textfile on.
-		WID_NT_VSCROLLBAR                    = ::WID_NT_VSCROLLBAR,                    ///< Vertical scrollbar to scroll through the textfile up-and-down.
-		WID_NT_HSCROLLBAR                    = ::WID_NT_HSCROLLBAR,                    ///< Horizontal scrollbar to scroll through the textfile left-to-right.
-	};
-
 	/** Widgets of the #NewGRFWindow class. */
 	enum NewGRFStateWidgets {
 		WID_NS_PRESET_LIST                   = ::WID_NS_PRESET_LIST,                   ///< Active NewGRF preset.
@@ -1713,6 +1706,14 @@ public:
 	enum ScanProgressWidgets {
 		WID_SP_PROGRESS_BAR                  = ::WID_SP_PROGRESS_BAR,                  ///< Simple progress bar.
 		WID_SP_PROGRESS_TEXT                 = ::WID_SP_PROGRESS_TEXT,                 ///< Text explaining what is happening.
+	};
+
+	/** Widgets of the #TextfileWindow class. */
+	enum TextfileWidgets {
+		WID_TF_CAPTION                       = ::WID_TF_CAPTION,                       ///< The caption of the window.
+		WID_TF_BACKGROUND                    = ::WID_TF_BACKGROUND,                    ///< Panel to draw the textfile on.
+		WID_TF_VSCROLLBAR                    = ::WID_TF_VSCROLLBAR,                    ///< Vertical scrollbar to scroll through the textfile up-and-down.
+		WID_TF_HSCROLLBAR                    = ::WID_TF_HSCROLLBAR,                    ///< Horizontal scrollbar to scroll through the textfile left-to-right.
 	};
 
 	/** Widgets of the #NewsWindow class. */
@@ -2153,6 +2154,8 @@ public:
 		WID_VT_SHARED_ORDER_LIST             = ::WID_VT_SHARED_ORDER_LIST,             ///< Show the shared order list.
 		WID_VT_ARRIVAL_DEPARTURE_SELECTION   = ::WID_VT_ARRIVAL_DEPARTURE_SELECTION,   ///< Disable/hide the arrival departure panel.
 		WID_VT_EXPECTED_SELECTION            = ::WID_VT_EXPECTED_SELECTION,            ///< Disable/hide the expected selection button.
+		WID_VT_CHANGE_SPEED                  = ::WID_VT_CHANGE_SPEED,                  ///< Change speed limit button.
+		WID_VT_CLEAR_SPEED                   = ::WID_VT_CLEAR_SPEED,                   ///< Clear speed limit button.
 	};
 
 	/** Widgets of the #MainToolbarWindow class. */

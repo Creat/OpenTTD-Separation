@@ -44,6 +44,7 @@ extern FreeTypeSettings _freetype;
 
 void InitFreeType(bool monospace);
 void UninitFreeType();
+void ClearFontCache();
 const Sprite *GetGlyph(FontSize size, uint32 key);
 uint GetGlyphWidth(FontSize size, uint32 key);
 bool GetDrawGlyphShadow();
@@ -65,6 +66,7 @@ bool SetFallbackFont(FreeTypeSettings *settings, const char *language_isocode, i
 /* Stub for initializiation */
 static inline void InitFreeType(bool monospace) { extern void ResetFontSizes(bool monospace); ResetFontSizes(monospace); }
 static inline void UninitFreeType() {}
+static inline void ClearFontCache() {}
 
 /** Get the Sprite for a glyph */
 static inline const Sprite *GetGlyph(FontSize size, uint32 key)

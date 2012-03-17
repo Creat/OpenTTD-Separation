@@ -745,6 +745,7 @@ STR_NEWS_MESSAGE_TYPE_CHANGES_OF_CARGO_ACCEPTANCE               :{YELLOW}Ŝarĝa
 STR_NEWS_MESSAGE_TYPE_SUBSIDIES                                 :{YELLOW}Subvencioj
 STR_NEWS_MESSAGE_TYPE_GENERAL_INFORMATION                       :{YELLOW}Ĝeneralaj informoj
 
+
 STR_NEWS_FIRST_TRAIN_ARRIVAL                                    :{BIG_FONT}{BLACK}Enloĝantoj festas . . .{}Unua trajno alvenas ĉe {STATION}!
 STR_NEWS_FIRST_BUS_ARRIVAL                                      :{BIG_FONT}{BLACK}Enloĝantoj festas . . .{}Unua buso alvenas en {STATION}!
 STR_NEWS_FIRST_TRUCK_ARRIVAL                                    :{BIG_FONT}{BLACK}Enloĝantoj festas . . .{}Unua ŝarĝaŭto alvenas en {STATION}!
@@ -1351,6 +1352,8 @@ STR_CONFIG_SETTING_REVERSE_AT_SIGNALS                           :{LTBLUE}Aŭtoma
 
 STR_CONFIG_SETTING_QUERY_CAPTION                                :{WHITE}Ŝanĝu agord-valoron
 
+# Config errors
+
 # Intro window
 STR_INTRO_CAPTION                                               :{WHITE}OpenTTD {REV}
 
@@ -1882,8 +1885,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Malaktiv
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Aktiva
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Ne marku ŝarĝregionon de proponata loko
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Marku ŝarĝregionon ĉe proponata loko
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Akceptiĝas: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Provizoj: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Akceptiĝas: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Provizoj: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Ligi stacion
@@ -2349,11 +2352,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Malsupre
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Movu la elektitan NewGRF-dosieron malsupren en la listo
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Listo da instalitaj NewGRF-dosieroj. Alklaku dosieron por ŝanĝi la parametrojn
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Vidi legumin
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Ŝanĝarĥivo
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licenco
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Agordu parametrojn
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Baskuligi paletron
 STR_NEWGRF_SETTINGS_APPLY_CHANGES                               :{BLACK}Apliku ŝanĝojn
@@ -2382,11 +2380,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Kondiĉu
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parametro {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Nombro da parametroj: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF legumin de {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF-a ŝanĝarĥivo de {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF-a licenco de {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspektu - {STRING}
@@ -2532,6 +2525,12 @@ STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_NEW_BUILDINGS                :{YELLOW}Pagu la
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_EXCLUSIVE_TRANSPORT          :{YELLOW}Aĉetu ekskluzivajn transportrajtojn en la urbo por 1 jaro. La urbo nur permesos pasaĝerojn kaj kargojn uzi la staciojn de via entrepreno.{}Cost: {CURRENCY_LONG}
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_BRIBE                        :{YELLOW}Subaĉetu la lokajn estrojn por pliigi vian rendimenton, riskante grandan punon je kaptiĝo.{}Kosto: {CURRENCY_LONG}
 
+# Goal window
+
+# Goal question window
+
+### Start of Goal Question button list
+
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Subvencioj
 STR_SUBSIDIES_OFFERED_TITLE                                     :{BLACK}Subvencioj haveblas por jenaj servoj:
@@ -2560,7 +2559,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Akceptas
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Montri liston de akceptataj ŝarĝoj.
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Akceptiĝas: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Akceptiĝas: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Takso
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Montru stacian takson
@@ -2666,6 +2665,8 @@ STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Kompania Nomo
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Nomo de la Manaĝanto
 
 STR_BUY_COMPANY_MESSAGE                                         :{WHITE}Ni serĉas transportkompanion por transpreni nian kompanion.{}{}Ĉu vi volas aĉeti {COMPANY} por {CURRENCY_LONG}?
+
+# Company infrastructure window
 
 # Industry directory
 STR_INDUSTRY_DIRECTORY_CAPTION                                  :{WHITE}Industrioj
@@ -2779,9 +2780,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Pezo: {G
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Kosto: {GOLD}{CURRENCY_LONG}{BLACK} Rapido: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Enhaveco: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Vagonfortoj: {GOLD}+{POWER}{BLACK} Weight: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Transformebla al: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Transformebla al: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Ĉiaj ŝarĝoj
-STR_PURCHASE_INFO_ALL_BUT                                       :Ĉio krom {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Ĉio krom {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Maksimuma Tiro: {GOLD}{FORCE}
 
 STR_BUY_VEHICLE_TRAIN_LIST_TOOLTIP                              :{BLACK}Trajnveturila elektolisto - alklaku veturilon por informoj
@@ -3023,7 +3024,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Profito 
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Fidindo: {LTBLUE}{COMMA}%  {BLACK}Paneoj ekde lasta servo: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Konstruita: {LTBLUE}{NUM}{BLACK} Valoro: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Enhaveco: {LTBLUE}Nenion
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Enhaveco: {LTBLUE}Nenion{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Enhaveco: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Enhaveco: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Enhaveco: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3227,6 +3228,7 @@ STR_ORDER_STOP_LOCATION_NEAR_END                                :[near end]
 STR_ORDER_STOP_LOCATION_MIDDLE                                  :[middle]
 STR_ORDER_STOP_LOCATION_FAR_END                                 :[far end]
 
+
 STR_ORDER_CONDITIONAL_UNCONDITIONAL                             :Saltu al ordono {COMMA}
 STR_ORDER_CONDITIONAL_NUM                                       :Saltu al ordono {COMMA} kiam {STRING} {STRING} {COMMA}
 STR_ORDER_CONDITIONAL_TRUE_FALSE                                :Saltu al ordonu {COMMA} kiam {STRING} {STRING}
@@ -3264,6 +3266,8 @@ STR_TIMETABLE_STARTING_DATE_TOOLTIP                             :{BLACK}Elekti d
 STR_TIMETABLE_CHANGE_TIME                                       :{BLACK}Ŝanĝu tempon
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Vakigi tempon
+
+
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Reigu malfruan kalkulumon
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Reigu malfruan kalkulumon, tiel la veturilon estos akuratan
@@ -3303,7 +3307,6 @@ STR_AI_DEBUG_CONTINUE_TOOLTIP                                   :{BLACK}Malpaŭz
 STR_AI_DEBUG_SELECT_AI_TOOLTIP                                  :{BLACK}Vidu forigeraran eligon de ĉiu tio AI
 
 
-
 # AI configuration window
 STR_AI_CONFIG_CAPTION                                           :{WHITE}AI-agordo
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Homa ludanto
@@ -3313,6 +3316,7 @@ STR_AI_CONFIG_MOVE_UP                                           :{BLACK}Movi sup
 STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Movi elektitan AI-on supren en la listo
 STR_AI_CONFIG_MOVE_DOWN                                         :{BLACK}Movi suben
 STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}Movi elektitan AI-on suben en la listo
+
 
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Agordi
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Agordi parametroj de la AI
@@ -3333,6 +3337,16 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Ne ŝan�
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Fermi
 STR_AI_SETTINGS_RESET                                           :{BLACK}Reŝargo
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} legumin de {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING}-a ŝanĝarĥivo de {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING}-a licenco de {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Vidi legumin
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Ŝanĝarĥivo
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licenco
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}

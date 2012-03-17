@@ -288,7 +288,7 @@ static char *FormatNumber(char *buff, int64 number, const char *last, const char
 			quot = num / divisor;
 			num = num % divisor;
 		}
-		if (tot |= quot || i >= max_digits - zerofill) {
+		if ((tot |= quot) || i >= max_digits - zerofill) {
 			buff += seprintf(buff, last, "%i", (int)quot);
 			if ((i % 3) == thousands_offset && i < max_digits - 1 - fractional_digits) buff = strecpy(buff, separator, last);
 		}
@@ -605,12 +605,13 @@ struct UnitConversion {
 	/**
 	 * Convert the displayed value back into a value of OpenTTD's internal unit.
 	 * @param input The input to convert.
-	 * @param round Whether to round the value or not.
+	 * @param round Whether to round the value up or not.
+	 * @param divider Divide the return value by this.
 	 * @return The converted value.
 	 */
-	int64 FromDisplay(int64 input, bool round = true) const
+	int64 FromDisplay(int64 input, bool round = true, int64 divider = 1) const
 	{
-		return ((input << this->shift) + (round ? this->multiplier / 2 : 0)) / this->multiplier;
+		return ((input << this->shift) + (round ? (this->multiplier * divider) - 1 : 0)) / (this->multiplier * divider);
 	}
 };
 
@@ -682,6 +683,25 @@ uint ConvertDisplaySpeedToSpeed(uint speed)
 	return _units[_settings_game.locale.units].c_velocity.FromDisplay(speed);
 }
 
+/**
+ * Convert the given km/h-ish speed to the display speed.
+ * @param speed the speed to convert
+ * @return the converted speed.
+ */
+uint ConvertKmhishSpeedToDisplaySpeed(uint speed)
+{
+	return _units[_settings_game.locale.units].c_velocity.ToDisplay(speed * 10, false) / 16;
+}
+
+/**
+ * Convert the given display speed to the km/h-ish speed.
+ * @param speed the speed to convert
+ * @return the converted speed.
+ */
+uint ConvertDisplaySpeedToKmhishSpeed(uint speed)
+{
+	return _units[_settings_game.locale.units].c_velocity.FromDisplay(speed * 16, true, 10);
+}
 /**
  * Parse most format codes within a string and write the result to a buffer.
  * @param buff  The buffer to write the final string to.
@@ -1086,6 +1106,38 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				break;
 			}
 
+			case SCC_CARGO_LIST: { // {CARGO_LIST}
+				uint32 cmask = args->GetInt32(SCC_CARGO_LIST);
+				bool first = true;
+
+				const CargoSpec *cs;
+				FOR_ALL_SORTED_CARGOSPECS(cs) {
+					if (!HasBit(cmask, cs->Index())) continue;
+
+					if (buff >= last - 2) break; // ',' and ' '
+
+					if (first) {
+						first = false;
+					} else {
+						/* Add a comma if this is not the first item */
+						*buff++ = ',';
+						*buff++ = ' ';
+					}
+
+					buff = GetStringWithArgs(buff, cs->name, args, last, next_substr_case_index, game_script);
+				}
+
+				/* If first is still true then no cargo is accepted */
+				if (first) buff = GetStringWithArgs(buff, STR_JUST_NOTHING, args, last, next_substr_case_index, game_script);
+
+				*buff = '\0';
+				next_substr_case_index = 0;
+
+				/* Make sure we detect any buffer overflow */
+				assert(buff < last);
+				break;
+			}
+
 			case SCC_CURRENCY_SHORT: // {CURRENCY_SHORT}
 				buff = FormatGenericCurrency(buff, _currency, args->GetInt64(), true, last);
 				break;
@@ -1137,7 +1189,7 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 
 			case SCC_VELOCITY: { // {VELOCITY}
 				assert(_settings_game.locale.units < lengthof(_units));
-				int64 args_array[] = {ConvertSpeedToDisplaySpeed(args->GetInt64(SCC_VELOCITY) * 10 / 16)};
+				int64 args_array[] = {ConvertKmhishSpeedToDisplaySpeed(args->GetInt64(SCC_VELOCITY))};
 				StringParameters tmp_params(args_array);
 				buff = FormatString(buff, GetStringPtr(_units[_settings_game.locale.units].velocity), &tmp_params, last);
 				break;

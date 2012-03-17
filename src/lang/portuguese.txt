@@ -341,7 +341,7 @@ STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Guardar cenári
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Abrir cenário
 STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Guardar mapa de alturas
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Abrir mapa de alturas
-STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Sair do editor
+STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Abandonar editor de cenário
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
 STR_SCENEDIT_FILE_MENU_QUIT                                     :Sair
 ############ range for SE file menu starts
@@ -361,13 +361,14 @@ STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Mostrar sinais 
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Animação completa
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Máximo de detalhes
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Edifícios transparentes
-STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Sinais transparentes nas estações
+STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Sinais Transparentes
 ############ range ends here
 
 ############ range for file menu starts
 STR_FILE_MENU_SAVE_GAME                                         :Guardar jogo
 STR_FILE_MENU_LOAD_GAME                                         :Abrir jogo
 STR_FILE_MENU_QUIT_GAME                                         :Abandonar jogo
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Sair
 ############ range ends here
 
@@ -1801,9 +1802,9 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Você fo
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Batotas não são permitidas neste servidor
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Estava a enviar demasiados comandos ao servidor
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Demorou demasiado tempo a introduzir a palavra-chave
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}O seu computador demorou demasiado a ligar a rede
-STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Demorou demasiado a transferir o mapa
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Demorou demasiado a ligar ao servidor
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}O seu computador é demasiado lento para acompanhar com o servidor
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}O seu computador demorou demasiado a transferir o mapa
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}O seu computador demorou demasiado a ligar ao servidor
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :erro geral
@@ -1929,7 +1930,7 @@ STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Não, sa
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Opções de Transparência
-STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Comutar transparência para sinais das estações. Ctrl+Clique para bloquear.
+STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Comutar transparência para sinais. Ctrl+Clique para bloquear.
 STR_TRANSPARENT_TREES_TOOLTIP                                   :{BLACK}Comutar transparência das árvores. Ctrl+Clique para bloquear.
 STR_TRANSPARENT_HOUSES_TOOLTIP                                  :{BLACK}Comutar transparência das casas. Ctrl+Clique para bloquear.
 STR_TRANSPARENT_INDUSTRIES_TOOLTIP                              :{BLACK}Comutar transparência das indústrias. Ctrl+Clique para bloquear.
@@ -1946,8 +1947,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Off
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}On
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Não exibir área de cobertura do sítio proposto
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Exibir área de cobertura do sítio proposto
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Aceita: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Fornecimentos: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Aceita: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Fornecimentos: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Juntar estação
@@ -2070,7 +2071,7 @@ STR_STATION_BUILD_BUS_ORIENTATION                               :{WHITE}Orienta�
 STR_STATION_BUILD_BUS_ORIENTATION_TOOLTIP                       :{BLACK}Seleccionar a orientação da estação de autocarros
 STR_STATION_BUILD_TRUCK_ORIENTATION                             :{WHITE}Orientação da estação de carga
 STR_STATION_BUILD_TRUCK_ORIENTATION_TOOLTIP                     :{BLACK}Seleccionar a orientação da estação de carregamento de camiões
-STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION                    :{WHITE}Orientação da Estação de Eléctricos
+STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION                    :{WHITE}Orientação da Estação de Eléctricos de Passageiros
 STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION_TOOLTIP            :{BLACK}Seleccionar orientação da estação de eléctricos
 STR_STATION_BUILD_CARGO_TRAM_ORIENTATION                        :{WHITE}Orientação da Estação de Eléctricos
 STR_STATION_BUILD_CARGO_TRAM_ORIENTATION_TOOLTIP                :{BLACK}Seleccionar orientação da estação de eléctricos
@@ -2457,11 +2458,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Para Bai
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Move o ficheiro NewGRF seleccionado para baixo na lista
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Uma lista dos ficheiros NewGRF que estão instalados.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Ver leia-me
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Lista de alterações
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licença
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Definir parâmetros
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Mostrar parametros
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Alternar palete
@@ -2492,11 +2488,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Retorna 
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parâmetro {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Número de parâmetros: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}Leiame NewGRF de {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}Lista de alterações NewGRF de {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}Licença NewGRF de {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspeccionar - {STRING}
@@ -2732,7 +2723,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Aceita
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Mostrar lista de carga aceite
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Aceita: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Aceita: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Avaliações
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Mostrar avaliações da estação
@@ -2977,9 +2968,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Peso: {G
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Custo: {GOLD}{CURRENCY_LONG}{BLACK} Velocidade: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Capacidade: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Vagões Motorizados: {GOLD}+{POWER}{BLACK} Peso: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Reconvertível para: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Reconvertível para: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Todos os tipos de carga
-STR_PURCHASE_INFO_ALL_BUT                                       :Todas menos {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Todas menos {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Máx. Força de Tracção: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Alcance: {GOLD}{COMMA} quadrados
 
@@ -3226,7 +3217,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Lucro ne
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Fiabilidade: {LTBLUE}{COMMA}%  {BLACK}Avarias desde o último serviço: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Construído: {LTBLUE}{NUM}{BLACK} Valor: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Capacidade: {LTBLUE}Nenhuma
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Capacidade: {LTBLUE}Nenhuma{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Capacidade: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Capacidade: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Capacidade: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3453,7 +3444,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Horário
 STR_TIMETABLE_NO_TRAVEL                                         :Não viaja
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Viagem (automático; calendarizadas por próxima ordem manual)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Viagem (sem programação)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Viajar no máximo a {2:VELOCITY} (sem programação)
 STR_TIMETABLE_TRAVEL_FOR                                        :Viajar durante {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Viajar por {STRING} no máximo a {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :e ficar durante {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :e viaja para {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} dia{P "" s}
@@ -3476,6 +3469,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Muda o e
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Apagar Tempo
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Apagar o tempo que dura a ordem seleccionada
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Alterar Limite de Velocidade
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Mudar a velocidade maxima durante a viagem da ordem selecionada
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Apagar Limite de Velocidade
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Limpar a velocidade maxima durante a viagem da ordem selecionada
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Apagar Contador Atraso
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Limpar o contador de atraso, para que o veículo passe a estar a horas
@@ -3571,6 +3570,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Fechar
 STR_AI_SETTINGS_RESET                                           :{BLACK}Repor
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Número de dias para iniciar esta IA depois da anterior (tomar ou lorgar): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}Leiame {STRING} de {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}Lista de alterações {STRING} de {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}Licença {STRING} de {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Ver leia-me
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Lista de alterações
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licença
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4448,6 +4457,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

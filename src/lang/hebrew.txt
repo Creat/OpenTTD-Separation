@@ -1860,8 +1860,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}מופס
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}מופעל
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}בטל הדגשת השטח המכוסה ע"י התחנה
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}הדגש את השטח המכוסה ע"י התחנה
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}מקבלת: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}מספקת: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}מקבלת: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}מספקת: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}חבר לתחנה קיימת
@@ -2326,8 +2326,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}העבר
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}מעביר את הקובץ שנבחר כלפי מטה ברשימה
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK} רשימת קבצי שדרוג גראפי מותקנים
 
-# Additional textfiles accompanying NewGRFs
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}קבע ערכים
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}החלף פלטת צבעים
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE_TOOLTIP                      :{BLACK}מחליף את פלטת הצבעים עבור קובץ השדרוג הגראפי שנבחר. השתמש באפשרות זו אם הצבעים שהתקבלו אינם די ברורים
@@ -2351,8 +2349,6 @@ STR_NEWGRF_SETTINGS_DISABLED                                    :{RED}מושתק
 STR_NEWGRF_PARAMETERS_RESET                                     :{BLACK}אתחל
 STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}הגדר את כל הפרמטרים לערך ברירת המחדל שלהם
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}מספר הגדרות: {ORANGE}{NUM}
-
-# NewGRF textfile window
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}בדוק - {STRING}
@@ -2485,6 +2481,10 @@ STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_BRIBE                        :{YELLOW}שחד 
 
 # Goal window
 
+# Goal question window
+
+### Start of Goal Question button list
+
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}סובסידיות
 STR_SUBSIDIES_OFFERED_TITLE                                     :{BLACK} :סובסידיות למימון שירותי הובלה
@@ -2513,7 +2513,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}מקבל
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}הצג רשימת סוגי המטען שהתחנה מקבלת
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}מקבלת: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}מקבלת: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}דירוג
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}הצג את דירוג השירות
@@ -2733,9 +2733,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}משקל
 STR_PURCHASE_INFO_COST_SPEED                                    :{GOLD}{1:VELOCITY}{BLACK} : מהירות {GOLD}{0:CURRENCY_LONG} {BLACK} :מחיר
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}קיבולת: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}קרונות ממונעים: {GOLD}+{POWER}{BLACK} משקל: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK} :ניתן להתאים ל{GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK} :ניתן להתאים ל{GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :כל סוגי המטען
-STR_PURCHASE_INFO_ALL_BUT                                       :{GOLD} כל סוגי המטען למעט
+STR_PURCHASE_INFO_ALL_BUT                                       :{CARGO_LIST} כל סוגי המטען למעט
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}כוח סחיבה מקסימלי: {GOLD}{FORCE}
 
 STR_BUY_VEHICLE_TRAIN_LIST_TOOLTIP                              :{BLACK} בחירת קרונות - לחץ על קרון לקבלת מידע
@@ -2977,7 +2977,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}רווח
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}מהימנות: {LTBLUE}{COMMA}%  {BLACK}קלקול מאז טיפול אחרון: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}נבנה: {LTBLUE}{NUM}{BLACK} ערך: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}קיבולת: {LTBLUE}אין
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}קיבולת: {LTBLUE}אין{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}קיבולת: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}קיבולת: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}קיבולת: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3201,6 +3201,8 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}שנה �
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}אפס זמן
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}אפס את פרק הזמן לשהייה ביעד שנבחר
 
+
+
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}אפס מונה איחורים
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}אפס את מונה האיחורים על מנת לאפשר לכלי להגיע בזמן
 
@@ -3274,6 +3276,10 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}אל ת�
 # AI Parameters
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}סגור
 STR_AI_SETTINGS_RESET                                           :{BLACK}אתחל
+
+
+# Textfile window
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}

@@ -318,7 +318,7 @@ STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Costruis
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Apre la barra di modellazione del terreno per alzare/abbassare il terreno, piantare alberi, etc.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Mostra la finestra suoni/musica
 STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Mostra l'ultimo messaggio/notizia, mostra le opzioni dei messaggi
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Informazioni area terreno, console, debug IA, screenshot, informazioni su OpenTTD
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Informazioni area terreno, console, debug degli script, screenshot, informazioni su OpenTTD
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Alterna barre degli strumenti
 
 # Extra tooltips for the scenario editor toolbar
@@ -351,7 +351,7 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :Esci
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Opzioni gioco
 STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Impostazioni difficoltà
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Impostazioni avanzate
-STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :Impostazioni IA e gioco
+STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :Impostazioni IA e Script
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :Impostazioni NewGRF
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Opzioni trasparenza
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Mostra nomi città
@@ -369,6 +369,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Cartelli traspa
 STR_FILE_MENU_SAVE_GAME                                         :Salva partita
 STR_FILE_MENU_LOAD_GAME                                         :Carica partita
 STR_FILE_MENU_QUIT_GAME                                         :Abbandona partita
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Esci
 ############ range ends here
 
@@ -446,7 +447,7 @@ STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :Cronologia mess
 STR_ABOUT_MENU_LAND_BLOCK_INFO                                  :Informazioni sull'area di terreno
 STR_ABOUT_MENU_SEPARATOR                                        :
 STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Apri/chiudi console
-STR_ABOUT_MENU_AI_DEBUG                                         :Debug IA / GameScript
+STR_ABOUT_MENU_AI_DEBUG                                         :Debug IA/Script
 STR_ABOUT_MENU_SCREENSHOT                                       :Screenshot
 STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Screenshot con zoom massimo
 STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Screenshot con zoom predefinito
@@ -1432,7 +1433,7 @@ STR_INTRO_DIFFICULTY                                            :{BLACK}Difficol
 STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Impostazioni avanzate
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}Impostazioni NewGRF
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Contenuti online
-STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}Impostazioni IA e gioco
+STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}Impostazioni IA e Script
 STR_INTRO_QUIT                                                  :{BLACK}Esci
 
 STR_INTRO_TOOLTIP_NEW_GAME                                      :{BLACK}Inizia una nuova partita. CTRL salta la configurazione della mappa.
@@ -1452,7 +1453,7 @@ STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}Mostra l
 STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Mostra le impostazioni avanzate
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Mostra le impostazioni NewGRF
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Controlla la disponibilità di contenuti nuovi o aggiornati da scaricare
-STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Mostra le impostazioni delle IA e del gioco
+STR_INTRO_TOOLTIP_SCRIPT_SETTINGS                               :{BLACK}Mostra le impostazioni delle IA e degli Script
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Esci da 'OpenTTD'
 
 STR_INTRO_TRANSLATION                                           :{BLACK}A questa traduzione mancano {NUM} string{P a he}. Aiutaci a migliorare OpenTTD iscrivendoti come traduttore. Vedi readme.txt per dettagli.
@@ -1824,9 +1825,9 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Sei stat
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}I trucchi non sono ammessi su questo server
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Stavano venendo inviati troppi comandi al server
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Si è impiegato troppo tempo ad inserire la password
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Il computer ha impiegato troppo tempo ad entrare nella partita
-STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Il download della mappa ha richiesto troppo tempo
-STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}L'ingresso al server ha richiesto troppo tempo
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Il computer è troppo lento per restare al passo col server
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Il compiuter ha impiegato troppo tempo per il download della mappa
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Il computer ha impiegato troppo tempo per l'ingresso al server
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :errore generale
@@ -1866,7 +1867,7 @@ STR_NETWORK_SERVER_MESSAGE_GAME_UNPAUSED                        :Partita ripresa
 STR_NETWORK_SERVER_MESSAGE_GAME_REASON_NOT_ENOUGH_PLAYERS       :numero di giocatori
 STR_NETWORK_SERVER_MESSAGE_GAME_REASON_CONNECTING_CLIENTS       :connessione client in corso
 STR_NETWORK_SERVER_MESSAGE_GAME_REASON_MANUAL                   :manuale
-STR_NETWORK_SERVER_MESSAGE_GAME_REASON_GAME_SCRIPT              :script di gioco
+STR_NETWORK_SERVER_MESSAGE_GAME_REASON_GAME_SCRIPT              :script
 ############ End of leave-in-this-order
 STR_NETWORK_MESSAGE_CLIENT_LEAVING                              :abbandono della partita
 STR_NETWORK_MESSAGE_CLIENT_JOINED                               :*** {STRING} è entrato nella partita
@@ -1928,7 +1929,7 @@ STR_CONTENT_TYPE_SCENARIO                                       :{G=m}Scenario
 STR_CONTENT_TYPE_HEIGHTMAP                                      :{G=f}Heightmap
 STR_CONTENT_TYPE_BASE_SOUNDS                                    :{G=m}Suoni base
 STR_CONTENT_TYPE_BASE_MUSIC                                     :{G=f}Musica base
-STR_CONTENT_TYPE_GAME_SCRIPT                                    :Script di gioco
+STR_CONTENT_TYPE_GAME_SCRIPT                                    :Script
 STR_CONTENT_TYPE_GS_LIBRARY                                     :Libreria script
 
 # Content downloading progress window
@@ -1969,8 +1970,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Off
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}On
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Non evidenziare l'area di copertura del sito proposto
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Evidenzia l'area di copertura del sito proposto
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Accetta: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Fornisce: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Accetta: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Fornisce: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Unisci stazione
@@ -2484,11 +2485,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Sposta g
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Sposta il file NewGRF selezionato più in basso nell'elenco
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Elenco dei file NewGRF installati.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Visualizza file leggimi
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Changelog
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licenza
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Imposta parametri
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Mostra parametri
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Alterna tavolozze
@@ -2520,11 +2516,6 @@ STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parametro {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Numero di parametri: {ORANGE}{NUM}
 
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}File leggimi del NewGRF {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}Changelog del NewGRF {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}Licenza del NewGRF {STRING}
-
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Ispeziona - {STRING}
 STR_NEWGRF_INSPECT_PARENT_BUTTON                                :{BLACK}Padre
@@ -2547,7 +2538,7 @@ STR_SPRITE_ALIGNER_PREVIOUS_TOOLTIP                             :{BLACK}Procede 
 STR_SPRITE_ALIGNER_SPRITE_TOOLTIP                               :{BLACK}Rappresentazione dello sprite corrente. L'allineamento viene ignorato in questa casella.
 STR_SPRITE_ALIGNER_MOVE_TOOLTIP                                 :{BLACK}Sposta lo sprite, cambiando i posizionamenti X e Y
 STR_SPRITE_ALIGNER_OFFSETS                                      :{BLACK}Posizionamento X: {NUM}, Y: {NUM}
-STR_SPRITE_ALIGNER_PICKER_BUTTON                                :{BLACK}Scegli
+STR_SPRITE_ALIGNER_PICKER_BUTTON                                :{BLACK}Scegli sprite
 STR_SPRITE_ALIGNER_PICKER_TOOLTIP                               :{BLACK}Sceglie uno o più sprite da un qualsiasi punto dello schermo
 
 STR_SPRITE_ALIGNER_GOTO_CAPTION                                 :{WHITE}Vai a
@@ -2759,7 +2750,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Accetta
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Mostra la lista delle merci accettate
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accetta: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Accetta: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Valutazione
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Mostra la valutazione della stazione
@@ -3004,9 +2995,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Peso: {G
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Costo: {GOLD}{CURRENCY_LONG}{BLACK} Velocità: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Capacità: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Vagoni motorizzati: {GOLD}+{POWER}{BLACK} Peso: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Riadattabile per: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Riadattabile per: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Tutti i tipi di carico
-STR_PURCHASE_INFO_ALL_BUT                                       :Tutto tranne {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Tutto tranne {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Sforzo di trazione massimo: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Autonomia: {GOLD}{COMMA} riquadr{P o i}
 
@@ -3253,7 +3244,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Profitto
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Affidabilità: {LTBLUE}{COMMA}%  {BLACK}Guasti dall'ultima manutenzione: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Costruito nel: {LTBLUE}{NUM}{BLACK} Valore: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Capacità: {LTBLUE}Nessuna
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Capacità: {LTBLUE}Nessuna{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Capacità: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Capacità: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Capacità: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3298,7 +3289,7 @@ STR_REFIT_CAPTION                                               :{WHITE}{VEHICLE
 STR_REFIT_TITLE                                                 :{GOLD}Selezionare il tipo di carico da trasportare:
 STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}Nuova capacità: {GOLD}{CARGO_LONG}{}{BLACK}Costo riadattamento: {GOLD}{CURRENCY_LONG}
 STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT                   :{BLACK}Nuova capacità: {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK}Costo riadattamento: {GOLD}{CURRENCY_LONG}
-STR_REFIT_SELECT_VEHICLES_TOOLTIP                               :{BLACK}Seleziona i veicoli da riadattare. Trascinare col mouse per selezionare più veicoli. Fare clic sullo spazio vuote per selezionarli tutti. CTRL+clic seleziona anche la parte successiva della composizione
+STR_REFIT_SELECT_VEHICLES_TOOLTIP                               :{BLACK}Seleziona i veicoli da riadattare. Trascinare col mouse per selezionare più veicoli. Fare clic sullo spazio vuoto per selezionarli tutti. CTRL+clic seleziona anche la parte successiva della composizione
 
 STR_REFIT_TRAIN_LIST_TOOLTIP                                    :{BLACK}Selezionare il tipo di carico da far trasportare al treno
 STR_REFIT_ROAD_VEHICLE_LIST_TOOLTIP                             :{BLACK}Selezionare il tipo di carico da far trasportare all'automezzo
@@ -3400,7 +3391,7 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Deposito più v
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Hangar più vicino
 STR_ORDER_CONDITIONAL                                           :Salto condizionale
 STR_ORDER_SHARE                                                 :Condividi ordini
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Inserisce un nuovo ordine prima di quello selezionato, o lo aggiunge alla fine della lista. Facendo clic con CTRL gli ordini verso le stazioni diventano 'attendi qualsiasi pieno carico', quelli verso waypoint 'no-stop' e quelli verso depositi 'manutenzione'. L'opzione 'Condividi ordini' o il tasto CTRL consentono a questo veicolo di condividere gli ordini con un veicolo selezionato. Cliccando su un veicolo gli ordini vengono invece copiati dallo stesso
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Inserisce un nuovo ordine prima di quello selezionato, o lo aggiunge alla fine della lista. Facendo clic con CTRL gli ordini verso le stazioni diventano 'attendi qualsiasi pieno carico', quelli verso waypoint 'no-stop' e quelli verso depositi 'manutenzione'. L'opzione 'Condividi ordini' o il tasto CTRL consentono a questo veicolo di condividere gli ordini con un veicolo selezionato. Cliccando su un veicolo gli ordini vengono copiati dallo stesso. Gli ordini verso i depositi disattivano la manutenzione automatica del veicolo
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Mostra tutti i veicoli che condividono questa lista ordini
 
@@ -3480,7 +3471,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Tabella 
 STR_TIMETABLE_NO_TRAVEL                                         :Nessun viaggio
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Viaggia (automatico; orario basato sul successivo ordine manuale)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Viaggia (senza orario)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Viaggia a non più di {2:VELOCITY} (senza orario)
 STR_TIMETABLE_TRAVEL_FOR                                        :Viaggia per {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Viaggia per {STRING} a non più di {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :e sosta per {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :e viaggia per {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} giorn{P o i}
@@ -3503,6 +3496,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Cambia l
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Elimina tempo
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Elimina l'impostazione della quantità di tempo per l'ordine selezionato
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Cambia limite di velocità
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Cambia l'impostazione del limite di velocità per l'ordine selezionato
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Elimina limite di velocità
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Elimina l'impostazione del limite di velocità per l'ordine selezionato
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Azzera ritardo
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Azzera il contatore del ritardo, in modo che il veicolo sia considerato in orario
@@ -3528,7 +3527,7 @@ STR_DATE_YEAR_TOOLTIP                                           :{BLACK}Selezion
 
 
 # AI debug window
-STR_AI_DEBUG                                                    :{WHITE}Debug IA / GameScript
+STR_AI_DEBUG                                                    :{WHITE}Debug IA/Script
 STR_AI_DEBUG_NAME_AND_VERSION                                   :{BLACK}{STRING} (v{NUM})
 STR_AI_DEBUG_NAME_TOOLTIP                                       :{BLACK}Nome dello script
 STR_AI_DEBUG_SETTINGS                                           :{BLACK}Impostazioni
@@ -3544,16 +3543,16 @@ STR_AI_DEBUG_MATCH_CASE_TOOLTIP                                 :{BLACK}Attiva/d
 STR_AI_DEBUG_CONTINUE                                           :{BLACK}Continua
 STR_AI_DEBUG_CONTINUE_TOOLTIP                                   :{BLACK}Esce dalla pausa e continua l'esecuzione della IA
 STR_AI_DEBUG_SELECT_AI_TOOLTIP                                  :{BLACK}Visualizza l'output di debug di questa IA
-STR_AI_GAME_SCRIPT                                              :{BLACK}Script di gioco
-STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Visualizza il log degli script di gioco
+STR_AI_GAME_SCRIPT                                              :{BLACK}Script
+STR_AI_GAME_SCRIPT_TOOLTIP                                      :{BLACK}Visualizza il log degli script
 
 STR_ERROR_AI_NO_AI_FOUND                                        :Impossibile trovare una IA adatta da caricare.{}La IA caricata è solo un abbozzo e resterà semplicemente passiva.{}È possibile scaricare numerose IA tramite il sistema 'Contenuti online'
-STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Uno degli script in funzione è andato in crash. Si prega di inviare una segnalazione all'autore dello script con uno screenshot della finestra Debug IA / GameScript
-STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}La finestra di debug IA / GameScript è disponibile soltanto per il server
+STR_ERROR_AI_PLEASE_REPORT_CRASH                                :{WHITE}Uno degli script in funzione è andato in crash. Si prega di inviare una segnalazione all'autore dello script con uno screenshot della finestra Debug IA/Script
+STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}La finestra di debug IA/Script è disponibile soltanto per il server
 
 # AI configuration window
-STR_AI_CONFIG_CAPTION                                           :{WHITE}Configurazione IA e gioco
-STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Lista dei GameScript che saranno caricati nella prossima partita
+STR_AI_CONFIG_CAPTION                                           :{WHITE}Configurazione IA e Script
+STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Lista degli Script che saranno caricati nella prossima partita
 STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}Lista delle IA che saranno caricate nella prossima partita
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Giocatore umano
 STR_AI_CONFIG_RANDOM_AI                                         :IA casuale
@@ -3564,13 +3563,13 @@ STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Sposta l
 STR_AI_CONFIG_MOVE_DOWN                                         :{BLACK}Sposta giù
 STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}Sposta l'IA selezionata più in basso nell'elenco
 
-STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}GameScript
+STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}Script
 STR_AI_CONFIG_AI                                                :{SILVER}IA
 
 STR_AI_CONFIG_CHANGE                                            :{BLACK}Seleziona {STRING}
 STR_AI_CONFIG_CHANGE_NONE                                       :
 STR_AI_CONFIG_CHANGE_AI                                         :IA
-STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :GameScript
+STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :Script
 STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Carica un altro script
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Configura
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configura i parametri dello script
@@ -3578,7 +3577,7 @@ STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Configur
 # Available AIs window
 STR_AI_LIST_CAPTION                                             :{WHITE}{STRING} disponibili
 STR_AI_LIST_CAPTION_AI                                          :IA
-STR_AI_LIST_CAPTION_GAMESCRIPT                                  :GameScript
+STR_AI_LIST_CAPTION_GAMESCRIPT                                  :Script
 STR_AI_LIST_TOOLTIP                                             :{BLACK}Fare clic per selezionare uno script
 
 STR_AI_LIST_AUTHOR                                              :{BLACK}Autore: {STRING}
@@ -3593,11 +3592,21 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Non modi
 # AI Parameters
 STR_AI_SETTINGS_CAPTION                                         :{WHITE}Parametri {STRING}
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
-STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :GameScript
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Script
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Chiudi
 STR_AI_SETTINGS_RESET                                           :{BLACK}Reimposta
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Giorni da attendere per l'avvio di questa IA dopo la precedente (approssimativo): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}File leggimi del {STRING} {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}Changelog del {STRING} {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}Licenza del {STRING} {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Visualizza file leggimi
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Changelog
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licenza
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4441,6 +4450,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
@@ -4475,6 +4485,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

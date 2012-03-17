@@ -232,7 +232,7 @@ STR_TOOLTIP_CLOSE_WINDOW                                        :{BLACK}Fenster 
 STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS                              :{BLACK}Titelleiste klicken und ziehen, um das Fenster zu verschieben
 STR_TOOLTIP_SHADE                                               :{BLACK}Fenster einklappen - Nur die Titelleiste zeigen
 STR_TOOLTIP_DEBUG                                               :{BLACK}Zeige Daten für NewGRF-Fehlerbeseitigung
-STR_TOOLTIP_STICKY                                              :{BLACK}Fenster wird nicht durch die "schließe alle Fenster"-Taste geschlossen
+STR_TOOLTIP_STICKY                                              :{BLACK}Fenster wird nicht durch die "Schließe alle Fenster"-Taste geschlossen
 STR_TOOLTIP_RESIZE                                              :{BLACK}Klicken und Ziehen zum Ändern der Größe des Fensters
 STR_TOOLTIP_TOGGLE_LARGE_SMALL_WINDOW                           :{BLACK}Zwischen Fenstergrößen umschalten
 STR_TOOLTIP_VSCROLL_BAR_SCROLLS_LIST                            :{BLACK}Bildlaufleiste: In der Liste auf- und abwärts blättern
@@ -317,7 +317,7 @@ STR_TOOLBAR_TOOLTIP_BUILD_AIRPORTS                              :{BLACK}Flughafe
 STR_TOOLBAR_TOOLTIP_LANDSCAPING                                 :{BLACK}Landschaftsbau: Land senken/heben, Bäume pflanzen, etc.
 STR_TOOLBAR_TOOLTIP_SHOW_SOUND_MUSIC_WINDOW                     :{BLACK}Sound- / Musikfenster anzeigen
 STR_TOOLBAR_TOOLTIP_SHOW_LAST_MESSAGE_NEWS                      :{BLACK}Zeige letzte Mitteilung / Nachricht, Nachrichtenoptionen anzeigen
-STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Gebietsinformation, Konsole, KI Debug, Screenshot, über OpenTTD
+STR_TOOLBAR_TOOLTIP_LAND_BLOCK_INFORMATION                      :{BLACK}Gebietsinformation, Konsole, KI- und Skript-Debug, Screenshots, über OpenTTD
 STR_TOOLBAR_TOOLTIP_SWITCH_TOOLBAR                              :{BLACK}Werkzeugleisten wechseln
 
 # Extra tooltips for the scenario editor toolbar
@@ -355,7 +355,7 @@ STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :NewGRF-Einstell
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Transparenzeinstellungen
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Städtenamen anzeigen
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Stationsnamen anzeigen
-STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Wegpunktsnamen anzeigen
+STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Wegpunktnamen anzeigen
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Schilder anzeigen
 STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Fremde Stationsnamen & Schilder zeigen
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Vollständige Animation
@@ -368,6 +368,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparenz fü
 STR_FILE_MENU_SAVE_GAME                                         :Spiel speichern
 STR_FILE_MENU_LOAD_GAME                                         :Spiel laden
 STR_FILE_MENU_QUIT_GAME                                         :Spiel beenden
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :OpenTTD beenden
 ############ range ends here
 
@@ -1801,7 +1802,7 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Sie wurd
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Mogeln ist auf diesem Server nicht erlaubt
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Es wurden zu viele Kommandos an den Server gesendet
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Zeit für die Eingabe des Passwortes wurde überschritten
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Dieser Computer brauchte zu lange, um dem Spiel beizutreten
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Dieser Computer ist sehr langsam, sodass er nicht mit dem Server mithalten kann
 STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Das Herunterladen der Karte dauerte zu lange
 STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Der Beitritt zum Server dauerte zu lange
 
@@ -1946,8 +1947,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}aus
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}an
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Einzugsgebiet nicht angezeigen
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Einzugsgebiet anzeigen
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Nimmt an: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Liefert: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Nimmt an: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Liefert: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Verbinde mit Station
@@ -1984,7 +1985,7 @@ STR_BUILD_DEPOT_TRAIN_ORIENTATION_TOOLTIP                       :{BLACK}Ausricht
 
 # Rail waypoint construction window
 STR_WAYPOINT_CAPTION                                            :{WHITE}Wegpunkt
-STR_WAYPOINT_GRAPHICS_TOOLTIP                                   :{BLACK}Wegpunktstyp auswählen
+STR_WAYPOINT_GRAPHICS_TOOLTIP                                   :{BLACK}Wegpunktbauform auswählen
 
 # Rail station construction window
 STR_STATION_BUILD_RAIL_CAPTION                                  :{WHITE}Bahnhof bauen
@@ -2457,11 +2458,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Nach unt
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Die ausgewählte NewGRF-Datei in der Liste nach unten verschieben
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Eine Liste der installierten NewGRF-Dateien.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Readme anzeigen
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Änderungen
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Lizenz
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Parameter setzen
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Zeige Parameter
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Farbpalette ändern
@@ -2492,11 +2488,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Alle Par
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parameter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Anzahl Parameter: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF - Readme von {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF Änderungen von {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF-Lizenz von {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Inspiziere - {STRING}
@@ -2732,7 +2723,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Angenommen
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Zeige Liste der angenommenen Frachtarten
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Nimmt an: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Nimmt an: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Bewertung
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Stationsbewertung anzeigen
@@ -2767,7 +2758,7 @@ STR_WAYPOINT_VIEW_CHANGE_WAYPOINT_NAME                          :{BLACK}Namen de
 STR_BUOY_VIEW_CENTER_TOOLTIP                                    :{BLACK}Hauptansicht zur Boje scrollen. Strg+Klick öffnet neue Zusatzansicht bei der Boje
 STR_BUOY_VIEW_CHANGE_BUOY_NAME                                  :{BLACK}Namen der Boje ändern
 
-STR_EDIT_WAYPOINT_NAME                                          :{WHITE}Namen der Wegpunkts ändern
+STR_EDIT_WAYPOINT_NAME                                          :{WHITE}Namen des Wegpunkts ändern
 
 # Finances window
 STR_FINANCES_CAPTION                                            :{WHITE}{COMPANY} Finanzen {BLACK}{COMPANY_NUM}
@@ -2977,9 +2968,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Gewicht:
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Kosten: {GOLD}{CURRENCY_LONG}{BLACK} Geschw.: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Kapazität: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Angetriebene Waggons: {GOLD}+{POWER}{BLACK} Gewicht: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Umrüstbar auf: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Umrüstbar auf: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Alle Frachtarten
-STR_PURCHASE_INFO_ALL_BUT                                       :Alles außer {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Alles außer {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Max. Zugkraft: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Reichweite: {GOLD}{COMMA} Felder
 
@@ -3226,7 +3217,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Gewinn d
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Zuverlässigkeit: {LTBLUE}{COMMA}%  {BLACK}Pannen seit der letzten Wartung: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Gebaut: {LTBLUE}{NUM}{BLACK} Wert: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapazität: {LTBLUE}Keine
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapazität: {LTBLUE}Keine{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Kapazität: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Kapazität: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Kapazität: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3301,11 +3292,11 @@ STR_ORDERS_END_OF_ORDERS                                        :- - Ende der Au
 STR_ORDERS_END_OF_SHARED_ORDERS                                 :- - Ende des gemeinsam genutzten Fahrplans - -
 
 # Order bottom buttons
-STR_ORDER_NON_STOP                                              :{BLACK}ohne Halt
+STR_ORDER_NON_STOP                                              :{BLACK}ohne Zwischenhalt
 STR_ORDER_GO_TO                                                 :Fahre zu
-STR_ORDER_GO_NON_STOP_TO                                        :Fahre ohne Halt zu
+STR_ORDER_GO_NON_STOP_TO                                        :Fahre ohne Zwischenhalt zu
 STR_ORDER_GO_VIA                                                :Fahre über
-STR_ORDER_GO_NON_STOP_VIA                                       :Fahre ohne Halt über
+STR_ORDER_GO_NON_STOP_VIA                                       :Fahre ohne Zwischenhalt über
 STR_ORDER_TOOLTIP_NON_STOP                                      :{BLACK}Ändert Stoppverhalten des ausgewählten Auftrags
 
 STR_ORDER_TOGGLE_FULL_LOAD                                      :{BLACK}Vollladen einer Fracht
@@ -3373,16 +3364,16 @@ STR_ORDER_GO_TO_NEAREST_DEPOT                                   :Nächstes Depot
 STR_ORDER_GO_TO_NEAREST_HANGAR                                  :Nächster Hangar
 STR_ORDER_CONDITIONAL                                           :Bedingter Sprung zu Auftrag
 STR_ORDER_SHARE                                                 :Gemeinsame Aufträge
-STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Einen neuen Auftrag vor dem markierten Auftrag oder am Ende der Liste einfügen. Strg halten, um für Stationen 'Vollladen einer Fracht', für Wegpunkte 'ohne Halt' und für Depots 'Wartung' auszuwählen. 'Gemeinsame Aufträge' erlauben ein Fahrzeug auszuwählen mit dem dieses die Aufträge teilt. Klicken auf ein Fahrzeug kopiert die Aufträge von diesem
+STR_ORDERS_GO_TO_TOOLTIP                                        :{BLACK}Einen neuen Auftrag vor dem markierten Auftrag oder am Ende der Liste einfügen. Strg halten, um für Stationen 'Vollladen einer Fracht', für Wegpunkte 'ohne Zwischenhalt' und für Depots 'Wartung' auszuwählen. 'Gemeinsame Aufträge' erlauben es, für mehrere Fahrzeuge nur einen Fahrplan und eine Auftragsliste zu verwenden. Durch Klicken auf ein Fahrzeug werden die Aufträge durch die des ausgewählten Fahrzeugs ersetzt. Wartungs- und Depotaufträge schalten die automatische Wartung aus.
 
 STR_ORDERS_VEH_WITH_SHARED_ORDERS_LIST_TOOLTIP                  :{BLACK}Alle Fahrzeuge mit demselben Fahrplan anzeigen
 
 # String parts to build the order string
 STR_ORDER_GO_TO_WAYPOINT                                        :Fahre über {WAYPOINT}
-STR_ORDER_GO_NON_STOP_TO_WAYPOINT                               :Fahre ohne Halt über {WAYPOINT}
+STR_ORDER_GO_NON_STOP_TO_WAYPOINT                               :Fahre ohne Zwischenhalt über {WAYPOINT}
 
 STR_ORDER_SERVICE_AT                                            :Falls nötig, fahre zwecks Wartung zu
-STR_ORDER_SERVICE_NON_STOP_AT                                   :Fahre ohne Halt zwecks Wartung zu
+STR_ORDER_SERVICE_NON_STOP_AT                                   :Fahre ohne Zwischenhalt zwecks Wartung zu
 
 STR_ORDER_NEAREST_DEPOT                                         :nächsten
 STR_ORDER_NEAREST_HANGAR                                        :dem nächsten Hangar
@@ -3453,7 +3444,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Fahrplan
 STR_TIMETABLE_NO_TRAVEL                                         :Nicht unterwegs
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Unterwegs (automatisch; Fahrplan abhängig vom nächsten manuellen Auftrag)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Unterwegs (ohne Fahrplan)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Fahrt mit höchstens {2:VELOCITY} (ohne Fahrplan)
 STR_TIMETABLE_TRAVEL_FOR                                        :Unterwegs für {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Fahrt zu {STRING} mit höchstens {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :und {STRING} lang bleiben
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :und {STRING} lang unterwegs
 STR_TIMETABLE_DAYS                                              :{COMMA} Tag{P "" e}
@@ -3476,6 +3469,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Zeitrahm
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Zeit löschen
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Zeitrahmen für den markierten Auftrag löschen
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Tempolimit ändern
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Tempolimit beim Ausführen des ausgewählten Auftrags ändern
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Tempolimit löschen
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Geschwindigkeitsbegrenzung beim Ausführen des ausgewählten Auftrags löschen
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Verspätung löschen
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Verspätungsmelder zurücksetzen (das Fahrzeug gilt dann als pünktlich).
@@ -3571,6 +3570,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Schließ
 STR_AI_SETTINGS_RESET                                           :{BLACK}Zurücksetzen
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Ungefährer Abstand in Tagen zwischen dem Starten dieser KI und dem der vorherigen : {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} - Readme von {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} Änderungen von {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING}-Lizenz von {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Readme anzeigen
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Änderungen
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Lizenz
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -3764,7 +3773,7 @@ STR_ERROR_TOO_CLOSE_TO_ANOTHER_WAYPOINT                         :{WHITE}Zu nahe 
 
 STR_ERROR_CAN_T_BUILD_TRAIN_WAYPOINT                            :{WHITE}Wegpunkt kann hier nicht gebaut werden...
 STR_ERROR_CAN_T_POSITION_BUOY_HERE                              :{WHITE}Boje kann hier nicht platziert werden...
-STR_ERROR_CAN_T_CHANGE_WAYPOINT_NAME                            :{WHITE}Wegpunktsname kann nicht geändert werden...
+STR_ERROR_CAN_T_CHANGE_WAYPOINT_NAME                            :{WHITE}Wegpunktname kann nicht geändert werden...
 
 STR_ERROR_CAN_T_REMOVE_TRAIN_WAYPOINT                           :{WHITE}Wegpunkt kann hier nicht entfernt werden...
 STR_ERROR_MUST_REMOVE_RAILWAYPOINT_FIRST                        :{WHITE}Wegpunkt muss erst abgerissen werden
@@ -4448,6 +4457,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

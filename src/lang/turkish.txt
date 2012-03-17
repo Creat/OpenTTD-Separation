@@ -368,6 +368,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparan ista
 STR_FILE_MENU_SAVE_GAME                                         :Kaydet
 STR_FILE_MENU_LOAD_GAME                                         :Yükle
 STR_FILE_MENU_QUIT_GAME                                         :Ana menüye dön
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Çıkış
 ############ range ends here
 
@@ -1802,6 +1803,8 @@ STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Bu sunuc
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Sunucuya çok fazla komut gönderiyordunuz
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Şifre girmeniz çok uzun sürdü
 STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Bilgisayarınızın katılması çok uzun sürdü
+STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Bilgisayarınızın haritayı indirmesi çok uzun sürdü
+STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Bilgisayarınızın sunucuya katılması çok uzun sürdü
 
 ############ Leave those lines in this order!!
 STR_NETWORK_ERROR_CLIENT_GENERAL                                :genel hata
@@ -1820,6 +1823,10 @@ STR_NETWORK_ERROR_CLIENT_KICKED                                 :sunucu tarafın
 STR_NETWORK_ERROR_CLIENT_CHEATER                                :hile yapmaya çalıştı
 STR_NETWORK_ERROR_CLIENT_SERVER_FULL                            :sunucu dolu
 STR_NETWORK_ERROR_CLIENT_TOO_MANY_COMMANDS                      :çok fazla komut gönderiyordu
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_PASSWORD                       :şifre zamanında alınamadı
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_COMPUTER                       :genel zamanaşımı
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_MAP                            :haritayı indirmek çok uzun sürdü
+STR_NETWORK_ERROR_CLIENT_TIMEOUT_JOIN                           :haritayı işlemek çok uzun sürdü
 ############ End of leave-in-this-order
 
 STR_NETWORK_ERROR_CLIENT_GUI_LOST_CONNECTION_CAPTION            :{WHITE}Olası bağlantı kaybı
@@ -1940,8 +1947,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Kapalı
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Açık
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Kapsama alanını gösterme
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Kapsama alanını göster
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}İstenen: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Sağladıkları: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}İstenen: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Sağladıkları: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}İstasyonu birleştir
@@ -2451,11 +2458,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Aşağı
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Seçili NewGRF dosyasını listenin aşağısına taşı
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Yüklü NewGRF dosyalarının listesidir. Seçeneklerini değiştirmek için bir dosyayı tıklayın
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Benioku dosyasını göster
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Değişiklik kayıtları
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Lisans
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Parametreler
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Parametreleri göster
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Palet değiştir
@@ -2486,11 +2488,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Tüm par
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parametre {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Parametre sayısı: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}{STRING} adlı NewGRF'nin benioku dosyası
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}{STRING} adlı NewGRF'nin değişiklik kaydı
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}{STRING} adlı NewGRF'nin lisansı
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}İncele - {STRING}
@@ -2535,9 +2532,16 @@ STR_NEWGRF_ERROR_OTTD_VERSION_NUMBER                            :{1:STRING} Open
 STR_NEWGRF_ERROR_AFTER_TRANSLATED_FILE                          :GRF dosyası çeviri için yapılmış
 STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Çok fazla NewGRF yüklendi
 STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :{1:STRING} adlı NewGRF'yi {STRING} ile birlikte kullanmak senkronizasyon sorunu oluşturabilir
+STR_NEWGRF_ERROR_UNEXPECTED_SPRITE                              :Beklenmedik sprayt (sprayt {3:NUM})
+STR_NEWGRF_ERROR_UNKNOWN_PROPERTY                               :Bilinmeyen Action 0 özelliği {4:HEX} (sprayt {3:NUM})
+STR_NEWGRF_ERROR_INVALID_ID                                     :Geçersiz ID kullanım girişimi (sprayt {3:NUM})
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} bozuk bir sprayt içeriyor. Tüm bozuk spraytlar kırmızı bir soru işareti (?) olarak görünecektir
+STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :Birden çok Action 8 girişi içeriyor (sprayt {3:NUM})
+STR_NEWGRF_ERROR_READ_BOUNDS                                    :Pseudo-sprayt bitiminden sonrasını okudu (sprayt {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Kullanımda olan temel grafik kümesi bazı spraytları içermiyor.{}Lütfen temel grafik kümesini güncelleyin
+STR_NEWGRF_ERROR_GRM_FAILED                                     :İstenen GRF kaynakları mevcut değil (sprayt {3:NUM})
 STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} {STRING} tarafından deaktive edildi
+STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Geçersiz bilinmeyen sprayt yerleşim biçimi (sprayt {3:NUM})
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Uyarı!
@@ -2667,6 +2671,9 @@ STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Ana gör
 
 # Goal question window
 STR_GOAL_QUESTION_CAPTION_QUESTION                              :Soru
+STR_GOAL_QUESTION_CAPTION_INFORMATION                           :Bilgi
+STR_GOAL_QUESTION_CAPTION_WARNING                               :Uyarı
+STR_GOAL_QUESTION_CAPTION_ERROR                                 :Hata
 
 ### Start of Goal Question button list
 STR_GOAL_QUESTION_BUTTON_CANCEL                                 :İptal
@@ -2716,7 +2723,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}İstenen
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}İstenen kargoların listesini göster
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}İstenen: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}İstenen: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Reyting
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}İstasyonun reytinglerini göster
@@ -2961,9 +2968,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Ağırl�
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Fiyat: {GOLD}{CURRENCY_LONG}{BLACK} Hız: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Kapasite: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Güç Veren Vagonlar: {GOLD}+{POWER}{BLACK} Ağırlık: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Dönüştürülebildiği kargolar: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Dönüştürülebildiği kargolar: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Tüm kargo türleri
-STR_PURCHASE_INFO_ALL_BUT                                       :Şunlar hariç tümü: {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Şunlar hariç tümü: {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Mak. Çekim Gücü: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Menzil: {GOLD}{COMMA} kare
 
@@ -3210,7 +3217,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Bu yıld
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Güvenilirlik: {LTBLUE}{COMMA}%  {BLACK}Son bakımdan beri bozulma sayısı: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Üretim: {LTBLUE}{NUM}{BLACK} Değer: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapasite: {LTBLUE}Yok
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Kapasite: {LTBLUE}Yok{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Kapasite: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Kapasite: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Kapasite: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3437,7 +3444,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Zaman ç
 STR_TIMETABLE_NO_TRAVEL                                         :Sefer yok
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Yolculuk (otomatik; bir sonraki manuel emir tarafından zamanlanır)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Gezi (zamanlı değil)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :En çok {2:VELOCITY} hız ile git (zaman tablosu yok)
 STR_TIMETABLE_TRAVEL_FOR                                        :{STRING} boyunca yol al
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :{STRING} boyunca en çok {VELOCITY} hız ile git
 STR_TIMETABLE_STAY_FOR                                          :{STRING} bekle
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :ve şuraya sefer yap: {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} gün
@@ -3460,6 +3469,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Seçili 
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Zamanı Temizle
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Seçili talimatın harcaması gereken süreyi sil
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Hız Sınırını Değiştir
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Seçili emrin azami hızını değiştir
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Hız Sınırını Kaldır
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Seçili emrin azami hızını kaldır
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Gecikme sayacını sıfırla
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Geç kalma sayacını sıfırla, böylece araç zamanında gitmiş sayılacak
@@ -3555,6 +3570,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Kapat
 STR_AI_SETTINGS_RESET                                           :{BLACK}Yeniden başlat
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Bu YZ bir öncekinden kaç gün sonra başlayacak (yaklaşık): {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} adlı {STRING}'nin benioku dosyası
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} adlı {STRING}'nin değişiklik kaydı
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} adlı {STRING}'nin lisansı
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Benioku dosyasını göster
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Değişiklik kayıtları
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Lisans
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}%{NUM}{UP_ARROW}
@@ -4408,6 +4433,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
@@ -4442,6 +4468,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

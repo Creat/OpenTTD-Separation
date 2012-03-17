@@ -1035,8 +1035,8 @@ STR_CONTENT_TYPE_GS_LIBRARY                                     :ГШ библи
 # Transparency settings window
 
 # Base for station construction window(s)
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Прифаќа: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Залихи: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Прифаќа: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Залихи: {GOLD}{CARGO_LIST}
 
 # Join station window
 
@@ -1219,8 +1219,6 @@ STR_NEWGRF_SETTINGS_ADD_FILE_TOOLTIP                            :{BLACK}Дода
 STR_NEWGRF_SETTINGS_RESCAN_FILES                                :{BLACK}повторно да го скенира додадени фајлови
 STR_NEWGRF_SETTINGS_RESCAN_FILES_TOOLTIP                        :{BLACK}Ажурирање на листата на НоваGRF датотеки
 
-# Additional textfiles accompanying NewGRFs
-
 
 
 STR_NEWGRF_SETTINGS_VERSION                                     :{BLACK}Верзија за: {SILVER}{NUM}
@@ -1235,8 +1233,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Наме
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Параметар {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Број на параметри: {ORANGE}{NUM}
-
-# NewGRF textfile window
 
 # NewGRF inspect window
 
@@ -1303,6 +1299,10 @@ STR_GOALS_NONE                                                  :{ORANGE}- Ни�
 STR_GOALS_COMPANY_TITLE                                         :{BLACK}Фирма цели:
 STR_GOALS_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                    :{BLACK}Кликнете на цел центар главниот приказ на индустријата / град / плочка. Ctrl + Кликнете отвора нов прозорец на индустријата / град / плочка Локација
 
+# Goal question window
+
+### Start of Goal Question button list
+
 # Subsidies window
 STR_SUBSIDIES_TOOLTIP_CLICK_ON_SERVICE_TO_CENTER                :{BLACK}Кликни на сервис за да се центрира погледот на индустријата/градот
 
@@ -1316,7 +1316,7 @@ STR_STATION_VIEW_WAITING_TITLE                                  :{BLACK}Чека
 STR_STATION_VIEW_WAITING_CARGO                                  :{WHITE}{CARGO_LONG}
 STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO_SHORT} пренасочено од {STATION})
 
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Прифаќа: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Прифаќа: {WHITE}{CARGO_LIST}
 
 
 ############ range for rating starts
@@ -1582,6 +1582,8 @@ STR_ORDER_OUT_OF_RANGE                                          :{RED} (След
 
 
 
+
+
 # Date window (for timetable)
 
 
@@ -1615,6 +1617,10 @@ STR_AI_SETTINGS_CAPTION_AI                                      :АИ
 STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :GameScript
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Број на денови за да започнете оваа Пи по претходниот (се дава или зема): {ORANGE}{STRING}
+
+
+# Textfile window
+
 
 # Vehicle loading indicators
 

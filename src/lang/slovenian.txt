@@ -520,6 +520,7 @@ STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Prosojni napisi
 STR_FILE_MENU_SAVE_GAME                                         :Shrani igro
 STR_FILE_MENU_LOAD_GAME                                         :Naloži igro
 STR_FILE_MENU_QUIT_GAME                                         :Zapusti igro
+STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Izhod
 ############ range ends here
 
@@ -1953,7 +1954,7 @@ STR_NETWORK_ERROR_KICKED                                        :{WHITE}Brcnjen/
 STR_NETWORK_ERROR_CHEATER                                       :{WHITE}Goljufanje ni dovoljeno na tem strežniku
 STR_NETWORK_ERROR_TOO_MANY_COMMANDS                             :{WHITE}Pošiljal si preveč ukazov strežniku
 STR_NETWORK_ERROR_TIMEOUT_PASSWORD                              :{WHITE}Tvoj čas za vnos gesla je bil predolg
-STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Tvoj računalnik se je predolgo povezoval
+STR_NETWORK_ERROR_TIMEOUT_COMPUTER                              :{WHITE}Tvoj računalnik je prepočasen in ne dohiteva strežnika
 STR_NETWORK_ERROR_TIMEOUT_MAP                                   :{WHITE}Tvoj prenos ozemlja je trajal predolgo
 STR_NETWORK_ERROR_TIMEOUT_JOIN                                  :{WHITE}Priklop na strežnik je trajal predolgo
 
@@ -2098,8 +2099,8 @@ STR_STATION_BUILD_COVERAGE_OFF                                  :{BLACK}Izključ
 STR_STATION_BUILD_COVERAGE_ON                                   :{BLACK}Vključeno
 STR_STATION_BUILD_COVERAGE_AREA_OFF_TOOLTIP                     :{BLACK}Ne osvetli zajemnega območja predvidene lokacije
 STR_STATION_BUILD_COVERAGE_AREA_ON_TOOLTIP                      :{BLACK}Osvetli zajemno območje predvidene lokacije
-STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Sprejema: {GOLD}{STRING}
-STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Dobavlja: {GOLD}{STRING}
+STR_STATION_BUILD_ACCEPTS_CARGO                                 :{BLACK}Sprejema: {GOLD}{CARGO_LIST}
+STR_STATION_BUILD_SUPPLIES_CARGO                                :{BLACK}Dobavlja: {GOLD}{CARGO_LIST}
 
 # Join station window
 STR_JOIN_STATION_CAPTION                                        :{WHITE}Združi postaje
@@ -2222,7 +2223,7 @@ STR_STATION_BUILD_BUS_ORIENTATION                               :{WHITE}Orientac
 STR_STATION_BUILD_BUS_ORIENTATION_TOOLTIP                       :{BLACK}Izberi orientacijo železniške postaje
 STR_STATION_BUILD_TRUCK_ORIENTATION                             :{WHITE}Orientacija tovorne postaje
 STR_STATION_BUILD_TRUCK_ORIENTATION_TOOLTIP                     :{BLACK}Izberi orientacijo tovorne postaje
-STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION                    :{WHITE}Orijentacija potniške postaje
+STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION                    :{WHITE}Orijentacija tramvaj potniške postaje
 STR_STATION_BUILD_PASSENGER_TRAM_ORIENTATION_TOOLTIP            :{BLACK}Izbor orijentacije potniške tramvaj postaje
 STR_STATION_BUILD_CARGO_TRAM_ORIENTATION                        :{WHITE}Orijentacija tovorne postaje
 STR_STATION_BUILD_CARGO_TRAM_ORIENTATION_TOOLTIP                :{BLACK}Izbor orijentacije tovorne tramvaj postaje
@@ -2609,11 +2610,6 @@ STR_NEWGRF_SETTINGS_MOVEDOWN                                    :{BLACK}Premakni
 STR_NEWGRF_SETTINGS_MOVEDOWN_TOOLTIP                            :{BLACK}Premakne izbrano NewGRF dol po seznamu
 STR_NEWGRF_SETTINGS_FILE_TOOLTIP                                :{BLACK}Seznam nameščenih NewGRF datotek.
 
-# Additional textfiles accompanying NewGRFs
-STR_NEWGRF_SETTINGS_VIEW_README                                 :{BLACK}Prikaži preberi-me datoteko
-STR_NEWGRF_SETTINGS_VIEW_CHANGELOG                              :{BLACK}Zamenjaj dnevnik
-STR_NEWGRF_SETTINGS_VIEW_LICENSE                                :{BLACK}Licenca
-
 STR_NEWGRF_SETTINGS_SET_PARAMETERS                              :{BLACK}Nastavi parametre
 STR_NEWGRF_SETTINGS_SHOW_PARAMETERS                             :{BLACK}Prikaži parametre
 STR_NEWGRF_SETTINGS_TOGGLE_PALETTE                              :{BLACK}Preklop palete
@@ -2644,11 +2640,6 @@ STR_NEWGRF_PARAMETERS_RESET_TOOLTIP                             :{BLACK}Ponastav
 STR_NEWGRF_PARAMETERS_DEFAULT_NAME                              :Parameter {NUM}
 STR_NEWGRF_PARAMETERS_SETTING                                   :{STRING}: {ORANGE}{STRING}
 STR_NEWGRF_PARAMETERS_NUM_PARAM                                 :{LTBLUE}Število parametrov: {ORANGE}{NUM}
-
-# NewGRF textfile window
-STR_NEWGRF_README_CAPTION                                       :{WHITE}NewGRF preberi-me od {STRING}
-STR_NEWGRF_CHANGELOG_CAPTION                                    :{WHITE}NewGRF zamenjaj dnevnik od {STRING}
-STR_NEWGRF_LICENSE_CAPTION                                      :{WHITE}NewGRF licenca od {STRING}
 
 # NewGRF inspect window
 STR_NEWGRF_INSPECT_CAPTION                                      :{WHITE}Preglej - {STRING}
@@ -2884,7 +2875,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Sprejema
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Prikaži seznam sprejetega tovora
-STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Sprejema: {WHITE}{STRING}
+STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Sprejema: {WHITE}{CARGO_LIST}
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Ocene
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Prikaz ocen postaje
@@ -3129,9 +3120,9 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Teža: {
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Cena: {GOLD}{CURRENCY_LONG}{BLACK} Hitrost: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Zmogljivost: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Pogonski vagoni: {GOLD}+{POWER}{BLACK} Teža: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Preureditve za: {GOLD}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Preureditve za: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Vse vrste tovora
-STR_PURCHASE_INFO_ALL_BUT                                       :Vse, razen {GOLD}
+STR_PURCHASE_INFO_ALL_BUT                                       :Vse, razen {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Največja vlečna moč: {GOLD}{FORCE}
 STR_PURCHASE_INFO_AIRCRAFT_RANGE                                :{BLACK}Domet: {GOLD}{COMMA} polj
 
@@ -3378,7 +3369,7 @@ STR_VEHICLE_INFO_PROFIT_THIS_YEAR_LAST_YEAR                     :{BLACK}Letošnj
 STR_VEHICLE_INFO_RELIABILITY_BREAKDOWNS                         :{BLACK}Zanesljivost: {LTBLUE}{COMMA}%  {BLACK}Okvare po zadnjem servisu: {LTBLUE}{COMMA}
 
 STR_VEHICLE_INFO_BUILT_VALUE                                    :{LTBLUE}{ENGINE} {BLACK}Zgrajeno: {LTBLUE}{NUM}{BLACK} Vrednost: {LTBLUE}{CURRENCY_LONG}
-STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Zmogljivost: {LTBLUE}Brez
+STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Zmogljivost: {LTBLUE}Brez{STRING}
 STR_VEHICLE_INFO_CAPACITY                                       :{BLACK}Zmogljivost: {LTBLUE}{CARGO_LONG}{3:STRING}
 STR_VEHICLE_INFO_CAPACITY_MULT                                  :{BLACK}Zmogljivost: {LTBLUE}{CARGO_LONG}{3:STRING} (x{4:NUM})
 STR_VEHICLE_INFO_CAPACITY_CAPACITY                              :{BLACK}Zmogljivost: {LTBLUE}{CARGO_LONG}, {CARGO_LONG}{STRING}
@@ -3605,7 +3596,9 @@ STR_TIMETABLE_TOOLTIP                                           :{BLACK}Urnik - 
 STR_TIMETABLE_NO_TRAVEL                                         :Brez potovanja
 STR_TIMETABLE_NOT_TIMETABLEABLE                                 :Potovanje (avtomatično; urnik z naslednjim ukazom)
 STR_TIMETABLE_TRAVEL_NOT_TIMETABLED                             :Potovanje (brez urnika)
+STR_TIMETABLE_TRAVEL_NOT_TIMETABLED_SPEED                       :Potuj z največ {2:VELOCITY} (brez časovne tabele)
 STR_TIMETABLE_TRAVEL_FOR                                        :Potuj za {STRING}
+STR_TIMETABLE_TRAVEL_FOR_SPEED                                  :Pozuj proti {STRING} z najvišjo hitrostjo {VELOCITY}
 STR_TIMETABLE_STAY_FOR                                          :in ostani za {STRING}
 STR_TIMETABLE_AND_TRAVEL_FOR                                    :s potovanjem za {STRING}
 STR_TIMETABLE_DAYS                                              :{COMMA} d{P an neva nevi ni}
@@ -3628,6 +3621,12 @@ STR_TIMETABLE_WAIT_TIME_TOOLTIP                                 :{BLACK}Spremeni
 
 STR_TIMETABLE_CLEAR_TIME                                        :{BLACK}Počisti čas
 STR_TIMETABLE_CLEAR_TIME_TOOLTIP                                :{BLACK}Počisti čas za označen ukaz
+
+STR_TIMETABLE_CHANGE_SPEED                                      :{BLACK}Spremeni omejitev hitrosti
+STR_TIMETABLE_CHANGE_SPEED_TOOLTIP                              :{BLACK}Spremeni najvišjo potovalno hitrost označenega ukaza
+
+STR_TIMETABLE_CLEAR_SPEED                                       :{BLACK}Počisti omejitev hitrosti
+STR_TIMETABLE_CLEAR_SPEED_TOOLTIP                               :{BLACK}Počisti najvišjo potovalno hitrost onačenega ukaza
 
 STR_TIMETABLE_RESET_LATENESS                                    :{BLACK}Resetiraj Števec zamud
 STR_TIMETABLE_RESET_LATENESS_TOOLTIP                            :{BLACK}Resetiraj števec zamud, da bodo vozila točna
@@ -3723,6 +3722,16 @@ STR_AI_SETTINGS_CLOSE                                           :{BLACK}Zapri
 STR_AI_SETTINGS_RESET                                           :{BLACK}Resetiraj
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
 STR_AI_SETTINGS_START_DELAY                                     :Število dni zamika med zagonom sledeče po predhodni UI: {ORANGE}{STRING}
+
+
+# Textfile window
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}{STRING} preberi-me od {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}{STRING} zamenjaj dnevnik od {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}{STRING} licenca od {STRING}
+STR_TEXTFILE_VIEW_README                                        :{BLACK}Prikaži preberi-me datoteko
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Zamenjaj dnevnik
+STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licenca
+
 
 # Vehicle loading indicators
 STR_PERCENT_UP_SMALL                                            :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}
@@ -4643,6 +4652,7 @@ STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
 STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
 STR_RED_STRING                                                  :{RED}{STRING}
+STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}

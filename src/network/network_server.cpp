@@ -701,7 +701,7 @@ NetworkRecvStatus ServerNetworkGameSocketHandler::SendCommand(const CommandPacke
  */
 NetworkRecvStatus ServerNetworkGameSocketHandler::SendChat(NetworkAction action, ClientID client_id, bool self_send, const char *msg, int64 data)
 {
-	if (this->status != STATUS_ACTIVE) return NETWORK_RECV_STATUS_OKAY;
+	if (this->status < STATUS_PRE_ACTIVE) return NETWORK_RECV_STATUS_OKAY;
 
 	Packet *p = new Packet(PACKET_SERVER_CHAT);
 
@@ -1330,7 +1330,7 @@ void NetworkServerSendChat(NetworkAction action, DestType desttype, int dest, co
 
 NetworkRecvStatus ServerNetworkGameSocketHandler::Receive_CLIENT_CHAT(Packet *p)
 {
-	if (this->status < STATUS_AUTHORIZED) {
+	if (this->status < STATUS_PRE_ACTIVE) {
 		/* Illegal call, return error and ignore the packet */
 		return this->SendError(NETWORK_ERROR_NOT_AUTHORIZED);
 	}
@@ -2100,11 +2100,18 @@ void NetworkPrintClients()
 {
 	NetworkClientInfo *ci;
 	FOR_ALL_CLIENT_INFOS(ci) {
-		IConsolePrintF(CC_INFO, _network_server ? "Client #%1d  name: '%s'  company: %1d  IP: %s" : "Client #%1d  name: '%s'  company: %1d",
-				ci->client_id,
-				ci->client_name,
-				ci->client_playas + (Company::IsValidID(ci->client_playas) ? 1 : 0),
-				_network_server ? (ci->client_id == CLIENT_ID_SERVER ? "server" : NetworkClientSocket::GetByClientID(ci->client_id)->GetClientIP()) : "");
+		if (_network_server) {
+			IConsolePrintF(CC_INFO, "Client #%1d  name: '%s'  company: %1d  IP: %s",
+					ci->client_id,
+					ci->client_name,
+					ci->client_playas + (Company::IsValidID(ci->client_playas) ? 1 : 0),
+					ci->client_id == CLIENT_ID_SERVER ? "server" : NetworkClientSocket::GetByClientID(ci->client_id)->GetClientIP());
+		} else {
+			IConsolePrintF(CC_INFO, "Client #%1d  name: '%s'  company: %1d",
+					ci->client_id,
+					ci->client_name,
+					ci->client_playas + (Company::IsValidID(ci->client_playas) ? 1 : 0));
+		}
 	}
 }
 

@@ -2224,7 +2224,9 @@ void Vehicle::ShowVisualEffect() const
 		}
 
 		max_speed = min(max_speed, t->gcache.cached_max_track_speed);
+		max_speed = min(max_speed, this->current_order.max_speed);
 	}
+	if (this->type == VEH_ROAD || this->type == VEH_SHIP) max_speed = min(max_speed, this->current_order.max_speed * 2);
 
 	const Vehicle *v = this;
 
