@@ -368,8 +368,10 @@ struct TimetableWindow : Window {
 		}
 		this->SetWidgetsDisabledState(b, WID_VT_TTSEP_SET_PARAMETER, WID_VT_TTSEP_MODE_DROPDOWN, WIDGET_LIST_END);
 
-		/* If we're in auto or off mode, we don't need to set any parameters */
-		this->SetWidgetDisabledState(WID_VT_TTSEP_SET_PARAMETER, (this->new_sep_settings.mode == TTS_MODE_AUTO) || (this->new_sep_settings.mode == TTS_MODE_OFF));
+		/* We can only set parameters if we're in one of the manual modes. */
+		bool enabled_state = (this->new_sep_settings.mode == TTS_MODE_MAN_N) || (this->new_sep_settings.mode == TTS_MODE_MAN_T);
+
+		this->SetWidgetDisabledState(WID_VT_TTSEP_SET_PARAMETER, !enabled_state);
 
 		this->DrawWidgets();
 	}
@@ -757,6 +759,7 @@ struct TimetableWindow : Window {
 			switch (this->new_sep_settings.mode)
 			{
 				case TTS_MODE_AUTO:
+				case TTS_MODE_BUFFERED_AUTO:
 				case TTS_MODE_OFF:
 					break;
 
