@@ -641,6 +641,7 @@ STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Sačuvaj sliku 
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :O OpenTTD-u
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Poravnjavanje sprajta
 STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Uključi/isključi granične linije
+STR_ABOUT_MENU_TOGGLE_DIRTY_BLOCKS                              :Uključi/Isključi bojenje nesređenih blokova
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -3293,8 +3294,8 @@ STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Cena: {C
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Cena: {CURRENCY_LONG} Težina: {WEIGHT_SHORT}{}Brzina: {VELOCITY}  Snaga: {POWER}  Najveća vučna snaga: {6:FORCE}{}Cena Održavanja: {4:CURRENCY_LONG}/god{}Nosivost: {5:CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Cena: {CURRENCY_LONG} Najveća Brzina: {VELOCITY}{}Nosivost: {CARGO_LONG}, {CARGO_LONG}{}Cena Održavanja: {CURRENCY_LONG}/god.
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Cena: {CURRENCY_LONG} Najveća Brzina: {VELOCITY}{}Nosivost: {CARGO_LONG}{}Cena Održavanja: {CURRENCY_LONG}/god.
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Cena: {CURRENCY_LONG} Najveća Brzina: {VELOCITY} Domet: {7:COMMA} pločica{}Nosivost: {CARGO_LONG}, {CARGO_LONG}{}Cena Održavanja: {CURRENCY_LONG}/god.
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Cena: {CURRENCY_LONG} Najveća Brzina: {VELOCITY} Domet: {7:COMMA} pločica{}Nosivost: {CARGO_LONG}{}Cena Održavanja: {CURRENCY_LONG}/god.
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Cena: {CURRENCY_LONG} Najveća Brzina: {VELOCITY} Domet: {COMMA} pločica{}Nosivost: {CARGO_LONG}, {CARGO_LONG}{}Cena Održavanja: {CURRENCY_LONG}/god.
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Cena: {CURRENCY_LONG} Najveća Brzina: {VELOCITY} Domet: {COMMA} pločica{}Nosivost: {CARGO_LONG}{}Cena Održavanja: {CURRENCY_LONG}/god.
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Zameni {STRING}
@@ -3928,7 +3929,8 @@ STR_ERROR_ONLY_ONE_ALLOWED_PER_TOWN                             :{WHITE}... dozv
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{WHITE}... dozvoljeno izgraditi samo u naseljima sa populacijom od najmanje 1200
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... gradnja je dozvoljena samo u područjima pod tropskim šumama
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... gradnja je dozvoljena samo u pustinjskim oblastima
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... gradnja je dozvoljena samo u naseljima
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... može da se izgradi samo u naseljima (zamenjujući kuće)
+STR_ERROR_CAN_ONLY_BE_BUILT_NEAR_TOWN_CENTER                    :{WHITE}... može da se izgradi samo blizu centra naselja
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... gradnja je dozvoljena samo u nizijskim oblastima
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... može biti postavljeno samo blizu ivica terena
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... šuma može biti posađena samo iznad linije snega

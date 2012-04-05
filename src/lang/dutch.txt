@@ -453,6 +453,7 @@ STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Screenshot van 
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Over 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Sprite uitlijner
 STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Schakel selectiekaders
+STR_ABOUT_MENU_TOGGLE_DIRTY_BLOCKS                              :Schakel kleuren van braakliggende grond aan/uit
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -2967,7 +2968,7 @@ STR_PURCHASE_INFO_WEIGHT_CWEIGHT                                :{BLACK}Gewicht:
 STR_PURCHASE_INFO_COST_SPEED                                    :{BLACK}Kosten: {GOLD}{CURRENCY_LONG}{BLACK} Snelheid: {GOLD}{VELOCITY}
 STR_PURCHASE_INFO_AIRCRAFT_CAPACITY                             :{BLACK}Capaciteit: {GOLD}{CARGO_LONG}, {CARGO_LONG}
 STR_PURCHASE_INFO_PWAGPOWER_PWAGWEIGHT                          :{BLACK}Aangedreven wagons: {GOLD}+{POWER}{BLACK} Gewicht: {GOLD}+{WEIGHT_SHORT}
-STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Om te bouwen voor: {GOLD}{STRING}
+STR_PURCHASE_INFO_REFITTABLE_TO                                 :{BLACK}Om te bouwen naar: {GOLD}{STRING}
 STR_PURCHASE_INFO_ALL_TYPES                                     :Alle vrachttypen
 STR_PURCHASE_INFO_ALL_BUT                                       :Alles behalve {CARGO_LIST}
 STR_PURCHASE_INFO_MAX_TE                                        :{BLACK}Max. trekkracht: {GOLD}{FORCE}
@@ -3092,8 +3093,8 @@ STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Prijs: {
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Prijs: {CURRENCY_LONG} Gewicht: {WEIGHT_SHORT}{}Snelheid: {VELOCITY}  Kracht: {POWER}  Max. T.E.: {6:FORCE}{}Bedrijfskosten: {4:CURRENCY_LONG}/yr{}Capaciteit: {5:CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Kosten: {CURRENCY_LONG} Max. Snelheid: {VELOCITY}{}Capaciteit: {CARGO_LONG}, {CARGO_LONG}{}Gebruikskosten: {CURRENCY_LONG}/yr
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Kosten: {CURRENCY_LONG} Max. Snelheid: {VELOCITY}{}Capaciteit: {CARGO_LONG}{}Gebruikskosten: {CURRENCY_LONG}/jaar
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Kosten: {CURRENCY_LONG} Max. Snelheid: {VELOCITY} Bereik: {7:COMMA} tegels{}Capaciteit: {CARGO_LONG}, {CARGO_LONG}{}Bedrijfskosten: {CURRENCY_LONG}/jr
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Kosten: {CURRENCY_LONG} Max. Snelheid: {VELOCITY} Bereik: {7:COMMA} tegels{}Capaciteit: {CARGO_LONG}{}Bedrijfskosten: {CURRENCY_LONG}/jr
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Kosten: {CURRENCY_LONG} Max. Snelheid: {VELOCITY} Bereik: {COMMA} tegels{}Capaciteit: {CARGO_LONG}, {CARGO_LONG}{}Bedrijfskosten: {CURRENCY_LONG}/jr
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Kosten: {CURRENCY_LONG} Max. Snelheid: {VELOCITY} Bereik: {COMMA} tegels{}Capaciteit: {CARGO_LONG}{}Bedrijfskosten: {CURRENCY_LONG}/jr
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Vervang {STRING}
@@ -3717,7 +3718,8 @@ STR_ERROR_ONLY_ONE_ALLOWED_PER_TOWN                             :{WHITE}... slec
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{WHITE}... kan alleen in plaatsen met meer dan 1.200 inwoners worden gebouwd
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... kan alleen in regenwouden gebouwd worden
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... kan alleen in woestijnen gebouwd worden
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... kan alleen in plaatsen gebouwd worden
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... kan alleen in plaatsen gebouwd worden (vervangt huizen)
+STR_ERROR_CAN_ONLY_BE_BUILT_NEAR_TOWN_CENTER                    :{WHITE}... kan alleen worden gebouwd in het centrum van de stad
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... kan alleen in laaggelegen gebieden gebouwd worden
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... kan alleen aan de rand van de kaart geplaatst worden
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... bossen kunnen alleen boven de sneeuwgrens worden geplant

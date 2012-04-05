@@ -1542,13 +1542,14 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 
 /**
  * Check if an aircraft has enough range for an order list.
- * @param v Aircraft to check.
+ * @param v_new Aircraft to check.
+ * @param v_order Vehicle currently holding the order list.
  * @param first First order in the source order list.
  * @return True if the aircraft has enough range for the orders, false otherwise.
  */
-bool CheckAircraftOrderDistance(const Aircraft *v, const Order *first)
+static bool CheckAircraftOrderDistance(const Aircraft *v_new, const Vehicle *v_order, const Order *first)
 {
-	if (first == NULL || v->acache.cached_max_range == 0) return true;
+	if (first == NULL || v_new->acache.cached_max_range == 0) return true;
 
 	/* Iterate over all orders to check the distance between all
 	 * 'goto' orders and their respective next order (of any type). */
@@ -1558,7 +1559,7 @@ bool CheckAircraftOrderDistance(const Aircraft *v, const Order *first)
 			case OT_GOTO_DEPOT:
 			case OT_GOTO_WAYPOINT:
 				/* If we don't have a next order, we've reached the end and must check the first order instead. */
-				if (GetOrderDistance(o, o->next != NULL ? o->next : first, v) > v->acache.cached_max_range_sqr) return false;
+				if (GetOrderDistance(o, o->next != NULL ? o->next : first, v_order) > v_new->acache.cached_max_range_sqr) return false;
 				break;
 
 			default: break;
@@ -1618,7 +1619,7 @@ CommandCost CmdCloneOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 			}
 
 			/* Check for aircraft range limits. */
-			if (dst->type == VEH_AIRCRAFT && !CheckAircraftOrderDistance(Aircraft::From(dst), src->GetFirstOrder())) {
+			if (dst->type == VEH_AIRCRAFT && !CheckAircraftOrderDistance(Aircraft::From(dst), src, src->GetFirstOrder())) {
 				return_cmd_error(STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE);
 			}
 
@@ -1665,7 +1666,7 @@ CommandCost CmdCloneOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 			}
 
 			/* Check for aircraft range limits. */
-			if (dst->type == VEH_AIRCRAFT && !CheckAircraftOrderDistance(Aircraft::From(dst), src->GetFirstOrder())) {
+			if (dst->type == VEH_AIRCRAFT && !CheckAircraftOrderDistance(Aircraft::From(dst), src, src->GetFirstOrder())) {
 				return_cmd_error(STR_ERROR_AIRCRAFT_NOT_ENOUGH_RANGE);
 			}
 

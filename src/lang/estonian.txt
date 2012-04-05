@@ -3149,8 +3149,8 @@ STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Hind: {C
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Hind: {CURRENCY_LONG} Tühimass: {WEIGHT_SHORT}{}Kiirus: {VELOCITY}  Võimsus: {POWER}  Veojõud: {6:FORCE}{}Käituskulud: {4:CURRENCY_LONG}/aasta{}Mahutavus: {5:CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Hind: {CURRENCY_LONG} Tippkiirus: {VELOCITY}{}Kandevõime: {CARGO_LONG}, {CARGO_LONG}{}Käituskulud: {CURRENCY_LONG}/a
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Hind: {CURRENCY_LONG} Tippkiirus: {VELOCITY}{}Kandevõime: {CARGO_LONG}{}Käituskulud: {CURRENCY_LONG}/a
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Maksumus: {CURRENCY_LONG} Maksimaalne kiirus: {VELOCITY} Tegevusraadius: {7:COMMA} ruutu{}Mahutavus: {CARGO_LONG}, {CARGO_LONG}{}Kasutamise hind: {CURRENCY_LONG}/aastas
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Maksumus: {CURRENCY_LONG} Maksimaalne kiirus: {VELOCITY} Tegevusraadius: {7:COMMA} ruutu{}Mahutavus: {CARGO_LONG}{}Kasutamise kulu: {CURRENCY_LONG}/aastas
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Maksumus: {CURRENCY_LONG} Maksimaalne kiirus: {VELOCITY} Tegevusraadius: {COMMA} ruutu{}Mahutavus: {CARGO_LONG}, {CARGO_LONG}{}Kasutamise hind: {CURRENCY_LONG}/aastas
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Maksumus: {CURRENCY_LONG} Maksimaalne kiirus: {VELOCITY} Tegevusraadius: {COMMA} ruutu{}Mahutavus: {CARGO_LONG}{}Kasutamise kulu: {CURRENCY_LONG}/aastas
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Asenda {STRING}
@@ -4479,6 +4479,7 @@ STR_JUST_CHECKMARK                                              :{CHECKMARK}
 STR_JUST_COMMA                                                  :{COMMA}
 STR_JUST_CURRENCY_SHORT                                         :{CURRENCY_SHORT}
 STR_JUST_CURRENCY_LONG                                          :{CURRENCY_LONG}
+STR_JUST_CARGO_LIST                                             :{CARGO_LIST}
 STR_JUST_INT                                                    :{NUM}
 STR_JUST_DATE_TINY                                              :{DATE_TINY}
 STR_JUST_DATE_SHORT                                             :{DATE_SHORT}

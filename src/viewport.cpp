@@ -47,6 +47,7 @@
 #include "window_gui.h"
 
 #include "table/strings.h"
+#include "table/palettes.h"
 
 Point _tile_fract_coords;
 
@@ -143,11 +144,15 @@ struct ViewportDrawer {
 	Point foundation_offset[FOUNDATION_PART_END];    ///< Pixel offset for ground sprites on the foundations.
 };
 
+static void MarkViewportDirty(const ViewPort *vp, int left, int top, int right, int bottom);
+
 static ViewportDrawer _vd;
 
 TileHighlightData _thd;
 static TileInfo *_cur_ti;
 bool _draw_bounding_boxes = false;
+bool _draw_dirty_blocks = false;
+uint _dirty_block_colour = 0;
 
 static Point MapXYZToViewport(const ViewPort *vp, int x, int y, int z)
 {
@@ -1242,20 +1247,31 @@ void ViewportSign::UpdatePosition(int center, int top, StringID str)
 
 /**
  * Mark the sign dirty in all viewports.
+ * @param maxzoom Maximum %ZoomLevel at which the text is visible.
  *
  * @ingroup dirty
  */
-void ViewportSign::MarkDirty() const
+void ViewportSign::MarkDirty(ZoomLevel maxzoom) const
 {
-	/* We use ZOOM_LVL_MAX here, as every viewport can have another zoom,
-	 *  and there is no way for us to know which is the biggest. So make the
-	 *  biggest area dirty, and we are safe for sure.
-	 * We also add 1 to make sure the whole thing is redrawn. */
-	MarkAllViewportsDirty(
-		this->center - ScaleByZoom(this->width_normal / 2 + 1, ZOOM_LVL_MAX),
-		this->top    - ScaleByZoom(1, ZOOM_LVL_MAX),
-		this->center + ScaleByZoom(this->width_normal / 2 + 1, ZOOM_LVL_MAX),
-		this->top    + ScaleByZoom(VPSM_TOP + FONT_HEIGHT_NORMAL + VPSM_BOTTOM + 1, ZOOM_LVL_MAX));
+	Rect zoomlevels[ZOOM_LVL_COUNT];
+
+	for (ZoomLevel zoom = ZOOM_LVL_BEGIN; zoom != ZOOM_LVL_END; zoom++) {
+		/* FIXME: This doesn't switch to width_small when appropriate. */
+		zoomlevels[zoom].left   = this->center - ScaleByZoom(this->width_normal / 2 + 1, zoom);
+		zoomlevels[zoom].top    = this->top    - ScaleByZoom(1, zoom);
+		zoomlevels[zoom].right  = this->center + ScaleByZoom(this->width_normal / 2 + 1, zoom);
+		zoomlevels[zoom].bottom = this->top    + ScaleByZoom(VPSM_TOP + FONT_HEIGHT_NORMAL + VPSM_BOTTOM + 1, zoom);
+	}
+
+	Window *w;
+	FOR_ALL_WINDOWS_FROM_BACK(w) {
+		ViewPort *vp = w->viewport;
+		if (vp != NULL && vp->zoom <= maxzoom) {
+			assert(vp->width != 0);
+			Rect &zl = zoomlevels[vp->zoom];
+			MarkViewportDirty(vp, zl.left, zl.top, zl.right, zl.bottom);
+		}
+	}
 }
 
 static void ViewportDrawTileSprites(const TileSpriteToDrawVector *tstdv)
@@ -1361,6 +1377,28 @@ static void ViewportDrawBoundingBoxes(const ParentSpriteToSortVector *psd)
 	}
 }
 
+/**
+ * Draw/colour the blocks that have been redrawn.
+ */
+static void ViewportDrawDirtyBlocks()
+{
+	Blitter *blitter = BlitterFactoryBase::GetCurrentBlitter();
+	const DrawPixelInfo *dpi = _cur_dpi;
+	void *dst;
+	int right =  UnScaleByZoom(dpi->width,  dpi->zoom);
+	int bottom = UnScaleByZoom(dpi->height, dpi->zoom);
+
+	int colour = _string_colourmap[_dirty_block_colour & 0xF];
+
+	dst = dpi->dst_ptr;
+
+	byte bo = UnScaleByZoom(dpi->left + dpi->top, dpi->zoom) & 1;
+	do {
+		for (int i = (bo ^= 1); i < right; i += 2) blitter->SetPixel(dst, i, 0, (uint8)colour);
+		dst = blitter->MoveTo(dst, 0, 1);
+	} while (--bottom > 0);
+}
+
 static void ViewportDrawStrings(DrawPixelInfo *dpi, const StringSpriteToDrawVector *sstdv)
 {
 	DrawPixelInfo dp;
@@ -1457,6 +1495,7 @@ void ViewportDoDraw(const ViewPort *vp, int left, int top, int right, int bottom
 	ViewportDrawParentSprites(&_vd.parent_sprites_to_sort, &_vd.child_screen_sprites_to_draw);
 
 	if (_draw_bounding_boxes) ViewportDrawBoundingBoxes(&_vd.parent_sprites_to_sort);
+	if (_draw_dirty_blocks) ViewportDrawDirtyBlocks();
 
 	if (_vd.string_sprites_to_draw.Length() != 0) ViewportDrawStrings(&_vd.dpi, &_vd.string_sprites_to_draw);
 

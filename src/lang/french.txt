@@ -144,7 +144,7 @@ STR_ABBREV_STEEL                                                :{TINY_FONT}AC
 STR_ABBREV_VALUABLES                                            :{TINY_FONT}VL
 STR_ABBREV_COPPER_ORE                                           :{TINY_FONT}CV
 STR_ABBREV_MAIZE                                                :{TINY_FONT}MS
-STR_ABBREV_FRUIT                                                :{TINY_FONT}FT
+STR_ABBREV_FRUIT                                                :{TINY_FONT}FR
 STR_ABBREV_DIAMONDS                                             :{TINY_FONT}DM
 STR_ABBREV_FOOD                                                 :{TINY_FONT}NR
 STR_ABBREV_PAPER                                                :{TINY_FONT}PR
@@ -454,6 +454,7 @@ STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Copie d'écran 
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :À propos d'OpenTTD
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Alignement de sprite
 STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Afficher/Cacher les boites de dimensions maximum
+STR_ABOUT_MENU_TOGGLE_DIRTY_BLOCKS                              :Activer/Désactiver la colorisation des blocs foireux
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -1692,7 +1693,7 @@ STR_NETWORK_LANG_LATVIAN                                        :Letton
 STR_NETWORK_GAME_LOBBY_CAPTION                                  :{WHITE}Préparation de la partie
 
 STR_NETWORK_GAME_LOBBY_PREPARE_TO_JOIN                          :{BLACK}Se prépare à rejoindre{NBSP}: {ORANGE}{STRING}
-STR_NETWORK_GAME_LOBBY_COMPANY_LIST_TOOLTIP                     :{BLACK}Liste des compagnies présentes dans le jeu. Vous pouvez soit en rejoindre une, soit en créer une si il reste un emplacement libre
+STR_NETWORK_GAME_LOBBY_COMPANY_LIST_TOOLTIP                     :{BLACK}Liste des compagnies présentes dans le jeu. Vous pouvez soit en rejoindre une, soit en créer une si il reste un emplacement libre.
 
 STR_NETWORK_GAME_LOBBY_COMPANY_INFO                             :{SILVER}INFOS SUR LA COMPAGNIE
 STR_NETWORK_GAME_LOBBY_COMPANY_NAME                             :{SILVER}Nom de la compagnie{NBSP}: {WHITE}{STRING}
@@ -1791,10 +1792,10 @@ STR_NETWORK_ERROR_DESYNC                                        :{WHITE}La synch
 STR_NETWORK_ERROR_LOSTCONNECTION                                :{WHITE}La connexion de la partie réseau a été perdue
 STR_NETWORK_ERROR_SAVEGAMEERROR                                 :{WHITE}La sauvegarde serveur n'a pas pu être chargée
 STR_NETWORK_ERROR_SERVER_START                                  :{WHITE}Le serveur n'a pas pu être démarré
-STR_NETWORK_ERROR_CLIENT_START                                  :{WHITE}Connexion échouée
+STR_NETWORK_ERROR_CLIENT_START                                  :{WHITE}Échec de la connexion
 STR_NETWORK_ERROR_TIMEOUT                                       :{WHITE}La connexion n°{NBSP}{NUM} a dépassé le temps d'attente
 STR_NETWORK_ERROR_SERVER_ERROR                                  :{WHITE}Une erreur de protocole a été détectée et la connexion a été fermée
-STR_NETWORK_ERROR_WRONG_REVISION                                :{WHITE}L'identifiant de révision de ce client ne correspond pas à celui du serveur
+STR_NETWORK_ERROR_WRONG_REVISION                                :{WHITE}Le numéro de version/révision de ce client ne correspond pas à celui du serveur
 STR_NETWORK_ERROR_WRONG_PASSWORD                                :{WHITE}Mot de passe incorrect
 STR_NETWORK_ERROR_SERVER_FULL                                   :{WHITE}Le serveur est complet
 STR_NETWORK_ERROR_SERVER_BANNED                                 :{WHITE}Vous êtes banni de ce serveur
@@ -1815,7 +1816,7 @@ STR_NETWORK_ERROR_CLIENT_PROTOCOL_ERROR                         :erreur de proto
 STR_NETWORK_ERROR_CLIENT_NEWGRF_MISMATCH                        :NewGRF requis
 STR_NETWORK_ERROR_CLIENT_NOT_AUTHORIZED                         :non autorisé
 STR_NETWORK_ERROR_CLIENT_NOT_EXPECTED                           :paquet invalide ou inattendu reçu
-STR_NETWORK_ERROR_CLIENT_WRONG_REVISION                         :révision incorrecte
+STR_NETWORK_ERROR_CLIENT_WRONG_REVISION                         :n° de version/révision incorrect
 STR_NETWORK_ERROR_CLIENT_NAME_IN_USE                            :nom déjà utilisé
 STR_NETWORK_ERROR_CLIENT_WRONG_PASSWORD                         :mot de passe de partie incorrect
 STR_NETWORK_ERROR_CLIENT_COMPANY_MISMATCH                       :mauvais company-id dans DoCommand
@@ -1839,7 +1840,7 @@ STR_NETWORK_SERVER_MESSAGE_GAME_PAUSED                          :Partie suspendu
 STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_1                  :Partie toujours suspendue ({STRING})
 STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_2                  :Partie toujours suspendue ({STRING}, {STRING})
 STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_3                  :Partie toujours suspendue ({STRING}, {STRING}, {STRING})
-STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_4                  :La partie est toujours en pause ({STRING}, {STRING}, {STRING}, {STRING})
+STR_NETWORK_SERVER_MESSAGE_GAME_STILL_PAUSED_4                  :Partie toujours suspendue ({STRING}, {STRING}, {STRING}, {STRING})
 STR_NETWORK_SERVER_MESSAGE_GAME_UNPAUSED                        :Reprise de la partie ({STRING})
 STR_NETWORK_SERVER_MESSAGE_GAME_REASON_NOT_ENOUGH_PLAYERS       :nombre de joueurs
 STR_NETWORK_SERVER_MESSAGE_GAME_REASON_CONNECTING_CLIENTS       :connexion de clients
@@ -1860,30 +1861,30 @@ STR_NETWORK_MESSAGE_SERVER_SHUTDOWN                             :{WHITE}Le serve
 STR_NETWORK_MESSAGE_SERVER_REBOOT                               :{WHITE}Le serveur redémarre...{}Veuillez patienter...
 
 # Content downloading window
-STR_CONTENT_TITLE                                               :{WHITE}Téléchargement de contenu
+STR_CONTENT_TITLE                                               :{WHITE}Téléchargement de modules
 STR_CONTENT_TYPE_CAPTION                                        :{BLACK}Type
-STR_CONTENT_TYPE_CAPTION_TOOLTIP                                :{BLACK}Type de contenu
+STR_CONTENT_TYPE_CAPTION_TOOLTIP                                :{BLACK}Type de module
 STR_CONTENT_NAME_CAPTION                                        :{BLACK}Nom
-STR_CONTENT_NAME_CAPTION_TOOLTIP                                :{BLACK}Nom du contenu
-STR_CONTENT_MATRIX_TOOLTIP                                      :{BLACK}Cliquer sur une ligne pour voir les détails{}Cocher la case comme pré-sélection pour le téléchargement
+STR_CONTENT_NAME_CAPTION_TOOLTIP                                :{BLACK}Nom du module
+STR_CONTENT_MATRIX_TOOLTIP                                      :{BLACK}Cliquer sur une ligne pour voir les détails.{}Cocher la case comme pré-sélection pour le téléchargement.
 STR_CONTENT_SELECT_ALL_CAPTION                                  :{BLACK}Sélectionner tout
-STR_CONTENT_SELECT_ALL_CAPTION_TOOLTIP                          :{BLACK}Marquer tous les contenus comme étant à télécharger
+STR_CONTENT_SELECT_ALL_CAPTION_TOOLTIP                          :{BLACK}Marquer tous les modules comme étant à télécharger
 STR_CONTENT_SELECT_UPDATES_CAPTION                              :{BLACK}Sélectionner les mises à jour
-STR_CONTENT_SELECT_UPDATES_CAPTION_TOOLTIP                      :{BLACK}Marquer comme étant à télécharger tous les contenus qui sont une mise à jour du contenu existant
+STR_CONTENT_SELECT_UPDATES_CAPTION_TOOLTIP                      :{BLACK}Marquer comme étant à télécharger tous les modules qui sont une mise à jour des modules existants
 STR_CONTENT_UNSELECT_ALL_CAPTION                                :{BLACK}Désélectionner tout
-STR_CONTENT_UNSELECT_ALL_CAPTION_TOOLTIP                        :{BLACK}Marquer tous les contenus comme étant à ne pas télécharger
+STR_CONTENT_UNSELECT_ALL_CAPTION_TOOLTIP                        :{BLACK}Marquer tous les modules comme étant à ne pas télécharger
 STR_CONTENT_FILTER_TITLE                                        :{BLACK}Filtre sur les étiquettes/le nom{NBSP}:
 STR_CONTENT_OPEN_URL                                            :{BLACK}Visiter le site web
-STR_CONTENT_OPEN_URL_TOOLTIP                                    :{BLACK}Visiter le site web pour ce contenu
+STR_CONTENT_OPEN_URL_TOOLTIP                                    :{BLACK}Visiter le site web pour ce module
 STR_CONTENT_DOWNLOAD_CAPTION                                    :{BLACK}Télécharger
-STR_CONTENT_DOWNLOAD_CAPTION_TOOLTIP                            :{BLACK}Démarrer le téléchargement des éléments sélectionnés
+STR_CONTENT_DOWNLOAD_CAPTION_TOOLTIP                            :{BLACK}Démarrer le téléchargement des modules sélectionnés
 STR_CONTENT_TOTAL_DOWNLOAD_SIZE                                 :{SILVER}Taille totale du téléchargement{NBSP}: {WHITE}{BYTES}
-STR_CONTENT_DETAIL_TITLE                                        :{SILVER}INFORMATIONS SUR LE CONTENU
+STR_CONTENT_DETAIL_TITLE                                        :{SILVER}INFORMATIONS SUR LE MODULE
 STR_CONTENT_DETAIL_SUBTITLE_UNSELECTED                          :{SILVER}Non pré-sélectionné pour le téléchargement
 STR_CONTENT_DETAIL_SUBTITLE_SELECTED                            :{SILVER}Pré-sélectionné pour le téléchargement
 STR_CONTENT_DETAIL_SUBTITLE_AUTOSELECTED                        :{SILVER}Cette dépendance a été sélectionnée pour être téléchargée
 STR_CONTENT_DETAIL_SUBTITLE_ALREADY_HERE                        :{SILVER}Vous avez déjà ceci
-STR_CONTENT_DETAIL_SUBTITLE_DOES_NOT_EXIST                      :{SILVER}Ce contenu est inconnu et ne peut pas être téléchargé dans OpenTTD
+STR_CONTENT_DETAIL_SUBTITLE_DOES_NOT_EXIST                      :{SILVER}Ce module est inconnu et ne peut pas être téléchargé dans OpenTTD
 STR_CONTENT_DETAIL_UPDATE                                       :{SILVER}Ceci est un remplacement pour {G "un" "des" "une"} {STRING} existant{G 0 "" "s" "e"}
 STR_CONTENT_DETAIL_NAME                                         :{SILVER}Nom{NBSP}: {WHITE}{STRING}
 STR_CONTENT_DETAIL_VERSION                                      :{SILVER}Version{NBSP}: {WHITE}{STRING}
@@ -1894,8 +1895,8 @@ STR_CONTENT_DETAIL_FILESIZE                                     :{SILVER}Taille{
 STR_CONTENT_DETAIL_SELECTED_BECAUSE_OF                          :{SILVER}Sélectionné à cause de{NBSP}: {WHITE}{STRING}
 STR_CONTENT_DETAIL_DEPENDENCIES                                 :{SILVER}Dépendances{NBSP}: {WHITE}{STRING}
 STR_CONTENT_DETAIL_TAGS                                         :{SILVER}Étiquettes{NBSP}: {WHITE}{STRING}
-STR_CONTENT_NO_ZLIB                                             :{WHITE}OpenTTD est compilé sans «{NBSP}zlib{NBSP}»...
-STR_CONTENT_NO_ZLIB_SUB                                         :{WHITE}... télécharger du contenu est impossible{NBSP}!
+STR_CONTENT_NO_ZLIB                                             :{WHITE}OpenTTD est compilé sans la gestion de «{NBSP}zlib{NBSP}»...
+STR_CONTENT_NO_ZLIB_SUB                                         :{WHITE}... téléchargement des modules impossible{NBSP}!
 
 # Order of these is important!
 STR_CONTENT_TYPE_BASE_GRAPHICS                                  :{G=m2}Graphiques de base
@@ -1907,10 +1908,10 @@ STR_CONTENT_TYPE_HEIGHTMAP                                      :{G=f}Carte d'al
 STR_CONTENT_TYPE_BASE_SOUNDS                                    :{G=m2}Sons de base
 STR_CONTENT_TYPE_BASE_MUSIC                                     :{G=m2}Musique de base
 STR_CONTENT_TYPE_GAME_SCRIPT                                    :Script de jeu
-STR_CONTENT_TYPE_GS_LIBRARY                                     :Bibliothèque GS
+STR_CONTENT_TYPE_GS_LIBRARY                                     :Bibliothèque SJ
 
 # Content downloading progress window
-STR_CONTENT_DOWNLOAD_TITLE                                      :{WHITE}Téléchargement du contenu...
+STR_CONTENT_DOWNLOAD_TITLE                                      :{WHITE}Téléchargement des modules...
 STR_CONTENT_DOWNLOAD_INITIALISE                                 :{WHITE}Demande des fichiers...
 STR_CONTENT_DOWNLOAD_FILE                                       :{WHITE}Téléchargement de {STRING} ({NUM} sur {NUM})
 STR_CONTENT_DOWNLOAD_COMPLETE                                   :{WHITE}Téléchargement terminé
@@ -3093,8 +3094,8 @@ STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Prix{NBS
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Prix{NBSP}: {CURRENCY_LONG} − Poids{NBSP}: {WEIGHT_SHORT}{}Vitesse{NBSP}: {VELOCITY} − Puissance{NBSP}: {POWER}{}Effort de traction max.{NBSP}: {6:FORCE}{}Coûts d'entretien{NBSP}: {4:CURRENCY_LONG}/an{}Capacité{NBSP}: {5:CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Prix{NBSP}: {CURRENCY_LONG} − Vitesse max.{NBSP}: {VELOCITY}{}Capacité{NBSP}: {CARGO_LONG}, {CARGO_LONG}{}Coûts d'entretien{NBSP}: {CURRENCY_LONG}/an
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Prix{NBSP}: {CURRENCY_LONG} − Vitesse max.{NBSP}: {VELOCITY}{}Capacité{NBSP}: {CARGO_LONG}{}Coûts d'entretien{NBSP}: {CURRENCY_LONG}/an
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Coût{NBSP}: {CURRENCY_LONG} − Vitesse max.{NBSP}: {VELOCITY} − Rayon d'action{NBSP}: {7:COMMA} cases{}Capacité{NBSP}: {CARGO_LONG}, {CARGO_LONG}{}Coûts d'entretien{NBSP}: {CURRENCY_LONG}/an
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Coût{NBSP}: {CURRENCY_LONG} − Vitesse max.{NBSP}: {VELOCITY} − Rayon d'action{NBSP}: {7:COMMA} cases{}Capacité{NBSP}: {CARGO_LONG}{}Coûts d'entretien{NBSP}: {CURRENCY_LONG}/an
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Coût{NBSP}: {CURRENCY_LONG} − Vitesse max.{NBSP}: {VELOCITY} − Rayon d'action{NBSP}: {COMMA} cases{}Capacité{NBSP}: {CARGO_LONG}, {CARGO_LONG}{}Coûts d'entretien{NBSP}: {CURRENCY_LONG}/an
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Coût{NBSP}: {CURRENCY_LONG} − Vitesse max.{NBSP}: {VELOCITY} − Rayon d'action{NBSP}: {COMMA} cases{}Capacité{NBSP}: {CARGO_LONG}{}Coûts d'entretien{NBSP}: {CURRENCY_LONG}/an
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Remplacer {STRING}
@@ -3573,11 +3574,11 @@ STR_AI_SETTINGS_START_DELAY                                     :Nombre de jours
 
 
 # Textfile window
-STR_TEXTFILE_README_CAPTION                                     :{WHITE}Lisez-moi du {STRING} {STRING}
-STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}Liste des changements du {STRING} {STRING}
-STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}Licence du {STRING} {STRING}
+STR_TEXTFILE_README_CAPTION                                     :{WHITE}Lisez-moi du module {STRING} {STRING}
+STR_TEXTFILE_CHANGELOG_CAPTION                                  :{WHITE}Journal des modifications pour le module {STRING} {STRING}
+STR_TEXTFILE_LICENCE_CAPTION                                    :{WHITE}Licence du module {STRING} {STRING}
 STR_TEXTFILE_VIEW_README                                        :{BLACK}Voir le Lisez-moi
-STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Liste des changements
+STR_TEXTFILE_VIEW_CHANGELOG                                     :{BLACK}Journal des modifications
 STR_TEXTFILE_VIEW_LICENCE                                       :{BLACK}Licence
 
 
@@ -3718,7 +3719,8 @@ STR_ERROR_ONLY_ONE_ALLOWED_PER_TOWN                             :{WHITE}... droi
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{WHITE}... peut seulement être construit dans des villes d'au moins 1200 habitants
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... peut seulement être construit dans une région tropicale
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... peut seulement être construit dans les endroits désertiques
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... peut seulement être construit en ville
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... peut seulement être construit en ville (en remplaçant des maisons)
+STR_ERROR_CAN_ONLY_BE_BUILT_NEAR_TOWN_CENTER                    :{WHITE}... peut seulement être construit près du centre des villes
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... peut seulement être construit dans les zones basses
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... positionnement uniquement sur les bords de la carte
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... les forêts ne peuvent être plantées qu'au dessus de l'altitude d'enneigement

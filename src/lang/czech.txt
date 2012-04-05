@@ -419,7 +419,7 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :Ukončit
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Možnosti hry
 STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Nastavení obtížnosti
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Pokročilé nastavení
-STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :nastavení AI / hry
+STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :Nastavení AI / hry
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :Nastavení grafik
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Nastavení průhlednosti
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Zobrazení jmen měst
@@ -3186,8 +3186,8 @@ STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Cena: {C
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Cena: {CURRENCY_LONG} Váha: {WEIGHT_SHORT}{}Rychlost: {VELOCITY}  Síla: {POWER}  Maximální tažná síla: {6:FORCE}{}Provozní náklady: {4:CURRENCY_LONG}/rok{}Kapacita: {5:CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Cena: {CURRENCY_LONG} Max. rychlost: {VELOCITY}{}Kapacita: {CARGO_LONG}, {CARGO_LONG}{}Cena provozu: {CURRENCY_LONG} ročně
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Cena: {CURRENCY_LONG} Max. rychlost: {VELOCITY}{}Kapacita: {CARGO_LONG}{}Cena provozu: {CURRENCY_LONG} ročně
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Cena {CURRENCY_LONG} Max. Rychlost: {VELOCITY} Dosah: {7:COMMA} polí{}Kapacita: {CARGO_LONG}, {CARGO_LONG}{}Provozní náklady: {CURRENCY_LONG}/rok
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Cena {CURRENCY_LONG} Max. Rychlost {VELOCITY} Dosah: {7:COMMA} polí{}Kapacita: {CARGO_LONG}{}Provozní náklady: {CURRENCY_LONG}/rok
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Cena {CURRENCY_LONG} Max. Rychlost: {VELOCITY} Dosah: {COMMA} polí{}Kapacita: {CARGO_LONG}, {CARGO_LONG}{}Provozní náklady: {CURRENCY_LONG}/rok
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Cena {CURRENCY_LONG} Max. Rychlost {VELOCITY} Dosah: {COMMA} polí{}Kapacita: {CARGO_LONG}{}Provozní náklady: {CURRENCY_LONG}/rok
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Vyměňování {STRING}
@@ -3812,6 +3812,7 @@ STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{WHITE}... mů�
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... může se vybudovat jedině v pralese
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... může se postavit jedině v poušti
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... může se postavit jedině ve městě
+STR_ERROR_CAN_ONLY_BE_BUILT_NEAR_TOWN_CENTER                    :{WHITE}... může být postaveno pouze poblíž centra města
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... může se postavit jen v nížinách
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... může být umístěno pouze poblíž okrajů mapy
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... les lze vysadit pouze nad sněžnou čárou

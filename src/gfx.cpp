@@ -45,6 +45,7 @@ SwitchMode _switch_mode;  ///< The next mainloop command.
 PauseModeByte _pause_mode;
 Palette _cur_palette;
 
+static Dimension _max_char_size[FS_END]; ///< Cache of the maximum size of any character of a font.
 static int _max_char_height; ///< Cache of the height of the largest font
 static int _max_char_width;  ///< Cache of the width of the largest font
 static byte _stringwidth_table[FS_END][224]; ///< Cache containing width of often used characters. @see GetCharacterWidth()
@@ -109,6 +110,7 @@ static const uint DIRTY_BLOCK_WIDTH    = 64;
 
 static uint _dirty_bytes_per_line = 0;
 static byte *_dirty_blocks = NULL;
+extern uint _dirty_block_colour;
 
 void GfxScroll(int left, int top, int width, int height, int xo, int yo)
 {
@@ -1551,20 +1553,25 @@ void DoPaletteAnimations()
  */
 void LoadStringWidthTable(bool monospace)
 {
-	_max_char_height = 0;
-	_max_char_width  = 0;
-
 	for (FontSize fs = monospace ? FS_MONO : FS_BEGIN; fs < (monospace ? FS_END : FS_MONO); fs++) {
-		_max_char_height = max<int>(_max_char_height, GetCharacterHeight(fs));
+		_max_char_size[fs].width = 0;
+		_max_char_size[fs].height = GetCharacterHeight(fs);
 		for (uint i = 0; i != 224; i++) {
 			_stringwidth_table[fs][i] = GetGlyphWidth(fs, i + 32);
-			_max_char_width = max<int>(_max_char_width, _stringwidth_table[fs][i]);
+			_max_char_size[fs].width = max<int>(_max_char_size[fs].width, _stringwidth_table[fs][i]);
 		}
+
+		/* Needed because they need to be 1 more than the widest. */
+		_max_char_size[fs].width++;
+		_max_char_size[fs].height++;
 	}
 
-	/* Needed because they need to be 1 more than the widest. */
-	_max_char_height++;
-	_max_char_width++;
+	_max_char_width  = 0;
+	_max_char_height = 0;
+	for (FontSize fs = FS_BEGIN; fs < FS_END; fs++) {
+		_max_char_width = max<int>(_max_char_width, _max_char_size[fs].width);
+		_max_char_height = max<int>(_max_char_height, _max_char_size[fs].height);
+	}
 
 	ReInitAllWindows();
 }
@@ -1801,6 +1808,7 @@ void DrawDirtyBlocks()
 		} while (b++, (x += DIRTY_BLOCK_WIDTH) != w);
 	} while (b += -(int)(w / DIRTY_BLOCK_WIDTH) + _dirty_bytes_per_line, (y += DIRTY_BLOCK_HEIGHT) != h);
 
+	++_dirty_block_colour;
 	_invalid_rect.left = w;
 	_invalid_rect.top = h;
 	_invalid_rect.right = 0;

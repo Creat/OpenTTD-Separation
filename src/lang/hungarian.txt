@@ -516,6 +516,7 @@ STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Képmentés tel
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Az 'OpenTTD'-ről
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Sprite elhelyező
 STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Befoglaló doboz ki/bekapcsolása
+STR_ABOUT_MENU_TOGGLE_DIRTY_BLOCKS                              :Koszos épületek színezésének be/kikapcsolása
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -3156,8 +3157,8 @@ STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Ár: {CU
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Ár: {CURRENCY_LONG} Súly: {WEIGHT_SHORT}{}Sebesség: {VELOCITY} Erő: {POWER} Maximális Vonóerő: {6:FORCE}{}Üzemeltetési költségeit: {4:CURRENCY_LONG}/év{}Capacity: {5:CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Ár: {CURRENCY_LONG} Végsebesség: {VELOCITY}{}Kapacitás: {CARGO_LONG}, {CARGO_LONG}{}Üzemeltetés: {CURRENCY_LONG}/év
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Ár: {CURRENCY_LONG} Végsebesség: {VELOCITY}{}Kapacitás: {CARGO_LONG}{}Üzemeltetés: {CURRENCY_LONG}/év
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Ár: {CURRENCY_LONG} Végsebesség: {VELOCITY} Hatótávolság: {7:COMMA} mező{}Kapacitás: {CARGO_LONG}, {CARGO_LONG}{}Üzemeltetés: {CURRENCY_LONG}/év
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Ár: {CURRENCY_LONG} Végsebesség: {VELOCITY} Hatótávolság: {7:COMMA} mező{}Kapacitás: {CARGO_LONG}{}Üzemeltetés: {CURRENCY_LONG}/év
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Ár: {CURRENCY_LONG} Végsebesség: {VELOCITY} Hatótávolság: {COMMA} mező{}Kapacitás: {CARGO_LONG}, {CARGO_LONG}{}Üzemeltetés: {CURRENCY_LONG}/év
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Ár: {CURRENCY_LONG} Végsebesség: {VELOCITY} Hatótávolság: {COMMA} mező{}Kapacitás: {CARGO_LONG}{}Üzemeltetés: {CURRENCY_LONG}/év
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Lecserél {STRING}
@@ -3602,7 +3603,7 @@ STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}Kiválas
 STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}Játékszkript
 STR_AI_CONFIG_AI                                                :{SILVER}MI-k
 
-STR_AI_CONFIG_CHANGE                                            :{BLACK}Kiválasztás {STRING}
+STR_AI_CONFIG_CHANGE                                            :{BLACK}{STRING} kiválasztása
 STR_AI_CONFIG_CHANGE_NONE                                       :
 STR_AI_CONFIG_CHANGE_AI                                         :MI
 STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :Játékszkript
@@ -3781,7 +3782,8 @@ STR_ERROR_ONLY_ONE_ALLOWED_PER_TOWN                             :{WHITE}... vár
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{WHITE}... csak 1200-nál nagyobb lakosságszámú településeken építhető
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... csak esőerdőben építhető
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... csak sivatagban építhető
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... csak településen építhető
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... csak településen, meglévő házak helyére építhető
+STR_ERROR_CAN_ONLY_BE_BUILT_NEAR_TOWN_CENTER                    :{WHITE}... csak települések központjában építhető
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... csak alacsony terepen építhető
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... csak a térkép határaihoz közel építhető
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... erdő csak a hóhatár fölé ültethető

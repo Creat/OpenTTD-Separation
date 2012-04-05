@@ -766,6 +766,7 @@ STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Здымак у
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Аб гульні OpenTTD
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Выраўноўваньне спрайтаў
 STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Пераключыць абмежавальныя рамкі
+STR_ABOUT_MENU_TOGGLE_DIRTY_BLOCKS                              :Падфарбоўваць блёкі, якія патрабуюць перамалёўкі
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -3441,8 +3442,8 @@ STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Кошт
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Кошт: {CURRENCY_LONG} Вага: {WEIGHT_SHORT}{}Хуткасьць: {VELOCITY}  Магутнасьць: {POWER}  Макс. ЦН: {6:FORCE}{}Кошт абслуг.: {4:CURRENCY_LONG}/год{}Ёмістасьць: {5:CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Кошт: {CURRENCY_LONG} Макс. хуткасьць: {VELOCITY}{}Ёмістасьць: {CARGO_LONG}, {CARGO_LONG}{}Кошт абслуг.: {CURRENCY_LONG}/год
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Кошт: {CURRENCY_LONG} Макс. хуткасьць: {VELOCITY}{}Ёмістасьць: {CARGO_LONG}{}Кошт абслуг.: {CURRENCY_LONG}/год
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Кошт: {CURRENCY_LONG} Макс. хуткасьць: {VELOCITY} Далёкасьць: {7:COMMA} клетк{P а i ак}{}Умяшчальнасьць: {CARGO_LONG}, {CARGO_LONG}{}Кошт абслугоўваньня: {CURRENCY_LONG}/год
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Кошт: {CURRENCY_LONG} Макс. хуткасьць: {VELOCITY} Далёкасьць: {7:COMMA} клет{P ка кi ак}{}Умяшчальнасьць: {CARGO_LONG}{}Кошт абслугоўваньня: {CURRENCY_LONG}/год
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Кошт: {CURRENCY_LONG} Макс. хуткасьць: {VELOCITY} Далёкасьць: {COMMA} клетк{P а i ак}{}Умяшчальнасьць: {CARGO_LONG}, {CARGO_LONG}{}Кошт абслугоўваньня: {CURRENCY_LONG}/год
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Кошт: {CURRENCY_LONG} Макс. хуткасьць: {VELOCITY} Далёкасьць: {COMMA} клет{P ка кi ак}{}Умяшчальнасьць: {CARGO_LONG}{}Кошт абслугоўваньня: {CURRENCY_LONG}/год
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Замена {STRING.gen}
@@ -4074,7 +4075,8 @@ STR_ERROR_ONLY_ONE_ALLOWED_PER_TOWN                             :{WHITE}... та
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{WHITE}... можна пабудаваць у гарадах з насельніцтвам ня менш за 1200 жыхароў
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... можна будаваць толькі ў тропіках
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... можна будаваць толькі ў пустэльні
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... можна будаваць толькі ў гарадах
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... можна будаваць толькі ў гарадах (на месцы дамоў)
+STR_ERROR_CAN_ONLY_BE_BUILT_NEAR_TOWN_CENTER                    :{WHITE}... можа быць пабудавана толькi ў цэнтры гарадоў
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... можна будаваць толькі ў нізінах
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... можа знаходзіцца толькі ля краю мапы
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... лес можна саджаць толькі вышэй за сьнегавую лiнiю

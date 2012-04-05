@@ -549,6 +549,7 @@ STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Slika zaslona c
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :O 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Poravnjanje sprite-a
 STR_ABOUT_MENU_TOGGLE_BOUNDING_BOXES                            :Odaberi granične okvire
+STR_ABOUT_MENU_TOGGLE_DIRTY_BLOCKS                              :Mijenjaj boju blatnih blokova
 ############ range ends here
 
 ############ range for days starts (also used for the place in the highscore window)
@@ -3188,8 +3189,8 @@ STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER                      :{BLACK}Cijena: 
 STR_ENGINE_PREVIEW_COST_WEIGHT_SPEED_POWER_MAX_TE               :{BLACK}Trošak: {CURRENCY_LONG} Težina: {WEIGHT_SHORT}{}Brzina: {VELOCITY}  Snaga: {POWER}  Maks. T.E.: {6:FORCE}{}Trošak uporabe: {4:CURRENCY_LONG}/god{}Nosivost: {5:CARGO_LONG}
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_CAPACITY_RUNCOST     :{BLACK}Trošak: {CURRENCY_LONG} Maks. brzina: {VELOCITY}{}Nosivost: {CARGO_LONG}, {CARGO_LONG}{}Trošak uporabe: {CURRENCY_LONG}/god
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_CAPACITY_RUNCOST              :{BLACK}Trošak: {CURRENCY_LONG} Maks. brzina: {VELOCITY}{}Nosivost: {CARGO_LONG}{}Trošak uporabe: {CURRENCY_LONG}/god
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Cijena: {CURRENCY_LONG} Maks. brzina: {VELOCITY} Domet: {7:COMMA} tiles{}Kapacitet: {CARGO_LONG}, {CARGO_LONG}{}Trošak vožnje: {CURRENCY_LONG}/god
-STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Cijena: {CURRENCY_LONG} Maks. Brzina: {VELOCITY} Domet: {7:COMMA} tiles{}Kapacitet: {CARGO_LONG}{}Trošak vožnje: {CURRENCY_LONG}/god
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Cijena: {CURRENCY_LONG} Maks. brzina: {VELOCITY} Domet: {COMMA} tiles{}Kapacitet: {CARGO_LONG}, {CARGO_LONG}{}Trošak vožnje: {CURRENCY_LONG}/god
+STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Cijena: {CURRENCY_LONG} Maks. Brzina: {VELOCITY} Domet: {COMMA} tiles{}Kapacitet: {CARGO_LONG}{}Trošak vožnje: {CURRENCY_LONG}/god
 
 # Autoreplace window
 STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Zamijeni {STRING}
@@ -3813,7 +3814,8 @@ STR_ERROR_ONLY_ONE_ALLOWED_PER_TOWN                             :{WHITE}... dopu
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{G=male}{WHITE}... može biti izgrađen samo u gradovima s najmanje 1.200 stanovnika
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... može biti izgrađen samo u predjelima kišnih šuma
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... može biti izgrađen samo u pustinjskim područjima
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... može biti izgrađen samo u gradovima
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... može biti izgrađen samo u gradovima (zamjenjujući kuće)
+STR_ERROR_CAN_ONLY_BE_BUILT_NEAR_TOWN_CENTER                    :{WHITE}... može biti izgrađen samo blizu središta gradova
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... može biti izgrađen samo u nizinskim područjima
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... može se postaviti samo blizu rubova karte
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... šume mogu biti posađene jedino iznad linije snijega
