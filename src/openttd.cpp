@@ -59,6 +59,7 @@
 #include "misc/getoptdata.h"
 #include "game/game.hpp"
 #include "game/game_config.hpp"
+#include "town.h"
 
 
 
@@ -191,6 +192,9 @@ static void ShowHelp()
 
 	/* List the blitters */
 	p = BlitterFactoryBase::GetBlittersInfo(p, lastof(buf));
+
+	/* List the debug facilities. */
+	p = DumpDebugFacilityNames(p, lastof(buf));
 
 	/* We need to initialize the AI, so it finds the AIs */
 	AI::Initialize();
@@ -426,6 +430,8 @@ struct AfterNewGRFScan : NewGRFScanCallback {
 		/* We have loaded the config, so we may possibly save it. */
 		*save_config_ptr = save_config;
 
+		/* restore saved music volume */
+		_music_driver->SetVolume(_settings_client.music.music_vol);
 
 		if (startyear != INVALID_YEAR) _settings_newgame.game_creation.starting_year = startyear;
 		if (generation_seed != GENERATE_NEW_SEED) _settings_newgame.game_creation.generation_seed = generation_seed;
@@ -812,9 +818,6 @@ int ttd_main(int argc, char *argv[])
 	}
 	free(musicdriver);
 
-	/* restore saved music volume */
-	_music_driver->SetVolume(_settings_client.music.music_vol);
-
 	/* Take our initial lock on whatever we might want to do! */
 	_modal_progress_paint_mutex->BeginCritical();
 	_modal_progress_work_mutex->BeginCritical();
@@ -1132,6 +1135,24 @@ static void CheckCaches()
 	 * always to aid testing of caches. */
 	if (_debug_desync_level <= 1) return;
 
+	/* Check the town caches. */
+	SmallVector<TownCache, 4> old_town_caches;
+	Town *t;
+	FOR_ALL_TOWNS(t) {
+		MemCpyT(old_town_caches.Append(), &t->cache);
+	}
+
+	extern void RebuildTownCaches();
+	RebuildTownCaches();
+
+	uint i = 0;
+	FOR_ALL_TOWNS(t) {
+		if (MemCmpT(old_town_caches.Get(i), &t->cache) != 0) {
+			DEBUG(desync, 2, "town cache mismatch: town %i", (int)t->index);
+		}
+		i++;
+	}
+
 	/* Check company infrastructure cache. */
 	SmallVector<CompanyInfrastructure, 4> old_infrastructure;
 	Company *c;
@@ -1140,7 +1161,7 @@ static void CheckCaches()
 	extern void AfterLoadCompanyStats();
 	AfterLoadCompanyStats();
 
-	uint i = 0;
+	i = 0;
 	FOR_ALL_COMPANIES(c) {
 		if (MemCmpT(old_infrastructure.Get(i), &c->infrastructure) != 0) {
 			DEBUG(desync, 2, "infrastructure cache mismatch: company %i", (int)c->index);

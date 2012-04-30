@@ -254,9 +254,8 @@ static void IndustryDrawBubbleGenerator( const TileInfo *ti)
 {
 	if (IsIndustryCompleted(ti->tile)) {
 		AddChildSpriteScreen(SPR_IT_BUBBLE_GENERATOR_BUBBLE, PAL_NONE, 5, _industry_anim_offs_bubbles[GetAnimationFrame(ti->tile)]);
-	} else {
-		AddChildSpriteScreen(SPR_IT_BUBBLE_GENERATOR_SPRING, PAL_NONE, 3, 67);
 	}
+	AddChildSpriteScreen(SPR_IT_BUBBLE_GENERATOR_SPRING, PAL_NONE, 3, 67);
 }
 
 static void IndustryDrawToyFactory(const TileInfo *ti)
@@ -1450,7 +1449,7 @@ static CommandCost CheckIfIndustryTilesAreFree(TileIndex tile, const IndustryTil
  */
 static CommandCost CheckIfIndustryIsAllowed(TileIndex tile, int type, const Town *t)
 {
-	if ((GetIndustrySpec(type)->behaviour & INDUSTRYBEH_TOWN1200_MORE) && t->population < 1200) {
+	if ((GetIndustrySpec(type)->behaviour & INDUSTRYBEH_TOWN1200_MORE) && t->cache.population < 1200) {
 		return_cmd_error(STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200);
 	}
 
@@ -1583,6 +1582,25 @@ static CommandCost CheckIfFarEnoughFromConflictingIndustry(TileIndex tile, int t
 }
 
 /**
+ * Advertise about a new industry opening.
+ * @param ind Industry being opened.
+ */
+static void AdvertiseIndustryOpening(const Industry *ind)
+{
+	const IndustrySpec *ind_spc = GetIndustrySpec(ind->type);
+	SetDParam(0, ind_spc->name);
+	if (ind_spc->new_industry_text > STR_LAST_STRINGID) {
+		SetDParam(1, STR_TOWN_NAME);
+		SetDParam(2, ind->town->index);
+	} else {
+		SetDParam(1, ind->town->index);
+	}
+	AddIndustryNewsItem(ind_spc->new_industry_text, NS_INDUSTRY_OPEN, ind->index);
+	AI::BroadcastNewEvent(new ScriptEventIndustryOpen(ind->index));
+	Game::NewEvent(new ScriptEventIndustryOpen(ind->index));
+}
+
+/**
  * Put an industry on the map.
  * @param i       Just allocated poolitem, mostly empty.
  * @param tile    North tile of the industry.
@@ -1637,8 +1655,6 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 	i->last_month_transported[1] = 0;
 	i->was_cargo_delivered = false;
 	i->last_prod_year = _cur_year;
-	i->last_month_production[0] = i->production_rate[0] * 8;
-	i->last_month_production[1] = i->production_rate[1] * 8;
 	i->founder = founder;
 
 	i->construction_date = _date;
@@ -1650,11 +1666,28 @@ static void DoCreateNewIndustry(Industry *i, TileIndex tile, IndustryType type, 
 	 * else, chosen layout + 1 */
 	i->selected_layout = layout + 1;
 
-	if (!_generating_world) i->last_month_production[0] = i->last_month_production[1] = 0;
-
 	i->prod_level = PRODLEVEL_DEFAULT;
 
 	/* Call callbacks after the regular fields got initialised. */
+
+	if (HasBit(indspec->callback_mask, CBM_IND_PROD_CHANGE_BUILD)) {
+		uint16 res = GetIndustryCallback(CBID_INDUSTRY_PROD_CHANGE_BUILD, 0, Random(), i, type, INVALID_TILE);
+		if (res != CALLBACK_FAILED) {
+			if (res < PRODLEVEL_MINIMUM || res > PRODLEVEL_MAXIMUM) {
+				ErrorUnknownCallbackResult(indspec->grf_prop.grffile->grfid, CBID_INDUSTRY_PROD_CHANGE_BUILD, res);
+			} else {
+				i->prod_level = res;
+				i->RecomputeProductionMultipliers();
+			}
+		}
+	}
+
+	if (_generating_world) {
+		i->last_month_production[0] = i->production_rate[0] * 8;
+		i->last_month_production[1] = i->production_rate[1] * 8;
+	} else {
+		i->last_month_production[0] = i->last_month_production[1] = 0;
+	}
 
 	if (HasBit(indspec->callback_mask, CBM_IND_DECIDE_COLOUR)) {
 		uint16 res = GetIndustryCallback(CBID_INDUSTRY_DECIDE_COLOUR, 0, 0, i, type, INVALID_TILE);
@@ -1868,17 +1901,7 @@ CommandCost CmdBuildIndustry(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
 	}
 
 	if ((flags & DC_EXEC) && ind != NULL && _game_mode != GM_EDITOR) {
-		/* Created a new industry in-game, advertise the event. */
-		SetDParam(0, indspec->name);
-		if (indspec->new_industry_text > STR_LAST_STRINGID) {
-			SetDParam(1, STR_TOWN_NAME);
-			SetDParam(2, ind->town->index);
-		} else {
-			SetDParam(1, ind->town->index);
-		}
-		AddIndustryNewsItem(indspec->new_industry_text, NS_INDUSTRY_OPEN, ind->index);
-		AI::BroadcastNewEvent(new ScriptEventIndustryOpen(ind->index));
-		Game::NewEvent(new ScriptEventIndustryOpen(ind->index));
+		AdvertiseIndustryOpening(ind);
 	}
 
 	return CommandCost(EXPENSES_OTHER, indspec->GetConstructionCost());
@@ -1974,25 +1997,6 @@ static uint GetNumberOfIndustries()
 	assert(lengthof(numof_industry_table) == ID_END);
 	uint difficulty = (_game_mode != GM_EDITOR) ? _settings_game.difficulty.industry_density : (uint)ID_VERY_LOW;
 	return ScaleByMapSize(numof_industry_table[difficulty]);
-}
-
-/**
- * Advertise about a new industry opening.
- * @param ind Industry being opened.
- */
-static void AdvertiseIndustryOpening(const Industry *ind)
-{
-	const IndustrySpec *ind_spc = GetIndustrySpec(ind->type);
-	SetDParam(0, ind_spc->name);
-	if (ind_spc->new_industry_text > STR_LAST_STRINGID) {
-		SetDParam(1, STR_TOWN_NAME);
-		SetDParam(2, ind->town->index);
-	} else {
-		SetDParam(1, ind->town->index);
-	}
-	AddIndustryNewsItem(ind_spc->new_industry_text, NS_INDUSTRY_OPEN, ind->index);
-	AI::BroadcastNewEvent(new ScriptEventIndustryOpen(ind->index));
-	Game::NewEvent(new ScriptEventIndustryOpen(ind->index));
 }
 
 /**
@@ -2752,7 +2756,7 @@ bool IndustrySpec::UsesSmoothEconomy() const
 {
 	return _settings_game.economy.smooth_economy &&
 		!(HasBit(this->callback_mask, CBM_IND_PRODUCTION_256_TICKS) || HasBit(this->callback_mask, CBM_IND_PRODUCTION_CARGO_ARRIVAL)) && // production callbacks
-		!(HasBit(this->callback_mask, CBM_IND_MONTHLYPROD_CHANGE) || HasBit(this->callback_mask, CBM_IND_PRODUCTION_CHANGE));            // production change callbacks
+		!(HasBit(this->callback_mask, CBM_IND_MONTHLYPROD_CHANGE) || HasBit(this->callback_mask, CBM_IND_PRODUCTION_CHANGE) || HasBit(this->callback_mask, CBM_IND_PROD_CHANGE_BUILD)); // production change callbacks
 }
 
 static CommandCost TerraformTile_Industry(TileIndex tile, DoCommandFlag flags, int z_new, Slope tileh_new)

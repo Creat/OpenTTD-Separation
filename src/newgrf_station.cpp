@@ -33,15 +33,17 @@ template <typename Tspec, typename Tid, Tid Tmax>
 	/* Set up initial data */
 	classes[0].global_id = 'DFLT';
 	classes[0].name = STR_STATION_CLASS_DFLT;
-	classes[0].count = 1;
-	classes[0].spec = MallocT<StationSpec*>(1);
-	classes[0].spec[0] = NULL;
+	classes[0].Insert(NULL);
 
 	classes[1].global_id = 'WAYP';
 	classes[1].name = STR_STATION_CLASS_WAYP;
-	classes[1].count = 1;
-	classes[1].spec = MallocT<StationSpec*>(1);
-	classes[1].spec[0] = NULL;
+	classes[1].Insert(NULL);
+}
+
+template <typename Tspec, typename Tid, Tid Tmax>
+bool NewGRFClass<Tspec, Tid, Tmax>::IsUIAvailable(uint index) const
+{
+	return true;
 }
 
 INSTANTIATE_NEWGRF_CLASS_METHODS(StationClass, StationSpec, StationClassID, STAT_CLASS_MAX)
@@ -805,13 +807,12 @@ void DeallocateSpecFromStation(BaseStation *st, byte specindex)
  */
 bool DrawStationTile(int x, int y, RailType railtype, Axis axis, StationClassID sclass, uint station)
 {
-	const StationSpec *statspec;
 	const DrawTileSprites *sprites = NULL;
 	const RailtypeInfo *rti = GetRailTypeInfo(railtype);
 	PaletteID palette = COMPANY_SPRITE_COLOUR(_local_company);
 	uint tile = 2;
 
-	statspec = StationClass::Get(sclass, station);
+	const StationSpec *statspec = StationClass::Get(sclass)->GetSpec(station);
 	if (statspec == NULL) return false;
 
 	if (HasBit(statspec->callback_mask, CBM_STATION_SPRITE_LAYOUT)) {

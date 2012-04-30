@@ -54,15 +54,23 @@ ObjectSpec _object_specs[NUM_OBJECTS];
 }
 
 /**
+ * Check whether the object might be available at some point in this game with the current game mode.
+ * @return true if it might be available.
+ */
+bool ObjectSpec::IsEverAvailable() const
+{
+	return this->enabled && HasBit(this->climate, _settings_game.game_creation.landscape) &&
+			(this->flags & (_game_mode != GM_EDITOR ? OBJECT_FLAG_ONLY_IN_SCENEDIT : OBJECT_FLAG_ONLY_IN_GAME)) == 0;
+}
+
+/**
  * Check whether the object is available at this time.
  * @return true if it is available.
  */
 bool ObjectSpec::IsAvailable() const
 {
-	return this->enabled && _date > this->introduction_date &&
-			(_date < this->end_of_life_date || this->end_of_life_date < this->introduction_date + 365) &&
-			HasBit(this->climate, _settings_game.game_creation.landscape) &&
-			(flags & (_game_mode != GM_EDITOR ? OBJECT_FLAG_ONLY_IN_SCENEDIT : OBJECT_FLAG_ONLY_IN_GAME)) == 0;
+	return this->IsEverAvailable() && _date > this->introduction_date &&
+			(_date < this->end_of_life_date || this->end_of_life_date < this->introduction_date + 365);
 }
 
 /**
@@ -91,18 +99,21 @@ void ResetObjects()
 template <typename Tspec, typename Tid, Tid Tmax>
 /* static */ void NewGRFClass<Tspec, Tid, Tmax>::InsertDefaults()
 {
-	/* We only add the transmitters in the scenario editor. */
-	if (_game_mode != GM_EDITOR) return;
-
 	ObjectClassID cls = ObjectClass::Allocate('LTHS');
-	ObjectClass::SetName(cls, STR_OBJECT_CLASS_LTHS);
+	ObjectClass::Get(cls)->name = STR_OBJECT_CLASS_LTHS;
 	_object_specs[OBJECT_LIGHTHOUSE].cls_id = cls;
 	ObjectClass::Assign(&_object_specs[OBJECT_LIGHTHOUSE]);
 
 	cls = ObjectClass::Allocate('TRNS');
-	ObjectClass::SetName(cls, STR_OBJECT_CLASS_TRNS);
+	ObjectClass::Get(cls)->name = STR_OBJECT_CLASS_TRNS;
 	_object_specs[OBJECT_TRANSMITTER].cls_id = cls;
 	ObjectClass::Assign(&_object_specs[OBJECT_TRANSMITTER]);
+}
+
+template <typename Tspec, typename Tid, Tid Tmax>
+bool NewGRFClass<Tspec, Tid, Tmax>::IsUIAvailable(uint index) const
+{
+	return this->GetSpec(index)->IsEverAvailable();
 }
 
 INSTANTIATE_NEWGRF_CLASS_METHODS(ObjectClass, ObjectSpec, ObjectClassID, OBJECT_CLASS_MAX)

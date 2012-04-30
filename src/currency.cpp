@@ -52,6 +52,9 @@ static const CurrencySpec origin_currency_specs[NUM_CURRENCY] = {
 	{   60, "", 2009,      "",             NBSP "Sk",        1, STR_GAME_OPTIONS_CURRENCY_SKK    }, ///< slovak koruna
 	{    4, "", CF_NOEURO, "R$" NBSP,      "",               0, STR_GAME_OPTIONS_CURRENCY_BRL    }, ///< brazil real
 	{   31, "", 2011,      "",             NBSP "EEK",       1, STR_GAME_OPTIONS_CURRENCY_EEK    }, ///< estonian krooni
+	{    4, "", 2014,      "",             NBSP "Lt",        1, STR_GAME_OPTIONS_CURRENCY_LTL    }, ///< lithuanian litas
+	{ 1850, "", CF_NOEURO, "\xE2\x82\xA9", "",               0, STR_GAME_OPTIONS_CURRENCY_KRW    }, ///< south korean won
+	{   13, "", CF_NOEURO, "R" NBSP,       "",               0, STR_GAME_OPTIONS_CURRENCY_ZAR    }, ///< south african rand
 	{    1, "", CF_NOEURO, "",             "",               2, STR_GAME_OPTIONS_CURRENCY_CUSTOM }, ///< custom currency
 };
 
@@ -93,6 +96,7 @@ enum Currencies {
 	CURR_SKK,
 	CURR_BRL,
 	CURR_EEK,
+	CURR_LTL,
 };
 
 /**

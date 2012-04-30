@@ -483,6 +483,10 @@ bool AfterLoadGame()
 
 	TileIndex map_size = MapSize();
 
+	extern TileIndex _cur_tileloop_tile; // From landscape.cpp.
+	/* The LFSR used in RunTileLoop iteration cannot have a zeroed state, make it non-zeroed. */
+	if (_cur_tileloop_tile == 0) _cur_tileloop_tile = 1;
+
 	if (IsSavegameVersionBefore(98)) GamelogOldver();
 
 	GamelogTestRevision();
@@ -2730,6 +2734,12 @@ bool AfterLoadGame()
 			SetRoadOwner(t, ROADTYPE_ROAD, o);
 			SetRoadOwner(t, ROADTYPE_TRAM, o);
 		}
+	}
+
+	if (IsSavegameVersionBefore(175)) {
+		/* Introduced tree planting limit. */
+		Company *c;
+		FOR_ALL_COMPANIES(c) c->tree_limit = _settings_game.construction.tree_frame_burst << 16;
 	}
 
 	/* Road stops is 'only' updating some caches */

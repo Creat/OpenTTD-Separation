@@ -42,16 +42,17 @@ public:
 		this->vscroll = this->GetScrollbar(WID_BO_SCROLLBAR);
 		this->vscroll->SetCapacity(5);
 		this->vscroll->SetPosition(0);
-		this->vscroll->SetCount(ObjectClass::GetCount());
+		this->vscroll->SetCount(ObjectClass::GetUIClassCount());
 
 		this->FinishInitNested(desc, 0);
 
 		this->SelectFirstAvailableObject(true);
+		assert(ObjectClass::Get(_selected_object_class)->GetUISpecCount() > 0); // object GUI should be disables elsewise
 		this->GetWidget<NWidgetMatrix>(WID_BO_OBJECT_MATRIX)->SetCount(4);
 
 		NWidgetMatrix *matrix = this->GetWidget<NWidgetMatrix>(WID_BO_SELECT_MATRIX);
 		matrix->SetScrollbar(this->GetScrollbar(WID_BO_SELECT_SCROLL));
-		matrix->SetCount(ObjectClass::GetCount(_selected_object_class));
+		matrix->SetCount(ObjectClass::Get(_selected_object_class)->GetUISpecCount());
 	}
 
 	virtual ~BuildObjectWindow()
@@ -61,8 +62,14 @@ public:
 	virtual void SetStringParameters(int widget) const
 	{
 		switch (widget) {
+			case WID_BO_OBJECT_NAME: {
+				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
+				SetDParam(0, spec != NULL ? spec->name : STR_EMPTY);
+				break;
+			}
+
 			case WID_BO_OBJECT_SIZE: {
-				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, _selected_object_index);
+				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
 				int size = spec == NULL ? 0 : spec->size;
 				SetDParam(0, GB(size, HasBit(_selected_object_view, 0) ? 4 : 0, 4));
 				SetDParam(1, GB(size, HasBit(_selected_object_view, 0) ? 0 : 4, 4));
@@ -77,8 +84,10 @@ public:
 	{
 		switch (widget) {
 			case WID_BO_CLASS_LIST: {
-				for (uint i = 0; i < ObjectClass::GetCount(); i++) {
-					size->width = max(size->width, GetStringBoundingBox(ObjectClass::GetName((ObjectClassID)i)).width);
+				for (uint i = 0; i < ObjectClass::GetClassCount(); i++) {
+					ObjectClass *objclass = ObjectClass::Get((ObjectClassID)i);
+					if (objclass->GetUISpecCount() == 0) continue;
+					size->width = max(size->width, GetStringBoundingBox(objclass->name).width);
 				}
 				size->width += padding.width;
 				this->line_height = FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM;
@@ -89,7 +98,7 @@ public:
 
 			case WID_BO_OBJECT_MATRIX: {
 				/* Get the right amount of buttons based on the current spec. */
-				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, _selected_object_index);
+				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
 				if (spec != NULL) {
 					if (spec->views >= 2) size->width  += resize->width;
 					if (spec->views >= 4) size->height += resize->height;
@@ -106,7 +115,7 @@ public:
 				/* Get the height and view information. */
 				for (int i = 0; i < NUM_OBJECTS; i++) {
 					const ObjectSpec *spec = ObjectSpec::Get(i);
-					if (!spec->enabled) continue;
+					if (!spec->IsEverAvailable()) continue;
 					two_wide |= spec->views >= 2;
 					height[spec->views / 4] = max<int>(ObjectSpec::Get(i)->height, height[spec->views / 4]);
 				}
@@ -129,7 +138,7 @@ public:
 				}
 
 				/* Get the right size for the single widget based on the current spec. */
-				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, _selected_object_index);
+				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
 				if (spec != NULL) {
 					if (spec->views >= 2) size->width  = size->width  / 2 - 1;
 					if (spec->views >= 4) size->height = size->height / 2 - 1;
@@ -155,8 +164,12 @@ public:
 		switch (GB(widget, 0, 16)) {
 			case WID_BO_CLASS_LIST: {
 				int y = r.top;
-				for (uint i = this->vscroll->GetPosition(); this->vscroll->IsVisible(i) && i < ObjectClass::GetCount(); i++) {
-					SetDParam(0, ObjectClass::GetName((ObjectClassID)i));
+				uint pos = 0;
+				for (uint i = 0; i < ObjectClass::GetClassCount(); i++) {
+					ObjectClass *objclass = ObjectClass::Get((ObjectClassID)i);
+					if (objclass->GetUISpecCount() == 0) continue;
+					if (!this->vscroll->IsVisible(pos++)) continue;
+					SetDParam(0, objclass->name);
 					DrawString(r.left + WD_MATRIX_LEFT, r.right + WD_MATRIX_RIGHT, y + WD_MATRIX_TOP, STR_JUST_STRING,
 							((int)i == _selected_object_class) ? TC_WHITE : TC_BLACK);
 					y += this->line_height;
@@ -165,7 +178,7 @@ public:
 			}
 
 			case WID_BO_OBJECT_SPRITE: {
-				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, _selected_object_index);
+				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
 				if (spec == NULL) break;
 
 				DrawPixelInfo tmp_dpi;
@@ -186,10 +199,10 @@ public:
 			}
 
 			case WID_BO_SELECT_IMAGE: {
-				if (_selected_object_index < 0) break;
-
-				int obj_index = GB(widget, 16, 16);
-				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, obj_index);
+				ObjectClass *objclass = ObjectClass::Get(_selected_object_class);
+				int obj_index = objclass->GetIndexFromUI(GB(widget, 16, 16));
+				if (obj_index < 0) break;
+				const ObjectSpec *spec = objclass->GetSpec(obj_index);
 				if (spec == NULL) break;
 
 				if (!spec->IsAvailable()) {
@@ -214,7 +227,7 @@ public:
 			}
 
 			case WID_BO_INFO: {
-				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, _selected_object_index);
+				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
 				if (spec == NULL) break;
 
 				/* Get the extra message for the GUI */
@@ -253,7 +266,7 @@ public:
 	{
 		_selected_object_index = object_index;
 		if (_selected_object_index != -1) {
-			const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, _selected_object_index);
+			const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
 			_selected_object_view = min(_selected_object_view, spec->views - 1);
 			this->ReInit();
 		} else {
@@ -261,7 +274,7 @@ public:
 		}
 
 		this->GetWidget<NWidgetMatrix>(WID_BO_OBJECT_MATRIX)->SetClicked(_selected_object_view);
-		this->GetWidget<NWidgetMatrix>(WID_BO_SELECT_MATRIX)->SetClicked(_selected_object_index);
+		this->GetWidget<NWidgetMatrix>(WID_BO_SELECT_MATRIX)->SetClicked(_selected_object_index != -1 ? ObjectClass::Get(_selected_object_class)->GetUIFromIndex(_selected_object_index) : -1);
 		this->UpdateSelectSize();
 		this->SetDirty();
 	}
@@ -271,7 +284,7 @@ public:
 		if (_selected_object_index == -1) {
 			SetTileSelectSize(1, 1);
 		} else {
-			const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, _selected_object_index);
+			const ObjectSpec *spec = ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index);
 			int w = GB(spec->size, HasBit(_selected_object_view, 0) ? 4 : 0, 4);
 			int h = GB(spec->size, HasBit(_selected_object_view, 0) ? 0 : 4, 4);
 			SetTileSelectSize(w, h);
@@ -289,18 +302,18 @@ public:
 		switch (GB(widget, 0, 16)) {
 			case WID_BO_CLASS_LIST: {
 				int num_clicked = this->vscroll->GetPosition() + (pt.y - this->nested_array[widget]->pos_y) / this->line_height;
-				if (num_clicked >= (int)ObjectClass::GetCount()) break;
+				if (num_clicked >= (int)ObjectClass::GetUIClassCount()) break;
 
-				_selected_object_class = (ObjectClassID)num_clicked;
-				this->GetWidget<NWidgetMatrix>(WID_BO_SELECT_MATRIX)->SetCount(ObjectClass::GetCount(_selected_object_class));
+				_selected_object_class = ObjectClass::GetUIClass(num_clicked);
+				this->GetWidget<NWidgetMatrix>(WID_BO_SELECT_MATRIX)->SetCount(ObjectClass::Get(_selected_object_class)->GetUISpecCount());
 				this->SelectFirstAvailableObject(false);
 				break;
 			}
 
 			case WID_BO_SELECT_IMAGE: {
-				int num_clicked = GB(widget, 16, 16);
-				const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, num_clicked);
-				if (spec->IsAvailable()) this->SelectOtherObject(num_clicked);
+				ObjectClass *objclass = ObjectClass::Get(_selected_object_class);
+				int num_clicked = objclass->GetIndexFromUI(GB(widget, 16, 16));
+				if (num_clicked >= 0 && objclass->GetSpec(num_clicked)->IsAvailable()) this->SelectOtherObject(num_clicked);
 				break;
 			}
 
@@ -323,10 +336,11 @@ public:
 	void SelectFirstAvailableObject(bool change_class)
 	{
 		/* First try to select an object in the selected class. */
-		for (uint i = 0; i < ObjectClass::GetCount(_selected_object_class); i++) {
-			const ObjectSpec *spec = ObjectClass::Get(_selected_object_class, i);
+		ObjectClass *sel_objclass = ObjectClass::Get(_selected_object_class);
+		for (uint i = 0; i < sel_objclass->GetSpecCount(); i++) {
+			const ObjectSpec *spec = sel_objclass->GetSpec(i);
 			if (spec->IsAvailable()) {
-				this->SelectOtherObject(0);
+				this->SelectOtherObject(i);
 				return;
 			}
 		}
@@ -334,8 +348,9 @@ public:
 			/* If that fails, select the first available object
 			 * from a random class. */
 			for (ObjectClassID j = OBJECT_CLASS_BEGIN; j < OBJECT_CLASS_MAX; j++) {
-				for (uint i = 0; i < ObjectClass::GetCount(j); i++) {
-					const ObjectSpec *spec = ObjectClass::Get(j, i);
+				ObjectClass *objclass = ObjectClass::Get(j);
+				for (uint i = 0; i < objclass->GetSpecCount(); i++) {
+					const ObjectSpec *spec = objclass->GetSpec(i);
 					if (spec->IsAvailable()) {
 						_selected_object_class = j;
 						this->SelectOtherObject(i);
@@ -344,7 +359,16 @@ public:
 				}
 			}
 		}
-		/* If all objects are unavailable, select nothing. */
+		/* If all objects are unavailable, select nothing... */
+		if (ObjectClass::Get(_selected_object_class)->GetUISpecCount() == 0) {
+			/* ... but make sure that the class is not empty. */
+			for (ObjectClassID j = OBJECT_CLASS_BEGIN; j < OBJECT_CLASS_MAX; j++) {
+				if (ObjectClass::Get(j)->GetUISpecCount() > 0) {
+					_selected_object_class = j;
+					break;
+				}
+			}
+		}
 		this->SelectOtherObject(-1);
 	}
 };
@@ -366,6 +390,7 @@ static const NWidgetPart _nested_build_object_widgets[] = {
 						NWidget(WWT_PANEL, COLOUR_GREY, WID_BO_OBJECT_SPRITE), SetDataTip(0x0, STR_OBJECT_BUILD_PREVIEW_TOOLTIP), EndContainer(),
 					EndContainer(),
 				EndContainer(),
+				NWidget(WWT_TEXT, COLOUR_DARK_GREEN, WID_BO_OBJECT_NAME), SetDataTip(STR_ORANGE_STRING, STR_NULL), SetPadding(2, 5, 2, 5),
 				NWidget(WWT_TEXT, COLOUR_DARK_GREEN, WID_BO_OBJECT_SIZE), SetDataTip(STR_OBJECT_BUILD_SIZE, STR_NULL), SetPadding(2, 5, 2, 5),
 			EndContainer(),
 			NWidget(WWT_PANEL, COLOUR_DARK_GREEN), SetScrollbar(WID_BO_SELECT_SCROLL),
@@ -418,5 +443,5 @@ void InitializeObjectGui()
  */
 void PlaceProc_Object(TileIndex tile)
 {
-	DoCommandP(tile, ObjectClass::Get(_selected_object_class, _selected_object_index)->Index(), _selected_object_view, CMD_BUILD_OBJECT | CMD_MSG(STR_ERROR_CAN_T_BUILD_OBJECT), CcTerraform);
+	DoCommandP(tile, ObjectClass::Get(_selected_object_class)->GetSpec(_selected_object_index)->Index(), _selected_object_view, CMD_BUILD_OBJECT | CMD_MSG(STR_ERROR_CAN_T_BUILD_OBJECT), CcTerraform);
 }

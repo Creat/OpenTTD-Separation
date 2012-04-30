@@ -1762,7 +1762,8 @@ public:
 		WID_BO_SCROLLBAR                     = ::WID_BO_SCROLLBAR,                     ///< The scrollbar associated with the list.
 		WID_BO_OBJECT_MATRIX                 = ::WID_BO_OBJECT_MATRIX,                 ///< The matrix with preview sprites.
 		WID_BO_OBJECT_SPRITE                 = ::WID_BO_OBJECT_SPRITE,                 ///< A preview sprite of the object.
-		WID_BO_OBJECT_SIZE                   = ::WID_BO_OBJECT_SIZE,                   ///< The size of an object.
+		WID_BO_OBJECT_NAME                   = ::WID_BO_OBJECT_NAME,                   ///< The name of the selected object.
+		WID_BO_OBJECT_SIZE                   = ::WID_BO_OBJECT_SIZE,                   ///< The size of the selected object.
 		WID_BO_INFO                          = ::WID_BO_INFO,                          ///< Other information about the object (from the NewGRF).
 		WID_BO_SELECT_MATRIX                 = ::WID_BO_SELECT_MATRIX,                 ///< Selection preview matrix of objects of a given class.
 		WID_BO_SELECT_IMAGE                  = ::WID_BO_SELECT_IMAGE,                  ///< Preview image in the #WID_BO_SELECT_MATRIX.
@@ -2059,6 +2060,7 @@ public:
 		WID_SV_LOCATION                      = ::WID_SV_LOCATION,                      ///< 'Location' button.
 		WID_SV_ACCEPTS_RATINGS               = ::WID_SV_ACCEPTS_RATINGS,               ///< 'Accepts' / 'Ratings' button.
 		WID_SV_RENAME                        = ::WID_SV_RENAME,                        ///< 'Rename' button.
+		WID_SV_CLOSE_AIRPORT                 = ::WID_SV_CLOSE_AIRPORT,                 ///< 'Close airport' button.
 		WID_SV_TRAINS                        = ::WID_SV_TRAINS,                        ///< List of scheduled trains button.
 		WID_SV_ROADVEHS                      = ::WID_SV_ROADVEHS,                      ///< List of scheduled road vehs button.
 		WID_SV_SHIPS                         = ::WID_SV_SHIPS,                         ///< List of scheduled ships button.

@@ -328,8 +328,8 @@ public:
 
 		uint y = r.top + WD_FRAMERECT_TOP;
 
-		SetDParam(0, this->town->population);
-		SetDParam(1, this->town->num_houses);
+		SetDParam(0, this->town->cache.population);
+		SetDParam(1, this->town->cache.num_houses);
 		DrawString(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_LEFT, y, STR_TOWN_VIEW_POPULATION_HOUSES);
 
 		SetDParam(0, this->town->supplied[CT_PASSENGERS].old_act);
@@ -343,8 +343,8 @@ public:
 		bool first = true;
 		for (int i = TE_BEGIN; i < TE_END; i++) {
 			if (this->town->goal[i] == 0) continue;
-			if (this->town->goal[i] == TOWN_GROWTH_WINTER && (TileHeight(this->town->xy) < LowestSnowLine() || this->town->population <= 90)) continue;
-			if (this->town->goal[i] == TOWN_GROWTH_DESERT && (GetTropicZone(this->town->xy) != TROPICZONE_DESERT || this->town->population <= 60)) continue;
+			if (this->town->goal[i] == TOWN_GROWTH_WINTER && (TileHeight(this->town->xy) < LowestSnowLine() || this->town->cache.population <= 90)) continue;
+			if (this->town->goal[i] == TOWN_GROWTH_DESERT && (GetTropicZone(this->town->xy) != TROPICZONE_DESERT || this->town->cache.population <= 60)) continue;
 
 			if (first) {
 				DrawString(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_LEFT, y += FONT_HEIGHT_NORMAL, STR_TOWN_VIEW_CARGO_FOR_TOWNGROWTH);
@@ -465,8 +465,8 @@ public:
 		bool first = true;
 		for (int i = TE_BEGIN; i < TE_END; i++) {
 			if (this->town->goal[i] == 0) continue;
-			if (this->town->goal[i] == TOWN_GROWTH_WINTER && (TileHeight(this->town->xy) < LowestSnowLine() || this->town->population <= 90)) continue;
-			if (this->town->goal[i] == TOWN_GROWTH_DESERT && (GetTropicZone(this->town->xy) != TROPICZONE_DESERT || this->town->population <= 60)) continue;
+			if (this->town->goal[i] == TOWN_GROWTH_WINTER && (TileHeight(this->town->xy) < LowestSnowLine() || this->town->cache.population <= 90)) continue;
+			if (this->town->goal[i] == TOWN_GROWTH_DESERT && (GetTropicZone(this->town->xy) != TROPICZONE_DESERT || this->town->cache.population <= 60)) continue;
 
 			if (first) {
 				aimed_height += FONT_HEIGHT_NORMAL;
@@ -681,7 +681,7 @@ private:
 	/** Sort by population */
 	static int CDECL TownPopulationSorter(const Town * const *a, const Town * const *b)
 	{
-		return (*a)->population - (*b)->population;
+		return (*a)->cache.population - (*b)->cache.population;
 	}
 
 public:
@@ -727,15 +727,31 @@ public:
 					DrawString(r.left + WD_FRAMERECT_LEFT, r.right, y, STR_TOWN_DIRECTORY_NONE);
 					break;
 				}
+
 				/* At least one town available. */
+				bool rtl = _current_text_dir == TD_RTL;
+				Dimension icon_size = GetSpriteSize(SPR_TOWN_RATING_GOOD);
+				int text_left  = r.left + WD_FRAMERECT_LEFT + (rtl ? 0 : icon_size.width + 2);
+				int text_right = r.right - WD_FRAMERECT_RIGHT - (rtl ? icon_size.width + 2 : 0);
+				int icon_x = rtl ? r.right - WD_FRAMERECT_RIGHT - icon_size.width : r.left + WD_FRAMERECT_LEFT;
+
 				for (uint i = this->vscroll->GetPosition(); i < this->towns.Length(); i++) {
 					const Town *t = this->towns[i];
-
 					assert(t->xy != INVALID_TILE);
 
+					/* Draw rating icon. */
+					if (_game_mode == GM_EDITOR || !HasBit(t->have_ratings, _local_company)) {
+						DrawSprite(SPR_TOWN_RATING_NA, PAL_NONE, icon_x, y + (this->resize.step_height - icon_size.height) / 2);
+					} else {
+						SpriteID icon = SPR_TOWN_RATING_APALLING;
+						if (t->ratings[_local_company] > RATING_VERYPOOR) icon = SPR_TOWN_RATING_MEDIOCRE;
+						if (t->ratings[_local_company] > RATING_GOOD)     icon = SPR_TOWN_RATING_GOOD;
+						DrawSprite(icon, PAL_NONE, icon_x, y + (this->resize.step_height - icon_size.height) / 2);
+					}
+
 					SetDParam(0, t->index);
-					SetDParam(1, t->population);
-					DrawString(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_RIGHT, y, STR_TOWN_DIRECTORY_TOWN);
+					SetDParam(1, t->cache.population);
+					DrawString(text_left, text_right, y + (this->resize.step_height - FONT_HEIGHT_NORMAL) / 2, STR_TOWN_DIRECTORY_TOWN);
 
 					y += this->resize.step_height;
 					if (++n == this->vscroll->GetCapacity()) break; // max number of towns in 1 window
@@ -767,6 +783,9 @@ public:
 					SetDParam(1, 10000000); // 10^7
 					d = maxdim(d, GetStringBoundingBox(STR_TOWN_DIRECTORY_TOWN));
 				}
+				Dimension icon_size = GetSpriteSize(SPR_TOWN_RATING_GOOD);
+				d.width += icon_size.width + 2;
+				d.height = max(d.height, icon_size.height);
 				resize->height = d.height;
 				d.height *= 5;
 				d.width += padding.width + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;

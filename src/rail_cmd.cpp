@@ -1198,6 +1198,7 @@ static bool CheckSignalAutoFill(TileIndex &tile, Trackdir &trackdir, int &signal
  * - p2 = (bit  5)    - 0 = build, 1 = remove signals
  * - p2 = (bit  6)    - 0 = selected stretch, 1 = auto fill
  * - p2 = (bit  7- 9) - default signal type
+ * - p2 = (bit 10)    - 0 = keep fixed distance, 1 = minimise gaps between signals
  * - p2 = (bit 24-31) - user defined signals_density
  * @param text unused
  * @return the cost of this operation or an error
@@ -1212,6 +1213,7 @@ static CommandCost CmdSignalTrackHelper(TileIndex tile, DoCommandFlag flags, uin
 	bool semaphores = HasBit(p2, 4);
 	bool remove = HasBit(p2, 5);
 	bool autofill = HasBit(p2, 6);
+	bool minimise_gaps = HasBit(p2, 10);
 	byte signal_density = GB(p2, 24, 8);
 
 	if (p1 >= MapSize() || !ValParamTrackOrientation(track)) return CMD_ERROR;
@@ -1258,7 +1260,11 @@ static CommandCost CmdSignalTrackHelper(TileIndex tile, DoCommandFlag flags, uin
 	if (signals & SignalAgainstTrackdir(trackdir)) SetBit(signal_dir, 1);
 
 	/* signal_ctr         - amount of tiles already processed
+	 * last_used_ctr      - amount of tiles before previously placed signal
 	 * signals_density    - setting to put signal on every Nth tile (double space on |, -- tracks)
+	 * last_suitable_ctr  - amount of tiles before last possible signal place
+	 * last_suitable_tile - last tile where it is possible to place a signal
+	 * last_suitable_trackdir - trackdir of the last tile
 	 **********
 	 * trackdir   - trackdir to build with autorail
 	 * semaphores - semaphores or signals
@@ -1266,11 +1272,15 @@ static CommandCost CmdSignalTrackHelper(TileIndex tile, DoCommandFlag flags, uin
 	 *              and convert all others to semaphore/signal
 	 * remove     - 1 remove signals, 0 build signals */
 	int signal_ctr = 0;
+	int last_used_ctr = INT_MIN; // initially INT_MIN to force building/removing at the first tile
+	int last_suitable_ctr = 0;
+	TileIndex last_suitable_tile = INVALID_TILE;
+	Trackdir last_suitable_trackdir = INVALID_TRACKDIR;
 	CommandCost last_error = CMD_ERROR;
 	bool had_success = false;
 	for (;;) {
 		/* only build/remove signals with the specified density */
-		if (remove || signal_ctr % signal_density == 0) {
+		if (remove || minimise_gaps || signal_ctr % signal_density == 0) {
 			uint32 p1 = GB(TrackdirToTrack(trackdir), 0, 3);
 			SB(p1, 3, 1, mode);
 			SB(p1, 4, 1, semaphores);
@@ -1282,17 +1292,42 @@ static CommandCost CmdSignalTrackHelper(TileIndex tile, DoCommandFlag flags, uin
 			if (HasBit(signal_dir, 0)) signals |= SignalAlongTrackdir(trackdir);
 			if (HasBit(signal_dir, 1)) signals |= SignalAgainstTrackdir(trackdir);
 
-			CommandCost ret = DoCommand(tile, p1, signals, flags, remove ? CMD_REMOVE_SIGNALS : CMD_BUILD_SIGNALS);
+			/* Test tiles in between for suitability as well if minimising gaps. */
+			bool test_only = minimise_gaps && signal_ctr < (last_used_ctr + signal_density);
+			CommandCost ret = DoCommand(tile, p1, signals, test_only ? flags & ~DC_EXEC : flags, remove ? CMD_REMOVE_SIGNALS : CMD_BUILD_SIGNALS);
 
-			/* Be user-friendly and try placing signals as much as possible */
 			if (ret.Succeeded()) {
-				had_success = true;
-				total_cost.AddCost(ret);
-			} else {
-				/* The "No railway" error is the least important one. */
-				if (ret.GetErrorMessage() != STR_ERROR_THERE_IS_NO_RAILROAD_TRACK ||
-						last_error.GetErrorMessage() == INVALID_STRING_ID) {
-					last_error = ret;
+				/* Remember last track piece where we can place a signal. */
+				last_suitable_ctr = signal_ctr;
+				last_suitable_tile = tile;
+				last_suitable_trackdir = trackdir;
+			} else if (!test_only && last_suitable_tile != INVALID_TILE) {
+				/* If a signal can't be placed, place it at the last possible position. */
+				SB(p1, 0, 3, TrackdirToTrack(last_suitable_trackdir));
+				ClrBit(p1, 17);
+
+				/* Pick the correct orientation for the track direction. */
+				signals = 0;
+				if (HasBit(signal_dir, 0)) signals |= SignalAlongTrackdir(last_suitable_trackdir);
+				if (HasBit(signal_dir, 1)) signals |= SignalAgainstTrackdir(last_suitable_trackdir);
+
+				ret = DoCommand(last_suitable_tile, p1, signals, flags, remove ? CMD_REMOVE_SIGNALS : CMD_BUILD_SIGNALS);
+			}
+
+			/* Collect cost. */
+			if (!test_only) {
+				/* Be user-friendly and try placing signals as much as possible */
+				if (ret.Succeeded()) {
+					had_success = true;
+					total_cost.AddCost(ret);
+					last_used_ctr = last_suitable_ctr;
+					last_suitable_tile = INVALID_TILE;
+				} else {
+					/* The "No railway" error is the least important one. */
+					if (ret.GetErrorMessage() != STR_ERROR_THERE_IS_NO_RAILROAD_TRACK ||
+							last_error.GetErrorMessage() == INVALID_STRING_ID) {
+						last_error = ret;
+					}
 				}
 			}
 		}
@@ -1810,7 +1845,7 @@ static uint32 _drawtile_track_palette;
 static void DrawTrackFence_NW(const TileInfo *ti, SpriteID base_image)
 {
 	RailFenceOffset rfo = RFO_FLAT_X;
-	if (ti->tileh != SLOPE_FLAT) rfo = (ti->tileh & SLOPE_S) ? RFO_SLOPE_SW : RFO_SLOPE_NE;
+	if (ti->tileh & SLOPE_NW) rfo = (ti->tileh & SLOPE_W) ? RFO_SLOPE_SW : RFO_SLOPE_NE;
 	AddSortableSpriteToDraw(base_image + rfo, _drawtile_track_palette,
 		ti->x, ti->y + 1, 16, 1, 4, ti->z);
 }
@@ -1818,7 +1853,7 @@ static void DrawTrackFence_NW(const TileInfo *ti, SpriteID base_image)
 static void DrawTrackFence_SE(const TileInfo *ti, SpriteID base_image)
 {
 	RailFenceOffset rfo = RFO_FLAT_X;
-	if (ti->tileh != SLOPE_FLAT) rfo = (ti->tileh & SLOPE_S) ? RFO_SLOPE_SW : RFO_SLOPE_NE;
+	if (ti->tileh & SLOPE_SE) rfo = (ti->tileh & SLOPE_S) ? RFO_SLOPE_SW : RFO_SLOPE_NE;
 	AddSortableSpriteToDraw(base_image + rfo, _drawtile_track_palette,
 		ti->x, ti->y + TILE_SIZE - 1, 16, 1, 4, ti->z);
 }
@@ -1832,7 +1867,7 @@ static void DrawTrackFence_NW_SE(const TileInfo *ti, SpriteID base_image)
 static void DrawTrackFence_NE(const TileInfo *ti, SpriteID base_image)
 {
 	RailFenceOffset rfo = RFO_FLAT_Y;
-	if (ti->tileh != SLOPE_FLAT) rfo = (ti->tileh & SLOPE_S) ? RFO_SLOPE_SE : RFO_SLOPE_NW;
+	if (ti->tileh & SLOPE_NE) rfo = (ti->tileh & SLOPE_E) ? RFO_SLOPE_SE : RFO_SLOPE_NW;
 	AddSortableSpriteToDraw(base_image + rfo, _drawtile_track_palette,
 		ti->x + 1, ti->y, 1, 16, 4, ti->z);
 }
@@ -1840,7 +1875,7 @@ static void DrawTrackFence_NE(const TileInfo *ti, SpriteID base_image)
 static void DrawTrackFence_SW(const TileInfo *ti, SpriteID base_image)
 {
 	RailFenceOffset rfo = RFO_FLAT_Y;
-	if (ti->tileh != SLOPE_FLAT) rfo = (ti->tileh & SLOPE_S) ? RFO_SLOPE_SE : RFO_SLOPE_NW;
+	if (ti->tileh & SLOPE_SW) rfo = (ti->tileh & SLOPE_S) ? RFO_SLOPE_SE : RFO_SLOPE_NW;
 	AddSortableSpriteToDraw(base_image + rfo, _drawtile_track_palette,
 		ti->x + TILE_SIZE - 1, ti->y, 1, 16, 4, ti->z);
 }
@@ -2518,78 +2553,37 @@ static void TileLoop_Track(TileIndex tile)
 		/* determine direction of fence */
 		TrackBits rail = GetTrackBits(tile);
 
-		switch (rail) {
-			case TRACK_BIT_UPPER: new_ground = RAIL_GROUND_FENCE_HORIZ1; break;
-			case TRACK_BIT_LOWER: new_ground = RAIL_GROUND_FENCE_HORIZ2; break;
-			case TRACK_BIT_LEFT:  new_ground = RAIL_GROUND_FENCE_VERT1;  break;
-			case TRACK_BIT_RIGHT: new_ground = RAIL_GROUND_FENCE_VERT2;  break;
+		Owner owner = GetTileOwner(tile);
+		byte fences = 0;
 
-			default: {
-				Owner owner = GetTileOwner(tile);
+		for (DiagDirection d = DIAGDIR_BEGIN; d < DIAGDIR_END; d++) {
+			static const TrackBits dir_to_trackbits[DIAGDIR_END] = {TRACK_BIT_3WAY_NE, TRACK_BIT_3WAY_SE, TRACK_BIT_3WAY_SW, TRACK_BIT_3WAY_NW};
 
-				if (rail == (TRACK_BIT_LOWER | TRACK_BIT_RIGHT) || (
-							(rail & TRACK_BIT_3WAY_NW) == 0 &&
-							(rail & TRACK_BIT_X)
-						)) {
-					TileIndex n = tile + TileDiffXY(0, -1);
-					TrackBits nrail = (IsPlainRailTile(n) ? GetTrackBits(n) : TRACK_BIT_NONE);
+			/* Track bit on this edge => no fence. */
+			if ((rail & dir_to_trackbits[d]) != TRACK_BIT_NONE) continue;
 
-					if ((!IsTileType(n, MP_RAILWAY) && !IsRailWaypointTile(n)) ||
-							!IsTileOwner(n, owner) ||
-							nrail == TRACK_BIT_UPPER ||
-							nrail == TRACK_BIT_LEFT) {
-						new_ground = RAIL_GROUND_FENCE_NW;
-					}
-				}
+			TileIndex tile2 = tile + TileOffsByDiagDir(d);
 
-				if (rail == (TRACK_BIT_UPPER | TRACK_BIT_LEFT) || (
-							(rail & TRACK_BIT_3WAY_SE) == 0 &&
-							(rail & TRACK_BIT_X)
-						)) {
-					TileIndex n = tile + TileDiffXY(0, 1);
-					TrackBits nrail = (IsPlainRailTile(n) ? GetTrackBits(n) : TRACK_BIT_NONE);
-
-					if ((!IsTileType(n, MP_RAILWAY) && !IsRailWaypointTile(n)) ||
-							!IsTileOwner(n, owner) ||
-							nrail == TRACK_BIT_LOWER ||
-							nrail == TRACK_BIT_RIGHT) {
-						new_ground = (new_ground == RAIL_GROUND_FENCE_NW) ?
-							RAIL_GROUND_FENCE_SENW : RAIL_GROUND_FENCE_SE;
-					}
-				}
-
-				if (rail == (TRACK_BIT_LOWER | TRACK_BIT_LEFT) || (
-							(rail & TRACK_BIT_3WAY_NE) == 0 &&
-							(rail & TRACK_BIT_Y)
-						)) {
-					TileIndex n = tile + TileDiffXY(-1, 0);
-					TrackBits nrail = (IsPlainRailTile(n) ? GetTrackBits(n) : TRACK_BIT_NONE);
-
-					if ((!IsTileType(n, MP_RAILWAY) && !IsRailWaypointTile(n)) ||
-							!IsTileOwner(n, owner) ||
-							nrail == TRACK_BIT_UPPER ||
-							nrail == TRACK_BIT_RIGHT) {
-						new_ground = RAIL_GROUND_FENCE_NE;
-					}
-				}
-
-				if (rail == (TRACK_BIT_UPPER | TRACK_BIT_RIGHT) || (
-							(rail & TRACK_BIT_3WAY_SW) == 0 &&
-							(rail & TRACK_BIT_Y)
-						)) {
-					TileIndex n = tile + TileDiffXY(1, 0);
-					TrackBits nrail = (IsPlainRailTile(n) ? GetTrackBits(n) : TRACK_BIT_NONE);
-
-					if ((!IsTileType(n, MP_RAILWAY) && !IsRailWaypointTile(n)) ||
-							!IsTileOwner(n, owner) ||
-							nrail == TRACK_BIT_LOWER ||
-							nrail == TRACK_BIT_LEFT) {
-						new_ground = (new_ground == RAIL_GROUND_FENCE_NE) ?
-							RAIL_GROUND_FENCE_NESW : RAIL_GROUND_FENCE_SW;
-					}
-				}
-				break;
+			/* Show fences if it's a house, industry, road, tunnelbridge or not owned by us. */
+			if (!IsValidTile(tile2) || IsTileType(tile2, MP_HOUSE) || IsTileType(tile2, MP_INDUSTRY) ||
+					IsTileType(tile2, MP_ROAD) || IsTileType(tile2, MP_TUNNELBRIDGE) || !IsTileOwner(tile2, owner)) {
+				fences |= 1 << d;
 			}
+		}
+
+		switch (fences) {
+			case 0: break;
+			case (1 << DIAGDIR_NE): new_ground = RAIL_GROUND_FENCE_NE; break;
+			case (1 << DIAGDIR_SE): new_ground = RAIL_GROUND_FENCE_SE; break;
+			case (1 << DIAGDIR_SW): new_ground = RAIL_GROUND_FENCE_SW; break;
+			case (1 << DIAGDIR_NW): new_ground = RAIL_GROUND_FENCE_NW; break;
+			case (1 << DIAGDIR_NE) | (1 << DIAGDIR_SW): new_ground = RAIL_GROUND_FENCE_NESW; break;
+			case (1 << DIAGDIR_SE) | (1 << DIAGDIR_NW): new_ground = RAIL_GROUND_FENCE_SENW; break;
+			case (1 << DIAGDIR_NE) | (1 << DIAGDIR_SE): new_ground = RAIL_GROUND_FENCE_VERT1; break;
+			case (1 << DIAGDIR_NE) | (1 << DIAGDIR_NW): new_ground = RAIL_GROUND_FENCE_HORIZ2; break;
+			case (1 << DIAGDIR_SE) | (1 << DIAGDIR_SW): new_ground = RAIL_GROUND_FENCE_HORIZ1; break;
+			case (1 << DIAGDIR_SW) | (1 << DIAGDIR_NW): new_ground = RAIL_GROUND_FENCE_VERT2; break;
+			default: NOT_REACHED();
 		}
 	}
 

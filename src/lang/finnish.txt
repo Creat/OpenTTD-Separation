@@ -34,7 +34,7 @@ STR_CARGO_PLURAL_OIL                                            :Öljyä
 STR_CARGO_PLURAL_LIVESTOCK                                      :Karjaa
 STR_CARGO_PLURAL_GOODS                                          :Tavaroita
 STR_CARGO_PLURAL_GRAIN                                          :Viljaa
-STR_CARGO_PLURAL_WOOD                                           :Puutavaraa
+STR_CARGO_PLURAL_WOOD                                           :Raakapuuta
 STR_CARGO_PLURAL_IRON_ORE                                       :Rautamalmia
 STR_CARGO_PLURAL_STEEL                                          :Terästä
 STR_CARGO_PLURAL_VALUABLES                                      :Arvotavaroita
@@ -68,7 +68,7 @@ STR_CARGO_SINGULAR_OIL                                          :Öljy
 STR_CARGO_SINGULAR_LIVESTOCK                                    :Karja
 STR_CARGO_SINGULAR_GOODS                                        :Tavara
 STR_CARGO_SINGULAR_GRAIN                                        :Vilja
-STR_CARGO_SINGULAR_WOOD                                         :Puutavara
+STR_CARGO_SINGULAR_WOOD                                         :Raakapuu
 STR_CARGO_SINGULAR_IRON_ORE                                     :Rautamalmi
 STR_CARGO_SINGULAR_STEEL                                        :Teräs
 STR_CARGO_SINGULAR_VALUABLES                                    :Arvotavara
@@ -102,7 +102,7 @@ STR_QUANTITY_OIL                                                :{VOLUME_LONG} �
 STR_QUANTITY_LIVESTOCK                                          :{COMMA} erä{P "" ä} karjaa
 STR_QUANTITY_GOODS                                              :{COMMA} laatikko{P "" a} tavaraa
 STR_QUANTITY_GRAIN                                              :{WEIGHT_LONG} viljaa
-STR_QUANTITY_WOOD                                               :{WEIGHT_LONG} puutavaraa
+STR_QUANTITY_WOOD                                               :{WEIGHT_LONG} raakapuuta
 STR_QUANTITY_IRON_ORE                                           :{WEIGHT_LONG} rautamalmia
 STR_QUANTITY_STEEL                                              :{WEIGHT_LONG} terästä
 STR_QUANTITY_VALUABLES                                          :{COMMA} säkki{P "" ä} arvotavaraa
@@ -894,6 +894,9 @@ STR_GAME_OPTIONS_CURRENCY_TRY                                   :Turkin liira (T
 STR_GAME_OPTIONS_CURRENCY_SKK                                   :Slovakian koruna (SKK)
 STR_GAME_OPTIONS_CURRENCY_BRL                                   :Brasilian reali (BRL)
 STR_GAME_OPTIONS_CURRENCY_EEK                                   :Viron kruunu (EEK)
+STR_GAME_OPTIONS_CURRENCY_LTL                                   :Liettuan liti (LTL)
+STR_GAME_OPTIONS_CURRENCY_KRW                                   :Etelä-Korean won (KRW)
+STR_GAME_OPTIONS_CURRENCY_ZAR                                   :Etelä-Afrikan randi (ZAR)
 STR_GAME_OPTIONS_CURRENCY_CUSTOM                                :Oma...
 ############ end of currency region
 
@@ -1295,6 +1298,7 @@ STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :{LTBLUE}Tasaine
 STR_CONFIG_SETTING_ALLOW_SHARES                                 :{LTBLUE}Salli osakkeiden ostaminen muista yhtiöistä: {ORANGE}{STRING}
 STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :{LTBLUE}Tuotoista syöttöjärjestelmiin maksettava osuus: {ORANGE}{STRING}%
 STR_CONFIG_SETTING_DRAG_SIGNALS_DENSITY                         :{LTBLUE}Vedettäessä aseta opastimien väleiksi: {ORANGE}{STRING} ruutu{P 0:1 "" a}
+STR_CONFIG_SETTING_DRAG_SIGNALS_FIXED_DISTANCE                  :{LTBLUE}Vedettäessä, pidä opastimien välinen matka vakiona: {ORANGE}{STRING}
 STR_CONFIG_SETTING_SEMAPHORE_BUILD_BEFORE_DATE                  :{LTBLUE}Rakenna oletuksena siipiopastimia ennen vuotta: {ORANGE}{STRING}
 STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :{LTBLUE}Käytä graafista opastinkäyttöliittymää: {ORANGE}{STRING}
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_TYPE                          :{LTBLUE}Oletusarvoinen opastintyyppi: {ORANGE}{STRING}
@@ -1483,8 +1487,8 @@ STR_LIVERY_TRAIN_TOOLTIP                                        :{BLACK}Näytä 
 STR_LIVERY_ROAD_VEHICLE_TOOLTIP                                 :{BLACK}Näytä tieajoneuvojen väriteemat
 STR_LIVERY_SHIP_TOOLTIP                                         :{BLACK}Näytä laivojen väriteemat
 STR_LIVERY_AIRCRAFT_TOOLTIP                                     :{BLACK}Näytä lentokoneiden väriteemat
-STR_LIVERY_PRIMARY_TOOLTIP                                      :{BLACK}Valitse valitulle teemalle ensisijainen väri
-STR_LIVERY_SECONDARY_TOOLTIP                                    :{BLACK}Valitse valitulle teemalle toissijainen väri
+STR_LIVERY_PRIMARY_TOOLTIP                                      :{BLACK}Valitse valitulle teemalle ensisijainen väri. Ctrl+Klik asettaa tämän värin jokaiselle teemalle
+STR_LIVERY_SECONDARY_TOOLTIP                                    :{BLACK}Valitse valitulle teemalle toissijainen väri. Ctrl+Klik asettaa tämän värin jokaiselle teemalle
 STR_LIVERY_PANEL_TOOLTIP                                        :{BLACK}Valitse muutettava väriteema, tai valitse useita Ctrl pohjassa. Paina valintalaatikkoa valitaksesi teeman
 
 STR_LIVERY_DEFAULT                                              :Normaalit tunnusvärit
@@ -2751,6 +2755,9 @@ STR_STATION_VIEW_SCHEDULED_SHIPS_TOOLTIP                        :{BLACK}Näytä 
 
 STR_STATION_VIEW_RENAME_STATION_CAPTION                         :Nimeä asema/lastausalue
 
+STR_STATION_VIEW_CLOSE_AIRPORT                                  :{BLACK}Sulje lentokenttä
+STR_STATION_VIEW_CLOSE_AIRPORT_TOOLTIP                          :{BLACK}Estä lentokoneiden laskeutuminen tälle lentokentälle
+
 # Waypoint/buoy view window
 STR_WAYPOINT_VIEW_CAPTION                                       :{WHITE}{WAYPOINT}
 STR_WAYPOINT_VIEW_CENTER_TOOLTIP                                :{BLACK}Keskitä ruutu reittipisteen sijaintiin. Ctrl+Klik avaa uuden näkymäikkunan reittipisteen sijaintiin
@@ -3097,7 +3104,7 @@ STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_CAPACITY_RUNCOST:{BLACK}Hinta: 
 STR_ENGINE_PREVIEW_COST_MAX_SPEED_RANGE_CAPACITY_RUNCOST        :{BLACK}Hinta: {CURRENCY_LONG} Suurin nopeus: {VELOCITY} Toimintasäde: {COMMA} ruutua{}Kapasiteetti: {CARGO_LONG}{}Käyttökustannukset: {CURRENCY_LONG}/vuosi
 
 # Autoreplace window
-STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Korvaa {STRING}
+STR_REPLACE_VEHICLES_WHITE                                      :{WHITE}Korvaa {STRING} - {STRING}
 STR_REPLACE_VEHICLE_TRAIN                                       :Juna
 STR_REPLACE_VEHICLE_ROAD_VEHICLE                                :Ajoneuvo
 STR_REPLACE_VEHICLE_SHIP                                        :Laiva
@@ -3107,9 +3114,12 @@ STR_REPLACE_HELP_LEFT_ARRAY                                     :{BLACK}Valitse 
 STR_REPLACE_HELP_RIGHT_ARRAY                                    :{BLACK}Valitse vasemmalla näkyvän veturityypinn korvaava uusi veturityyppi.
 
 STR_REPLACE_VEHICLES_START                                      :{BLACK}Aloita ajoneuvojen korvaaminen
+STR_REPLACE_VEHICLES_NOW                                        :Korvaa kaikki liikennevälineet nyt
+STR_REPLACE_VEHICLES_WHEN_OLD                                   :Korvaa vain vanhat liikennevälineet
 STR_REPLACE_HELP_START_BUTTON                                   :{BLACK}Napsauta aloittaaksesi vasemmalta valitun veturityypin korvauksen oikealta valitulla veturityypillä.
 STR_REPLACE_NOT_REPLACING                                       :{BLACK}Ei korvata
 STR_REPLACE_NOT_REPLACING_VEHICLE_SELECTED                      :{BLACK}Ei liikennevälinettä valittuna
+STR_REPLACE_REPLACING_WHEN_OLD                                  :{ENGINE} kun vanha
 STR_REPLACE_VEHICLES_STOP                                       :{BLACK}Lopeta ajoneuvojen korv.
 STR_REPLACE_HELP_STOP_BUTTON                                    :{BLACK}Napsauta pysäyttääksesi vasemmalta valitun veturityypin korvauksen.
 
@@ -3658,6 +3668,7 @@ STR_ERROR_OWNED_BY                                              :{WHITE}... omis
 STR_ERROR_AREA_IS_OWNED_BY_ANOTHER                              :{WHITE}... alueen omistaa toinen yhtiö
 STR_ERROR_TERRAFORM_LIMIT_REACHED                               :{WHITE}... maanmuokkausraja saavutettu
 STR_ERROR_CLEARING_LIMIT_REACHED                                :{WHITE}... ruutujen tyhjennysraja saavutettu
+STR_ERROR_TREE_PLANT_LIMIT_REACHED                              :{WHITE}... puiden istutusraja saavutettu
 STR_ERROR_NAME_MUST_BE_UNIQUE                                   :{WHITE}Nimen täytyy olla uniikki
 STR_ERROR_GENERIC_OBJECT_IN_THE_WAY                             :{WHITE}{1:STRING} on tiellä.
 STR_ERROR_NOT_ALLOWED_WHILE_PAUSED                              :{WHITE}Ei sallittu pelin ollessa pysäytetty

@@ -67,9 +67,10 @@ INSTANTIATE_POOL_METHODS(Vehicle)
 /**
  * Function to tell if a vehicle needs to be autorenewed
  * @param *c The vehicle owner
+ * @param use_renew_setting Should the company renew setting be considered?
  * @return true if the vehicle is old enough for replacement
  */
-bool Vehicle::NeedsAutorenewing(const Company *c) const
+bool Vehicle::NeedsAutorenewing(const Company *c, bool use_renew_setting) const
 {
 	/* We can always generate the Company pointer when we have the vehicle.
 	 * However this takes time and since the Company pointer is often present
@@ -77,7 +78,7 @@ bool Vehicle::NeedsAutorenewing(const Company *c) const
 	 * argument rather than finding it again. */
 	assert(c == Company::Get(this->owner));
 
-	if (!c->settings.engine_renew) return false;
+	if (use_renew_setting && !c->settings.engine_renew) return false;
 	if (this->age - this->max_age < (c->settings.engine_renew_months * 30)) return false;
 
 	/* Only engines need renewing */
@@ -91,6 +92,8 @@ void VehicleServiceInDepot(Vehicle *v)
 	v->date_of_last_service = _date;
 	v->breakdowns_since_last_service = 0;
 	v->reliability = v->GetEngine()->reliability;
+	/* Prevent vehicles from breaking down directly after exiting the depot. */
+	v->breakdown_chance /= 4;
 	SetWindowDirty(WC_VEHICLE_DETAILS, v->index); // ensure that last service date and reliability are updated
 }
 
@@ -129,10 +132,13 @@ bool Vehicle::NeedsServicing() const
 	if (needed_money > c->money) return false;
 
 	for (const Vehicle *v = this; v != NULL; v = (v->type == VEH_TRAIN) ? Train::From(v)->GetNextUnit() : NULL) {
-		EngineID new_engine = EngineReplacementForCompany(c, v->engine_type, v->group_id);
+		bool replace_when_old = false;
+		EngineID new_engine = EngineReplacementForCompany(c, v->engine_type, v->group_id, &replace_when_old);
 
 		/* Check engine availability */
 		if (new_engine == INVALID_ENGINE || !HasBit(Engine::Get(new_engine)->company_avail, v->owner)) continue;
+		/* Is the vehicle old if we are not always replacing? */
+		if (replace_when_old && !v->NeedsAutorenewing(c, false)) continue;
 
 		/* Check refittability */
 		uint32 available_cargo_types, union_mask;
@@ -194,7 +200,7 @@ uint Vehicle::Crash(bool flooded)
 	SetWindowDirty(WC_VEHICLE_DETAILS, this->index);
 	SetWindowDirty(WC_VEHICLE_DEPOT, this->tile);
 
-	return pass;
+	return RandomRange(pass + 1); // Randomise deceased passengers.
 }
 
 /** Marks the separation of this vehicle's order list invalid. */
@@ -1157,7 +1163,7 @@ bool Vehicle::HandleBreakdown()
 						(this->type == VEH_TRAIN ? SND_3A_COMEDY_BREAKDOWN_2 : SND_35_COMEDY_BREAKDOWN), this);
 				}
 
-				if (!(this->vehstatus & VS_HIDDEN)) {
+				if (!(this->vehstatus & VS_HIDDEN) && !HasBit(EngInfo(this->engine_type)->misc_flags, EF_NO_BREAKDOWN_SMOKE)) {
 					EffectVehicle *u = CreateEffectVehicleRel(this, 4, 4, 5, EV_BREAKDOWN_SMOKE);
 					if (u != NULL) u->animation_state = this->breakdown_delay * 2;
 				}

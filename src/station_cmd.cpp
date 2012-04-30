@@ -744,7 +744,7 @@ static CommandCost CheckFlatLandRailStation(TileArea tile_area, DoCommandFlag fl
 	int allowed_z = -1;
 	uint invalid_dirs = 5 << axis;
 
-	const StationSpec *statspec = StationClass::Get(spec_class, spec_index);
+	const StationSpec *statspec = StationClass::Get(spec_class)->GetSpec(spec_index);
 	bool slope_cb = statspec != NULL && HasBit(statspec->callback_mask, CBM_STATION_SLOPE_CHECK);
 
 	TILE_AREA_LOOP(tile_cur, tile_area) {
@@ -1105,8 +1105,8 @@ CommandCost CmdBuildRailStation(TileIndex tile_org, DoCommandFlag flags, uint32 
 	if (!ValParamRailtype(rt)) return CMD_ERROR;
 
 	/* Check if the given station class is valid */
-	if ((uint)spec_class >= StationClass::GetCount() || spec_class == STAT_CLASS_WAYP) return CMD_ERROR;
-	if (spec_index >= StationClass::GetCount(spec_class)) return CMD_ERROR;
+	if ((uint)spec_class >= StationClass::GetClassCount() || spec_class == STAT_CLASS_WAYP) return CMD_ERROR;
+	if (spec_index >= StationClass::Get(spec_class)->GetSpecCount()) return CMD_ERROR;
 	if (plat_len == 0 || numtracks == 0) return CMD_ERROR;
 
 	int w_org, h_org;
@@ -1175,7 +1175,7 @@ CommandCost CmdBuildRailStation(TileIndex tile_org, DoCommandFlag flags, uint32 
 	}
 
 	/* Check if we can allocate a custom stationspec to this station */
-	const StationSpec *statspec = StationClass::Get(spec_class, spec_index);
+	const StationSpec *statspec = StationClass::Get(spec_class)->GetSpec(spec_index);
 	int specindex = AllocateSpecToStation(statspec, st, (flags & DC_EXEC) != 0);
 	if (specindex == -1) return_cmd_error(STR_ERROR_TOO_MANY_STATION_SPECS);
 
@@ -2263,7 +2263,7 @@ CommandCost CmdBuildAirport(TileIndex tile, DoCommandFlag flags, uint32 p1, uint
 		st->RecomputeIndustriesNear();
 		InvalidateWindowData(WC_SELECT_STATION, 0, 0);
 		InvalidateWindowData(WC_STATION_LIST, st->owner, 0);
-		SetWindowWidgetDirty(WC_STATION_VIEW, st->index, WID_SV_PLANES);
+		InvalidateWindowData(WC_STATION_VIEW, st->index);
 
 		if (_settings_game.economy.station_noise_level) {
 			SetWindowDirty(WC_TOWN_VIEW, st->town->index);
@@ -2339,7 +2339,7 @@ static CommandCost RemoveAirport(TileIndex tile, DoCommandFlag flags)
 		st->airport.Clear();
 		st->facilities &= ~FACIL_AIRPORT;
 
-		SetWindowWidgetDirty(WC_STATION_VIEW, st->index, WID_SV_PLANES);
+		InvalidateWindowData(WC_STATION_VIEW, st->index);
 
 		if (_settings_game.economy.station_noise_level) {
 			SetWindowDirty(WC_TOWN_VIEW, st->town->index);
@@ -2355,6 +2355,32 @@ static CommandCost RemoveAirport(TileIndex tile, DoCommandFlag flags)
 	}
 
 	return cost;
+}
+
+/**
+ * Open/close an airport to incoming aircraft.
+ * @param tile Unused.
+ * @param flags Operation to perform.
+ * @param p1 Station ID of the airport.
+ * @param p2 Unused.
+ * @param text unused
+ * @return the cost of this operation or an error
+ */
+CommandCost CmdOpenCloseAirport(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text)
+{
+	if (!Station::IsValidID(p1)) return CMD_ERROR;
+	Station *st = Station::Get(p1);
+
+	if (!(st->facilities & FACIL_AIRPORT)) return CMD_ERROR;
+
+	CommandCost ret = CheckOwnership(st->owner);
+	if (ret.Failed()) return ret;
+
+	if (flags & DC_EXEC) {
+		st->airport.flags ^= AIRPORT_CLOSED_block;
+		SetWindowWidgetDirty(WC_STATION_VIEW, st->index, WID_SV_CLOSE_AIRPORT);
+	}
+	return CommandCost();
 }
 
 /**
@@ -2886,7 +2912,7 @@ static void GetTileDesc_Station(TileIndex tile, TileDesc *td)
 		const StationSpec *spec = GetStationSpec(tile);
 
 		if (spec != NULL) {
-			td->station_class = StationClass::GetName(spec->cls_id);
+			td->station_class = StationClass::Get(spec->cls_id)->name;
 			td->station_name  = spec->name;
 
 			if (spec->grf_prop.grffile != NULL) {
@@ -2901,7 +2927,7 @@ static void GetTileDesc_Station(TileIndex tile, TileDesc *td)
 
 	if (IsAirport(tile)) {
 		const AirportSpec *as = Station::GetByTile(tile)->airport.GetSpec();
-		td->airport_class = AirportClass::GetName(as->cls_id);
+		td->airport_class = AirportClass::Get(as->cls_id)->name;
 		td->airport_name = as->name;
 
 		const AirportTileSpec *ats = AirportTileSpec::GetByTile(tile);

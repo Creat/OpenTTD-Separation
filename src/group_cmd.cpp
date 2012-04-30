@@ -379,12 +379,39 @@ CommandCost CmdRenameGroup(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 		/* Assign the new one */
 		g->name = reset ? NULL : strdup(text);
 
+		SetWindowDirty(WC_REPLACE_VEHICLE, g->vehicle_type);
 		InvalidateWindowData(GetWindowClassForVehicleType(g->vehicle_type), VehicleListIdentifier(VL_GROUP_LIST, g->vehicle_type, _current_company).Pack());
 	}
 
 	return CommandCost();
 }
 
+
+/**
+ * Do add a vehicle to a group.
+ * @param v Vehicle to add.
+ * @param new_g Group to add to.
+ */
+static void AddVehicleToGroup(Vehicle *v, GroupID new_g)
+{
+	GroupStatistics::CountVehicle(v, -1);
+
+	switch (v->type) {
+		default: NOT_REACHED();
+		case VEH_TRAIN:
+			SetTrainGroupID(Train::From(v), new_g);
+			break;
+
+		case VEH_ROAD:
+		case VEH_SHIP:
+		case VEH_AIRCRAFT:
+			if (v->IsEngineCountable()) UpdateNumEngineGroup(v, v->group_id, new_g);
+			v->group_id = new_g;
+			break;
+	}
+
+	GroupStatistics::CountVehicle(v, 1);
+}
 
 /**
  * Add a vehicle to a group
@@ -394,15 +421,16 @@ CommandCost CmdRenameGroup(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
  *   - p1 bit 0-15 : GroupID
  * @param p2   vehicle to add to a group
  *   - p2 bit 0-19 : VehicleID
+ *   - p2 bit   31 : Add shared vehicles as well.
  * @param text unused
  * @return the cost of this operation or an error
  */
 CommandCost CmdAddVehicleGroup(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text)
 {
-	Vehicle *v = Vehicle::GetIfValid(p2);
+	Vehicle *v = Vehicle::GetIfValid(GB(p2, 0, 20));
 	GroupID new_g = p1;
 
-	if (v == NULL || (!Group::IsValidID(new_g) && !IsDefaultGroupID(new_g))) return CMD_ERROR;
+	if (v == NULL || (!Group::IsValidID(new_g) && !IsDefaultGroupID(new_g) && new_g != NEW_GROUP)) return CMD_ERROR;
 
 	if (Group::IsValidID(new_g)) {
 		Group *g = Group::Get(new_g);
@@ -411,23 +439,24 @@ CommandCost CmdAddVehicleGroup(TileIndex tile, DoCommandFlag flags, uint32 p1, u
 
 	if (v->owner != _current_company || !v->IsPrimaryVehicle()) return CMD_ERROR;
 
-	if (flags & DC_EXEC) {
-		GroupStatistics::CountVehicle(v, -1);
+	if (new_g == NEW_GROUP) {
+		/* Create new group. */
+		CommandCost ret = CmdCreateGroup(0, flags, v->type, 0, NULL);
+		if (ret.Failed()) return ret;
 
-		switch (v->type) {
-			default: NOT_REACHED();
-			case VEH_TRAIN:
-				SetTrainGroupID(Train::From(v), new_g);
-				break;
-			case VEH_ROAD:
-			case VEH_SHIP:
-			case VEH_AIRCRAFT:
-				if (v->IsEngineCountable()) UpdateNumEngineGroup(v, v->group_id, new_g);
-				v->group_id = new_g;
-				break;
+		new_g = _new_group_id;
+	}
+
+	if (flags & DC_EXEC) {
+		AddVehicleToGroup(v, new_g);
+
+		if (HasBit(p2, 31)) {
+			/* Add vehicles in the shared order list as well. */
+			for (Vehicle *v2 = v->FirstShared(); v2 != NULL; v2 = v2->NextShared()) {
+				if (v2->group_id != new_g) AddVehicleToGroup(v2, new_g);
+			}
 		}
 
-		GroupStatistics::CountVehicle(v, 1);
 		GroupStatistics::UpdateAutoreplace(v->owner);
 
 		/* Update the Replace Vehicle Windows */

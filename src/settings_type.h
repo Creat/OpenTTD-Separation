@@ -102,6 +102,7 @@ struct GUISettings {
 	bool   quick_goto;                       ///< Allow quick access to 'goto button' in vehicle orders window
 	bool   auto_euro;                        ///< automatically switch to euro in 2002
 	byte   drag_signals_density;             ///< many signals density
+	bool   drag_signals_fixed_distance;      ///< keep fixed distance between signals when dragging
 	Year   semaphore_build_before;           ///< build semaphore signals automatically before this year
 	byte   news_message_timeout;             ///< how much longer than the news message "age" should we keep the message in the history
 	bool   show_track_reservation;           ///< highlight reserved tracks.
@@ -253,6 +254,8 @@ struct ConstructionSettings {
 	uint16 terraform_frame_burst;            ///< how many tile heights may, over a short period, be terraformed?
 	uint32 clear_per_64k_frames;             ///< how many tiles may, over a long period, be cleared per 65536 frames?
 	uint16 clear_frame_burst;                ///< how many tiles may, over a short period, be cleared?
+	uint32 tree_per_64k_frames;              ///< how many trees may, over a long period, be planted per 65536 frames?
+	uint16 tree_frame_burst;                 ///< how many trees may, over a short period, be planted?
 };
 
 /** Settings related to the AI. */
