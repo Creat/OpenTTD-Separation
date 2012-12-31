@@ -89,6 +89,19 @@ void OSOpenBrowser(const char *url)
  * modified from Jan Wassenberg's GPL implementation posted over at
  * http://www.gamedev.net/community/forums/topic.asp?topic_id=364584&whichpage=1&#2398903 */
 
+struct DIR {
+	HANDLE hFind;
+	/* the dirent returned by readdir.
+	 * note: having only one global instance is not possible because
+	 * multiple independent opendir/readdir sequences must be supported. */
+	dirent ent;
+	WIN32_FIND_DATA fd;
+	/* since opendir calls FindFirstFile, we need a means of telling the
+	 * first call to readdir that we already have a file.
+	 * that's the case iff this is true */
+	bool at_first_entry;
+};
+
 /* suballocator - satisfies most requests with a reusable static instance.
  * this avoids hundreds of alloc/free which would fragment the heap.
  * To guarantee concurrency, we fall back to malloc if the instance is
@@ -226,7 +239,7 @@ bool FiosIsValidFile(const char *path, const struct dirent *ent, struct stat *sb
 	 * http://www.gamedev.net/community/forums/topic.asp?topic_id=294070&whichpage=1&#1860504
 	 * XXX - not entirely correct, since filetimes on FAT aren't UTC but local,
 	 * this won't entirely be correct, but we use the time only for comparsion. */
-	sb->st_mtime = (time_t)((*(uint64*)&fd->ftLastWriteTime - posix_epoch_hns) / 1E7);
+	sb->st_mtime = (time_t)((*(const uint64*)&fd->ftLastWriteTime - posix_epoch_hns) / 1E7);
 	sb->st_mode  = (fd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)? S_IFDIR : S_IFREG;
 
 	return true;
@@ -547,7 +560,7 @@ bool GetClipboardContents(char *buffer, size_t buff_len)
 		cbuf = GetClipboardData(CF_UNICODETEXT);
 
 		ptr = (const char*)GlobalLock(cbuf);
-		const char *ret = convert_from_fs((wchar_t*)ptr, buffer, buff_len);
+		const char *ret = convert_from_fs((const wchar_t*)ptr, buffer, buff_len);
 		GlobalUnlock(cbuf);
 		CloseClipboard();
 

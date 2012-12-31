@@ -99,11 +99,11 @@ static const NWidgetPart _nested_generate_landscape_widgets[] = {
 					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_LANDSCAPE_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_TOWN_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_TERRAIN_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
-					NWidget(WWT_EDITBOX, COLOUR_WHITE, WID_GL_RANDOM_EDITBOX), SetDataTip(STR_MAPGEN_RANDOM_SEED_OSKTITLE, STR_MAPGEN_RANDOM_SEED_HELP), SetFill(1, 1),
+					NWidget(WWT_EDITBOX, COLOUR_ORANGE, WID_GL_RANDOM_EDITBOX), SetDataTip(STR_MAPGEN_RANDOM_SEED_OSKTITLE, STR_MAPGEN_RANDOM_SEED_HELP), SetFill(1, 1),
 					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_WATER_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_TREE_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_VARIETY_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
-					NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_BORDERS_RANDOM), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
+					NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_BORDERS_RANDOM), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 				EndContainer(),
 			EndContainer(),
 			NWidget(NWID_VERTICAL), SetPIP(0, 4, 0),
@@ -118,26 +118,26 @@ static const NWidgetPart _nested_generate_landscape_widgets[] = {
 						/* Starting date. */
 						NWidget(NWID_HORIZONTAL),
 							NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_GL_START_DATE_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD), SetFill(0, 1),
-							NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_START_DATE_TEXT), SetDataTip(STR_BLACK_DATE_LONG, STR_NULL), SetFill(1, 0),
+							NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_START_DATE_TEXT), SetDataTip(STR_BLACK_DATE_LONG, STR_NULL), SetFill(1, 0),
 							NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_GL_START_DATE_UP), SetDataTip(SPR_ARROW_UP, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_FORWARD), SetFill(0, 1),
 						EndContainer(),
 						/* Snow line. */
 						NWidget(NWID_HORIZONTAL),
 							NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_GL_SNOW_LEVEL_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_MAPGEN_SNOW_LINE_DOWN), SetFill(0, 1),
-							NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_SNOW_LEVEL_TEXT), SetDataTip(STR_BLACK_INT, STR_NULL), SetFill(1, 0),
+							NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_SNOW_LEVEL_TEXT), SetDataTip(STR_BLACK_INT, STR_NULL), SetFill(1, 0),
 							NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_GL_SNOW_LEVEL_UP), SetDataTip(SPR_ARROW_UP, STR_MAPGEN_SNOW_LINE_UP), SetFill(0, 1),
 						EndContainer(),
 						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_INDUSTRY_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_SMOOTHNESS_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 					EndContainer(),
 				EndContainer(),
-				NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_RANDOM_BUTTON), SetDataTip(STR_MAPGEN_RANDOM, STR_MAPGEN_RANDOM_HELP), SetFill(1, 0),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_RANDOM_BUTTON), SetDataTip(STR_MAPGEN_RANDOM, STR_MAPGEN_RANDOM_HELP), SetFill(1, 0),
 				NWidget(NWID_HORIZONTAL), SetPIP(0, 3, 0),
 					NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_QUANTITY_OF_RIVERS, STR_NULL), SetFill(1, 1),
 					NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_RIVER_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 				EndContainer(),
 				NWidget(NWID_SPACER), SetFill(1, 1),
-				NWidget(WWT_TEXTBTN, COLOUR_GREEN, WID_GL_GENERATE_BUTTON), SetMinimalSize(84, 30), SetDataTip(STR_MAPGEN_GENERATE, STR_NULL), SetFill(1, 0),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREEN, WID_GL_GENERATE_BUTTON), SetMinimalSize(84, 30), SetDataTip(STR_MAPGEN_GENERATE, STR_NULL), SetFill(1, 0),
 			EndContainer(),
 		EndContainer(),
 		NWidget(NWID_SPACER), SetMinimalSize(0, 4),
@@ -147,8 +147,8 @@ static const NWidgetPart _nested_generate_landscape_widgets[] = {
 				NWidget(NWID_SPACER), SetFill(1, 1),
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_NORTHWEST, STR_NULL), SetPadding(1, 0, 0, 0), SetFill(0, 1),
 			EndContainer(),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_WATER_NW), SetDataTip(STR_JUST_STRING, STR_MAPGEN_NORTHWEST), SetFill(1, 1),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_WATER_NE), SetDataTip(STR_JUST_STRING, STR_MAPGEN_NORTHEAST), SetFill(1, 1),
+			NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_WATER_NW), SetDataTip(STR_JUST_STRING, STR_MAPGEN_NORTHWEST), SetFill(1, 1),
+			NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_WATER_NE), SetDataTip(STR_JUST_STRING, STR_MAPGEN_NORTHEAST), SetFill(1, 1),
 			NWidget(NWID_HORIZONTAL), SetPIP(3, 0, 0),
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_NORTHEAST, STR_NULL), SetPadding(1, 0, 0, 0), SetFill(0, 1),
 				NWidget(NWID_SPACER), SetFill(1, 1),
@@ -159,8 +159,8 @@ static const NWidgetPart _nested_generate_landscape_widgets[] = {
 				NWidget(NWID_SPACER), SetFill(1, 1),
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_SOUTHWEST, STR_NULL), SetPadding(1, 0, 0, 0), SetFill(0, 1),
 			EndContainer(),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_WATER_SW), SetDataTip(STR_JUST_STRING, STR_MAPGEN_SOUTHWEST), SetFill(1, 1),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_WATER_SE), SetDataTip(STR_JUST_STRING, STR_MAPGEN_SOUTHEAST), SetFill(1, 1),
+			NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_WATER_SW), SetDataTip(STR_JUST_STRING, STR_MAPGEN_SOUTHWEST), SetFill(1, 1),
+			NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_WATER_SE), SetDataTip(STR_JUST_STRING, STR_MAPGEN_SOUTHEAST), SetFill(1, 1),
 			NWidget(NWID_HORIZONTAL), SetPIP(3, 0, 0),
 				NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_SOUTHEAST, STR_NULL), SetPadding(1, 0, 0, 0), SetFill(0, 1),
 				NWidget(NWID_SPACER), SetFill(1, 1),
@@ -217,7 +217,7 @@ static const NWidgetPart _nested_heightmap_load_widgets[] = {
 						EndContainer(),
 						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_TOWN_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_INDUSTRY_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
-						NWidget(WWT_EDITBOX, COLOUR_WHITE, WID_GL_RANDOM_EDITBOX), SetDataTip(STR_MAPGEN_RANDOM_SEED_OSKTITLE, STR_MAPGEN_RANDOM_SEED_HELP), SetFill(1, 1),
+						NWidget(WWT_EDITBOX, COLOUR_ORANGE, WID_GL_RANDOM_EDITBOX), SetDataTip(STR_MAPGEN_RANDOM_SEED_OSKTITLE, STR_MAPGEN_RANDOM_SEED_HELP), SetFill(1, 1),
 						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_RIVER_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_TREE_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
 						NWidget(WWT_DROPDOWN, COLOUR_ORANGE, WID_GL_HEIGHTMAP_ROTATION_PULLDOWN), SetDataTip(STR_JUST_STRING, STR_NULL), SetFill(1, 0),
@@ -233,19 +233,19 @@ static const NWidgetPart _nested_heightmap_load_widgets[] = {
 								NWidget(WWT_TEXT, COLOUR_ORANGE, WID_GL_HEIGHTMAP_SIZE_TEXT), SetDataTip(STR_MAPGEN_HEIGHTMAP_SIZE, STR_NULL), SetFill(1, 0),
 								NWidget(NWID_HORIZONTAL),
 									NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_GL_START_DATE_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD), SetFill(0, 1),
-									NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_START_DATE_TEXT), SetDataTip(STR_BLACK_DATE_LONG, STR_NULL), SetFill(1, 0),
+									NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_START_DATE_TEXT), SetDataTip(STR_BLACK_DATE_LONG, STR_NULL), SetFill(1, 0),
 									NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_GL_START_DATE_UP), SetDataTip(SPR_ARROW_UP, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_FORWARD), SetFill(0, 1),
 								EndContainer(),
 								NWidget(NWID_HORIZONTAL),
 									NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_GL_SNOW_LEVEL_DOWN), SetDataTip(SPR_ARROW_DOWN, STR_MAPGEN_SNOW_LINE_DOWN), SetFill(0, 1),
-									NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_SNOW_LEVEL_TEXT), SetDataTip(STR_BLACK_INT, STR_NULL), SetFill(1, 0),
+									NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_SNOW_LEVEL_TEXT), SetDataTip(STR_BLACK_INT, STR_NULL), SetFill(1, 0),
 									NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_GL_SNOW_LEVEL_UP), SetDataTip(SPR_ARROW_UP, STR_MAPGEN_SNOW_LINE_UP), SetFill(0, 1),
 								EndContainer(),
 							EndContainer(),
 						EndContainer(),
-						NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_GL_RANDOM_BUTTON), SetDataTip(STR_MAPGEN_RANDOM, STR_MAPGEN_RANDOM_HELP), SetFill(1, 0),
+						NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_GL_RANDOM_BUTTON), SetDataTip(STR_MAPGEN_RANDOM, STR_MAPGEN_RANDOM_HELP), SetFill(1, 0),
 						NWidget(NWID_SPACER), SetFill(1, 1),
-						NWidget(WWT_TEXTBTN, COLOUR_GREEN, WID_GL_GENERATE_BUTTON), SetMinimalSize(84, 30), SetDataTip(STR_MAPGEN_GENERATE, STR_NULL), SetFill(1, 0),
+						NWidget(WWT_PUSHTXTBTN, COLOUR_GREEN, WID_GL_GENERATE_BUTTON), SetMinimalSize(84, 30), SetDataTip(STR_MAPGEN_GENERATE, STR_NULL), SetFill(1, 0),
 					EndContainer(),
 				EndContainer(),
 			EndContainer(),
@@ -263,7 +263,7 @@ static void StartGeneratingLandscape(GenenerateLandscapeWindowMode mode)
 	MakeNewgameSettingsLive();
 	ResetGRFConfig(true);
 
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.confirm) SndPlayFx(SND_15_BEEP);
 	switch (mode) {
 		case GLWM_GENERATE:  _switch_mode = (_game_mode == GM_EDITOR) ? SM_GENRANDLAND    : SM_NEWGAME;         break;
 		case GLWM_HEIGHTMAP: _switch_mode = (_game_mode == GM_EDITOR) ? SM_LOAD_HEIGHTMAP : SM_START_HEIGHTMAP; break;
@@ -303,24 +303,24 @@ static const StringID _variety[]     = {STR_VARIETY_NONE, STR_VARIETY_VERY_LOW, 
 
 assert_compile(lengthof(_num_inds) == ID_END + 1);
 
-struct GenerateLandscapeWindow : public QueryStringBaseWindow {
+struct GenerateLandscapeWindow : public Window {
 	uint widget_id;
 	uint x;
 	uint y;
 	char name[64];
 	GenenerateLandscapeWindowMode mode;
+	QueryString seed_editbox;
 
-	GenerateLandscapeWindow(const WindowDesc *desc, WindowNumber number = 0) : QueryStringBaseWindow(11)
+	GenerateLandscapeWindow(const WindowDesc *desc, WindowNumber number = 0) : seed_editbox(11)
 	{
 		this->InitNested(desc, number);
 
 		this->LowerWidget(_settings_newgame.game_creation.landscape + WID_GL_TEMPERATE);
 
-		/* snprintf() always outputs trailing '\0', so whole buffer can be used */
-		snprintf(this->edit_str_buf, this->edit_str_size, "%u", _settings_newgame.game_creation.generation_seed);
-		InitializeTextBuffer(&this->text, this->edit_str_buf, this->edit_str_size);
-		this->caption = STR_NULL;
-		this->afilter = CS_NUMERAL;
+		this->querystrings[WID_GL_RANDOM_EDITBOX] = &this->seed_editbox;
+		this->seed_editbox.text.Print("%u", _settings_newgame.game_creation.generation_seed);
+		this->seed_editbox.caption = STR_NULL;
+		this->seed_editbox.afilter = CS_NUMERAL;
 
 		this->mode = (GenenerateLandscapeWindowMode)this->window_number;
 
@@ -449,12 +449,12 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 
 			case WID_GL_MAPSIZE_X_PULLDOWN:
 			case WID_GL_MAPSIZE_Y_PULLDOWN:
-				SetDParam(0, MAX_MAP_SIZE);
+				SetDParamMaxValue(0, MAX_MAP_SIZE);
 				*size = GetStringBoundingBox(STR_JUST_INT);
 				break;
 
 			case WID_GL_SNOW_LEVEL_TEXT:
-				SetDParam(0, MAX_TILE_HEIGHT);
+				SetDParamMaxValue(0, MAX_TILE_HEIGHT);
 				*size = GetStringBoundingBox(STR_JUST_INT);
 				break;
 
@@ -466,7 +466,7 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 
 			case WID_GL_TOWN_PULLDOWN:
 				strs = _num_towns;
-				SetDParam(0, CUSTOM_TOWN_MAX_NUMBER);
+				SetDParamMaxValue(0, CUSTOM_TOWN_MAX_NUMBER);
 				*size = GetStringBoundingBox(STR_NUM_CUSTOM_NUMBER);
 				break;
 
@@ -476,7 +476,7 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 			case WID_GL_TERRAIN_PULLDOWN:    strs = _elevations; break;
 			case WID_GL_WATER_PULLDOWN:
 				strs = _sea_lakes;
-				SetDParam(0, CUSTOM_SEA_LEVEL_MAX_PERCENTAGE);
+				SetDParamMaxValue(0, CUSTOM_SEA_LEVEL_MAX_PERCENTAGE);
 				*size = GetStringBoundingBox(STR_SEA_LEVEL_CUSTOM_PERCENTAGE);
 				break;
 
@@ -521,12 +521,6 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 		}
 	}
 
-	virtual void OnPaint()
-	{
-		this->DrawWidgets();
-		this->DrawEditBox(WID_GL_RANDOM_EDITBOX);
-	}
-
 	virtual void OnClick(Point pt, int widget, int click_count)
 	{
 		switch (widget) {
@@ -555,8 +549,7 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 
 			case WID_GL_RANDOM_BUTTON: // Random seed
 				_settings_newgame.game_creation.generation_seed = InteractiveRandom();
-				snprintf(this->edit_str_buf, this->edit_str_size, "%u", _settings_newgame.game_creation.generation_seed);
-				UpdateTextBufferSize(&this->text);
+				this->seed_editbox.text.Print("%u", _settings_newgame.game_creation.generation_seed);
 				this->SetDirty();
 				break;
 
@@ -700,21 +693,15 @@ struct GenerateLandscapeWindow : public QueryStringBaseWindow {
 		}
 	}
 
-	virtual void OnMouseLoop()
+	virtual void OnEditboxChanged(int wid)
 	{
-		this->HandleEditBox(WID_GL_RANDOM_EDITBOX);
-	}
-
-	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
-	{
-		EventState state = ES_NOT_HANDLED;
-		this->HandleEditBoxKey(WID_GL_RANDOM_EDITBOX, key, keycode, state);
-		/* the seed is unsigned, therefore atoi cannot be used.
-		 * As UINT32_MAX is a 'magic' value (use random seed) it
-		 * should not be possible to be entered into the input
-		 * field; the generate seed button can be used instead. */
-		_settings_newgame.game_creation.generation_seed = minu(strtoul(this->edit_str_buf, NULL, 10), UINT32_MAX - 1);
-		return state;
+		if (wid == WID_GL_RANDOM_EDITBOX) {
+			/* the seed is unsigned, therefore atoi cannot be used.
+			 * As UINT32_MAX is a 'magic' value (use random seed) it
+			 * should not be possible to be entered into the input
+			 * field; the generate seed button can be used instead. */
+			_settings_newgame.game_creation.generation_seed = minu(strtoul(this->seed_editbox.text.buf, NULL, 10), UINT32_MAX - 1);
+		}
 	}
 
 	virtual void OnDropdownSelect(int widget, int index)
@@ -936,11 +923,11 @@ struct CreateScenarioWindow : public Window
 
 			case WID_CS_MAPSIZE_X_PULLDOWN:
 			case WID_CS_MAPSIZE_Y_PULLDOWN:
-				SetDParam(0, MAX_MAP_SIZE);
+				SetDParamMaxValue(0, MAX_MAP_SIZE);
 				break;
 
 			case WID_CS_FLAT_LAND_HEIGHT_TEXT:
-				SetDParam(0, MAX_TILE_HEIGHT);
+				SetDParamMaxValue(0, MAX_TILE_HEIGHT);
 				break;
 
 			default:
@@ -1075,8 +1062,8 @@ static const NWidgetPart _nested_create_scenario_widgets[] = {
 		NWidget(NWID_HORIZONTAL), SetPIP(10, 8, 10),
 			/* Green generation type buttons: 'Flat land' and 'Random land'. */
 			NWidget(NWID_VERTICAL), SetPIP(10, 6, 10),
-				NWidget(WWT_TEXTBTN, COLOUR_GREEN, WID_CS_EMPTY_WORLD), SetDataTip(STR_SE_MAPGEN_FLAT_WORLD, STR_SE_MAPGEN_FLAT_WORLD_TOOLTIP), SetFill(1, 1),
-				NWidget(WWT_TEXTBTN, COLOUR_GREEN, WID_CS_RANDOM_WORLD), SetDataTip(STR_SE_MAPGEN_RANDOM_LAND, STR_TERRAFORM_TOOLTIP_GENERATE_RANDOM_LAND), SetFill(1, 1),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREEN, WID_CS_EMPTY_WORLD), SetDataTip(STR_SE_MAPGEN_FLAT_WORLD, STR_SE_MAPGEN_FLAT_WORLD_TOOLTIP), SetFill(1, 1),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREEN, WID_CS_RANDOM_WORLD), SetDataTip(STR_SE_MAPGEN_RANDOM_LAND, STR_TERRAFORM_TOOLTIP_GENERATE_RANDOM_LAND), SetFill(1, 1),
 			EndContainer(),
 			/* Labels + setting drop-downs */
 			NWidget(NWID_VERTICAL), SetPIP(10, 6, 10),
@@ -1093,7 +1080,7 @@ static const NWidgetPart _nested_create_scenario_widgets[] = {
 					NWidget(WWT_TEXT, COLOUR_ORANGE), SetDataTip(STR_MAPGEN_DATE, STR_NULL), SetPadding(1, 0, 0, 0),
 					NWidget(NWID_SPACER), SetMinimalSize(6, 0), SetFill(1, 0),
 					NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_CS_START_DATE_DOWN), SetFill(0, 1), SetDataTip(SPR_ARROW_DOWN, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_BACKWARD),
-					NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_CS_START_DATE_TEXT), SetDataTip(STR_BLACK_DATE_LONG, STR_NULL),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_CS_START_DATE_TEXT), SetDataTip(STR_BLACK_DATE_LONG, STR_NULL),
 					NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_CS_START_DATE_UP), SetFill(0, 1), SetDataTip(SPR_ARROW_UP, STR_SCENEDIT_TOOLBAR_TOOLTIP_MOVE_THE_STARTING_DATE_FORWARD),
 				EndContainer(),
 				/* Flat map height. */
@@ -1102,7 +1089,7 @@ static const NWidgetPart _nested_create_scenario_widgets[] = {
 												SetDataTip(STR_SE_MAPGEN_FLAT_WORLD_HEIGHT, STR_NULL), SetPadding(1, 0, 0, 0),
 					NWidget(NWID_SPACER), SetMinimalSize(6, 0), SetFill(1, 0),
 					NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_CS_FLAT_LAND_HEIGHT_DOWN), SetFill(0, 1), SetDataTip(SPR_ARROW_DOWN, STR_SE_MAPGEN_FLAT_WORLD_HEIGHT_DOWN),
-					NWidget(WWT_TEXTBTN, COLOUR_ORANGE, WID_CS_FLAT_LAND_HEIGHT_TEXT), SetDataTip(STR_BLACK_INT, STR_NULL),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_ORANGE, WID_CS_FLAT_LAND_HEIGHT_TEXT), SetDataTip(STR_BLACK_INT, STR_NULL),
 					NWidget(WWT_IMGBTN, COLOUR_ORANGE, WID_CS_FLAT_LAND_HEIGHT_UP), SetFill(0, 1), SetDataTip(SPR_ARROW_UP, STR_SE_MAPGEN_FLAT_WORLD_HEIGHT_UP),
 				EndContainer(),
 			EndContainer(),
@@ -1113,7 +1100,7 @@ static const NWidgetPart _nested_create_scenario_widgets[] = {
 static const WindowDesc _create_scenario_desc(
 	WDP_CENTER, 0, 0,
 	WC_GENERATE_LANDSCAPE, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_create_scenario_widgets, lengthof(_nested_create_scenario_widgets)
 );
 
@@ -1141,7 +1128,7 @@ static const NWidgetPart _nested_generate_progress_widgets[] = {
 static const WindowDesc _generate_progress_desc(
 	WDP_CENTER, 0, 0,
 	WC_MODAL_PROGRESS, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_generate_progress_widgets, lengthof(_nested_generate_progress_widgets)
 );
 
@@ -1207,7 +1194,7 @@ struct GenerateProgressWindow : public Window {
 	{
 		switch (widget) {
 			case WID_GP_PROGRESS_BAR: {
-				SetDParam(0, 100);
+				SetDParamMaxValue(0, 100);
 				*size = GetStringBoundingBox(STR_GENERATION_PROGRESS);
 				/* We need some spacing for the 'border' */
 				size->height += 8;

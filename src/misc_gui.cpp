@@ -30,15 +30,14 @@
 
 #include "table/strings.h"
 
-/**
- * Try to retrive the current clipboard contents.
- *
- * @note OS-specific funtion.
- * @return True if some text could be retrived.
- */
-bool GetClipboardContents(char *buffer, size_t buff_len);
+/** Method to open the OSK. */
+enum OskActivation {
+	OSKA_DISABLED,           ///< The OSK shall not be activated at all.
+	OSKA_DOUBLE_CLICK,       ///< Double click on the edit box opens OSK.
+	OSKA_SINGLE_CLICK,       ///< Single click after focus click opens OSK.
+	OSKA_IMMEDIATELY,        ///< Focussing click already opens OSK.
+};
 
-int _caret_timer;
 
 static const NWidgetPart _nested_land_info_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
@@ -391,6 +390,7 @@ static const char * const _credits[] = {
 	"  Zden\xC4\x9Bk Sojka (SmatZ) - Bug finder and fixer",
 	"  Jos\xC3\xA9 Soler (Terkhen) - General coding",
 	"  Thijs Marinussen (Yexo) - AI Framework",
+	"  Leif Linse (Zuu) - AI/Game Script",
 	"",
 	"Inactive Developers:",
 	"  Bjarni Corfitzen (Bjarni) - MacOSX port, coder and vehicles",
@@ -715,272 +715,13 @@ void GuiShowTooltips(Window *parent, StringID str, uint paramcount, const uint64
 	new TooltipsWindow(parent, str, paramcount, params, close_tooltip);
 }
 
-/* Delete a character at the caret position in a text buf.
- * If backspace is set, delete the character before the caret,
- * else delete the character after it. */
-static void DelChar(Textbuf *tb, bool backspace)
-{
-	WChar c;
-	char *s = tb->buf + tb->caretpos;
-
-	if (backspace) s = Utf8PrevChar(s);
-
-	uint16 len = (uint16)Utf8Decode(&c, s);
-	uint width = GetCharacterWidth(FS_NORMAL, c);
-
-	tb->pixels -= width;
-	if (backspace) {
-		tb->caretpos   -= len;
-		tb->caretxoffs -= width;
-	}
-
-	/* Move the remaining characters over the marker */
-	memmove(s, s + len, tb->bytes - (s - tb->buf) - len);
-	tb->bytes -= len;
-	tb->chars--;
-}
-
-/**
- * Delete a character from a textbuffer, either with 'Delete' or 'Backspace'
- * The character is delete from the position the caret is at
- * @param tb Textbuf type to be changed
- * @param delmode Type of deletion, either WKC_BACKSPACE or WKC_DELETE
- * @return Return true on successful change of Textbuf, or false otherwise
- */
-bool DeleteTextBufferChar(Textbuf *tb, int delmode)
-{
-	if (delmode == WKC_BACKSPACE && tb->caretpos != 0) {
-		DelChar(tb, true);
-		return true;
-	} else if (delmode == WKC_DELETE && tb->caretpos < tb->bytes - 1) {
-		DelChar(tb, false);
-		return true;
-	}
-
-	return false;
-}
-
-/**
- * Delete every character in the textbuffer
- * @param tb Textbuf buffer to be emptied
- */
-void DeleteTextBufferAll(Textbuf *tb)
-{
-	memset(tb->buf, 0, tb->max_bytes);
-	tb->bytes = tb->chars = 1;
-	tb->pixels = tb->caretpos = tb->caretxoffs = 0;
-}
-
-/**
- * Insert a character to a textbuffer. If maxwidth of the Textbuf is zero,
- * we don't care about the visual-length but only about the physical
- * length of the string
- * @param tb Textbuf type to be changed
- * @param key Character to be inserted
- * @return Return true on successful change of Textbuf, or false otherwise
- */
-bool InsertTextBufferChar(Textbuf *tb, WChar key)
-{
-	const byte charwidth = GetCharacterWidth(FS_NORMAL, key);
-	uint16 len = (uint16)Utf8CharLen(key);
-	if (tb->bytes + len <= tb->max_bytes && tb->chars + 1 <= tb->max_chars) {
-		memmove(tb->buf + tb->caretpos + len, tb->buf + tb->caretpos, tb->bytes - tb->caretpos);
-		Utf8Encode(tb->buf + tb->caretpos, key);
-		tb->chars++;
-		tb->bytes  += len;
-		tb->pixels += charwidth;
-
-		tb->caretpos   += len;
-		tb->caretxoffs += charwidth;
-		return true;
-	}
-	return false;
-}
-
-/**
- * Insert a chunk of text from the clipboard onto the textbuffer. Get TEXT clipboard
- * and append this up to the maximum length (either absolute or screenlength). If maxlength
- * is zero, we don't care about the screenlength but only about the physical length of the string
- * @param tb Textbuf type to be changed
- * @return true on successful change of Textbuf, or false otherwise
- */
-bool InsertTextBufferClipboard(Textbuf *tb)
-{
-	char utf8_buf[512];
-
-	if (!GetClipboardContents(utf8_buf, lengthof(utf8_buf))) return false;
-
-	uint16 pixels = 0, bytes = 0, chars = 0;
-	WChar c;
-	for (const char *ptr = utf8_buf; (c = Utf8Consume(&ptr)) != '\0';) {
-		if (!IsPrintable(c)) break;
-
-		byte len = Utf8CharLen(c);
-		if (tb->bytes + bytes + len > tb->max_bytes) break;
-		if (tb->chars + chars + 1   > tb->max_chars) break;
-
-		byte char_pixels = GetCharacterWidth(FS_NORMAL, c);
-
-		pixels += char_pixels;
-		bytes += len;
-		chars++;
-	}
-
-	if (bytes == 0) return false;
-
-	memmove(tb->buf + tb->caretpos + bytes, tb->buf + tb->caretpos, tb->bytes - tb->caretpos);
-	memcpy(tb->buf + tb->caretpos, utf8_buf, bytes);
-	tb->pixels += pixels;
-	tb->caretxoffs += pixels;
-
-	tb->bytes += bytes;
-	tb->chars += chars;
-	tb->caretpos += bytes;
-	assert(tb->bytes <= tb->max_bytes);
-	assert(tb->chars <= tb->max_chars);
-	tb->buf[tb->bytes - 1] = '\0'; // terminating zero
-
-	return true;
-}
-
-/**
- * Handle text navigation with arrow keys left/right.
- * This defines where the caret will blink and the next characer interaction will occur
- * @param tb Textbuf type where navigation occurs
- * @param navmode Direction in which navigation occurs WKC_LEFT, WKC_RIGHT, WKC_END, WKC_HOME
- * @return Return true on successful change of Textbuf, or false otherwise
- */
-bool MoveTextBufferPos(Textbuf *tb, int navmode)
-{
-	switch (navmode) {
-		case WKC_LEFT:
-			if (tb->caretpos != 0) {
-				WChar c;
-				const char *s = Utf8PrevChar(tb->buf + tb->caretpos);
-				Utf8Decode(&c, s);
-				tb->caretpos    = s - tb->buf; // -= (tb->buf + tb->caretpos - s)
-				tb->caretxoffs -= GetCharacterWidth(FS_NORMAL, c);
-
-				return true;
-			}
-			break;
-
-		case WKC_RIGHT:
-			if (tb->caretpos < tb->bytes - 1) {
-				WChar c;
-
-				tb->caretpos   += (uint16)Utf8Decode(&c, tb->buf + tb->caretpos);
-				tb->caretxoffs += GetCharacterWidth(FS_NORMAL, c);
-
-				return true;
-			}
-			break;
-
-		case WKC_HOME:
-			tb->caretpos = 0;
-			tb->caretxoffs = 0;
-			return true;
-
-		case WKC_END:
-			tb->caretpos = tb->bytes - 1;
-			tb->caretxoffs = tb->pixels;
-			return true;
-
-		default:
-			break;
-	}
-
-	return false;
-}
-
-/**
- * Initialize the textbuffer by supplying it the buffer to write into
- * and the maximum length of this buffer
- * @param tb Textbuf type which is getting initialized
- * @param buf the buffer that will be holding the data for input
- * @param max_bytes maximum size in bytes, including terminating '\0'
- */
-void InitializeTextBuffer(Textbuf *tb, char *buf, uint16 max_bytes)
-{
-	InitializeTextBuffer(tb, buf, max_bytes, max_bytes);
-}
-
-/**
- * Initialize the textbuffer by supplying it the buffer to write into
- * and the maximum length of this buffer
- * @param tb Textbuf type which is getting initialized
- * @param buf the buffer that will be holding the data for input
- * @param max_bytes maximum size in bytes, including terminating '\0'
- * @param max_chars maximum size in chars, including terminating '\0'
- */
-void InitializeTextBuffer(Textbuf *tb, char *buf, uint16 max_bytes, uint16 max_chars)
-{
-	assert(max_bytes != 0);
-	assert(max_chars != 0);
-
-	tb->buf        = buf;
-	tb->max_bytes  = max_bytes;
-	tb->max_chars  = max_chars;
-	tb->caret      = true;
-	UpdateTextBufferSize(tb);
-}
-
-/**
- * Update Textbuf type with its actual physical character and screenlength
- * Get the count of characters in the string as well as the width in pixels.
- * Useful when copying in a larger amount of text at once
- * @param tb Textbuf type which length is calculated
- */
-void UpdateTextBufferSize(Textbuf *tb)
-{
-	const char *buf = tb->buf;
-
-	tb->pixels = 0;
-	tb->chars = tb->bytes = 1; // terminating zero
-
-	WChar c;
-	while ((c = Utf8Consume(&buf)) != '\0') {
-		tb->pixels += GetCharacterWidth(FS_NORMAL, c);
-		tb->bytes += Utf8CharLen(c);
-		tb->chars++;
-	}
-
-	assert(tb->bytes <= tb->max_bytes);
-	assert(tb->chars <= tb->max_chars);
-
-	tb->caretpos = tb->bytes - 1;
-	tb->caretxoffs = tb->pixels;
-}
-
-/**
- * Handle the flashing of the caret.
- * @param tb The text buffer to handle the caret of.
- * @return True if the caret state changes.
- */
-bool HandleCaret(Textbuf *tb)
-{
-	/* caret changed? */
-	bool b = !!(_caret_timer & 0x20);
-
-	if (b != tb->caret) {
-		tb->caret = b;
-		return true;
-	}
-	return false;
-}
-
-bool QueryString::HasEditBoxFocus(const Window *w, int wid) const
-{
-	if (w->IsWidgetGloballyFocused(wid)) return true;
-	if (w->window_class != WC_OSK || _focused_window != w->parent) return false;
-	return w->parent->nested_focus != NULL && w->parent->nested_focus->type == WWT_EDITBOX;
-}
-
 HandleEditBoxResult QueryString::HandleEditBoxKey(Window *w, int wid, uint16 key, uint16 keycode, EventState &state)
 {
-	if (!QueryString::HasEditBoxFocus(w, wid)) return HEBR_NOT_FOCUSED;
+	if (!w->IsWidgetGloballyFocused(wid)) return HEBR_NOT_FOCUSED;
 
 	state = ES_HANDLED;
+
+	bool edited = false;
 
 	switch (keycode) {
 		case WKC_ESC: return HEBR_CANCEL;
@@ -991,59 +732,72 @@ HandleEditBoxResult QueryString::HandleEditBoxKey(Window *w, int wid, uint16 key
 		case (WKC_META | 'V'):
 #endif
 		case (WKC_CTRL | 'V'):
-			if (InsertTextBufferClipboard(&this->text)) w->SetWidgetDirty(wid);
+			edited = this->text.InsertClipboard();
 			break;
 
 #ifdef WITH_COCOA
 		case (WKC_META | 'U'):
 #endif
 		case (WKC_CTRL | 'U'):
-			DeleteTextBufferAll(&this->text);
-			w->SetWidgetDirty(wid);
+			this->text.DeleteAll();
+			edited = true;
 			break;
 
 		case WKC_BACKSPACE: case WKC_DELETE:
-			if (DeleteTextBufferChar(&this->text, keycode)) w->SetWidgetDirty(wid);
+		case WKC_CTRL | WKC_BACKSPACE: case WKC_CTRL | WKC_DELETE:
+			edited = this->text.DeleteChar(keycode);
 			break;
 
 		case WKC_LEFT: case WKC_RIGHT: case WKC_END: case WKC_HOME:
-			if (MoveTextBufferPos(&this->text, keycode)) w->SetWidgetDirty(wid);
+		case WKC_CTRL | WKC_LEFT: case WKC_CTRL | WKC_RIGHT:
+			this->text.MovePos(keycode);
 			break;
 
 		default:
 			if (IsValidChar(key, this->afilter)) {
-				if (InsertTextBufferChar(&this->text, key)) w->SetWidgetDirty(wid);
+				edited = this->text.InsertChar(key);
 			} else {
 				state = ES_NOT_HANDLED;
 			}
+			break;
 	}
 
-	return HEBR_EDITING;
+	return edited ? HEBR_EDITING : HEBR_CURSOR;
 }
 
 void QueryString::HandleEditBox(Window *w, int wid)
 {
-	if (HasEditBoxFocus(w, wid) && HandleCaret(&this->text)) {
+	if (w->IsWidgetGloballyFocused(wid) && this->text.HandleCaret()) {
 		w->SetWidgetDirty(wid);
-		/* When we're not the OSK, notify 'our' OSK to redraw the widget,
-		 * so the caret changes appropriately. */
-		if (w->window_class != WC_OSK) {
-			Window *w_osk = FindWindowById(WC_OSK, 0);
-			if (w_osk != NULL && w_osk->parent == w) w_osk->InvalidateData();
-		}
+
+		/* For the OSK also invalidate the parent window */
+		if (w->window_class == WC_OSK) w->InvalidateData();
 	}
 }
 
-void QueryString::DrawEditBox(Window *w, int wid)
+void QueryString::DrawEditBox(const Window *w, int wid) const
 {
-	const NWidgetBase *wi = w->GetWidget<NWidgetBase>(wid);
+	const NWidgetLeaf *wi = w->GetWidget<NWidgetLeaf>(wid);
 
 	assert((wi->type & WWT_MASK) == WWT_EDITBOX);
-	int left   = wi->pos_x;
-	int right  = wi->pos_x + wi->current_x - 1;
+
+	bool rtl = _current_text_dir == TD_RTL;
+	Dimension sprite_size = GetSpriteSize(rtl ? SPR_IMG_DELETE_RIGHT : SPR_IMG_DELETE_LEFT);
+	int clearbtn_width = sprite_size.width + WD_IMGBTN_LEFT + WD_IMGBTN_RIGHT;
+
+	int clearbtn_left  = wi->pos_x + (rtl ? 0 : wi->current_x - clearbtn_width);
+	int clearbtn_right = wi->pos_x + (rtl ? clearbtn_width : wi->current_x) - 1;
+	int left   = wi->pos_x + (rtl ? clearbtn_width : 0);
+	int right  = wi->pos_x + (rtl ? wi->current_x : wi->current_x - clearbtn_width) - 1;
+
 	int top    = wi->pos_y;
 	int bottom = wi->pos_y + wi->current_y - 1;
 
+	DrawFrameRect(clearbtn_left, top, clearbtn_right, bottom, wi->colour, wi->IsLowered() ? FR_LOWERED : FR_NONE);
+	DrawSprite(rtl ? SPR_IMG_DELETE_RIGHT : SPR_IMG_DELETE_LEFT, PAL_NONE, clearbtn_left + WD_IMGBTN_LEFT + (wi->IsLowered() ? 1 : 0), (top + bottom - sprite_size.height) / 2 + (wi->IsLowered() ? 1 : 0));
+	if (this->text.bytes == 1) GfxFillRect(clearbtn_left + 1, top + 1, clearbtn_right - 1, bottom - 1, _colour_gradient[wi->colour & 0xF][2], FILLRECT_CHECKER);
+
+	DrawFrameRect(left, top, right, bottom, wi->colour, FR_LOWERED | FR_DARKENED);
 	GfxFillRect(left + 1, top + 1, right - 1, bottom - 1, PC_BLACK);
 
 	/* Limit the drawing of the string inside the widget boundaries */
@@ -1061,7 +815,8 @@ void QueryString::DrawEditBox(Window *w, int wid)
 	if (tb->caretxoffs + delta < 0) delta = -tb->caretxoffs;
 
 	DrawString(delta, tb->pixels, 0, tb->buf, TC_YELLOW);
-	if (HasEditBoxFocus(w, wid) && tb->caret) {
+	bool focussed = w->IsWidgetGloballyFocused(wid) || IsOSKOpenedFor(w, wid);
+	if (focussed && tb->caret) {
 		int caret_width = GetStringBoundingBox("_").width;
 		DrawString(tb->caretxoffs + delta, tb->caretxoffs + delta + caret_width, 0, "_", TC_WHITE);
 	}
@@ -1069,56 +824,69 @@ void QueryString::DrawEditBox(Window *w, int wid)
 	_cur_dpi = old_dpi;
 }
 
-HandleEditBoxResult QueryStringBaseWindow::HandleEditBoxKey(int wid, uint16 key, uint16 keycode, EventState &state)
+void QueryString::ClickEditBox(Window *w, Point pt, int wid, int click_count, bool focus_changed)
 {
-	return this->QueryString::HandleEditBoxKey(this, wid, key, keycode, state);
-}
+	const NWidgetLeaf *wi = w->GetWidget<NWidgetLeaf>(wid);
 
-void QueryStringBaseWindow::HandleEditBox(int wid)
-{
-	this->QueryString::HandleEditBox(this, wid);
-}
+	assert((wi->type & WWT_MASK) == WWT_EDITBOX);
 
-void QueryStringBaseWindow::DrawEditBox(int wid)
-{
-	this->QueryString::DrawEditBox(this, wid);
-}
+	bool rtl = _current_text_dir == TD_RTL;
+	int clearbtn_width = GetSpriteSize(rtl ? SPR_IMG_DELETE_RIGHT : SPR_IMG_DELETE_LEFT).width;
 
-void QueryStringBaseWindow::OnOpenOSKWindow(int wid)
-{
-	ShowOnScreenKeyboard(this, wid, 0, 0);
+	int clearbtn_left  = wi->pos_x + (rtl ? 0 : wi->current_x - clearbtn_width);
+
+	if (IsInsideBS(pt.x, clearbtn_left, clearbtn_width)) {
+		if (this->text.bytes > 1) {
+			this->text.DeleteAll();
+			w->HandleButtonClick(wid);
+			w->OnEditboxChanged(wid);
+		}
+		return;
+	}
+
+	if (w->window_class != WC_OSK && _settings_client.gui.osk_activation != OSKA_DISABLED &&
+		(!focus_changed || _settings_client.gui.osk_activation == OSKA_IMMEDIATELY) &&
+		(click_count == 2 || _settings_client.gui.osk_activation != OSKA_DOUBLE_CLICK)) {
+		/* Open the OSK window */
+		ShowOnScreenKeyboard(w, wid);
+	}
 }
 
 /** Class for the string query window. */
-struct QueryStringWindow : public QueryStringBaseWindow
+struct QueryStringWindow : public Window
 {
+	QueryString editbox;    ///< Editbox.
 	QueryStringFlags flags; ///< Flags controlling behaviour of the window.
 
 	QueryStringWindow(StringID str, StringID caption, uint max_bytes, uint max_chars, const WindowDesc *desc, Window *parent, CharSetFilter afilter, QueryStringFlags flags) :
-			QueryStringBaseWindow(max_bytes, max_chars)
+			editbox(max_bytes, max_chars)
 	{
-		GetString(this->edit_str_buf, str, &this->edit_str_buf[max_bytes - 1]);
-		str_validate(this->edit_str_buf, &this->edit_str_buf[max_bytes - 1], SVS_NONE);
+		char *last_of = &this->editbox.text.buf[this->editbox.text.max_bytes - 1];
+		GetString(this->editbox.text.buf, str, last_of);
+		str_validate(this->editbox.text.buf, last_of, SVS_NONE);
 
 		/* Make sure the name isn't too long for the text buffer in the number of
 		 * characters (not bytes). max_chars also counts the '\0' characters. */
-		while (Utf8StringLength(this->edit_str_buf) + 1 > max_chars) {
-			*Utf8PrevChar(this->edit_str_buf + strlen(this->edit_str_buf)) = '\0';
+		while (Utf8StringLength(this->editbox.text.buf) + 1 > this->editbox.text.max_chars) {
+			*Utf8PrevChar(this->editbox.text.buf + strlen(this->editbox.text.buf)) = '\0';
 		}
 
-		if ((flags & QSF_ACCEPT_UNCHANGED) == 0) this->orig = strdup(this->edit_str_buf);
+		this->editbox.text.UpdateSize();
 
-		this->caption = caption;
-		this->afilter = afilter;
+		if ((flags & QSF_ACCEPT_UNCHANGED) == 0) this->editbox.orig = strdup(this->editbox.text.buf);
+
+		this->querystrings[WID_QS_TEXT] = &this->editbox;
+		this->editbox.caption = caption;
+		this->editbox.cancel_button = WID_QS_CANCEL;
+		this->editbox.ok_button = WID_QS_OK;
+		this->editbox.afilter = afilter;
 		this->flags = flags;
-		InitializeTextBuffer(&this->text, this->edit_str_buf, max_bytes, max_chars);
 
 		this->InitNested(desc, WN_QUERY_STRING);
 
 		this->parent = parent;
 
 		this->SetFocusedWidget(WID_QS_TEXT);
-		this->LowerWidget(WID_QS_TEXT);
 	}
 
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
@@ -1131,29 +899,22 @@ struct QueryStringWindow : public QueryStringBaseWindow
 		}
 	}
 
-	virtual void OnPaint()
-	{
-		this->DrawWidgets();
-
-		this->DrawEditBox(WID_QS_TEXT);
-	}
-
 	virtual void SetStringParameters(int widget) const
 	{
-		if (widget == WID_QS_CAPTION) SetDParam(0, this->caption);
+		if (widget == WID_QS_CAPTION) SetDParam(0, this->editbox.caption);
 	}
 
 	void OnOk()
 	{
-		if (this->orig == NULL || strcmp(this->text.buf, this->orig) != 0) {
+		if (this->editbox.orig == NULL || strcmp(this->editbox.text.buf, this->editbox.orig) != 0) {
 			/* If the parent is NULL, the editbox is handled by general function
 			 * HandleOnEditText */
 			if (this->parent != NULL) {
-				this->parent->OnQueryTextFinished(this->text.buf);
+				this->parent->OnQueryTextFinished(this->editbox.text.buf);
 			} else {
-				HandleOnEditText(this->text.buf);
+				HandleOnEditText(this->editbox.text.buf);
 			}
-			this->handled = true;
+			this->editbox.handled = true;
 		}
 	}
 
@@ -1161,7 +922,7 @@ struct QueryStringWindow : public QueryStringBaseWindow
 	{
 		switch (widget) {
 			case WID_QS_DEFAULT:
-				this->text.buf[0] = '\0';
+				this->editbox.text.DeleteAll();
 				/* FALL THROUGH */
 			case WID_QS_OK:
 				this->OnOk();
@@ -1172,37 +933,9 @@ struct QueryStringWindow : public QueryStringBaseWindow
 		}
 	}
 
-	virtual void OnMouseLoop()
-	{
-		this->HandleEditBox(WID_QS_TEXT);
-	}
-
-	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
-	{
-		EventState state = ES_NOT_HANDLED;
-		switch (this->HandleEditBoxKey(WID_QS_TEXT, key, keycode, state)) {
-			default: NOT_REACHED();
-			case HEBR_EDITING: {
-				Window *osk = FindWindowById(WC_OSK, 0);
-				if (osk != NULL && osk->parent == this) osk->InvalidateData();
-				break;
-			}
-			case HEBR_CONFIRM: this->OnOk();
-				/* FALL THROUGH */
-			case HEBR_CANCEL: delete this; break; // close window, abandon changes
-			case HEBR_NOT_FOCUSED: break;
-		}
-		return state;
-	}
-
-	virtual void OnOpenOSKWindow(int wid)
-	{
-		ShowOnScreenKeyboard(this, wid, WID_QS_CANCEL, WID_QS_OK);
-	}
-
 	~QueryStringWindow()
 	{
-		if (!this->handled && this->parent != NULL) {
+		if (!this->editbox.handled && this->parent != NULL) {
 			Window *parent = this->parent;
 			this->parent = NULL; // so parent doesn't try to delete us again
 			parent->OnQueryTextFinished(NULL);
@@ -1297,8 +1030,8 @@ struct QueryWindow : public Window {
 		if (widget != WID_Q_TEXT) return;
 
 		Dimension d = GetStringMultiLineBoundingBox(this->message, *size);
-		d.width += padding.width;
-		d.height += padding.height;
+		d.width += WD_FRAMETEXT_LEFT + WD_FRAMETEXT_RIGHT;
+		d.height += WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM;
 		*size = d;
 	}
 
@@ -1306,7 +1039,8 @@ struct QueryWindow : public Window {
 	{
 		if (widget != WID_Q_TEXT) return;
 
-		DrawStringMultiLine(r.left, r.right, r.top, r.bottom, this->message, TC_FROMSTRING, SA_CENTER);
+		DrawStringMultiLine(r.left + WD_FRAMETEXT_LEFT, r.right - WD_FRAMETEXT_RIGHT, r.top + WD_FRAMERECT_TOP, r.bottom - WD_FRAMERECT_BOTTOM,
+				this->message, TC_FROMSTRING, SA_CENTER);
 	}
 
 	virtual void OnClick(Point pt, int widget, int click_count)
@@ -1368,7 +1102,7 @@ static const NWidgetPart _nested_query_widgets[] = {
 static const WindowDesc _query_desc(
 	WDP_CENTER, 0, 0,
 	WC_CONFIRM_POPUP_QUERY, WC_NONE,
-	WDF_UNCLICK_BUTTONS | WDF_MODAL,
+	WDF_MODAL,
 	_nested_query_widgets, lengthof(_nested_query_widgets)
 );
 

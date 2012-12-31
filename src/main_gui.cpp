@@ -101,7 +101,7 @@ bool HandlePlacePushButton(Window *w, int widget, CursorID cursor, HighLightStyl
 {
 	if (w->IsWidgetDisabled(widget)) return false;
 
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	w->SetDirty();
 
 	if (w->IsWidgetLowered(widget)) {
@@ -117,7 +117,7 @@ bool HandlePlacePushButton(Window *w, int widget, CursorID cursor, HighLightStyl
 
 void CcPlaySound10(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 {
-	if (result.Succeeded()) SndPlayTileFx(SND_12_EXPLOSION, tile);
+	if (result.Succeeded() && _settings_client.sound.confirm) SndPlayTileFx(SND_12_EXPLOSION, tile);
 }
 
 #ifdef ENABLE_NETWORK
@@ -441,7 +441,7 @@ struct MainWindow : Window
 	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
 	{
 		if (!gui_scope) return;
-		/* Forward the message to the appropiate toolbar (ingame or scenario editor) */
+		/* Forward the message to the appropriate toolbar (ingame or scenario editor) */
 		InvalidateWindowData(WC_MAIN_TOOLBAR, 0, data, true);
 	}
 

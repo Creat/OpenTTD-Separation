@@ -358,7 +358,6 @@ STR_TOOLBAR_SOUND_MUSIC                                         :ध्वनी
 ############ range ends here
 
 ############ range for message menu starts
-STR_NEWS_MENU_MESSAGE_SETTINGS                                  :निरोपांचे पर्याय
 STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :निरोपांचा इतिहास
 ############ range ends here
 
@@ -451,9 +450,6 @@ STR_STATUSBAR_COMPANY_NAME                                      :{SILVER}- -  {C
 
 # News message history
 STR_MESSAGE_NEWS_FORMAT                                         :{STRING}  -  {STRING}
-
-# Message settings window
-
 
 
 
@@ -561,14 +557,6 @@ STR_GAME_OPTIONS_RESOLUTION_OTHER                               :अन्य
 
 
 
-# Difficulty level window
-
-############ range for difficulty levels starts
-############ range for difficulty levels ends
-
-
-############ range for difficulty settings starts
-############ range for difficulty settings ends
 
 
 
@@ -584,9 +572,9 @@ STR_SUBSIDY_X4                                                  :x४
 
 
 
-
-
 # Advanced settings window
+
+
 
 
 
@@ -595,10 +583,11 @@ STR_CONFIG_SETTING_ORIGINAL                                     :मुळ
 STR_CONFIG_SETTING_REALISTIC                                    :खरेखुरे
 
 
-STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}वाहनांचा धूर/ठिणग्या: {ORANGE}{STRING}
+
+STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :वाहनांचा धूर/ठिणग्या: {STRING}
 
 
-STR_CONFIG_SETTING_WARN_LOST_VEHICLE                            :{LTBLUE} वाहन हरवल्यास सूचित करा: {ORANGE}{STRING}
+STR_CONFIG_SETTING_WARN_LOST_VEHICLE                            : वाहन हरवल्यास सूचित करा: {STRING}
 
 
 
@@ -616,7 +605,11 @@ STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_ACTIONS              :सर्व �
 
 
 
-STR_CONFIG_SETTING_STATUSBAR_POS                                :{LTBLUE}स्टेटसबार वरचं स्थान: {ORANGE}{STRING}
+
+
+
+
+STR_CONFIG_SETTING_STATUSBAR_POS                                :स्टेटसबार वरचं स्थान: {STRING}
 
 
 
@@ -989,6 +982,7 @@ STR_STATION_VIEW_CAPTION                                        :{WHITE}{STATION
 STR_STATION_VIEW_WAITING_CARGO                                  :{WHITE}{CARGO_LONG}
 
 
+
 STR_STATION_VIEW_CARGO_RATING                                   :{WHITE}{STRING}: {YELLOW}{STRING} ({COMMA}%)
 
 ############ range for rating starts
@@ -1001,6 +995,7 @@ STR_CARGO_RATING_VERY_GOOD                                      :अतिशय
 STR_CARGO_RATING_EXCELLENT                                      :अव्वल
 STR_CARGO_RATING_OUTSTANDING                                    :उत्कृष्ट
 ############ range for rating ends
+
 
 
 
@@ -1284,6 +1279,7 @@ STR_MESSAGE_ESTIMATED_INCOME                                    :{WHITE}अं�
 # Soundset messages
 
 # Screenshot related messages
+
 
 # Error message titles
 
@@ -1597,6 +1593,8 @@ STR_ORANGE_STRING                                               :{ORANGE}{STRING
 STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
+STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}
+STR_ORANGE_STRING1_LTBLUE                                       :{ORANGE}{STRING}{LTBLUE}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}
 STR_TINY_RIGHT_ARROW                                            :{TINY_FONT}{RIGHT_ARROW}

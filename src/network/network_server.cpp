@@ -450,6 +450,8 @@ NetworkRecvStatus ServerNetworkGameSocketHandler::SendNeedGamePassword()
 	if (this->status >= STATUS_AUTH_GAME) return this->CloseConnection(NETWORK_RECV_STATUS_MALFORMED_PACKET);
 
 	this->status = STATUS_AUTH_GAME;
+	/* Reset 'lag' counters */
+	this->last_frame = this->last_frame_server = _frame_counter;
 
 	Packet *p = new Packet(PACKET_SERVER_NEED_GAME_PASSWORD);
 	this->SendPacket(p);
@@ -463,6 +465,8 @@ NetworkRecvStatus ServerNetworkGameSocketHandler::SendNeedCompanyPassword()
 	if (this->status >= STATUS_AUTH_COMPANY) return this->CloseConnection(NETWORK_RECV_STATUS_MALFORMED_PACKET);
 
 	this->status = STATUS_AUTH_COMPANY;
+	/* Reset 'lag' counters */
+	this->last_frame = this->last_frame_server = _frame_counter;
 
 	Packet *p = new Packet(PACKET_SERVER_NEED_COMPANY_PASSWORD);
 	p->Send_uint32(_settings_game.game_creation.generation_seed);
@@ -481,6 +485,9 @@ NetworkRecvStatus ServerNetworkGameSocketHandler::SendWelcome()
 	if (this->status >= STATUS_AUTHORIZED) return this->CloseConnection(NETWORK_RECV_STATUS_MALFORMED_PACKET);
 
 	this->status = STATUS_AUTHORIZED;
+	/* Reset 'lag' counters */
+	this->last_frame = this->last_frame_server = _frame_counter;
+
 	_network_game_info.clients_on++;
 
 	p = new Packet(PACKET_SERVER_WELCOME);
@@ -2045,7 +2052,16 @@ uint NetworkServerKickOrBanIP(ClientID client_id, bool ban)
 uint NetworkServerKickOrBanIP(const char *ip, bool ban)
 {
 	/* Add address to ban-list */
-	if (ban) *_network_ban_list.Append() = strdup(ip);
+	if (ban) {
+		bool contains = false;
+		for (char **iter = _network_ban_list.Begin(); iter != _network_ban_list.End(); iter++) {
+			if (strcmp(*iter, ip) == 0) {
+				contains = true;
+				break;
+			}
+		}
+		if (!contains) *_network_ban_list.Append() = strdup(ip);
+	}
 
 	uint n = 0;
 

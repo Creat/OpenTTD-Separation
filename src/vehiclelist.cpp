@@ -19,12 +19,13 @@
  */
 uint32 VehicleListIdentifier::Pack()
 {
-	assert(this->company < (1 <<  4));
+	byte c = this->company == OWNER_NONE ? 0xF : (byte)this->company;
+	assert(c             < (1 <<  4));
 	assert(this->type    < (1 <<  3));
 	assert(this->vtype   < (1 <<  2));
 	assert(this->index   < (1 << 20));
 
-	return this->company << 28 | this->type << 23 | this->vtype << 26 | this->index;
+	return c << 28 | this->type << 23 | this->vtype << 26 | this->index;
 }
 
 /**
@@ -34,7 +35,8 @@ uint32 VehicleListIdentifier::Pack()
  */
 bool VehicleListIdentifier::Unpack(uint32 data)
 {
-	this->company = (CompanyID)GB(data, 28, 4);
+	byte c        = GB(data, 28, 4);
+	this->company = c == 0xF ? OWNER_NONE : (CompanyID)c;
 	this->type    = (VehicleListType)GB(data, 23, 3);
 	this->vtype   = (VehicleType)GB(data, 26, 2);
 	this->index   = GB(data, 0, 20);
@@ -58,7 +60,7 @@ VehicleListIdentifier::VehicleListIdentifier(uint32 data)
  * @param tile    The tile the depot is located on
  * @param engines Pointer to list to add vehicles to
  * @param wagons  Pointer to list to add wagons to (can be NULL)
- * @param individual_wagons If true add every wagon to #wagons which is not attached to an engine. If false only add the first wagon of every row.
+ * @param individual_wagons If true add every wagon to \a wagons which is not attached to an engine. If false only add the first wagon of every row.
  */
 void BuildDepotVehicleList(VehicleType type, TileIndex tile, VehicleList *engines, VehicleList *wagons, bool individual_wagons)
 {

@@ -32,7 +32,7 @@ enum VehicleAirFlags {
 
 
 void HandleAircraftEnterHangar(Aircraft *v);
-void GetAircraftSpriteSize(EngineID engine, uint &width, uint &height, EngineImageType image_type);
+void GetAircraftSpriteSize(EngineID engine, uint &width, uint &height, int &xoffs, int &yoffs, EngineImageType image_type);
 void UpdateAirplanesOnNewStation(const Station *st);
 void UpdateAircraftCache(Aircraft *v, bool update_range = false);
 
@@ -76,8 +76,15 @@ struct Aircraft FINAL : public SpecializedVehicle<Aircraft, VEH_AIRCRAFT> {
 	int GetDisplaySpeed() const    { return this->cur_speed; }
 	int GetDisplayMaxSpeed() const { return this->vcache.cached_max_speed; }
 	int GetSpeedOldUnits() const   { return this->vcache.cached_max_speed * 10 / 128; }
+	int GetCurrentMaxSpeed() const { return this->GetSpeedOldUnits(); }
 	Money GetRunningCost() const;
-	bool IsInDepot() const { return (this->vehstatus & VS_HIDDEN) != 0 && IsHangarTile(this->tile); }
+
+	bool IsInDepot() const
+	{
+		assert(this->IsPrimaryVehicle());
+		return (this->vehstatus & VS_HIDDEN) != 0 && IsHangarTile(this->tile);
+	}
+
 	bool Tick();
 	void OnNewDay();
 	uint Crash(bool flooded = false);

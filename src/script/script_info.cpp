@@ -263,6 +263,15 @@ SQInteger ScriptInfo::AddLabels(HSQUIRRELVM vm)
 	}
 	sq_pop(vm, 1);
 
+	/* Check labels for completeness */
+	config->complete_labels = true;
+	for (int value = config->min_value; value <= config->max_value; value++) {
+		if (!config->labels->Contains(value)) {
+			config->complete_labels = false;
+			break;
+		}
+	}
+
 	return 0;
 }
 
@@ -284,11 +293,11 @@ int ScriptInfo::GetSettingDefaultValue(const char *name) const
 	for (ScriptConfigItemList::const_iterator it = this->config_list.begin(); it != this->config_list.end(); it++) {
 		if (strcmp((*it).name, name) != 0) continue;
 		/* The default value depends on the difficulty level */
-		switch (GetGameSettings().difficulty.diff_level) {
-			case 0: return (*it).easy_value;
-			case 1: return (*it).medium_value;
-			case 2: return (*it).hard_value;
-			case 3: return (*it).custom_value;
+		switch (GetGameSettings().script.settings_profile) {
+			case SP_EASY:   return (*it).easy_value;
+			case SP_MEDIUM: return (*it).medium_value;
+			case SP_HARD:   return (*it).hard_value;
+			case SP_CUSTOM: return (*it).custom_value;
 			default: NOT_REACHED();
 		}
 	}

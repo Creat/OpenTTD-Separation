@@ -452,6 +452,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\cargomonitor.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\cargopacket.cpp"
 				>
 			</File>
@@ -529,6 +533,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\fontcache.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\base_consist.cpp"
 				>
 			</File>
 			<File
@@ -708,11 +716,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\stringfilter.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\strings.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\..\src\subsidy.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\textbuf.cpp"
 				>
 			</File>
 			<File
@@ -821,6 +837,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\cargo_type.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\cargomonitor.h"
 				>
 			</File>
 			<File
@@ -1009,6 +1029,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\fontcache.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\base_consist.h"
 				>
 			</File>
 			<File
@@ -1428,6 +1452,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\settings_gui.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\settings_internal.h"
 				>
 			</File>
@@ -1528,6 +1556,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\stringfilter_type.h"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\strings_func.h"
 				>
 			</File>
@@ -1557,6 +1589,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\textbuf_gui.h"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\textbuf_type.h"
 				>
 			</File>
 			<File
@@ -2424,6 +2460,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\saveload\cargomonitor_sl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\saveload\cargopacket_sl.cpp"
 				>
 			</File>
@@ -3120,6 +3160,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\..\src\script\api\script_cargomonitor.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\..\src\script\api\script_company.hpp"
 				>
 			</File>
@@ -3365,6 +3409,10 @@
 			</File>
 			<File
 				RelativePath=".\..\src\script\api\script_cargolist.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\..\src\script\api\script_cargomonitor.cpp"
 				>
 			</File>
 			<File

@@ -39,27 +39,57 @@ public:
 	 * Copy constructor.
 	 * @param other The other vector to copy.
 	 */
+	SmallVector(const SmallVector &other) : data(NULL), items(0), capacity(0)
+	{
+		this->Assign(other);
+	}
+
+	/**
+	 * Generic copy constructor.
+	 * @param other The other vector to copy.
+	 */
 	template <uint X>
 	SmallVector(const SmallVector<T, X> &other) : data(NULL), items(0), capacity(0)
 	{
-		MemCpyT<T>(this->Append(other.Length()), other.Begin(), other.Length());
+		this->Assign(other);
 	}
 
 	/**
 	 * Assignment.
-	 * @param other The new vector that.
+	 * @param other The other vector to assign.
+	 */
+	SmallVector &operator=(const SmallVector &other)
+	{
+		this->Assign(other);
+		return *this;
+	}
+
+	/**
+	 * Generic assignment.
+	 * @param other The other vector to assign.
 	 */
 	template <uint X>
 	SmallVector &operator=(const SmallVector<T, X> &other)
 	{
-		this->Reset();
-		MemCpyT<T>(this->Append(other.Length()), other.Begin(), other.Length());
+		this->Assign(other);
 		return *this;
 	}
 
 	~SmallVector()
 	{
 		free(this->data);
+	}
+
+	/**
+	 * Assign items from other vector.
+	 */
+	template <uint X>
+	inline void Assign(const SmallVector<T, X> &other)
+	{
+		if ((const void *)&other == (void *)this) return;
+
+		this->Clear();
+		if (other.Length() > 0) MemCpyT<T>(this->Append(other.Length()), other.Begin(), other.Length());
 	}
 
 	/**
@@ -148,10 +178,10 @@ public:
 	 * @param item Item to search for
 	 * @return The position of the item, or -1 when not present
 	 */
-	inline int FindIndex(const T &item)
+	inline int FindIndex(const T &item) const
 	{
 		int index = 0;
-		T *pos = this->Begin();
+		const T *pos = this->Begin();
 		const T *end = this->End();
 		while (pos != end && *pos != item) {
 			pos++;

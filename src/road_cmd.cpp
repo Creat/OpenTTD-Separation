@@ -216,6 +216,9 @@ static CommandCost RemoveRoad(TileIndex tile, DoCommandFlag flags, RoadBits piec
 
 		CommandCost cost(EXPENSES_CONSTRUCTION);
 		if (IsTileType(tile, MP_TUNNELBRIDGE)) {
+			/* Removing any roadbit in the bridge axis removes the roadtype (that's the behaviour remove-long-roads needs) */
+			if ((AxisToRoadBits(DiagDirToAxis(GetTunnelBridgeDirection(tile))) & pieces) == ROAD_NONE) return_cmd_error(rt == ROADTYPE_TRAM ? STR_ERROR_THERE_IS_NO_TRAMWAY : STR_ERROR_THERE_IS_NO_ROAD);
+
 			TileIndex other_end = GetOtherTunnelBridgeEnd(tile);
 			/* Pay for *every* tile of the bridge or tunnel */
 			uint len = GetTunnelBridgeLength(other_end, tile) + 2;
@@ -651,6 +654,7 @@ CommandCost CmdBuildRoad(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 
 		case MP_TUNNELBRIDGE: {
 			if (GetTunnelBridgeTransportType(tile) != TRANSPORT_ROAD) goto do_clear;
+			/* Only allow building the outern roadbit, so building long roads stops at existing bridges */
 			if (MirrorRoadBits(DiagDirToRoadBits(GetTunnelBridgeDirection(tile))) != pieces) goto do_clear;
 			if (HasTileRoadType(tile, rt)) return_cmd_error(STR_ERROR_ALREADY_BUILT);
 			/* Don't allow adding roadtype to the bridge/tunnel when vehicles are already driving on it */
@@ -782,17 +786,32 @@ do_clear:;
 }
 
 /**
+ * Checks whether a road or tram connection can be found when building a new road or tram.
+ * @param tile Tile at which the road being built will end.
+ * @param rt Roadtype of the road being built.
+ * @param dir Direction that the road is following.
+ * @return True if the next tile at dir direction is suitable for being connected directly by a second roadbit at the end of the road being built.
+ */
+static bool CanConnectToRoad(TileIndex tile, RoadType rt, DiagDirection dir)
+{
+	RoadBits bits = GetAnyRoadBits(tile + TileOffsByDiagDir(dir), rt, false);
+	return (bits & DiagDirToRoadBits(ReverseDiagDir(dir))) != 0;
+}
+
+/**
  * Build a long piece of road.
  * @param start_tile start tile of drag (the building cost will appear over this tile)
  * @param flags operation to perform
  * @param p1 end tile of drag
  * @param p2 various bitstuffed elements
- * - p2 = (bit 0) - start tile starts in the 2nd half of tile (p2 & 1)
- * - p2 = (bit 1) - end tile starts in the 2nd half of tile (p2 & 2)
+ * - p2 = (bit 0) - start tile starts in the 2nd half of tile (p2 & 1). Only used if bit 6 is set or if we are building a single tile
+ * - p2 = (bit 1) - end tile starts in the 2nd half of tile (p2 & 2). Only used if bit 6 is set or if we are building a single tile
  * - p2 = (bit 2) - direction: 0 = along x-axis, 1 = along y-axis (p2 & 4)
  * - p2 = (bit 3 + 4) - road type
  * - p2 = (bit 5) - set road direction
- * - p2 = (bit 6) - 0 = build up to an obstacle, 1 = fail if an obstacle is found (used for AIs).
+ * - p2 = (bit 6) - defines two different behaviors for this command:
+ *      - 0 = Build up to an obstacle. Do not build the first and last roadbits unless they can be connected to something, or if we are building a single tile
+ *      - 1 = Fail if an obstacle is found. Always take into account bit 0 and 1. This behavior is used for scripts
  * @param text unused
  * @return the cost of this operation or an error
  */
@@ -833,19 +852,31 @@ CommandCost CmdBuildLongRoad(TileIndex start_tile, DoCommandFlag flags, uint32 p
 	bool had_bridge = false;
 	bool had_tunnel = false;
 	bool had_success = false;
+	bool is_ai = HasBit(p2, 6);
+
 	/* Start tile is the first tile clicked by the user. */
 	for (;;) {
 		RoadBits bits = AxisToRoadBits(axis);
 
-		/* Road parts only have to be built at the start tile or at the end tile. */
-		if (tile == end_tile && !HasBit(p2, 1)) bits &= DiagDirToRoadBits(ReverseDiagDir(dir));
-		if (tile == start_tile && HasBit(p2, 0)) bits &= DiagDirToRoadBits(dir);
+		/* Determine which road parts should be built. */
+		if (!is_ai && start_tile != end_tile) {
+			/* Only build the first and last roadbit if they can connect to something. */
+			if (tile == end_tile && !CanConnectToRoad(tile, rt, dir)) {
+				bits = DiagDirToRoadBits(ReverseDiagDir(dir));
+			} else if (tile == start_tile && !CanConnectToRoad(tile, rt, ReverseDiagDir(dir))) {
+				bits = DiagDirToRoadBits(dir);
+			}
+		} else {
+			/* Road parts only have to be built at the start tile or at the end tile. */
+			if (tile == end_tile && !HasBit(p2, 1)) bits &= DiagDirToRoadBits(ReverseDiagDir(dir));
+			if (tile == start_tile && HasBit(p2, 0)) bits &= DiagDirToRoadBits(dir);
+		}
 
 		CommandCost ret = DoCommand(tile, drd << 6 | rt << 4 | bits, 0, flags, CMD_BUILD_ROAD);
 		if (ret.Failed()) {
 			last_error = ret;
 			if (last_error.GetErrorMessage() != STR_ERROR_ALREADY_BUILT) {
-				if (HasBit(p2, 6)) return last_error;
+				if (is_ai) return last_error;
 				break;
 			}
 		} else {
@@ -1486,7 +1517,7 @@ static void TileLoop_Road(TileIndex tile)
 				if (GetFoundationSlope(tile) == SLOPE_FLAT && EnsureNoVehicleOnGround(tile).Succeeded() && Chance16(1, 40)) {
 					StartRoadWorks(tile);
 
-					SndPlayTileFx(SND_21_JACKHAMMER, tile);
+					if (_settings_client.sound.ambient) SndPlayTileFx(SND_21_JACKHAMMER, tile);
 					CreateEffectVehicleAbove(
 						TileX(tile) * TILE_SIZE + 7,
 						TileY(tile) * TILE_SIZE + 7,

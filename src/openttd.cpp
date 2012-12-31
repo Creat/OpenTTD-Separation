@@ -60,7 +60,7 @@
 #include "game/game.hpp"
 #include "game/game_config.hpp"
 #include "town.h"
-
+#include "subsidy_func.h"
 
 
 #include <stdarg.h>
@@ -74,7 +74,6 @@ void ResetMusic();
 void CallWindowTickEvent();
 bool HandleBootstrap();
 
-extern void SetDifficultyLevel(int mode, DifficultySettings *gm_opt);
 extern Company *DoStartupNewCompany(bool is_ai, CompanyID company = INVALID_COMPANY);
 extern void ShowOSErrorBox(const char *buf, bool system);
 extern char *_config_file;
@@ -159,7 +158,7 @@ static void ShowHelp()
 		"  -g [savegame]       = Start new/save game immediately\n"
 		"  -G seed             = Set random seed\n"
 #if defined(ENABLE_NETWORK)
-		"  -n [ip:port#company]= Start networkgame\n"
+		"  -n [ip:port#company]= Join network game\n"
 		"  -p password         = Password to join server\n"
 		"  -P password         = Password to join company\n"
 		"  -D [ip][:port]      = Start dedicated server\n"
@@ -725,8 +724,14 @@ int ttd_main(int argc, char *argv[])
 
 	BaseGraphics::FindSets();
 	if (graphics_set == NULL && BaseGraphics::ini_set != NULL) graphics_set = strdup(BaseGraphics::ini_set);
-	if (!BaseGraphics::SetSet(graphics_set) && !StrEmpty(graphics_set)) {
-		usererror("Failed to select requested graphics set '%s'", graphics_set);
+	if (!BaseGraphics::SetSet(graphics_set)) {
+		if (!StrEmpty(graphics_set)) {
+			BaseGraphics::SetSet(NULL);
+
+			ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_BASE_GRAPHICS_NOT_FOUND);
+			msg.SetDParamStr(0, graphics_set);
+			ScheduleErrorMessage(msg);
+		}
 	}
 	free(graphics_set);
 
@@ -785,18 +790,26 @@ int ttd_main(int argc, char *argv[])
 	BaseSounds::FindSets();
 	if (sounds_set == NULL && BaseSounds::ini_set != NULL) sounds_set = strdup(BaseSounds::ini_set);
 	if (!BaseSounds::SetSet(sounds_set)) {
-		StrEmpty(sounds_set) ?
-			usererror("Failed to find a sounds set. Please acquire a sounds set for OpenTTD. See section 4.1 of readme.txt.") :
-			usererror("Failed to select requested sounds set '%s'", sounds_set);
+		if (StrEmpty(sounds_set) || !BaseSounds::SetSet(NULL)) {
+			usererror("Failed to find a sounds set. Please acquire a sounds set for OpenTTD. See section 4.1 of readme.txt.");
+		} else {
+			ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_BASE_SOUNDS_NOT_FOUND);
+			msg.SetDParamStr(0, sounds_set);
+			ScheduleErrorMessage(msg);
+		}
 	}
 	free(sounds_set);
 
 	BaseMusic::FindSets();
 	if (music_set == NULL && BaseMusic::ini_set != NULL) music_set = strdup(BaseMusic::ini_set);
 	if (!BaseMusic::SetSet(music_set)) {
-		StrEmpty(music_set) ?
-			usererror("Failed to find a music set. Please acquire a music set for OpenTTD. See section 4.1 of readme.txt.") :
-			usererror("Failed to select requested music set '%s'", music_set);
+		if (StrEmpty(music_set) || !BaseMusic::SetSet(NULL)) {
+			usererror("Failed to find a music set. Please acquire a music set for OpenTTD. See section 4.1 of readme.txt.");
+		} else {
+			ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_BASE_MUSIC_NOT_FOUND);
+			msg.SetDParamStr(0, music_set);
+			ScheduleErrorMessage(msg);
+		}
 	}
 	free(music_set);
 
@@ -1041,7 +1054,8 @@ void SwitchToMode(SwitchMode new_mode)
 				ShowErrorMessage(STR_JUST_RAW_STRING, INVALID_STRING_ID, WL_ERROR);
 			} else {
 				if (_saveload_mode == SLD_LOAD_SCENARIO) {
-					StartupEngines();
+					/* Reset engine pool to simplify changing engine NewGRFs in scenario editor. */
+					EngineOverrideManager::ResetToCurrentNewGRFConfig();
 				}
 				/* Update the local company for a loaded game. It is either always
 				 * company #1 (eg 0) or in the case of a dedicated server a spectator */
@@ -1144,6 +1158,7 @@ static void CheckCaches()
 
 	extern void RebuildTownCaches();
 	RebuildTownCaches();
+	RebuildSubsidisedSourceAndDestinationCache();
 
 	uint i = 0;
 	FOR_ALL_TOWNS(t) {

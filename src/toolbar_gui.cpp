@@ -41,6 +41,7 @@
 #include "newgrf_debug.h"
 #include "hotkeys.h"
 #include "engine_base.h"
+#include "highscore.h"
 
 #include "widgets/toolbar_widget.h"
 
@@ -51,6 +52,8 @@
 
 RailType _last_built_railtype;
 RoadType _last_built_roadtype;
+
+static ScreenshotType _confirmed_screenshot_type; ///< Screenshot type the current query is about to confirm.
 
 /** Toobar modes */
 enum ToolbarMode {
@@ -164,7 +167,7 @@ static void PopupMainToolbMenu(Window *w, int widget, StringID string, int count
 		list->push_back(new DropDownListStringItem(string + i, i, false));
 	}
 	ShowDropDownList(w, list, 0, widget, 140, true, true);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 }
 
 /** Enum for the Company Toolbar's network related buttons */
@@ -198,7 +201,7 @@ static void PopupMainCompanyToolbMenu(Window *w, int widget, int grey = 0)
 	}
 
 	ShowDropDownList(w, list, _local_company == COMPANY_SPECTATOR ? CTMN_CLIENT_LIST : (int)_local_company, widget, 240, true, true);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 }
 
 
@@ -221,7 +224,9 @@ static CallBackFunction ToolbarPauseClick(Window *w)
 {
 	if (_networking && !_network_server) return CBF_NONE; // only server can pause the game
 
-	if (DoCommandP(0, PM_PAUSED_NORMAL, _pause_mode == PM_UNPAUSED, CMD_PAUSE)) SndPlayFx(SND_15_BEEP);
+	if (DoCommandP(0, PM_PAUSED_NORMAL, _pause_mode == PM_UNPAUSED, CMD_PAUSE)) {
+		if (_settings_client.sound.confirm) SndPlayFx(SND_15_BEEP);
+	}
 	return CBF_NONE;
 }
 
@@ -234,7 +239,7 @@ static CallBackFunction ToolbarPauseClick(Window *w)
 static CallBackFunction ToolbarFastForwardClick(Window *w)
 {
 	_fast_forward ^= true;
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
 
@@ -243,7 +248,6 @@ static CallBackFunction ToolbarFastForwardClick(Window *w)
  */
 enum OptionMenuEntries {
 	OME_GAMEOPTIONS,
-	OME_DIFFICULTIES,
 	OME_SETTINGS,
 	OME_SCRIPT_SETTINGS,
 	OME_NEWGRFSETTINGS,
@@ -269,7 +273,6 @@ static CallBackFunction ToolbarOptionsClick(Window *w)
 {
 	DropDownList *list = new DropDownList();
 	list->push_back(new DropDownListStringItem(STR_SETTINGS_MENU_GAME_OPTIONS,             OME_GAMEOPTIONS, false));
-	list->push_back(new DropDownListStringItem(STR_SETTINGS_MENU_DIFFICULTY_SETTINGS,      OME_DIFFICULTIES, false));
 	list->push_back(new DropDownListStringItem(STR_SETTINGS_MENU_CONFIG_SETTINGS,          OME_SETTINGS, false));
 	/* Changes to the per-AI settings don't get send from the server to the clients. Clients get
 	 * the settings once they join but never update it. As such don't show the window at all
@@ -289,7 +292,7 @@ static CallBackFunction ToolbarOptionsClick(Window *w)
 	list->push_back(new DropDownListCheckedItem(STR_SETTINGS_MENU_TRANSPARENT_SIGNS,       OME_SHOW_STATIONSIGNS, false, IsTransparencySet(TO_SIGNS)));
 
 	ShowDropDownList(w, list, 0, WID_TN_SETTINGS, 140, true, true);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
 
@@ -303,7 +306,6 @@ static CallBackFunction MenuClickSettings(int index)
 {
 	switch (index) {
 		case OME_GAMEOPTIONS:          ShowGameOptions();                               return CBF_NONE;
-		case OME_DIFFICULTIES:         ShowGameDifficulty();                            return CBF_NONE;
 		case OME_SETTINGS:             ShowGameSettings();                              return CBF_NONE;
 		case OME_SCRIPT_SETTINGS:      ShowAIConfigWindow();                            return CBF_NONE;
 		case OME_NEWGRFSETTINGS:       ShowNewGRFSettings(!_networking && _settings_client.gui.UserIsAllowedToChangeNewGRFs(), true, true, &_grfconfig); return CBF_NONE;
@@ -610,7 +612,7 @@ static CallBackFunction MenuClickGraphs(int index)
 
 static CallBackFunction ToolbarLeagueClick(Window *w)
 {
-	PopupMainToolbMenu(w, WID_TN_LEAGUE, STR_GRAPH_MENU_COMPANY_LEAGUE_TABLE, 2);
+	PopupMainToolbMenu(w, WID_TN_LEAGUE, STR_GRAPH_MENU_COMPANY_LEAGUE_TABLE, _networking ? 2 : 3);
 	return CBF_NONE;
 }
 
@@ -625,6 +627,7 @@ static CallBackFunction MenuClickLeague(int index)
 	switch (index) {
 		case 0: ShowCompanyLeagueTable();      break;
 		case 1: ShowPerformanceRatingDetail(); break;
+		case 2: ShowHighscoreTable(); break;
 	}
 	return CBF_NONE;
 }
@@ -634,7 +637,7 @@ static CallBackFunction MenuClickLeague(int index)
 static CallBackFunction ToolbarIndustryClick(Window *w)
 {
 	/* Disable build-industry menu if we are a spectator */
-	PopupMainToolbMenu(w, WID_TN_INDUSTRIES, STR_INDUSTRY_MENU_INDUSTRY_DIRECTORY, (_local_company == COMPANY_SPECTATOR) ? 1 : 2);
+	PopupMainToolbMenu(w, WID_TN_INDUSTRIES, STR_INDUSTRY_MENU_INDUSTRY_DIRECTORY, (_local_company == COMPANY_SPECTATOR) ? 2 : 3);
 	return CBF_NONE;
 }
 
@@ -647,8 +650,9 @@ static CallBackFunction ToolbarIndustryClick(Window *w)
 static CallBackFunction MenuClickIndustry(int index)
 {
 	switch (index) {
-		case 0: ShowIndustryDirectory();   break;
-		case 1: ShowBuildIndustryWindow(); break;
+		case 0: ShowIndustryDirectory();     break;
+		case 1: ShowIndustryCargoesWindow(); break;
+		case 2: ShowBuildIndustryWindow();   break;
 	}
 	return CBF_NONE;
 }
@@ -751,7 +755,7 @@ static CallBackFunction ToolbarZoomInClick(Window *w)
 {
 	if (DoZoomInOutWindow(ZOOM_IN, FindWindowById(WC_MAIN_WINDOW, 0))) {
 		w->HandleButtonClick((_game_mode == GM_EDITOR) ? (byte)WID_TE_ZOOM_IN : (byte)WID_TN_ZOOM_IN);
-		SndPlayFx(SND_15_BEEP);
+		if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	}
 	return CBF_NONE;
 }
@@ -762,7 +766,7 @@ static CallBackFunction ToolbarZoomOutClick(Window *w)
 {
 	if (DoZoomInOutWindow(ZOOM_OUT, FindWindowById(WC_MAIN_WINDOW, 0))) {
 		w->HandleButtonClick((_game_mode == GM_EDITOR) ? (byte)WID_TE_ZOOM_OUT : (byte)WID_TN_ZOOM_OUT);
-		SndPlayFx(SND_15_BEEP);
+		if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	}
 	return CBF_NONE;
 }
@@ -772,7 +776,7 @@ static CallBackFunction ToolbarZoomOutClick(Window *w)
 static CallBackFunction ToolbarBuildRailClick(Window *w)
 {
 	ShowDropDownList(w, GetRailTypeDropDownList(), _last_built_railtype, WID_TN_RAILS, 140, true, true);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
 
@@ -809,7 +813,7 @@ static CallBackFunction ToolbarBuildRoadClick(Window *w)
 		break;
 	}
 	ShowDropDownList(w, list, _last_built_roadtype, WID_TN_ROADS, 140, true, true);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
 
@@ -914,7 +918,7 @@ static CallBackFunction MenuClickMusicWindow(int index)
 
 static CallBackFunction ToolbarNewspaperClick(Window *w)
 {
-	PopupMainToolbMenu(w, WID_TN_MESSAGES, STR_NEWS_MENU_LAST_MESSAGE_NEWS_REPORT, 3);
+	PopupMainToolbMenu(w, WID_TN_MESSAGES, STR_NEWS_MENU_LAST_MESSAGE_NEWS_REPORT, 2);
 	return CBF_NONE;
 }
 
@@ -928,8 +932,7 @@ static CallBackFunction MenuClickNewspaper(int index)
 {
 	switch (index) {
 		case 0: ShowLastNewsMessage(); break;
-		case 1: ShowMessageOptions();  break;
-		case 2: ShowMessageHistory();  break;
+		case 1: ShowMessageHistory();  break;
 	}
 	return CBF_NONE;
 }
@@ -958,19 +961,35 @@ static void MenuClickSmallScreenshot()
 	MakeScreenshot(SC_VIEWPORT, NULL);
 }
 
-static void MenuClickZoomedInScreenshot()
+/**
+ * Callback on the confirmation window for huge screenshots.
+ * @param w Window with viewport
+ * @param confirmed true on confirmation
+ */
+static void ScreenshotConfirmCallback(Window *w, bool confirmed)
 {
-	MakeScreenshot(SC_ZOOMEDIN, NULL);
+	if (confirmed) MakeScreenshot(_confirmed_screenshot_type, NULL);
 }
 
-static void MenuClickDefaultZoomScreenshot()
+/**
+ * Make a screenshot of the world.
+ * Ask for confirmation if the screenshot will be huge.
+ * @param t Screenshot type: World or viewport screenshot
+ */
+static void MenuClickLargeWorldScreenshot(ScreenshotType t)
 {
-	MakeScreenshot(SC_DEFAULTZOOM, NULL);
-}
-
-static void MenuClickWorldScreenshot()
-{
-	MakeScreenshot(SC_WORLD, NULL);
+	ViewPort vp;
+	SetupScreenshotViewport(t, &vp);
+	if (vp.width * vp.height > 8192 * 8192) {
+		/* Ask for confirmation */
+		SetDParam(0, vp.width);
+		SetDParam(1, vp.height);
+		_confirmed_screenshot_type = t;
+		ShowQuery(STR_WARNING_SCREENSHOT_SIZE_CAPTION, STR_WARNING_SCREENSHOT_SIZE_MESSAGE, NULL, ScreenshotConfirmCallback);
+	} else {
+		/* Less than 4M pixels, just do it */
+		MakeScreenshot(t, NULL);
+	}
 }
 
 /**
@@ -1019,9 +1038,9 @@ static CallBackFunction MenuClickHelp(int index)
 		case  2: IConsoleSwitch();                 break;
 		case  3: ShowAIDebugWindow();              break;
 		case  4: MenuClickSmallScreenshot();       break;
-		case  5: MenuClickZoomedInScreenshot();    break;
-		case  6: MenuClickDefaultZoomScreenshot(); break;
-		case  7: MenuClickWorldScreenshot();       break;
+		case  5: MenuClickLargeWorldScreenshot(SC_ZOOMEDIN);    break;
+		case  6: MenuClickLargeWorldScreenshot(SC_DEFAULTZOOM); break;
+		case  7: MenuClickLargeWorldScreenshot(SC_WORLD);       break;
 		case  8: ShowAboutWindow();                break;
 		case  9: ShowSpriteAlignerWindow();        break;
 		case 10: ToggleBoundingBoxes();            break;
@@ -1042,7 +1061,7 @@ static CallBackFunction ToolbarSwitchClick(Window *w)
 
 	w->ReInit();
 	w->SetWidgetLoweredState(WID_TN_SWITCH_BAR, _toolbar_mode == TB_LOWER);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return CBF_NONE;
 }
 
@@ -1090,7 +1109,7 @@ static CallBackFunction ToolbarScenDateForward(Window *w)
 static CallBackFunction ToolbarScenGenLand(Window *w)
 {
 	w->HandleButtonClick(WID_TE_LAND_GENERATE);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 
 	ShowEditorTerraformToolbar();
 	return CBF_NONE;
@@ -1100,7 +1119,7 @@ static CallBackFunction ToolbarScenGenLand(Window *w)
 static CallBackFunction ToolbarScenGenTown(Window *w)
 {
 	w->HandleButtonClick(WID_TE_TOWN_GENERATE);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	ShowFoundTownWindow();
 	return CBF_NONE;
 }
@@ -1108,7 +1127,7 @@ static CallBackFunction ToolbarScenGenTown(Window *w)
 static CallBackFunction ToolbarScenGenIndustry(Window *w)
 {
 	w->HandleButtonClick(WID_TE_INDUSTRY);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	ShowBuildIndustryWindow();
 	return CBF_NONE;
 }
@@ -1116,7 +1135,7 @@ static CallBackFunction ToolbarScenGenIndustry(Window *w)
 static CallBackFunction ToolbarScenBuildRoad(Window *w)
 {
 	w->HandleButtonClick(WID_TE_ROADS);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	ShowBuildRoadScenToolbar();
 	return CBF_NONE;
 }
@@ -1124,7 +1143,7 @@ static CallBackFunction ToolbarScenBuildRoad(Window *w)
 static CallBackFunction ToolbarScenBuildDocks(Window *w)
 {
 	w->HandleButtonClick(WID_TE_WATER);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	ShowBuildDocksScenToolbar();
 	return CBF_NONE;
 }
@@ -1132,7 +1151,7 @@ static CallBackFunction ToolbarScenBuildDocks(Window *w)
 static CallBackFunction ToolbarScenPlantTrees(Window *w)
 {
 	w->HandleButtonClick(WID_TE_TREES);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	ShowBuildTreesToolbar();
 	return CBF_NONE;
 }
@@ -1140,7 +1159,7 @@ static CallBackFunction ToolbarScenPlantTrees(Window *w)
 static CallBackFunction ToolbarScenPlaceSign(Window *w)
 {
 	w->HandleButtonClick(WID_TE_SIGNS);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	return SelectSignTool();
 }
 
@@ -1599,9 +1618,9 @@ struct MainToolbarWindow : Window {
 			case MTHK_MUSIC: ShowMusicWindow(); break;
 			case MTHK_AI_DEBUG: ShowAIDebugWindow(); break;
 			case MTHK_SMALL_SCREENSHOT: MenuClickSmallScreenshot(); break;
-			case MTHK_ZOOMEDIN_SCREENSHOT: MenuClickZoomedInScreenshot(); break;
-			case MTHK_DEFAULTZOOM_SCREENSHOT: MenuClickDefaultZoomScreenshot(); break;
-			case MTHK_GIANT_SCREENSHOT: MenuClickWorldScreenshot(); break;
+			case MTHK_ZOOMEDIN_SCREENSHOT: MenuClickLargeWorldScreenshot(SC_ZOOMEDIN); break;
+			case MTHK_DEFAULTZOOM_SCREENSHOT: MenuClickLargeWorldScreenshot(SC_DEFAULTZOOM); break;
+			case MTHK_GIANT_SCREENSHOT: MenuClickLargeWorldScreenshot(SC_WORLD); break;
 			case MTHK_CHEATS: if (!_networking) ShowCheatWindow(); break;
 			case MTHK_TERRAFORM: ShowTerraformToolbar(); break;
 			case MTHK_EXTRA_VIEWPORT: ShowExtraViewPortWindowForTileUnderCursor(); break;
@@ -1903,7 +1922,7 @@ struct ScenarioEditorToolbarWindow : Window {
 		if (widget == WID_TE_SMALL_MAP) widget = WID_TN_SMALL_MAP;
 		CallBackFunction cbf = _menu_clicked_procs[widget](index);
 		if (cbf != CBF_NONE) this->last_started_action = cbf;
-		SndPlayFx(SND_15_BEEP);
+		if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 	}
 
 	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
@@ -1924,9 +1943,9 @@ struct ScenarioEditorToolbarWindow : Window {
 			case MTEHK_MUSIC:                  ShowMusicWindow(); break;
 			case MTEHK_LANDINFO:               cbf = PlaceLandBlockInfo(); break;
 			case MTEHK_SMALL_SCREENSHOT:       MenuClickSmallScreenshot(); break;
-			case MTEHK_ZOOMEDIN_SCREENSHOT:    MenuClickZoomedInScreenshot(); break;
-			case MTEHK_DEFAULTZOOM_SCREENSHOT: MenuClickDefaultZoomScreenshot(); break;
-			case MTEHK_GIANT_SCREENSHOT:       MenuClickWorldScreenshot(); break;
+			case MTEHK_ZOOMEDIN_SCREENSHOT:    MenuClickLargeWorldScreenshot(SC_ZOOMEDIN); break;
+			case MTEHK_DEFAULTZOOM_SCREENSHOT: MenuClickLargeWorldScreenshot(SC_DEFAULTZOOM); break;
+			case MTEHK_GIANT_SCREENSHOT:       MenuClickLargeWorldScreenshot(SC_WORLD); break;
 			case MTEHK_ZOOM_IN:                ToolbarZoomInClick(this); break;
 			case MTEHK_ZOOM_OUT:               ToolbarZoomOutClick(this); break;
 			case MTEHK_TERRAFORM:              ShowEditorTerraformToolbar(); break;
@@ -2078,7 +2097,7 @@ static const NWidgetPart _nested_toolb_scen_widgets[] = {
 static WindowDesc _toolb_scen_desc(
 	WDP_MANUAL, 640, 22,
 	WC_MAIN_TOOLBAR, WC_NONE,
-	WDF_UNCLICK_BUTTONS | WDF_NO_FOCUS,
+	WDF_NO_FOCUS,
 	_nested_toolb_scen_widgets, lengthof(_nested_toolb_scen_widgets)
 );
 

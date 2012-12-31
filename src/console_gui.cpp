@@ -10,7 +10,7 @@
 /** @file console_gui.cpp Handling the GUI of the in-game console. */
 
 #include "stdafx.h"
-#include "textbuf_gui.h"
+#include "textbuf_type.h"
 #include "window_gui.h"
 #include "console_gui.h"
 #include "console_internal.h"
@@ -126,7 +126,7 @@ struct IConsoleLine {
 
 
 /* ** main console cmd buffer ** */
-static Textbuf _iconsole_cmdline;
+static Textbuf _iconsole_cmdline(ICON_CMDLN_SIZE);
 static char *_iconsole_history[ICON_HISTORY_SIZE];
 static int _iconsole_historypos;
 IConsoleModes _iconsole_mode;
@@ -233,7 +233,7 @@ struct IConsoleWindow : Window
 
 	virtual void OnMouseLoop()
 	{
-		if (HandleCaret(&_iconsole_cmdline)) this->SetDirty();
+		if (_iconsole_cmdline.HandleCaret()) this->SetDirty();
 	}
 
 	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
@@ -294,7 +294,7 @@ struct IConsoleWindow : Window
 			case (WKC_META | 'V'):
 #endif
 			case (WKC_CTRL | 'V'):
-				if (InsertTextBufferClipboard(&_iconsole_cmdline)) {
+				if (_iconsole_cmdline.InsertClipboard()) {
 					IConsoleResetHistoryPos();
 					this->SetDirty();
 				}
@@ -308,19 +308,19 @@ struct IConsoleWindow : Window
 			case (WKC_META | 'U'):
 #endif
 			case (WKC_CTRL | 'U'):
-				DeleteTextBufferAll(&_iconsole_cmdline);
+				_iconsole_cmdline.DeleteAll();
 				this->SetDirty();
 				break;
 
 			case WKC_BACKSPACE: case WKC_DELETE:
-				if (DeleteTextBufferChar(&_iconsole_cmdline, keycode)) {
+				if (_iconsole_cmdline.DeleteChar(keycode)) {
 					IConsoleResetHistoryPos();
 					this->SetDirty();
 				}
 				break;
 
 			case WKC_LEFT: case WKC_RIGHT: case WKC_END: case WKC_HOME:
-				if (MoveTextBufferPos(&_iconsole_cmdline, keycode)) {
+				if (_iconsole_cmdline.MovePos(keycode)) {
 					IConsoleResetHistoryPos();
 					this->SetDirty();
 				}
@@ -329,7 +329,7 @@ struct IConsoleWindow : Window
 			default:
 				if (IsValidChar(key, CS_ALPHANUMERAL)) {
 					IConsoleWindow::scroll = 0;
-					InsertTextBufferChar(&_iconsole_cmdline, key);
+					_iconsole_cmdline.InsertChar(key);
 					IConsoleResetHistoryPos();
 					this->SetDirty();
 				} else {
@@ -356,10 +356,6 @@ void IConsoleGUIInit()
 	IConsoleLine::Reset();
 	memset(_iconsole_history, 0, sizeof(_iconsole_history));
 
-	_iconsole_cmdline.buf = CallocT<char>(ICON_CMDLN_SIZE); // create buffer and zero it
-	_iconsole_cmdline.max_bytes = ICON_CMDLN_SIZE;
-	_iconsole_cmdline.max_chars = ICON_CMDLN_SIZE;
-
 	IConsolePrintF(CC_WARNING, "OpenTTD Game Console Revision 7 - %s", _openttd_revision);
 	IConsolePrint(CC_WHITE,  "------------------------------------");
 	IConsolePrint(CC_WHITE,  "use \"help\" for more information");
@@ -374,7 +370,6 @@ void IConsoleClearBuffer()
 
 void IConsoleGUIFree()
 {
-	free(_iconsole_cmdline.buf);
 	IConsoleClearBuffer();
 }
 
@@ -456,11 +451,10 @@ static void IConsoleHistoryNavigate(int direction)
 	if (direction > 0 && _iconsole_history[_iconsole_historypos] == NULL) _iconsole_historypos--;
 
 	if (_iconsole_historypos == -1) {
-		*_iconsole_cmdline.buf = '\0';
+		_iconsole_cmdline.DeleteAll();
 	} else {
-		ttd_strlcpy(_iconsole_cmdline.buf, _iconsole_history[_iconsole_historypos], _iconsole_cmdline.max_bytes);
+		_iconsole_cmdline.Assign(_iconsole_history[_iconsole_historypos]);
 	}
-	UpdateTextBufferSize(&_iconsole_cmdline);
 }
 
 /**

@@ -215,7 +215,7 @@ struct TimetableWindow : Window {
 	{
 		switch (widget) {
 			case WID_VT_ARRIVAL_DEPARTURE_PANEL:
-				SetDParam(0, MAX_YEAR * DAYS_IN_YEAR);
+				SetDParamMaxValue(0, MAX_YEAR * DAYS_IN_YEAR);
 				this->deparr_time_width = GetStringBoundingBox(STR_JUST_DATE_TINY).width;
 				this->deparr_abbr_width = max(GetStringBoundingBox(STR_TIMETABLE_ARRIVAL_ABBREVIATION).width, GetStringBoundingBox(STR_TIMETABLE_DEPARTURE_ABBREVIATION).width);
 				size->width = WD_FRAMERECT_LEFT + this->deparr_abbr_width + 10 + this->deparr_time_width + WD_FRAMERECT_RIGHT;
@@ -251,12 +251,12 @@ struct TimetableWindow : Window {
 	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
 	{
 		switch (data) {
-			case -666:
+			case VIWD_AUTOREPLACE:
 				/* Autoreplace replaced the vehicle */
 				this->vehicle = Vehicle::Get(this->window_number);
 				break;
 
-			case -1:
+			case VIWD_REMOVE_ALL_ORDERS:
 				/* Removed / replaced all orders (after deleting / sharing) */
 				if (this->sel_index == -1) break;
 
@@ -264,7 +264,7 @@ struct TimetableWindow : Window {
 				this->sel_index = -1;
 				break;
 
-			case -2:
+			case VIWD_MODIFY_ORDERS:
 				if (!gui_scope) break;
 				this->UpdateSelectionStates();
 				this->ReInit();
@@ -399,8 +399,8 @@ struct TimetableWindow : Window {
 				bool final_order = false;
 
 				bool rtl = _current_text_dir == TD_RTL;
-				SetDParam(0, 99);
-				int index_column_width = GetStringBoundingBox(STR_ORDER_INDEX).width + GetSpriteSize(rtl ? SPR_ARROW_RIGHT : SPR_ARROW_LEFT).width + 3;
+				SetDParamMaxValue(0, v->GetNumOrders(), 2);
+				int index_column_width = GetStringBoundingBox(STR_ORDER_INDEX).width + 2 * GetSpriteSize(rtl ? SPR_ARROW_RIGHT : SPR_ARROW_LEFT).width + 3;
 				int middle = rtl ? r.right - WD_FRAMERECT_RIGHT - index_column_width : r.left + WD_FRAMERECT_LEFT + index_column_width;
 
 				const Order *order = v->GetOrder(order_id);
@@ -857,7 +857,7 @@ static const NWidgetPart _nested_timetable_widgets[] = {
 static const WindowDesc _timetable_desc(
 	WDP_AUTO, 400, 130,
 	WC_VEHICLE_TIMETABLE, WC_VEHICLE_VIEW,
-	WDF_UNCLICK_BUTTONS | WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION,
 	_nested_timetable_widgets, lengthof(_nested_timetable_widgets)
 );
 

@@ -534,7 +534,7 @@ struct RefitWindow : public Window {
 			if (this->sel == -1) this->vscroll->ScrollTowards(0);
 		} else {
 			/* Rebuild the refit list */
-			this->OnInvalidateData(0);
+			this->OnInvalidateData(VIWD_CONSIST_CHANGED);
 		}
 	}
 
@@ -600,14 +600,25 @@ struct RefitWindow : public Window {
 		SetDParam(0, option->cargo);
 		SetDParam(1, _returned_refit_capacity);
 
+		Money money = cost.GetCost();
 		if (_returned_mail_refit_capacity > 0) {
 			SetDParam(2, CT_MAIL);
 			SetDParam(3, _returned_mail_refit_capacity);
-			SetDParam(4, cost.GetCost());
-			return STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT;
+			if (money <= 0) {
+				SetDParam(4, -money);
+				return STR_REFIT_NEW_CAPACITY_INCOME_FROM_AIRCRAFT_REFIT;
+			} else {
+				SetDParam(4, money);
+				return STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT;
+			}
 		} else {
-			SetDParam(2, cost.GetCost());
-			return STR_REFIT_NEW_CAPACITY_COST_OF_REFIT;
+			if (money <= 0) {
+				SetDParam(2, -money);
+				return STR_REFIT_NEW_CAPACITY_INCOME_FROM_REFIT;
+			} else {
+				SetDParam(2, money);
+				return STR_REFIT_NEW_CAPACITY_COST_OF_REFIT;
+			}
 		}
 	}
 
@@ -696,8 +707,8 @@ struct RefitWindow : public Window {
 	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
 	{
 		switch (data) {
-			case -666: // Autoreplace replaced the vehicle; selected_vehicle became invalid.
-			case 0: { // The consist has changed; rebuild the entire list.
+			case VIWD_AUTOREPLACE: // Autoreplace replaced the vehicle; selected_vehicle became invalid.
+			case VIWD_CONSIST_CHANGED: { // The consist has changed; rebuild the entire list.
 				/* Clear the selection. */
 				Vehicle *v = Vehicle::Get(this->window_number);
 				this->selected_vehicle = v->index;
@@ -906,7 +917,7 @@ static const NWidgetPart _nested_vehicle_refit_widgets[] = {
 static const WindowDesc _vehicle_refit_desc(
 	WDP_AUTO, 240, 174,
 	WC_VEHICLE_REFIT, WC_VEHICLE_VIEW,
-	WDF_UNCLICK_BUTTONS | WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION,
 	_nested_vehicle_refit_widgets, lengthof(_nested_vehicle_refit_widgets)
 );
 
@@ -1116,7 +1127,7 @@ static inline void ChangeVehicleWindow(WindowClass window_class, VehicleID from_
 		}
 
 		/* Notify the window. */
-		w->InvalidateData(-666, false);
+		w->InvalidateData(VIWD_AUTOREPLACE, false);
 	}
 }
 
@@ -1159,13 +1170,13 @@ static const NWidgetPart _nested_vehicle_list[] = {
 			NWidget(NWID_HORIZONTAL),
 				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_VL_AVAILABLE_VEHICLES), SetMinimalSize(106, 12), SetFill(0, 1),
 								SetDataTip(STR_BLACK_STRING, STR_VEHICLE_LIST_AVAILABLE_ENGINES_TOOLTIP),
+				NWidget(WWT_PANEL, COLOUR_GREY), SetMinimalSize(0, 12), SetResize(1, 0), SetFill(1, 1), EndContainer(),
 				NWidget(WWT_DROPDOWN, COLOUR_GREY, WID_VL_MANAGE_VEHICLES_DROPDOWN), SetMinimalSize(118, 12), SetFill(0, 1),
 								SetDataTip(STR_VEHICLE_LIST_MANAGE_LIST, STR_VEHICLE_LIST_MANAGE_LIST_TOOLTIP),
 				NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_VL_STOP_ALL), SetMinimalSize(12, 12), SetFill(0, 1),
 								SetDataTip(SPR_FLAG_VEH_STOPPED, STR_VEHICLE_LIST_MASS_STOP_LIST_TOOLTIP),
 				NWidget(WWT_PUSHIMGBTN, COLOUR_GREY, WID_VL_START_ALL), SetMinimalSize(12, 12), SetFill(0, 1),
 								SetDataTip(SPR_FLAG_VEH_RUNNING, STR_VEHICLE_LIST_MASS_START_LIST_TOOLTIP),
-				NWidget(WWT_PANEL, COLOUR_GREY), SetMinimalSize(0, 12), SetResize(1, 0), SetFill(1, 1), EndContainer(),
 			EndContainer(),
 			/* Widget to be shown for other companies hiding the previous 5 widgets. */
 			NWidget(WWT_PANEL, COLOUR_GREY), SetFill(1, 1), SetResize(1, 0), EndContainer(),
@@ -1292,7 +1303,7 @@ void BaseVehicleListWindow::DrawVehicleListItems(VehicleID selected_vehicle, int
 
 		if (show_orderlist) DrawSmallOrderList(v, orderlist_left, orderlist_right, y, v->cur_real_order_index);
 
-		if (v->IsInDepot()) {
+		if (v->IsChainInDepot()) {
 			str = STR_BLUE_COMMA;
 		} else {
 			str = (v->age > v->max_age - DAYS_IN_LEAP_YEAR) ? STR_RED_COMMA : STR_BLACK_COMMA;
@@ -1358,7 +1369,7 @@ public:
 		}
 
 		this->FinishInitNested(desc, window_number);
-		this->owner = this->vli.company;
+		if (this->vli.company != OWNER_NONE) this->owner = this->vli.company;
 
 		if (this->vli.vtype == VEH_TRAIN) ResizeWindow(this, 65, 0);
 	}
@@ -1544,7 +1555,7 @@ public:
 
 				switch (index) {
 					case ADI_REPLACE: // Replace window
-						ShowReplaceGroupVehicleWindow(DEFAULT_GROUP, this->vli.vtype);
+						ShowReplaceGroupVehicleWindow(ALL_GROUP, this->vli.vtype);
 						break;
 					case ADI_SERVICE: // Send for servicing
 					case ADI_DEPOT: // Send to Depots
@@ -1603,13 +1614,13 @@ public:
 static WindowDesc _vehicle_list_desc(
 	WDP_AUTO, 260, 246,
 	WC_INVALID, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_vehicle_list, lengthof(_nested_vehicle_list)
 );
 
 static void ShowVehicleListWindowLocal(CompanyID company, VehicleListType vlt, VehicleType vehicle_type, uint16 unique_number)
 {
-	if (!Company::IsValidID(company)) return;
+	if (!Company::IsValidID(company) && company != OWNER_NONE) return;
 
 	_vehicle_list_desc.cls = GetWindowClassForVehicleType(vehicle_type);
 	AllocateWindowDescFront<VehicleListWindow>(&_vehicle_list_desc, VehicleListIdentifier(vlt, vehicle_type, company, unique_number).Pack());
@@ -1636,15 +1647,7 @@ void ShowVehicleListWindow(const Vehicle *v)
 
 void ShowVehicleListWindow(CompanyID company, VehicleType vehicle_type, StationID station)
 {
-	if (!Company::IsValidID(company)) {
-		company = _local_company;
-		/* This can happen when opening the vehicle list as a spectator. */
-		if (!Company::IsValidID(company)) return;
-		_vehicle_list_desc.flags |= WDF_CONSTRUCTION;
-	} else {
-		_vehicle_list_desc.flags &= ~WDF_CONSTRUCTION;
-	}
-
+	_vehicle_list_desc.flags &= ~WDF_CONSTRUCTION;
 	ShowVehicleListWindowLocal(company, VL_STATION_LIST, vehicle_type, station);
 }
 
@@ -1757,7 +1760,7 @@ struct VehicleDetailsWindow : Window {
 	 */
 	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
 	{
-		if (data == -666) {
+		if (data == VIWD_AUTOREPLACE) {
 			/* Autoreplace replaced the vehicle.
 			 * Nothing to do for this window. */
 			return;
@@ -1802,7 +1805,7 @@ struct VehicleDetailsWindow : Window {
 				Dimension dim = { 0, 0 };
 				size->height = WD_FRAMERECT_TOP + 4 * FONT_HEIGHT_NORMAL + WD_FRAMERECT_BOTTOM;
 
-				for (uint i = 0; i < 4; i++) SetDParam(i, INT16_MAX);
+				for (uint i = 0; i < 4; i++) SetDParamMaxValue(i, INT16_MAX);
 				static const StringID info_strings[] = {
 					STR_VEHICLE_INFO_MAX_SPEED,
 					STR_VEHICLE_INFO_WEIGHT_POWER_MAX_SPEED,
@@ -1846,8 +1849,8 @@ struct VehicleDetailsWindow : Window {
 				break;
 
 			case WID_VD_SERVICING_INTERVAL:
-				SetDParam(0, 9999); // Roughly the maximum interval
-				SetDParam(1, MAX_YEAR * DAYS_IN_YEAR); // Roughly the maximum year
+				SetDParamMaxValue(0, MAX_SERVINT_DAYS); // Roughly the maximum interval
+				SetDParamMaxValue(1, MAX_YEAR * DAYS_IN_YEAR); // Roughly the maximum year
 				size->width = max(GetStringBoundingBox(STR_VEHICLE_DETAILS_SERVICING_INTERVAL_PERCENT).width, GetStringBoundingBox(STR_VEHICLE_DETAILS_SERVICING_INTERVAL_DAYS).width) + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;
 				size->height = WD_FRAMERECT_TOP + FONT_HEIGHT_NORMAL + WD_FRAMERECT_BOTTOM;
 				break;
@@ -2070,7 +2073,7 @@ struct VehicleDetailsWindow : Window {
 static const WindowDesc _train_vehicle_details_desc(
 	WDP_AUTO, 405, 178,
 	WC_VEHICLE_DETAILS, WC_VEHICLE_VIEW,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_train_vehicle_details_widgets, lengthof(_nested_train_vehicle_details_widgets)
 );
 
@@ -2078,7 +2081,7 @@ static const WindowDesc _train_vehicle_details_desc(
 static const WindowDesc _nontrain_vehicle_details_desc(
 	WDP_AUTO, 405, 113,
 	WC_VEHICLE_DETAILS, WC_VEHICLE_VIEW,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_nontrain_vehicle_details_widgets, lengthof(_nested_nontrain_vehicle_details_widgets)
 );
 
@@ -2137,7 +2140,7 @@ static const NWidgetPart _nested_vehicle_view_widgets[] = {
 static const WindowDesc _vehicle_view_desc(
 	WDP_AUTO, 250, 116,
 	WC_VEHICLE_VIEW, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_vehicle_view_widgets, lengthof(_nested_vehicle_view_widgets)
 );
 
@@ -2148,7 +2151,7 @@ static const WindowDesc _vehicle_view_desc(
 static const WindowDesc _train_view_desc(
 	WDP_AUTO, 250, 134,
 	WC_VEHICLE_VIEW, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_vehicle_view_widgets, lengthof(_nested_vehicle_view_widgets)
 );
 
@@ -2522,9 +2525,13 @@ public:
 				ShowVehicleDetailsWindow(v);
 				break;
 			case WID_VV_CLONE: // clone vehicle
+				/* Suppress the vehicle GUI when share-cloning.
+				 * There is no point to it except for starting the vehicle.
+				 * For starting the vehicle the player has to open the depot GUI, which is
+				 * most likely already open, but is also visible in the vehicle viewport. */
 				DoCommandP(v->tile, v->index, _ctrl_pressed ? 1 : 0,
 										_vehicle_command_translation_table[VCT_CMD_CLONE_VEH][v->type],
-										CcCloneVehicle);
+										_ctrl_pressed ? NULL : CcCloneVehicle);
 				break;
 			case WID_VV_TURN_AROUND: // turn around
 				assert(v->IsGroundVehicle());
@@ -2578,7 +2585,7 @@ public:
 	 */
 	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
 	{
-		if (data == -666) {
+		if (data == VIWD_AUTOREPLACE) {
 			/* Autoreplace replaced the vehicle.
 			 * Nothing to do for this window. */
 			return;

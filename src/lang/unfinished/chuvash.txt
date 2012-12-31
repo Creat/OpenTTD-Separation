@@ -428,15 +428,7 @@ STR_STATUSBAR_SAVING_GAME                                       :{RED}*  *  ВӐ
 # News message history
 STR_MESSAGE_NEWS_FORMAT                                         :{STRING}  -  {STRING}
 
-# Message settings window
 STR_NEWS_MESSAGE_CAPTION                                        :{WHITE}Пӗлтерӳ
-STR_NEWS_MESSAGE_OPTIONS_CAPTION                                :{WHITE}Майлаштару пӗлтерӗвӗ
-STR_NEWS_MESSAGES_OFF                                           :Сӳнтер
-STR_NEWS_MESSAGES_SUMMARY                                       :Кӗске
-STR_NEWS_MESSAGES_FULL                                          :Тулли
-
-STR_NEWS_MESSAGE_TYPE_SUBSIDIES                                 :{YELLOW}Грантсем
-
 
 
 
@@ -521,21 +513,6 @@ STR_CURRENCY_SUFFIX                                             :{LTBLUE}Суф�
 
 STR_CURRENCY_PREVIEW                                            :{LTBLUE}Малтанласа пӑхса тухни: {ORANGE}{CURRENCY_LONG}
 
-# Difficulty level window
-
-############ range for difficulty levels starts
-STR_DIFFICULTY_LEVEL_EASY                                       :{BLACK}Ҫӑмӑл
-STR_DIFFICULTY_LEVEL_MEDIUM                                     :{BLACK}Вӑтам
-STR_DIFFICULTY_LEVEL_HARD                                       :{BLACK}Йывӑр
-STR_DIFFICULTY_LEVEL_CUSTOM                                     :{BLACK}Харпӑр хӑй
-############ range for difficulty levels ends
-
-STR_DIFFICULTY_LEVEL_SAVE                                       :{BLACK}Упра
-
-############ range for difficulty settings starts
-STR_DIFFICULTY_LEVEL_SETTING_ECONOMY                            :{LTBLUE}Экономика: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_DISASTERS                          :{LTBLUE}Инкек: {ORANGE}{STRING}
-############ range for difficulty settings ends
 
 STR_NONE                                                        :Ҫук
 STR_NUM_CUSTOM                                                  :Харпӑр хӑй
@@ -558,9 +535,9 @@ STR_SUBSIDY_X4                                                  :x4
 
 
 
-
-
 # Advanced settings window
+
+
 
 STR_CONFIG_SETTING_OFF                                          :Сӳнтер
 STR_CONFIG_SETTING_ON                                           :Ҫут
@@ -576,10 +553,11 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_LEFT                          :Сулахай�
 STR_CONFIG_SETTING_HORIZONTAL_POS_CENTER                        :Варринче
 STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Сылтӑмра
 
+
 STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NONE        :ҫук
 STR_CONFIG_SETTING_PLANE_CRASHES_NONE                           :ҫук
 
-STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :{LTBLUE}Аэропорт кивел мар: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :Аэропорт кивел мар: {STRING}
 
 
 STR_CONFIG_SETTING_LAND_GENERATOR_ORIGINAL                      :Чӑн
@@ -603,6 +581,14 @@ STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :ISO (2008-12-31
 
 
 
+
+
+
+STR_CONFIG_SETTING_NEWS_SUBSIDIES                               :Грантсем: {STRING}
+
+STR_CONFIG_SETTING_NEWS_MESSAGES_OFF                            :Сӳнтер
+STR_CONFIG_SETTING_NEWS_MESSAGES_SUMMARY                        :Кӗске
+STR_CONFIG_SETTING_NEWS_MESSAGES_FULL                           :Тулли
 
 
 STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :чӑн
@@ -1021,7 +1007,6 @@ STR_NEWGRF_LIST_NONE                                            :Ҫук
 # NewGRF scanning window
 
 # Sign list window
-STR_SIGN_LIST_CLEAR                                             :{BLACK}Филтр тасат
 
 # Sign window
 
@@ -1060,10 +1045,12 @@ STR_STATION_VIEW_CAPTION                                        :{WHITE}{STATION
 STR_STATION_VIEW_WAITING_CARGO                                  :{WHITE}{CARGO_LONG}
 
 
+
 STR_STATION_VIEW_CARGO_RATING                                   :{WHITE}{STRING}: {YELLOW}{STRING} ({COMMA}%)
 
 ############ range for rating starts
 ############ range for rating ends
+
 
 
 
@@ -1265,7 +1252,7 @@ STR_AI_CONFIG_CHANGE_NONE                                       :
 
 # Available AIs window
 
-STR_AI_LIST_VERSION                                             :{BLACK}Верси: {NUM}
+STR_AI_LIST_VERSION                                             :{LTBLUE}Верси: {ORANGE}{NUM}
 
 
 # AI Parameters
@@ -1292,6 +1279,7 @@ STR_GAME_SAVELOAD_NOT_AVAILABLE                                 :<палӑ ма�
 # Soundset messages
 
 # Screenshot related messages
+
 STR_ERROR_SCREENSHOT_FAILED                                     :{WHITE}Ӑнӑҫсӑр экран сӑнӗ
 
 # Error message titles
@@ -1482,6 +1470,8 @@ STR_ORANGE_STRING                                               :{ORANGE}{STRING
 STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
+STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}
+STR_ORANGE_STRING1_LTBLUE                                       :{ORANGE}{STRING}{LTBLUE}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}
 STR_TINY_RIGHT_ARROW                                            :{TINY_FONT}{RIGHT_ARROW}

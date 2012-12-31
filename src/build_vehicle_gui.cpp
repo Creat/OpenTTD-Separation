@@ -43,7 +43,7 @@
  */
 uint GetEngineListHeight(VehicleType type)
 {
-	return max<uint>(FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM, GetVehicleHeight(type));
+	return max<uint>(FONT_HEIGHT_NORMAL + WD_MATRIX_TOP + WD_MATRIX_BOTTOM, GetVehicleImageCellSize(type, EIT_PURCHASE).height);
 }
 
 static const NWidgetPart _nested_build_vehicle_widgets[] = {
@@ -99,7 +99,7 @@ static CargoID _last_filter_criteria[] = {CF_ANY, CF_ANY, CF_ANY, CF_ANY};
  */
 static int CDECL EngineNumberSorter(const EngineID *a, const EngineID *b)
 {
-	int r = ListPositionOfEngine(*a) - ListPositionOfEngine(*b);
+	int r = Engine::Get(*a)->list_position - Engine::Get(*b)->list_position;
 
 	return _internal_sort_order ? -r : r;
 }
@@ -516,7 +516,7 @@ static const StringID _sort_listing[][12] = {{
 static bool CDECL CargoFilter(const EngineID *eid, const CargoID cid)
 {
 	if (cid == CF_ANY) return true;
-	uint32 refit_mask = GetUnionOfArticulatedRefitMasks(*eid, true);
+	uint32 refit_mask = GetUnionOfArticulatedRefitMasks(*eid, true) & _standard_cargo_mask;
 	return (cid == CF_NONE ? refit_mask == 0 : HasBit(refit_mask, cid));
 }
 
@@ -871,27 +871,33 @@ int DrawVehiclePurchaseInfo(int left, int right, int y, EngineID engine_number)
  */
 void DrawEngineList(VehicleType type, int l, int r, int y, const GUIEngineList *eng_list, uint16 min, uint16 max, EngineID selected_id, bool show_count, GroupID selected_group)
 {
-	static const int sprite_widths[]  = { 60, 60, 76, 67 };
 	static const int sprite_y_offsets[] = { -1, -1, -2, -2 };
 
 	/* Obligatory sanity checks! */
-	assert((uint)type < lengthof(sprite_widths));
-	assert_compile(lengthof(sprite_y_offsets) == lengthof(sprite_widths));
 	assert(max <= eng_list->Length());
 
 	bool rtl = _current_text_dir == TD_RTL;
 	int step_size = GetEngineListHeight(type);
-	int sprite_width = sprite_widths[type];
+	int sprite_left  = GetVehicleImageCellSize(type, EIT_PURCHASE).extend_left;
+	int sprite_right = GetVehicleImageCellSize(type, EIT_PURCHASE).extend_right;
+	int sprite_width = sprite_left + sprite_right;
 
-	int sprite_x        = (rtl ? r - sprite_width / 2 : l + sprite_width / 2) - 1;
+	int sprite_x        = rtl ? r - sprite_right - 1 : l + sprite_left + 1;
 	int sprite_y_offset = sprite_y_offsets[type] + step_size / 2;
 
 	Dimension replace_icon = {0, 0};
-	if (show_count) replace_icon = GetSpriteSize(SPR_GROUP_REPLACE_ACTIVE);
+	int count_width = 0;
+	if (show_count) {
+		replace_icon = GetSpriteSize(SPR_GROUP_REPLACE_ACTIVE);
+		SetDParamMaxDigits(0, 3);
+		count_width = GetStringBoundingBox(STR_TINY_BLACK_COMA).width;
+	}
 
-	int text_left  = l + (rtl ? WD_FRAMERECT_LEFT + replace_icon.width : sprite_width);
-	int text_right = r - (rtl ? sprite_width : WD_FRAMERECT_RIGHT + replace_icon.width);
+	int text_left  = l + (rtl ? WD_FRAMERECT_LEFT + replace_icon.width + 8 + count_width : sprite_width + WD_FRAMETEXT_LEFT);
+	int text_right = r - (rtl ? sprite_width + WD_FRAMETEXT_RIGHT : WD_FRAMERECT_RIGHT + replace_icon.width + 8 + count_width);
 	int replace_icon_left = rtl ? l + WD_FRAMERECT_LEFT : r - WD_FRAMERECT_RIGHT - replace_icon.width;
+	int count_left = l;
+	int count_right = rtl ? text_left : r - WD_FRAMERECT_RIGHT - replace_icon.width - 8;
 
 	int normal_text_y_offset = (step_size - FONT_HEIGHT_NORMAL) / 2;
 	int small_text_y_offset  = step_size - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 1;
@@ -903,11 +909,11 @@ void DrawEngineList(VehicleType type, int l, int r, int y, const GUIEngineList *
 		const uint num_engines = GetGroupNumEngines(_local_company, selected_group, engine);
 
 		SetDParam(0, engine);
-		DrawString(text_left, text_right, y + normal_text_y_offset, STR_ENGINE_NAME, engine == selected_id ? TC_WHITE : TC_BLACK);
+		DrawString(text_left, text_right, y + normal_text_y_offset, STR_ENGINE_NAME, engine == selected_id ? TC_WHITE : TC_BLACK, SA_STRIP | (rtl ? SA_RIGHT : SA_LEFT));
 		DrawVehicleEngine(l, r, sprite_x, y + sprite_y_offset, engine, (show_count && num_engines == 0) ? PALETTE_CRASH : GetEnginePalette(engine, _local_company), EIT_PURCHASE);
 		if (show_count) {
 			SetDParam(0, num_engines);
-			DrawString(text_left, text_right, y + small_text_y_offset, STR_TINY_BLACK_COMA, TC_FROMSTRING, SA_RIGHT);
+			DrawString(count_left, count_right, y + small_text_y_offset, STR_TINY_BLACK_COMA, TC_FROMSTRING, SA_RIGHT | SA_FORCE);
 			if (EngineHasReplacementForCompany(Company::Get(_local_company), engine, selected_group)) DrawSprite(SPR_GROUP_REPLACE_ACTIVE, num_engines == 0 ? PALETTE_CRASH : PAL_NONE, replace_icon_left, y + replace_icon_y_offset);
 		}
 	}
@@ -1093,7 +1099,7 @@ struct BuildVehicleWindow : Window {
 
 		this->sel_engine = sel_id;
 
-		/* make engines first, and then wagons, sorted by ListPositionOfEngine() */
+		/* make engines first, and then wagons, sorted by selected sort_criteria */
 		_internal_sort_order = false;
 		EngList_Sort(&this->eng_list, TrainEnginesThenWagonsSorter);
 
@@ -1401,7 +1407,7 @@ struct BuildVehicleWindow : Window {
 static const WindowDesc _build_vehicle_desc(
 	WDP_AUTO, 240, 268,
 	WC_BUILD_VEHICLE, WC_NONE,
-	WDF_UNCLICK_BUTTONS | WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION,
 	_nested_build_vehicle_widgets, lengthof(_nested_build_vehicle_widgets)
 );
 

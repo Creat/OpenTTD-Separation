@@ -103,15 +103,15 @@ struct EndGameWindow : EndGameHighScoreBaseWindow {
 			}
 		}
 
-		/* In a network game show the endscores of the custom difficulty 'network' which is the last one
-		 * as well as generate a TOP5 of that game, and not an all-time top5. */
+		/* In a network game show the endscores of the custom difficulty 'network' which is
+		 * a TOP5 of that game, and not an all-time TOP5. */
 		if (_networking) {
-			this->window_number = lengthof(_highscore_table) - 1;
+			this->window_number = SP_MULTIPLAYER;
 			this->rank = SaveHighScoreValueNetwork();
 		} else {
 			/* in single player _local company is always valid */
 			const Company *c = Company::Get(_local_company);
-			this->window_number = _settings_game.difficulty.diff_level;
+			this->window_number = SP_CUSTOM;
 			this->rank = SaveHighScoreValue(c);
 		}
 
@@ -177,7 +177,6 @@ struct HighScoreWindow : EndGameHighScoreBaseWindow {
 		Point pt = this->GetTopLeft640x480();
 
 		SetDParam(0, ORIGINAL_END_YEAR);
-		SetDParam(1, this->window_number + STR_DIFFICULTY_LEVEL_EASY);
 		DrawStringMultiLine(pt.x + 70, pt.x + 570, pt.y, pt.y + 140, !_networking ? STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED : STR_HIGHSCORE_TOP_COMPANIES_NETWORK_GAME, TC_FROMSTRING, SA_CENTER);
 
 		/* Draw Highscore peepz */

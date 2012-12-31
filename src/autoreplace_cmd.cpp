@@ -357,11 +357,6 @@ static CommandCost CopyHeadSpecificThings(Vehicle *old_head, Vehicle *new_head, 
 
 	/* Last do those things which do never fail (resp. we do not care about), but which are not undo-able */
 	if (cost.Succeeded() && old_head != new_head && (flags & DC_EXEC) != 0) {
-		/* Copy vehicle name */
-		if (old_head->name != NULL) {
-			DoCommand(0, new_head->index, 0, DC_EXEC | DC_AUTOREPLACE, CMD_RENAME_VEHICLE, old_head->name);
-		}
-
 		/* Copy other things which cannot be copied by a command and which shall not stay resetted from the build vehicle command */
 		new_head->CopyVehicleConfigAndStatistics(old_head);
 
@@ -665,7 +660,7 @@ CommandCost CmdAutoreplaceVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1
 	CommandCost ret = CheckOwnership(v->owner);
 	if (ret.Failed()) return ret;
 
-	if (!v->IsInDepot()) return CMD_ERROR;
+	if (!v->IsChainInDepot()) return CMD_ERROR;
 	if (v->vehstatus & VS_CRASHED) return CMD_ERROR;
 
 	bool free_wagon = false;
@@ -702,7 +697,7 @@ CommandCost CmdAutoreplaceVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1
 		if (!was_stopped) cost.AddCost(CmdStartStopVehicle(v, true));
 		if (cost.Failed()) return cost;
 
-		assert(v->IsStoppedInDepot());
+		assert(free_wagon || v->IsStoppedInDepot());
 
 		/* We have to construct the new vehicle chain to test whether it is valid.
 		 * Vehicle construction needs random bits, so we have to save the random seeds
@@ -769,7 +764,10 @@ CommandCost CmdSetAutoReplace(TileIndex tile, DoCommandFlag flags, uint32 p1, ui
 		cost = RemoveEngineReplacementForCompany(c, old_engine_type, id_g, flags);
 	}
 
-	if (flags & DC_EXEC) GroupStatistics::UpdateAutoreplace(_current_company);
+	if (flags & DC_EXEC) {
+		GroupStatistics::UpdateAutoreplace(_current_company);
+		SetWindowClassesDirty(GetWindowClassForVehicleType(Engine::Get(old_engine_type)->type));
+	}
 	if ((flags & DC_EXEC) && IsLocalCompany()) InvalidateAutoreplaceWindow(old_engine_type, id_g);
 
 	return cost;

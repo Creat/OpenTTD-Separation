@@ -282,7 +282,7 @@ public:
 static const WindowDesc _town_authority_desc(
 	WDP_AUTO, 317, 222,
 	WC_TOWN_AUTHORITY, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_town_authority_widgets, lengthof(_nested_town_authority_widgets)
 );
 
@@ -552,7 +552,7 @@ static const NWidgetPart _nested_town_game_view_widgets[] = {
 static const WindowDesc _town_game_view_desc(
 	WDP_AUTO, 260, TownViewWindow::WID_TV_HEIGHT_NORMAL,
 	WC_TOWN_VIEW, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_town_game_view_widgets, lengthof(_nested_town_game_view_widgets)
 );
 
@@ -583,7 +583,7 @@ static const NWidgetPart _nested_town_editor_view_widgets[] = {
 static const WindowDesc _town_editor_view_desc(
 	WDP_AUTO, 260, TownViewWindow::WID_TV_HEIGHT_NORMAL,
 	WC_TOWN_VIEW, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_town_editor_view_widgets, lengthof(_nested_town_editor_view_widgets)
 );
 
@@ -780,7 +780,7 @@ public:
 					assert(t != NULL);
 
 					SetDParam(0, t->index);
-					SetDParam(1, 10000000); // 10^7
+					SetDParamMaxDigits(1, 8);
 					d = maxdim(d, GetStringBoundingBox(STR_TOWN_DIRECTORY_TOWN));
 				}
 				Dimension icon_size = GetSpriteSize(SPR_TOWN_RATING_GOOD);
@@ -794,7 +794,7 @@ public:
 				break;
 			}
 			case WID_TD_WORLD_POPULATION: {
-				SetDParam(0, 1000000000); // 10^9
+				SetDParamMaxDigits(0, 10);
 				Dimension d = GetStringBoundingBox(STR_TOWN_POPULATION);
 				d.width += padding.width;
 				d.height += padding.height;
@@ -888,7 +888,7 @@ GUITownList::SortFunction * const TownDirectoryWindow::sorter_funcs[] = {
 static const WindowDesc _town_directory_desc(
 	WDP_AUTO, 208, 202,
 	WC_TOWN_DIRECTORY, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_town_directory_widgets, lengthof(_nested_town_directory_widgets)
 );
 
@@ -902,7 +902,7 @@ void CcFoundTown(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2
 {
 	if (result.Failed()) return;
 
-	SndPlayTileFx(SND_1F_SPLAT, tile);
+	if (_settings_client.sound.confirm) SndPlayTileFx(SND_1F_SPLAT, tile);
 	if (!_settings_client.gui.persistent_buildingtools) ResetObjectToPlace();
 }
 
@@ -923,15 +923,15 @@ static const NWidgetPart _nested_found_town_widgets[] = {
 		NWidget(NWID_SPACER), SetMinimalSize(0, 2),
 		NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_TF_NEW_TOWN), SetMinimalSize(156, 12), SetFill(1, 0),
 										SetDataTip(STR_FOUND_TOWN_NEW_TOWN_BUTTON, STR_FOUND_TOWN_NEW_TOWN_TOOLTIP), SetPadding(0, 2, 1, 2),
-		NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_TF_RANDOM_TOWN), SetMinimalSize(156, 12), SetFill(1, 0),
+		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_TF_RANDOM_TOWN), SetMinimalSize(156, 12), SetFill(1, 0),
 										SetDataTip(STR_FOUND_TOWN_RANDOM_TOWN_BUTTON, STR_FOUND_TOWN_RANDOM_TOWN_TOOLTIP), SetPadding(0, 2, 1, 2),
-		NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_TF_MANY_RANDOM_TOWNS), SetMinimalSize(156, 12), SetFill(1, 0),
+		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_TF_MANY_RANDOM_TOWNS), SetMinimalSize(156, 12), SetFill(1, 0),
 										SetDataTip(STR_FOUND_TOWN_MANY_RANDOM_TOWNS, STR_FOUND_TOWN_RANDOM_TOWNS_TOOLTIP), SetPadding(0, 2, 0, 2),
 		/* Town name selection. */
 		NWidget(WWT_LABEL, COLOUR_DARK_GREEN), SetMinimalSize(156, 14), SetPadding(0, 2, 0, 2), SetDataTip(STR_FOUND_TOWN_NAME_TITLE, STR_NULL),
-		NWidget(WWT_EDITBOX, COLOUR_WHITE, WID_TF_TOWN_NAME_EDITBOX), SetMinimalSize(156, 12), SetPadding(0, 2, 3, 2),
+		NWidget(WWT_EDITBOX, COLOUR_GREY, WID_TF_TOWN_NAME_EDITBOX), SetMinimalSize(156, 12), SetPadding(0, 2, 3, 2),
 										SetDataTip(STR_FOUND_TOWN_NAME_EDITOR_TITLE, STR_FOUND_TOWN_NAME_EDITOR_HELP),
-		NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_TF_TOWN_NAME_RANDOM), SetMinimalSize(78, 12), SetPadding(0, 2, 0, 2), SetFill(1, 0),
+		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_TF_TOWN_NAME_RANDOM), SetMinimalSize(78, 12), SetPadding(0, 2, 0, 2), SetFill(1, 0),
 										SetDataTip(STR_FOUND_TOWN_NAME_RANDOM_BUTTON, STR_FOUND_TOWN_NAME_RANDOM_TOOLTIP),
 		/* Town size selection. */
 		NWidget(NWID_HORIZONTAL), SetPIP(2, 0, 2),
@@ -978,24 +978,25 @@ static const NWidgetPart _nested_found_town_widgets[] = {
 };
 
 /** Found a town window class. */
-struct FoundTownWindow : QueryStringBaseWindow {
+struct FoundTownWindow : Window {
 private:
 	TownSize town_size;     ///< Selected town size
 	TownLayout town_layout; ///< Selected town layout
 	bool city;              ///< Are we building a city?
+	QueryString townname_editbox; ///< Townname editbox
 	bool townnamevalid;     ///< Is generated town name valid?
 	uint32 townnameparts;   ///< Generated town name
 	TownNameParams params;  ///< Town name parameters
 
 public:
 	FoundTownWindow(const WindowDesc *desc, WindowNumber window_number) :
-			QueryStringBaseWindow(MAX_LENGTH_TOWN_NAME_CHARS * MAX_CHAR_LENGTH, MAX_LENGTH_TOWN_NAME_CHARS),
 			town_size(TSZ_MEDIUM),
 			town_layout(_settings_game.economy.town_layout),
+			townname_editbox(MAX_LENGTH_TOWN_NAME_CHARS * MAX_CHAR_LENGTH, MAX_LENGTH_TOWN_NAME_CHARS),
 			params(_settings_game.game_creation.town_name)
 	{
 		this->InitNested(desc, window_number);
-		InitializeTextBuffer(&this->text, this->edit_str_buf, this->edit_str_size, this->max_chars);
+		this->querystrings[WID_TF_TOWN_NAME_EDITBOX] = &this->townname_editbox;
 		this->RandomTownName();
 		this->UpdateButtons(true);
 	}
@@ -1005,11 +1006,11 @@ public:
 		this->townnamevalid = GenerateTownName(&this->townnameparts);
 
 		if (!this->townnamevalid) {
-			this->edit_str_buf[0] = '\0';
+			this->townname_editbox.text.DeleteAll();
 		} else {
-			GetTownName(this->edit_str_buf, &this->params, this->townnameparts, &this->edit_str_buf[this->edit_str_size - 1]);
+			GetTownName(this->townname_editbox.text.buf, &this->params, this->townnameparts, &this->townname_editbox.text.buf[this->townname_editbox.text.max_bytes - 1]);
+			this->townname_editbox.text.UpdateSize();
 		}
-		UpdateTextBufferSize(&this->text);
 		UpdateOSKOriginalText(this, WID_TF_TOWN_NAME_EDITBOX);
 
 		this->SetWidgetDirty(WID_TF_TOWN_NAME_EDITBOX);
@@ -1042,24 +1043,18 @@ public:
 		const char *name = NULL;
 
 		if (!this->townnamevalid) {
-			name = this->edit_str_buf;
+			name = this->townname_editbox.text.buf;
 		} else {
 			/* If user changed the name, send it */
 			char buf[MAX_LENGTH_TOWN_NAME_CHARS * MAX_CHAR_LENGTH];
 			GetTownName(buf, &this->params, this->townnameparts, lastof(buf));
-			if (strcmp(buf, this->edit_str_buf) != 0) name = this->edit_str_buf;
+			if (strcmp(buf, this->townname_editbox.text.buf) != 0) name = this->townname_editbox.text.buf;
 		}
 
 		bool success = DoCommandP(tile, this->town_size | this->city << 2 | this->town_layout << 3 | random << 6,
 				townnameparts, CMD_FOUND_TOWN | CMD_MSG(errstr), cc, name);
 
 		if (success) this->RandomTownName();
-	}
-
-	virtual void OnPaint()
-	{
-		this->DrawWidgets();
-		if (!this->IsShaded()) this->DrawEditBox(WID_TF_TOWN_NAME_EDITBOX);
 	}
 
 	virtual void OnClick(Point pt, int widget, int click_count)
@@ -1070,7 +1065,6 @@ public:
 				break;
 
 			case WID_TF_RANDOM_TOWN:
-				this->HandleButtonClick(WID_TF_RANDOM_TOWN);
 				this->ExecuteFoundTownCommand(0, true, STR_ERROR_CAN_T_GENERATE_TOWN, CcFoundRandomTown);
 				break;
 
@@ -1080,8 +1074,6 @@ public:
 				break;
 
 			case WID_TF_MANY_RANDOM_TOWNS:
-				this->HandleButtonClick(WID_TF_MANY_RANDOM_TOWNS);
-
 				_generating_world = true;
 				UpdateNearestTownForRoadTiles(true);
 				if (!GenerateTowns(this->town_layout)) {
@@ -1108,27 +1100,6 @@ public:
 				this->UpdateButtons(false);
 				break;
 		}
-	}
-
-	virtual void OnTimeout()
-	{
-		this->RaiseWidget(WID_TF_RANDOM_TOWN);
-		this->RaiseWidget(WID_TF_MANY_RANDOM_TOWNS);
-		this->SetDirty();
-	}
-
-	virtual void OnMouseLoop()
-	{
-		this->HandleEditBox(WID_TF_TOWN_NAME_EDITBOX);
-	}
-
-	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
-	{
-		EventState state = ES_NOT_HANDLED;
-		if (this->HandleEditBoxKey(WID_TF_TOWN_NAME_EDITBOX, key, keycode, state) == HEBR_CANCEL) {
-			this->UnfocusFocusedWidget();
-		}
-		return state;
 	}
 
 	virtual void OnPlaceObject(Point pt, TileIndex tile)

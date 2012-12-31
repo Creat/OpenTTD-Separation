@@ -504,7 +504,7 @@ public:
 			}
 		} else {
 			/* Draw the label under the data point rather than on the grid line. */
-			SetDParam(0, this->x_values_start + this->num_on_x_axis * this->x_values_increment);
+			SetDParamMaxValue(0, this->x_values_start + this->num_on_x_axis * this->x_values_increment);
 			x_label_width = GetStringBoundingBox(STR_GRAPH_Y_LABEL_NUMBER).width;
 		}
 
@@ -645,7 +645,7 @@ static const NWidgetPart _nested_operating_profit_widgets[] = {
 static const WindowDesc _operating_profit_desc(
 	WDP_AUTO, 0, 0,
 	WC_OPERATING_PROFIT, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_operating_profit_widgets, lengthof(_nested_operating_profit_widgets)
 );
 
@@ -695,7 +695,7 @@ static const NWidgetPart _nested_income_graph_widgets[] = {
 static const WindowDesc _income_graph_desc(
 	WDP_AUTO, 0, 0,
 	WC_INCOME_GRAPH, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_income_graph_widgets, lengthof(_nested_income_graph_widgets)
 );
 
@@ -743,7 +743,7 @@ static const NWidgetPart _nested_delivered_cargo_graph_widgets[] = {
 static const WindowDesc _delivered_cargo_graph_desc(
 	WDP_AUTO, 0, 0,
 	WC_DELIVERED_CARGO, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_delivered_cargo_graph_widgets, lengthof(_nested_delivered_cargo_graph_widgets)
 );
 
@@ -798,7 +798,7 @@ static const NWidgetPart _nested_performance_history_widgets[] = {
 static const WindowDesc _performance_history_desc(
 	WDP_AUTO, 0, 0,
 	WC_PERFORMANCE_HISTORY, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_performance_history_widgets, lengthof(_nested_performance_history_widgets)
 );
 
@@ -846,7 +846,7 @@ static const NWidgetPart _nested_company_value_graph_widgets[] = {
 static const WindowDesc _company_value_graph_desc(
 	WDP_AUTO, 0, 0,
 	WC_COMPANY_VALUE, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_company_value_graph_widgets, lengthof(_nested_company_value_graph_widgets)
 );
 
@@ -1076,7 +1076,7 @@ static const NWidgetPart _nested_cargo_payment_rates_widgets[] = {
 static const WindowDesc _cargo_payment_rates_desc(
 	WDP_AUTO, 0, 0,
 	WC_PAYMENT_RATES, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_cargo_payment_rates_widgets, lengthof(_nested_cargo_payment_rates_widgets)
 );
 
@@ -1322,10 +1322,10 @@ struct PerformanceRatingDetailWindow : Window {
 				for (uint i = SCORE_BEGIN; i < SCORE_END; i++) {
 					score_info_width = max(score_info_width, GetStringBoundingBox(STR_PERFORMANCE_DETAIL_VEHICLES + i).width);
 				}
-				SetDParam(0, 1000);
+				SetDParamMaxValue(0, 1000);
 				score_info_width += GetStringBoundingBox(STR_BLACK_COMMA).width + WD_FRAMERECT_LEFT;
 
-				SetDParam(0, 100);
+				SetDParamMaxValue(0, 100);
 				this->bar_width = GetStringBoundingBox(STR_PERFORMANCE_DETAIL_PERCENT).width + 20; // Wide bars!
 
 				/* At this number we are roughly at the max; it can become wider,

@@ -33,6 +33,7 @@
 #include "../script/api/game/game_bridgelist.hpp.sq"
 #include "../script/api/game/game_cargo.hpp.sq"
 #include "../script/api/game/game_cargolist.hpp.sq"
+#include "../script/api/game/game_cargomonitor.hpp.sq"
 #include "../script/api/game/game_company.hpp.sq"
 #include "../script/api/game/game_companymode.hpp.sq"
 #include "../script/api/game/game_controller.hpp.sq"
@@ -88,6 +89,8 @@ GameInstance::GameInstance() :
 
 void GameInstance::Initialize(GameInfo *info)
 {
+	this->versionAPI = info->GetAPIVersion();
+
 	/* Register the GameController */
 	SQGSController_Register(this->engine);
 
@@ -113,6 +116,7 @@ void GameInstance::RegisterAPI()
 	SQGSCargoList_IndustryAccepting_Register(this->engine);
 	SQGSCargoList_IndustryProducing_Register(this->engine);
 	SQGSCargoList_StationAccepting_Register(this->engine);
+	SQGSCargoMonitor_Register(this->engine);
 	SQGSCompany_Register(this->engine);
 	SQGSCompanyMode_Register(this->engine);
 	SQGSDate_Register(this->engine);
@@ -126,10 +130,13 @@ void GameInstance::RegisterAPI()
 	SQGSEventCompanyInTrouble_Register(this->engine);
 	SQGSEventCompanyMerger_Register(this->engine);
 	SQGSEventCompanyNew_Register(this->engine);
+	SQGSEventCompanyTown_Register(this->engine);
 	SQGSEventController_Register(this->engine);
+	SQGSEventExclusiveTransportRights_Register(this->engine);
 	SQGSEventGoalQuestionAnswer_Register(this->engine);
 	SQGSEventIndustryClose_Register(this->engine);
 	SQGSEventIndustryOpen_Register(this->engine);
+	SQGSEventRoadReconstruction_Register(this->engine);
 	SQGSEventStationFirstVehicle_Register(this->engine);
 	SQGSEventSubsidyAwarded_Register(this->engine);
 	SQGSEventSubsidyExpired_Register(this->engine);
@@ -187,6 +194,8 @@ void GameInstance::RegisterAPI()
 	SQGSWindow_Register(this->engine);
 
 	RegisterGameTranslation(this->engine);
+
+	if (!this->LoadCompatibilityScripts(this->versionAPI, GAME_DIR)) this->Died();
 }
 
 int GameInstance::GetSetting(const char *name)

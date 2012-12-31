@@ -319,7 +319,7 @@ struct CompanyFinancesWindow : Window {
 			case WID_CF_BALANCE_VALUE:
 			case WID_CF_LOAN_VALUE:
 			case WID_CF_TOTAL_VALUE:
-				SetDParam(0, CompanyFinancesWindow::max_money);
+				SetDParamMaxValue(0, CompanyFinancesWindow::max_money);
 				size->width = max(GetStringBoundingBox(STR_FINANCES_NEGATIVE_INCOME).width, GetStringBoundingBox(STR_FINANCES_POSITIVE_INCOME).width) + padding.width;
 				break;
 
@@ -466,7 +466,7 @@ Money CompanyFinancesWindow::max_money = INT32_MAX;
 static const WindowDesc _company_finances_desc(
 	WDP_AUTO, 0, 0,
 	WC_FINANCES, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_company_finances_widgets, lengthof(_nested_company_finances_widgets)
 );
 
@@ -1281,11 +1281,7 @@ public:
 				break;
 
 			case WID_SCMF_TIE_EARRING:
-				if (this->is_female) { // Only for female faces
-					this->DrawFaceStringLabel(WID_SCMF_TIE_EARRING, GetCompanyManagerFaceBits(this->face, CMFV_TIE_EARRING, this->ge), false);
-				} else { // Only for male faces
-					this->DrawFaceStringLabel(WID_SCMF_TIE_EARRING, GetCompanyManagerFaceBits(this->face, CMFV_TIE_EARRING, this->ge), false);
-				}
+				this->DrawFaceStringLabel(WID_SCMF_TIE_EARRING, GetCompanyManagerFaceBits(this->face, CMFV_TIE_EARRING, this->ge), false);
 				break;
 
 			case WID_SCMF_LIPS_MOUSTACHE:
@@ -1486,7 +1482,7 @@ const StringID SelectCompanyManagerFaceWindow::PART_TEXTS[] = {
 static const WindowDesc _select_company_manager_face_desc(
 	WDP_AUTO, 0, 0,
 	WC_COMPANY_MANAGER_FACE, WC_NONE,
-	WDF_UNCLICK_BUTTONS | WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION,
 	_nested_select_company_manager_face_widgets, lengthof(_nested_select_company_manager_face_widgets)
 );
 
@@ -1695,12 +1691,12 @@ struct CompanyInfrastructureWindow : Window
 				max_val = max(max_val, c->infrastructure.airport);
 				max_cost = max(max_cost, AirportMaintenanceCost(c->index));
 
-				SetDParam(0, max_val);
-				SetDParam(1, max_cost * 12); // Convert to per year
+				SetDParamMaxValue(0, max_val);
+				SetDParamMaxValue(1, max_cost * 12); // Convert to per year
 				size->width = max(size->width, GetStringBoundingBox(_settings_game.economy.infrastructure_maintenance ? STR_COMPANY_INFRASTRUCTURE_VIEW_COST : STR_WHITE_COMMA).width + 20); // Reserve some wiggle room.
 
 				if (_settings_game.economy.infrastructure_maintenance) {
-					SetDParam(0, this->GetTotalMaintenanceCost() * 12); // Convert to per year
+					SetDParamMaxValue(0, this->GetTotalMaintenanceCost() * 12); // Convert to per year
 					this->total_width = GetStringBoundingBox(STR_COMPANY_INFRASTRUCTURE_VIEW_TOTAL).width + 20;
 					size->width = max(size->width, this->total_width);
 				}
@@ -1840,7 +1836,7 @@ struct CompanyInfrastructureWindow : Window
 static const WindowDesc _company_infrastructure_desc(
 	WDP_AUTO, 0, 0,
 	WC_COMPANY_INFRASTRUCTURE, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_company_infrastructure_widgets, lengthof(_nested_company_infrastructure_widgets)
 );
 
@@ -2099,14 +2095,14 @@ struct CompanyWindow : Window
 				break;
 
 			case WID_C_DESC_VEHICLE_COUNTS:
-				SetDParam(0, 5000); // Maximum number of vehicles
+				SetDParamMaxValue(0, 5000); // Maximum number of vehicles
 				for (uint i = 0; i < lengthof(_company_view_vehicle_count_strings); i++) {
 					size->width = max(size->width, GetStringBoundingBox(_company_view_vehicle_count_strings[i]).width);
 				}
 				break;
 
 			case WID_C_DESC_INFRASTRUCTURE_COUNTS:
-				SetDParam(0, UINT_MAX);
+				SetDParamMaxValue(0, UINT_MAX);
 				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL).width);
 				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_ROAD).width);
 				size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_INFRASTRUCTURE_WATER).width);
@@ -2119,7 +2115,7 @@ struct CompanyWindow : Window
 				const Company *c2;
 
 				FOR_ALL_COMPANIES(c2) {
-					SetDParam(0, 25);
+					SetDParamMaxValue(0, 75);
 					SetDParam(1, c2->index);
 
 					size->width = max(size->width, GetStringBoundingBox(STR_COMPANY_VIEW_SHARES_OWNED_BY).width);
@@ -2405,7 +2401,7 @@ struct CompanyWindow : Window
 static const WindowDesc _company_desc(
 	WDP_AUTO, 0, 0,
 	WC_COMPANY, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_company_widgets, lengthof(_nested_company_widgets)
 );
 

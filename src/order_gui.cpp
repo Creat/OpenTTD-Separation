@@ -820,7 +820,7 @@ public:
 
 			if (station_orders < 2) this->OrderClick_Goto(0);
 		}
-		this->OnInvalidateData(-2);
+		this->OnInvalidateData(VIWD_MODIFY_ORDERS);
 	}
 
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
@@ -866,13 +866,17 @@ public:
 		VehicleOrderID to   = INVALID_VEH_ORDER_ID;
 
 		switch (data) {
-			case -666:
+			case VIWD_AUTOREPLACE:
 				/* Autoreplace replaced the vehicle */
 				this->vehicle = Vehicle::Get(this->window_number);
+				/* FALL THROUGH */
+
+			case VIWD_CONSIST_CHANGED:
+				/* Vehicle composition was changed. */
 				this->UpdateAutoRefitState();
 				break;
 
-			case -1:
+			case VIWD_REMOVE_ALL_ORDERS:
 				/* Removed / replaced all orders (after deleting / sharing) */
 				if (this->selected_order == -1) break;
 
@@ -881,7 +885,7 @@ public:
 				this->selected_order = -1;
 				break;
 
-			case -2:
+			case VIWD_MODIFY_ORDERS:
 				/* Some other order changes */
 				break;
 
@@ -1097,7 +1101,7 @@ public:
 		if (widget != WID_O_ORDER_LIST) return;
 
 		bool rtl = _current_text_dir == TD_RTL;
-		SetDParam(0, 99);
+		SetDParamMaxValue(0, this->vehicle->GetNumOrders(), 2);
 		int index_column_width = GetStringBoundingBox(STR_ORDER_INDEX).width + 2 * GetSpriteSize(rtl ? SPR_ARROW_RIGHT : SPR_ARROW_LEFT).width + 3;
 		int middle = rtl ? r.right - WD_FRAMETEXT_RIGHT - index_column_width : r.left + WD_FRAMETEXT_LEFT + index_column_width;
 
@@ -1500,21 +1504,6 @@ public:
 		this->vscroll->SetCapacityFromWidget(this, WID_O_ORDER_LIST);
 	}
 
-	virtual void OnTimeout()
-	{
-		static const int raise_widgets[] = {
-			WID_O_TIMETABLE_VIEW, WID_O_SKIP, WID_O_DELETE, WID_O_STOP_SHARING, WID_O_REFIT, WID_O_SHARED_ORDER_LIST, WIDGET_LIST_END,
-		};
-
-		/* Unclick all buttons in raise_widgets[]. */
-		for (const int *widnum = raise_widgets; *widnum != WIDGET_LIST_END; widnum++) {
-			if (this->IsWidgetLowered(*widnum)) {
-				this->RaiseWidget(*widnum);
-				this->SetWidgetDirty(*widnum);
-			}
-		}
-	}
-
 	static Hotkey<OrdersWindow> order_hotkeys[];
 };
 
@@ -1568,7 +1557,7 @@ static const NWidgetPart _nested_orders_train_widgets[] = {
 															SetDataTip(STR_ORDER_SERVICE, STR_ORDER_SERVICE_TOOLTIP), SetResize(1, 0),
 				EndContainer(),
 				NWidget(NWID_SELECTION, INVALID_COLOUR, WID_O_SEL_TOP_RIGHT),
-					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_O_EMPTY), SetMinimalSize(93, 12), SetFill(1, 0),
+					NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_O_EMPTY), SetMinimalSize(93, 12), SetFill(1, 0),
 															SetDataTip(STR_ORDER_REFIT, STR_ORDER_REFIT_TOOLTIP), SetResize(1, 0),
 					NWidget(NWID_BUTTON_DROPDOWN, COLOUR_GREY, WID_O_REFIT_DROPDOWN), SetMinimalSize(93, 12), SetFill(1, 0),
 															SetDataTip(STR_ORDER_REFIT_AUTO, STR_ORDER_REFIT_AUTO_TOOLTIP), SetResize(1, 0),
@@ -1703,7 +1692,7 @@ static const NWidgetPart _nested_other_orders_widgets[] = {
 static const WindowDesc _other_orders_desc(
 	WDP_AUTO, 384, 86,
 	WC_VEHICLE_ORDERS, WC_VEHICLE_VIEW,
-	WDF_UNCLICK_BUTTONS | WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION,
 	_nested_other_orders_widgets, lengthof(_nested_other_orders_widgets)
 );
 

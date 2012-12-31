@@ -62,6 +62,24 @@ void StringParameters::ClearTypeInformation()
 	MemSetT(this->type, 0, this->num_param);
 }
 
+
+/**
+ * Read an int64 from the argument array. The offset is increased
+ * so the next time GetInt64 is called the next value is read.
+ */
+int64 StringParameters::GetInt64(WChar type)
+{
+	if (this->offset >= this->num_param) {
+		DEBUG(misc, 0, "Trying to read invalid string parameter");
+		return 0;
+	}
+	if (this->type != NULL) {
+		assert(this->type[this->offset] == 0 || this->type[this->offset] == type);
+		this->type[this->offset] = type;
+	}
+	return this->data[this->offset++];
+}
+
 /**
  * Shift all data in the data array by the given amount to make
  * room for some extra parameters.
@@ -70,6 +88,38 @@ void StringParameters::ShiftParameters(uint amount)
 {
 	assert(amount <= this->num_param);
 	MemMoveT(this->data + amount, this->data, this->num_param - amount);
+}
+
+/**
+ * Set DParam n to some number that is suitable for string size computations.
+ * @param n Index of the string parameter.
+ * @param max_value The biggest value which shall be displayed.
+ *                  For the result only the number of digits of \a max_value matter.
+ * @param min_count Minimum number of digits indepentent of \a max.
+ */
+void SetDParamMaxValue(uint n, uint64 max_value, uint min_count)
+{
+	uint num_digits = 1;
+	while (max_value >= 10) {
+		num_digits++;
+		max_value /= 10;
+	}
+	SetDParamMaxDigits(n, max(min_count, num_digits));
+}
+
+/**
+ * Set DParam n to some number that is suitable for string size computations.
+ * @param n Index of the string parameter.
+ * @param count Number of digits which shall be displayable.
+ */
+void SetDParamMaxDigits(uint n, uint count)
+{
+	static const uint biggest_digit = 8; ///< Digit with the biggest string width.
+	uint64 val = biggest_digit;
+	for (; count > 1; count--) {
+		val = 10 * val + biggest_digit;
+	}
+	SetDParam(n, val);
 }
 
 /**
@@ -132,7 +182,7 @@ static char **_langpack_offs;
 static LanguagePack *_langpack;
 static uint _langtab_num[TAB_COUNT];   ///< Offset into langpack offs
 static uint _langtab_start[TAB_COUNT]; ///< Offset into langpack offs
-static bool _keep_gender_data = false;  ///< Should we retain the gender data in the current string?
+static bool _scan_for_gender_data = false;  ///< Are we scanning for the gender of the current string? (instead of formatting it)
 
 
 const char *GetStringPtr(StringID string)
@@ -469,75 +519,74 @@ static int DeterminePluralForm(int64 count, int plural_form)
 		default:
 			NOT_REACHED();
 
-		/* Two forms, singular used for one only
+		/* Two forms: singular used for one only.
 		 * Used in:
 		 *   Danish, Dutch, English, German, Norwegian, Swedish, Estonian, Finnish,
 		 *   Greek, Hebrew, Italian, Portuguese, Spanish, Esperanto */
 		case 0:
 			return n != 1;
 
-		/* Only one form
+		/* Only one form.
 		 * Used in:
 		 *   Hungarian, Japanese, Korean, Turkish */
 		case 1:
 			return 0;
 
-		/* Two forms, singular used for zero and one
+		/* Two forms: singular used for 0 and 1.
 		 * Used in:
 		 *   French, Brazilian Portuguese */
 		case 2:
 			return n > 1;
 
-		/* Three forms, special case for 0 and ending in 1, except those ending in 11
+		/* Three forms: special cases for 0, and numbers ending in 1 except when ending in 11.
 		 * Used in:
 		 *   Latvian */
 		case 3:
 			return n % 10 == 1 && n % 100 != 11 ? 0 : n != 0 ? 1 : 2;
 
-		/* Five forms, special case for one, two, 3 to 6 and 7 to 10
+		/* Five forms: special cases for 1, 2, 3 to 6, and 7 to 10.
 		 * Used in:
 		 *   Gaelige (Irish) */
 		case 4:
 			return n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4;
 
-		/* Three forms, special case for numbers ending in 1[2-9]
+		/* Three forms: special cases for numbers ending in 1 except when ending in 11, and 2 to 9 except when ending in 12 to 19.
 		 * Used in:
 		 *   Lithuanian */
 		case 5:
 			return n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
 
-		/* Three forms, special cases for numbers ending in 1 and 2, 3, 4, except those ending in 1[1-4]
+		/* Three forms: special cases for numbers ending in 1 except wehn ending in 11, and 2 to 4 except when ending in 12 to 14.
 		 * Used in:
 		 *   Croatian, Russian, Ukrainian */
 		case 6:
 			return n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
 
-		/* Three forms, special case for one and some numbers ending in 2, 3, or 4
+		/* Three forms: special cases for 1, and numbers ending in 2 to 4 except when ending in 12 to 14.
 		 * Used in:
 		 *   Polish */
 		case 7:
 			return n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
 
-		/* Four forms, special case for one and all numbers ending in 02, 03, or 04
+		/* Four forms: special cases for numbers ending in 01, 02, and 03 to 04.
 		 * Used in:
 		 *   Slovenian */
 		case 8:
 			return n % 100 == 1 ? 0 : n % 100 == 2 ? 1 : n % 100 == 3 || n % 100 == 4 ? 2 : 3;
 
-		/* Two forms; singular used for everything ending in 1 but not in 11.
+		/* Two forms: singular used for numbers ending in 1 except when ending in 11.
 		 * Used in:
 		 *   Icelandic */
 		case 9:
 			return n % 10 == 1 && n % 100 != 11 ? 0 : 1;
 
-		/* Three forms, special cases for one and 2, 3, or 4
+		/* Three forms: special cases for 1, and 2 to 4
 		 * Used in:
 		 *   Czech, Slovak */
 		case 10:
 			return n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2;
 
-		/* Two forms, special 'hack' for Korean; singular for numbers ending
-		 *   in a consonant and plural for numbers ending in a vowel.
+		/* Two forms: cases for numbers ending with a consonant, and with a vowel.
 		 * Korean doesn't have the concept of plural, but depending on how a
 		 * number is pronounced it needs another version of a particle.
 		 * As such the plural system is misused to give this distinction.
@@ -562,7 +611,7 @@ static int DeterminePluralForm(int64 count, int plural_form)
 					NOT_REACHED();
 			}
 
-		/* Four forms: one, 0 and everything ending in 02..10, everything ending in 11..19.
+		/* Four forms: special cases for 1, 0 and numbers ending in 02 to 10, and numbers ending in 11 to 19.
 		 * Used in:
 		 *  Maltese */
 		case 12:
@@ -781,7 +830,7 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				}
 
 				int i = 0;
-				while (*p != '\0') {
+				while (*p != '\0' && i < 20) {
 					uint64 param;
 					s = ++p;
 
@@ -880,11 +929,11 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 
 					/* Now do the string formatting. */
 					char buf[256];
-					bool old_kgd = _keep_gender_data;
-					_keep_gender_data = true;
+					bool old_sgd = _scan_for_gender_data;
+					_scan_for_gender_data = true;
 					StringParameters tmp_params(args->GetPointerToOffset(offset), args->num_param - offset, NULL);
 					p = FormatString(buf, input, &tmp_params, lastof(buf));
-					_keep_gender_data = old_kgd;
+					_scan_for_gender_data = old_sgd;
 					*p = '\0';
 
 					/* And determine the string. */
@@ -900,7 +949,7 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 			/* This sets up the gender for the string.
 			 * We just ignore this one. It's used in {G 0 Der Die Das} to determine the case. */
 			case SCC_GENDER_INDEX: // {GENDER 0}
-				if (_keep_gender_data) {
+				if (_scan_for_gender_data) {
 					buff += Utf8Encode(buff, SCC_GENDER_INDEX);
 					*buff++ = *str++;
 				} else {
@@ -1314,11 +1363,18 @@ static char *FormatString(char *buff, const char *str_arg, StringParameters *arg
 				const Industry *i = Industry::GetIfValid(args->GetInt32(SCC_INDUSTRY_NAME));
 				if (i == NULL) break;
 
-				/* First print the town name and the industry type name. */
-				int64 args_array[2] = {i->town->index, GetIndustrySpec(i->type)->name};
-				StringParameters tmp_params(args_array);
+				if (_scan_for_gender_data) {
+					/* Gender is defined by the industry type.
+					 * STR_FORMAT_INDUSTRY_NAME may have the town first, so it would result in the gender of the town name */
+					StringParameters tmp_params(NULL, 0, NULL);
+					buff = FormatString(buff, GetStringPtr(GetIndustrySpec(i->type)->name), &tmp_params, last, next_substr_case_index);
+				} else {
+					/* First print the town name and the industry type name. */
+					int64 args_array[2] = {i->town->index, GetIndustrySpec(i->type)->name};
+					StringParameters tmp_params(args_array);
 
-				buff = FormatString(buff, GetStringPtr(STR_FORMAT_INDUSTRY_NAME), &tmp_params, last, next_substr_case_index);
+					buff = FormatString(buff, GetStringPtr(STR_FORMAT_INDUSTRY_NAME), &tmp_params, last, next_substr_case_index);
+				}
 				next_substr_case_index = 0;
 				break;
 			}

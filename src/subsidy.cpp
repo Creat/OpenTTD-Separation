@@ -54,7 +54,7 @@ void Subsidy::AwardTo(CompanyID company)
 	SetDParamStr(0, cn);
 	AddNewsItem(
 		STR_NEWS_SERVICE_SUBSIDY_AWARDED_HALF + _settings_game.difficulty.subsidy_multiplier,
-		NS_SUBSIDIES,
+		NT_SUBSIDIES, NF_NORMAL,
 		(NewsReferenceType)reftype.a, this->src, (NewsReferenceType)reftype.b, this->dst,
 		cn
 	);
@@ -189,9 +189,9 @@ static bool CheckSubsidyDuplicate(CargoID cargo, SourceType src_type, SourceID s
 
 /**
  * Checks if the source and destination of a subsidy are inside the distance limit.
- * @param src_type Type of #src.
+ * @param src_type Type of \a src.
  * @param src      Index of source.
- * @param dst_type Type of #dst.
+ * @param dst_type Type of \a dst.
  * @param dst      Index of destination.
  * @return True if they are inside the distance limit.
  */
@@ -206,9 +206,9 @@ static bool CheckSubsidyDistance(SourceType src_type, SourceID src, SourceType d
 /**
  * Creates a subsidy with the given parameters.
  * @param cid      Subsidised cargo.
- * @param src_type Type of #src.
+ * @param src_type Type of \a src.
  * @param src      Index of source.
- * @param dst_type Type of #dst.
+ * @param dst_type Type of \a dst.
  * @param dst      Index of destination.
  */
 void CreateSubsidy(CargoID cid, SourceType src_type, SourceID src, SourceType dst_type, SourceID dst)
@@ -223,7 +223,7 @@ void CreateSubsidy(CargoID cid, SourceType src_type, SourceID src, SourceType ds
 	s->awarded = INVALID_COMPANY;
 
 	Pair reftype = SetupSubsidyDecodeParam(s, false);
-	AddNewsItem(STR_NEWS_SERVICE_SUBSIDY_OFFERED, NS_SUBSIDIES, (NewsReferenceType)reftype.a, s->src, (NewsReferenceType)reftype.b, s->dst);
+	AddNewsItem(STR_NEWS_SERVICE_SUBSIDY_OFFERED, NT_SUBSIDIES, NF_NORMAL, (NewsReferenceType)reftype.a, s->src, (NewsReferenceType)reftype.b, s->dst);
 	SetPartOfSubsidyFlag(s->src_type, s->src, POS_SRC);
 	SetPartOfSubsidyFlag(s->dst_type, s->dst, POS_DST);
 	AI::BroadcastNewEvent(new ScriptEventSubsidyOffer(s->index));
@@ -399,7 +399,7 @@ bool FindSubsidyIndustryCargoRoute()
 /**
  * Tries to find a suitable destination for the given source and cargo.
  * @param cid      Subsidized cargo.
- * @param src_type Type of #src.
+ * @param src_type Type of \a src.
  * @param src      Index of source.
  * @return True iff the subsidy was created.
  */
@@ -464,13 +464,13 @@ void SubsidyMonthlyLoop()
 		if (--s->remaining == 0) {
 			if (!s->IsAwarded()) {
 				Pair reftype = SetupSubsidyDecodeParam(s, true);
-				AddNewsItem(STR_NEWS_OFFER_OF_SUBSIDY_EXPIRED, NS_SUBSIDIES, (NewsReferenceType)reftype.a, s->src, (NewsReferenceType)reftype.b, s->dst);
+				AddNewsItem(STR_NEWS_OFFER_OF_SUBSIDY_EXPIRED, NT_SUBSIDIES, NF_NORMAL, (NewsReferenceType)reftype.a, s->src, (NewsReferenceType)reftype.b, s->dst);
 				AI::BroadcastNewEvent(new ScriptEventSubsidyOfferExpired(s->index));
 				Game::NewEvent(new ScriptEventSubsidyOfferExpired(s->index));
 			} else {
 				if (s->awarded == _local_company) {
 					Pair reftype = SetupSubsidyDecodeParam(s, true);
-					AddNewsItem(STR_NEWS_SUBSIDY_WITHDRAWN_SERVICE, NS_SUBSIDIES, (NewsReferenceType)reftype.a, s->src, (NewsReferenceType)reftype.b, s->dst);
+					AddNewsItem(STR_NEWS_SUBSIDY_WITHDRAWN_SERVICE, NT_SUBSIDIES, NF_NORMAL, (NewsReferenceType)reftype.a, s->src, (NewsReferenceType)reftype.b, s->dst);
 				}
 				AI::BroadcastNewEvent(new ScriptEventSubsidyExpired(s->index));
 				Game::NewEvent(new ScriptEventSubsidyExpired(s->index));
@@ -520,7 +520,7 @@ void SubsidyMonthlyLoop()
  * Tests whether given delivery is subsidised and possibly awards the subsidy to delivering company
  * @param cargo_type type of cargo
  * @param company company delivering the cargo
- * @param src_type type of #src
+ * @param src_type type of \a src
  * @param src index of source
  * @param st station where the cargo is delivered to
  * @return is the delivery subsidised?

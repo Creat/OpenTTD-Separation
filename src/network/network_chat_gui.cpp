@@ -284,10 +284,11 @@ static void SendChat(const char *buf, DestType type, int dest)
 }
 
 /** Window to enter the chat message in. */
-struct NetworkChatWindow : public QueryStringBaseWindow {
+struct NetworkChatWindow : public Window {
 	DestType dtype;       ///< The type of destination.
 	StringID dest_string; ///< String representation of the destination.
 	int dest;             ///< The identifier of the destination.
+	QueryString message_editbox; ///< Message editbox.
 
 	/**
 	 * Create a chat input window.
@@ -295,12 +296,14 @@ struct NetworkChatWindow : public QueryStringBaseWindow {
 	 * @param type The type of destination.
 	 * @param dest The actual destination index.
 	 */
-	NetworkChatWindow(const WindowDesc *desc, DestType type, int dest) : QueryStringBaseWindow(NETWORK_CHAT_LENGTH)
+	NetworkChatWindow(const WindowDesc *desc, DestType type, int dest) : message_editbox(NETWORK_CHAT_LENGTH)
 	{
 		this->dtype   = type;
 		this->dest    = dest;
-		this->afilter = CS_ALPHANUMERAL;
-		InitializeTextBuffer(&this->text, this->edit_str_buf, this->edit_str_size);
+		this->querystrings[WID_NC_TEXTBOX] = &this->message_editbox;
+		this->message_editbox.cancel_button = WID_NC_CLOSE;
+		this->message_editbox.ok_button = WID_NC_SENDBUTTON;
+		this->message_editbox.afilter = CS_ALPHANUMERAL;
 
 		static const StringID chat_captions[] = {
 			STR_NETWORK_CHAT_ALL_CAPTION,
@@ -382,9 +385,9 @@ struct NetworkChatWindow : public QueryStringBaseWindow {
 	void ChatTabCompletion()
 	{
 		static char _chat_tab_completion_buf[NETWORK_CHAT_LENGTH];
-		assert(this->edit_str_size == lengthof(_chat_tab_completion_buf));
+		assert(this->message_editbox.text.max_bytes == lengthof(_chat_tab_completion_buf));
 
-		Textbuf *tb = &this->text;
+		Textbuf *tb = &this->message_editbox.text;
 		size_t len, tb_len;
 		uint item;
 		char *tb_buf, *pre_buf;
@@ -436,13 +439,10 @@ struct NetworkChatWindow : public QueryStringBaseWindow {
 
 				/* Change to the found name. Add ': ' if we are at the start of the line (pretty) */
 				if (pre_buf == tb_buf) {
-					snprintf(tb->buf, this->edit_str_size, "%s: ", cur_name);
+					this->message_editbox.text.Print("%s: ", cur_name);
 				} else {
-					snprintf(tb->buf, this->edit_str_size, "%s %s", pre_buf, cur_name);
+					this->message_editbox.text.Print("%s %s", pre_buf, cur_name);
 				}
-
-				/* Update the textbuffer */
-				UpdateTextBufferSize(&this->text);
 
 				this->SetDirty();
 				free(pre_buf);
@@ -452,21 +452,12 @@ struct NetworkChatWindow : public QueryStringBaseWindow {
 
 		if (second_scan) {
 			/* We walked all posibilities, and the user presses tab again.. revert to original text */
-			strcpy(tb->buf, _chat_tab_completion_buf);
+			this->message_editbox.text.Assign(_chat_tab_completion_buf);
 			_chat_tab_completion_active = false;
-
-			/* Update the textbuffer */
-			UpdateTextBufferSize(&this->text);
 
 			this->SetDirty();
 		}
 		free(pre_buf);
-	}
-
-	virtual void OnPaint()
-	{
-		this->DrawWidgets();
-		this->DrawEditBox(WID_NC_TEXTBOX);
 	}
 
 	virtual Point OnInitialPosition(const WindowDesc *desc, int16 sm_width, int16 sm_height, int window_number)
@@ -502,15 +493,10 @@ struct NetworkChatWindow : public QueryStringBaseWindow {
 	{
 		switch (widget) {
 			/* Send */
-			case WID_NC_SENDBUTTON: SendChat(this->text.buf, this->dtype, this->dest);
+			case WID_NC_SENDBUTTON: SendChat(this->message_editbox.text.buf, this->dtype, this->dest);
 				/* FALL THROUGH */
 			case WID_NC_CLOSE: /* Cancel */ delete this; break;
 		}
-	}
-
-	virtual void OnMouseLoop()
-	{
-		this->HandleEditBox(WID_NC_TEXTBOX);
 	}
 
 	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
@@ -519,28 +505,13 @@ struct NetworkChatWindow : public QueryStringBaseWindow {
 		if (keycode == WKC_TAB) {
 			ChatTabCompletion();
 			state = ES_HANDLED;
-		} else {
-			_chat_tab_completion_active = false;
-			switch (this->HandleEditBoxKey(WID_NC_TEXTBOX, key, keycode, state)) {
-				default: NOT_REACHED();
-				case HEBR_EDITING: {
-					Window *osk = FindWindowById(WC_OSK, 0);
-					if (osk != NULL && osk->parent == this) osk->InvalidateData();
-					break;
-				}
-				case HEBR_CONFIRM:
-					SendChat(this->text.buf, this->dtype, this->dest);
-					/* FALL THROUGH */
-				case HEBR_CANCEL: delete this; break;
-				case HEBR_NOT_FOCUSED: break;
-			}
 		}
 		return state;
 	}
 
-	virtual void OnOpenOSKWindow(int wid)
+	virtual void OnEditboxChanged(int wid)
 	{
-		ShowOnScreenKeyboard(this, wid, WID_NC_CLOSE, WID_NC_SENDBUTTON);
+		_chat_tab_completion_active = false;
 	}
 
 	/**

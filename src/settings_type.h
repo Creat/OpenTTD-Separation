@@ -20,6 +20,23 @@
 #include "zoom_type.h"
 #include "openttd.h"
 
+
+/** Settings profiles and highscore tables. */
+enum SettingsProfile {
+	SP_BEGIN = 0,
+	SP_EASY = SP_BEGIN,                       ///< Easy difficulty.
+	SP_MEDIUM,                                ///< Medium difficulty.
+	SP_HARD,                                  ///< Hard difficulty.
+
+	SP_END,                                   ///< End of setting profiles.
+
+	SP_CUSTOM = SP_END,                       ///< No profile, special "custom" highscore.
+	SP_SAVED_HIGHSCORE_END,                   ///< End of saved highscore tables.
+
+	SP_MULTIPLAYER = SP_SAVED_HIGHSCORE_END,  ///< Special "multiplayer" highscore. Not saved, always specific to the current game.
+	SP_HIGHSCORE_END,                         ///< End of highscore tables.
+};
+
 /** Available industry map generation densities. */
 enum IndustryDensity {
 	ID_FUND_ONLY, ///< The game does not build industries.
@@ -46,11 +63,10 @@ struct DifficultySettings {
 	byte   construction_cost;                ///< how expensive is building
 	byte   terrain_type;                     ///< the mountainousness of the landscape
 	byte   quantity_sea_lakes;               ///< the amount of seas/lakes
-	byte   economy;                          ///< how volatile is the economy
-	byte   line_reverse_mode;                ///< reversing at stations or not
-	byte   disasters;                        ///< are disasters enabled
+	bool   economy;                          ///< how volatile is the economy
+	bool   line_reverse_mode;                ///< reversing at stations or not
+	bool   disasters;                        ///< are disasters enabled
 	byte   town_council_tolerance;           ///< minimum required town ratings to be allowed to demolish stuff
-	byte   diff_level;                       ///< the difficulty level
 };
 
 /** Settings related to the GUI and other stuff that is not saved in the savegame. */
@@ -63,7 +79,7 @@ struct GUISettings {
 	bool   sg_new_nonstop;                   ///< ttdpatch compatible nonstop handling read from pre v93 savegames
 	bool   new_nonstop;                      ///< ttdpatch compatible nonstop handling
 	uint8  stop_location;                    ///< what is the default stop location of trains?
-	bool   autoscroll;                       ///< scroll when moving mouse to the edge
+	uint8  auto_scrolling;                   ///< scroll when moving mouse to the edge (see #ViewportAutoscrolling)
 	byte   errmsg_duration;                  ///< duration of error message
 	byte   hover_delay;                      ///< time required to activate a hover event, in seconds
 	bool   link_terraform_toolbar;           ///< display terraform toolbar when displaying rail, road, water and airport toolbars
@@ -117,6 +133,7 @@ struct GUISettings {
 	uint32 last_newgrf_count;                ///< the numbers of NewGRFs we found during the last scan
 	byte   missing_strings_threshold;        ///< the number of missing strings before showing the warning
 	uint8  graph_line_thickness;             ///< the thickness of the lines in the various graph guis
+	uint8  osk_activation;                   ///< Mouse gesture to trigger the OSK.
 
 	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
 	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
@@ -131,6 +148,7 @@ struct GUISettings {
 	bool   newgrf_developer_tools;           ///< activate NewGRF developer tools and allow modifying NewGRFs in an existing game
 	bool   ai_developer_tools;               ///< activate AI developer tools
 	bool   scenario_developer;               ///< activate scenario developer: allow modifying NewGRFs in an existing game
+	uint8  settings_restriction_mode;        ///< selected restriction mode in adv. settings GUI. @see RestrictionMode
 	bool   newgrf_show_old_versions;         ///< whether to show old versions in the NewGRF list
 	uint8  newgrf_default_palette;           ///< default palette to use for NewGRFs without action 14 palette information
 
@@ -142,6 +160,18 @@ struct GUISettings {
 	{
 		return this->scenario_developer || this->newgrf_developer_tools;
 	}
+};
+
+/** Settings related to sound effects. */
+struct SoundSettings {
+	bool   news_ticker;                      ///< Play a ticker sound when a news item is published.
+	bool   news_full;                        ///< Play sound effects associated to certain news types.
+	bool   new_year;                         ///< Play sound on new year, summarising the performance during the last year.
+	bool   confirm;                          ///< Play sound effect on succesful constructions or other actions.
+	bool   click_beep;                       ///< Beep on a random selection of buttons.
+	bool   disaster;                         ///< Play disaster and accident sounds.
+	bool   vehicle;                          ///< Play vehicle sound effects.
+	bool   ambient;                          ///< Play ambient, industry and town sounds.
 };
 
 /** Settings related to music. */
@@ -162,6 +192,25 @@ struct LocaleSettings {
 	char  *digit_group_separator;            ///< thousand separator for non-currencies
 	char  *digit_group_separator_currency;   ///< thousand separator for currencies
 	char  *digit_decimal_separator;          ///< decimal separator
+};
+
+/** Settings related to news */
+struct NewsSettings {
+	uint8 arrival_player;                                 ///< NewsDisplay of vehicles arriving at new stations of current player
+	uint8 arrival_other;                                  ///< NewsDisplay of vehicles arriving at new stations of other players
+	uint8 accident;                                       ///< NewsDisplay of accidents that occur
+	uint8 company_info;                                   ///< NewsDisplay of general company information
+	uint8 open;                                           ///< NewsDisplay on new industry constructions
+	uint8 close;                                          ///< NewsDisplay about closing industries
+	uint8 economy;                                        ///< NewsDisplay on economical changes
+	uint8 production_player;                              ///< NewsDisplay of production changes of industries affecting current player
+	uint8 production_other;                               ///< NewsDisplay of production changes of industries affecting competitors
+	uint8 production_nobody;                              ///< NewsDisplay of production changes of industries affecting no one
+	uint8 advice;                                         ///< NewsDisplay on advice affecting the player's vehicles
+	uint8 new_vehicles;                                   ///< NewsDisplay of new vehicles becoming available
+	uint8 acceptance;                                     ///< NewsDisplay on changes affecting the acceptance of cargo at stations
+	uint8 subsidies;                                      ///< NewsDisplay of changes on subsidies
+	uint8 general;                                        ///< NewsDisplay of other topics
 };
 
 /** All settings related to the network. */
@@ -240,7 +289,7 @@ struct ConstructionSettings {
 	bool   autoslope;                        ///< allow terraforming under things
 	uint16 max_bridge_length;                ///< maximum length of bridges
 	uint16 max_tunnel_length;                ///< maximum length of tunnels
-	bool   signal_side;                      ///< show signals on right side
+	byte   train_signal_side;                ///< show signals on left / driving / right side
 	bool   extra_dynamite;                   ///< extra dynamite
 	bool   road_stop_on_town_road;           ///< allow building of drive-through road stops on town owned roads
 	bool   road_stop_on_competitor_road;     ///< allow building of drive-through road stops on roads owned by competitors
@@ -269,6 +318,7 @@ struct AISettings {
 
 /** Settings related to scripts. */
 struct ScriptSettings {
+	uint8  settings_profile;                 ///< difficulty profile to set initial settings of scripts, esp. random AIs
 	uint32 script_max_opcode_till_suspend;   ///< max opcode calls till scripts will suspend
 };
 
@@ -477,7 +527,9 @@ struct ClientSettings {
 	GUISettings          gui;                ///< settings related to the GUI
 	NetworkSettings      network;            ///< settings related to the network
 	CompanySettings      company;            ///< default values for per-company settings
+	SoundSettings        sound;              ///< sound effect settings
 	MusicSettings        music;              ///< settings related to music/sound
+	NewsSettings         news_display;       ///< news display settings.
 };
 
 /** The current settings for this game. */

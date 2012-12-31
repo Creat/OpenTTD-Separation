@@ -20,8 +20,28 @@
  * 1.3.0 is not yet released. The following changes are not set in stone yet.
  *
  * API additions:
+ * \li GSCargoMonitor
+ * \li GSEngine::IsValidEngine and GSEngine::IsBuildable when outside GSCompanyMode scope
+ * \li GSEventExclusiveTransportRights
+ * \li GSEventRoadReconstruction
+ * \li GSNews::NT_ACCIDENT, GSNews::NT_COMPANY_INFO, GSNews::NT_ADVICE, GSNews::NT_ACCEPTANCE
+ * \li GSIndustryType::IsProcessingIndustry
  * \li GSStation::IsAirportClosed
  * \li GSStation::OpenCloseAirport
+ * \li GSController::Break
+ * \li GSIndustryType::BuildIndustry, GSIndustryType::CanBuildIndustry, GSIndustryType::ProspectIndustry and GSIndustryType::CanProspectIndustry when outside GSCompanyMode scope
+ *
+ * \b 1.2.3
+ *
+ * No changes
+ *
+ * \b 1.2.2
+ *
+ * No changes
+ *
+ * \b 1.2.1
+ *
+ * No changes
  *
  * \b 1.2.0
  * \li First stable release with the NoGo framework.

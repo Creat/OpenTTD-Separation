@@ -50,6 +50,8 @@ bool TryPathReserve(Train *v, bool mark_as_stuck = false, bool first_tile_okay =
 
 int GetTrainStopLocation(StationID station_id, TileIndex tile, const Train *v, int *station_ahead, int *station_length);
 
+void GetTrainSpriteSize(EngineID engine, uint &width, uint &height, int &xoffs, int &yoffs, EngineImageType image_type);
+
 /** Variables that are cached to improve performance and such */
 struct TrainCache {
 	/* Cached wagon override spritegroup */
@@ -101,8 +103,7 @@ struct Train FINAL : public GroundVehicle<Train, VEH_TRAIN> {
 	int GetDisplayMaxSpeed() const { return this->vcache.cached_max_speed; }
 	Money GetRunningCost() const;
 	int GetDisplayImageWidth(Point *offset = NULL) const;
-	bool IsInDepot() const;
-	bool IsStoppedInDepot() const;
+	bool IsInDepot() const { return this->track == TRACK_BIT_DEPOT; }
 	bool Tick();
 	void OnNewDay();
 	uint Crash(bool flooded = false);

@@ -11,7 +11,7 @@
 
 #include "stdafx.h"
 #include "error.h"
-#include "gui.h"
+#include "settings_gui.h"
 #include "newgrf.h"
 #include "strings_func.h"
 #include "window_func.h"
@@ -19,9 +19,11 @@
 #include "settings_type.h"
 #include "settings_func.h"
 #include "widgets/dropdown_type.h"
+#include "widgets/dropdown_func.h"
 #include "network/network.h"
 #include "network/network_content.h"
 #include "sortlist_type.h"
+#include "stringfilter_type.h"
 #include "querystring_gui.h"
 #include "core/geometry_func.hpp"
 #include "newgrf_text.h"
@@ -143,6 +145,8 @@ struct NewGRFParametersWindow : public Window {
 	GRFConfig *grf_config; ///< Set the parameters of this GRFConfig.
 	uint clicked_button;   ///< The row in which a button was clicked or UINT_MAX.
 	bool clicked_increase; ///< True if the increase button was clicked, false for the decrease button.
+	bool clicked_dropdown; ///< Whether the dropdown is open.
+	bool closing_dropdown; ///< True, if the dropdown list is currently closing.
 	int timeout;           ///< How long before we unpress the last-pressed button?
 	uint clicked_row;      ///< The selected parameter
 	int line_height;       ///< Height of a row in the matrix widget.
@@ -153,6 +157,8 @@ struct NewGRFParametersWindow : public Window {
 	NewGRFParametersWindow(const WindowDesc *desc, GRFConfig *c, bool editable) : Window(),
 		grf_config(c),
 		clicked_button(UINT_MAX),
+		clicked_dropdown(false),
+		closing_dropdown(false),
 		timeout(0),
 		clicked_row(UINT_MAX),
 		editable(editable)
@@ -191,7 +197,7 @@ struct NewGRFParametersWindow : public Window {
 			}
 
 			case WID_NP_NUMPAR: {
-				SetDParam(0, 999);
+				SetDParamMaxValue(0, lengthof(this->grf_config->param));
 				Dimension d = GetStringBoundingBox(this->GetWidget<NWidgetCore>(widget)->widget_data);
 				d.width += padding.width;
 				d.height += padding.height;
@@ -247,11 +253,12 @@ struct NewGRFParametersWindow : public Window {
 		}
 
 		bool rtl = _current_text_dir == TD_RTL;
-		uint buttons_left = rtl ? r.right - 23 : r.left + 4;
-		uint text_left    = r.left + (rtl ? WD_FRAMERECT_LEFT : 28);
-		uint text_right   = r.right - (rtl ? 28 : WD_FRAMERECT_RIGHT);
+		uint buttons_left = rtl ? r.right - SETTING_BUTTON_WIDTH - 3 : r.left + 4;
+		uint text_left    = r.left + (rtl ? WD_FRAMERECT_LEFT : SETTING_BUTTON_WIDTH + 8);
+		uint text_right   = r.right - (rtl ? SETTING_BUTTON_WIDTH + 8 : WD_FRAMERECT_RIGHT);
 
 		int y = r.top;
+		int button_y_offset = (this->line_height - SETTING_BUTTON_HEIGHT) / 2;
 		for (uint i = this->vscroll->GetPosition(); this->vscroll->IsVisible(i) && i < this->vscroll->GetCount(); i++) {
 			GRFParameterInfo *par_info = (i < this->grf_config->param_info.Length()) ? this->grf_config->param_info[i] : NULL;
 			if (par_info == NULL) par_info = GetDummyParameterInfo(i);
@@ -259,10 +266,14 @@ struct NewGRFParametersWindow : public Window {
 			bool selected = (i == this->clicked_row);
 
 			if (par_info->type == PTYPE_BOOL) {
-				DrawBoolButton(buttons_left, y + 2, current_value != 0, this->editable);
+				DrawBoolButton(buttons_left, y + button_y_offset, current_value != 0, this->editable);
 				SetDParam(2, par_info->GetValue(this->grf_config) == 0 ? STR_CONFIG_SETTING_OFF : STR_CONFIG_SETTING_ON);
 			} else if (par_info->type == PTYPE_UINT_ENUM) {
-				DrawArrowButtons(buttons_left, y + 2, COLOUR_YELLOW, (this->clicked_button == i) ? 1 + (this->clicked_increase != rtl) : 0, this->editable && current_value > par_info->min_value, this->editable && current_value < par_info->max_value);
+				if (par_info->complete_labels) {
+					DrawDropDownButton(buttons_left, y + button_y_offset, COLOUR_YELLOW, this->clicked_row == i && this->clicked_dropdown, this->editable);
+				} else {
+					DrawArrowButtons(buttons_left, y + button_y_offset, COLOUR_YELLOW, (this->clicked_button == i) ? 1 + (this->clicked_increase != rtl) : 0, this->editable && current_value > par_info->min_value, this->editable && current_value < par_info->max_value);
+				}
 				SetDParam(2, STR_JUST_INT);
 				SetDParam(3, current_value);
 				if (par_info->value_names.Contains(current_value)) {
@@ -286,6 +297,15 @@ struct NewGRFParametersWindow : public Window {
 			DrawString(text_left, text_right, y + WD_MATRIX_TOP, STR_NEWGRF_PARAMETERS_SETTING, selected ? TC_WHITE : TC_LIGHT_BLUE);
 			y += this->line_height;
 		}
+	}
+
+	virtual void OnPaint()
+	{
+		if (this->closing_dropdown) {
+			this->closing_dropdown = false;
+			this->clicked_dropdown = false;
+		}
+		this->DrawWidgets();
 	}
 
 	virtual void OnClick(Point pt, int widget, int click_count)
@@ -315,25 +335,56 @@ struct NewGRFParametersWindow : public Window {
 				if (num >= this->vscroll->GetCount()) break;
 				if (this->clicked_row != num) {
 					DeleteChildWindows(WC_QUERY_STRING);
+					HideDropDownMenu(this);
 					this->clicked_row = num;
+					this->clicked_dropdown = false;
 				}
 
 				const NWidgetBase *wid = this->GetWidget<NWidgetBase>(WID_NP_BACKGROUND);
 				int x = pt.x - wid->pos_x;
-				if (_current_text_dir == TD_RTL) x = wid->current_x - x;
+				if (_current_text_dir == TD_RTL) x = wid->current_x - 1 - x;
 				x -= 4;
 
 				GRFParameterInfo *par_info = (num < this->grf_config->param_info.Length()) ? this->grf_config->param_info[num] : NULL;
 				if (par_info == NULL) par_info = GetDummyParameterInfo(num);
 
 				/* One of the arrows is clicked */
-				if (IsInsideMM(x, 0, 21)) {
-					uint32 val = par_info->GetValue(this->grf_config);
-					uint32 old_val = val;
+				uint32 old_val = par_info->GetValue(this->grf_config);
+				if (par_info->type != PTYPE_BOOL && IsInsideMM(x, 0, SETTING_BUTTON_WIDTH) && par_info->complete_labels) {
+					if (this->clicked_dropdown) {
+						/* unclick the dropdown */
+						HideDropDownMenu(this);
+						this->clicked_dropdown = false;
+						this->closing_dropdown = false;
+					} else {
+						const NWidgetBase *wid = this->GetWidget<NWidgetBase>(WID_NP_BACKGROUND);
+						int rel_y = (pt.y - (int)wid->pos_y) % this->line_height;
+
+						Rect wi_rect;
+						wi_rect.left = pt.x - (_current_text_dir == TD_RTL ? SETTING_BUTTON_WIDTH - 1 - x : x);;
+						wi_rect.right = wi_rect.left + SETTING_BUTTON_WIDTH - 1;
+						wi_rect.top = pt.y - rel_y + (this->line_height - SETTING_BUTTON_HEIGHT) / 2;
+						wi_rect.bottom = wi_rect.top + SETTING_BUTTON_HEIGHT - 1;
+
+						/* For dropdowns we also have to check the y position thoroughly, the mouse may not above the just opening dropdown */
+						if (pt.y >= wi_rect.top && pt.y <= wi_rect.bottom) {
+							this->clicked_dropdown = true;
+							this->closing_dropdown = false;
+
+							DropDownList *list = new DropDownList();
+							for (uint32 i = par_info->min_value; i <= par_info->max_value; i++) {
+								list->push_back(new DropDownListCharStringItem(GetGRFStringFromGRFText(par_info->value_names.Find(i)->second), i, false));
+							}
+
+							ShowDropDownListAt(this, list, old_val, -1, wi_rect, COLOUR_ORANGE, true);
+						}
+					}
+				} else if (IsInsideMM(x, 0, SETTING_BUTTON_WIDTH)) {
+					uint32 val = old_val;
 					if (par_info->type == PTYPE_BOOL) {
 						val = !val;
 					} else {
-						if (x >= 10) {
+						if (x >= SETTING_BUTTON_WIDTH / 2) {
 							/* Increase button clicked */
 							if (val < par_info->max_value) val++;
 							this->clicked_increase = true;
@@ -349,9 +400,9 @@ struct NewGRFParametersWindow : public Window {
 						this->clicked_button = num;
 						this->timeout = 5;
 					}
-				} else if (par_info->type == PTYPE_UINT_ENUM && click_count >= 2) {
+				} else if (par_info->type == PTYPE_UINT_ENUM && !par_info->complete_labels && click_count >= 2) {
 					/* Display a query box so users can enter a custom value. */
-					SetDParam(0, this->grf_config->param[num]);
+					SetDParam(0, old_val);
 					ShowQueryString(STR_JUST_INT, STR_CONFIG_SETTING_QUERY_CAPTION, 10, this, CS_NUMERAL, QSF_NONE);
 				}
 				this->SetDirty();
@@ -379,6 +430,26 @@ struct NewGRFParametersWindow : public Window {
 		if (par_info == NULL) par_info = GetDummyParameterInfo(this->clicked_row);
 		uint32 val = Clamp<uint32>(value, par_info->min_value, par_info->max_value);
 		par_info->SetValue(this->grf_config, val);
+		this->SetDirty();
+	}
+
+	virtual void OnDropdownSelect(int widget, int index)
+	{
+		assert(this->clicked_dropdown);
+		GRFParameterInfo *par_info = ((uint)this->clicked_row < this->grf_config->param_info.Length()) ? this->grf_config->param_info[this->clicked_row] : NULL;
+		if (par_info == NULL) par_info = GetDummyParameterInfo(this->clicked_row);
+		par_info->SetValue(this->grf_config, index);
+		this->SetDirty();
+	}
+
+	virtual void OnDropdownClose(Point pt, int widget, int index, bool instant_close)
+	{
+		/* We cannot raise the dropdown button just yet. OnClick needs some hint, whether
+		 * the same dropdown button was clicked again, and then not open the dropdown again.
+		 * So, we only remember that it was closed, and process it on the next OnPaint, which is
+		 * after OnClick. */
+		assert(this->clicked_dropdown);
+		this->closing_dropdown = true;
 		this->SetDirty();
 	}
 
@@ -455,7 +526,7 @@ static const NWidgetPart _nested_newgrf_parameter_widgets[] = {
 static const WindowDesc _newgrf_parameters_desc(
 	WDP_CENTER, 500, 208,
 	WC_GRF_PARAMETERS, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_newgrf_parameter_widgets, lengthof(_nested_newgrf_parameter_widgets)
 );
 
@@ -471,8 +542,6 @@ struct NewGRFTextfileWindow : public TextfileWindow {
 
 	NewGRFTextfileWindow(TextfileType file_type, const GRFConfig *c) : TextfileWindow(file_type), grf_config(c)
 	{
-		this->GetWidget<NWidgetCore>(WID_TF_CAPTION)->SetDataTip(STR_TEXTFILE_README_CAPTION + file_type, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS);
-
 		const char *textfile = this->grf_config->GetTextfile(file_type);
 		this->LoadTextfile(textfile, NEWGRF_DIR);
 	}
@@ -516,8 +585,8 @@ static void NewGRFConfirmationCallback(Window *w, bool confirmed);
 /**
  * Window for showing NewGRF files
  */
-struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
-	typedef GUIList<const GRFConfig *> GUIGRFConfigList;
+struct NewGRFWindow : public Window, NewGRFScanCallback {
+	typedef GUIList<const GRFConfig *, StringFilter &> GUIGRFConfigList;
 
 	static const uint EDITBOX_MAX_SIZE   =  50;
 
@@ -529,6 +598,8 @@ struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 	GUIGRFConfigList avails;    ///< Available (non-active) grfs.
 	const GRFConfig *avail_sel; ///< Currently selected available grf. \c NULL is none is selected.
 	int avail_pos;              ///< Index of #avail_sel if existing, else \c -1.
+	StringFilter string_filter; ///< Filter for available grf.
+	QueryString filter_editbox; ///< Filter editbox;
 
 	GRFConfig *actives;         ///< Temporary active grf list to which changes are made.
 	GRFConfig *active_sel;      ///< Selected active grf item.
@@ -543,7 +614,7 @@ struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 	Scrollbar *vscroll;
 	Scrollbar *vscroll2;
 
-	NewGRFWindow(const WindowDesc *desc, bool editable, bool show_params, bool execute, GRFConfig **orig_list) : QueryStringBaseWindow(EDITBOX_MAX_SIZE)
+	NewGRFWindow(const WindowDesc *desc, bool editable, bool show_params, bool execute, GRFConfig **orig_list) : filter_editbox(EDITBOX_MAX_SIZE)
 	{
 		this->avail_sel   = NULL;
 		this->avail_pos   = -1;
@@ -567,7 +638,8 @@ struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 		this->GetWidget<NWidgetStacked>(WID_NS_SHOW_APPLY)->SetDisplayedPlane(this->editable ? 0 : this->show_params ? 1 : SZSP_HORIZONTAL);
 		this->FinishInitNested(desc, WN_GAME_OPTIONS_NEWGRF_STATE);
 
-		InitializeTextBuffer(&this->text, this->edit_str_buf, this->edit_str_size);
+		this->querystrings[WID_NS_FILTER] = &this->filter_editbox;
+		this->filter_editbox.cancel_button = QueryString::ACTION_CLEAR;
 		this->SetFocusedWidget(WID_NS_FILTER);
 
 		this->avails.SetListing(this->last_sorting);
@@ -664,12 +736,6 @@ struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 				}
 				break;
 		}
-	}
-
-	virtual void OnPaint()
-	{
-		this->DrawWidgets();
-		if (this->editable) this->DrawEditBox(WID_NS_FILTER);
 	}
 
 	/**
@@ -1146,7 +1212,7 @@ struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 			has_missing    |= c->status == GCS_NOT_FOUND;
 			has_compatible |= HasBit(c->flags, GCF_COMPATIBLE);
 		}
-		uint16 widget_data;
+		uint32 widget_data;
 		StringID tool_tip;
 		if (has_missing || has_compatible) {
 			widget_data = STR_NEWGRF_SETTINGS_FIND_MISSING_CONTENT_BUTTON;
@@ -1161,11 +1227,6 @@ struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 		this->GetWidget<NWidgetCore>(WID_NS_CONTENT_DOWNLOAD2)->tool_tip    = tool_tip;
 
 		this->SetWidgetDisabledState(WID_NS_PRESET_SAVE, has_missing);
-	}
-
-	virtual void OnMouseLoop()
-	{
-		if (this->editable) this->HandleEditBox(WID_NS_FILTER);
 	}
 
 	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
@@ -1203,14 +1264,8 @@ struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 				this->avail_pos = this->avails.Length() - 1;
 				break;
 
-			default: {
-				/* Handle editbox input */
-				EventState state = ES_NOT_HANDLED;
-				if (this->HandleEditBoxKey(WID_NS_FILTER, key, keycode, state) == HEBR_EDITING) {
-					this->OnOSKInput(WID_NS_FILTER);
-				}
-				return state;
-			}
+			default:
+				return ES_NOT_HANDLED;
 		}
 
 		if (this->avails.Length() == 0) this->avail_pos = -1;
@@ -1223,11 +1278,12 @@ struct NewGRFWindow : public QueryStringBaseWindow, NewGRFScanCallback {
 		return ES_HANDLED;
 	}
 
-	virtual void OnOSKInput(int wid)
+	virtual void OnEditboxChanged(int wid)
 	{
 		if (!this->editable) return;
 
-		this->avails.SetFilterState(!StrEmpty(this->edit_str_buf));
+		string_filter.SetFilterTerm(this->filter_editbox.text.buf);
+		this->avails.SetFilterState(!string_filter.IsEmpty());
 		this->avails.ForceRebuild();
 		this->InvalidateData(0);
 	}
@@ -1317,12 +1373,13 @@ private:
 	}
 
 	/** Filter grfs by tags/name */
-	static bool CDECL TagNameFilter(const GRFConfig * const *a, const char *filter_string)
+	static bool CDECL TagNameFilter(const GRFConfig * const *a, StringFilter &filter)
 	{
-		if (strcasestr((*a)->GetName(), filter_string) != NULL) return true;
-		if ((*a)->filename != NULL && strcasestr((*a)->filename, filter_string) != NULL) return true;
-		if ((*a)->GetDescription() != NULL && strcasestr((*a)->GetDescription(), filter_string) != NULL) return true;
-		return false;
+		filter.ResetState();
+		filter.AddLine((*a)->GetName());
+		filter.AddLine((*a)->filename);
+		filter.AddLine((*a)->GetDescription());
+		return filter.GetState();;
 	}
 
 	void BuildAvailables()
@@ -1342,7 +1399,7 @@ private:
 				const GRFConfig *best = FindGRFConfig(c->ident.grfid, HasBit(c->flags, GCF_INVALID) ? FGCM_NEWEST : FGCM_NEWEST_VALID);
 				/*
 				 * If the best version is 0, then all NewGRF with this GRF ID
-				 * have version 0, so for backward compatability reasons we
+				 * have version 0, so for backward compatibility reasons we
 				 * want to show them all.
 				 * If we are the best version, then we definitely want to
 				 * show that NewGRF!.
@@ -1353,7 +1410,7 @@ private:
 			}
 		}
 
-		this->avails.Filter(this->edit_str_buf);
+		this->avails.Filter(this->string_filter);
 		this->avails.Compact();
 		this->avails.RebuildDone();
 		this->avails.Sort();
@@ -1812,7 +1869,7 @@ static const NWidgetPart _nested_newgrf_widgets[] = {
 static const WindowDesc _newgrf_desc(
 	WDP_CENTER, 300, 263,
 	WC_GAME_OPTIONS, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_newgrf_widgets, lengthof(_nested_newgrf_widgets)
 );
 
@@ -1883,7 +1940,7 @@ static const NWidgetPart _nested_scan_progress_widgets[] = {
 static const WindowDesc _scan_progress_desc(
 	WDP_CENTER, 0, 0,
 	WC_MODAL_PROGRESS, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_scan_progress_widgets, lengthof(_nested_scan_progress_widgets)
 );
 
@@ -1908,7 +1965,7 @@ struct ScanProgressWindow : public Window {
 	{
 		switch (widget) {
 			case WID_SP_PROGRESS_BAR: {
-				SetDParam(0, 100);
+				SetDParamMaxValue(0, 100);
 				*size = GetStringBoundingBox(STR_GENERATION_PROGRESS);
 				/* We need some spacing for the 'border' */
 				size->height += 8;
@@ -1917,8 +1974,8 @@ struct ScanProgressWindow : public Window {
 			}
 
 			case WID_SP_PROGRESS_TEXT:
-				SetDParam(0, 9999);
-				SetDParam(1, 9999);
+				SetDParamMaxDigits(0, 4);
+				SetDParamMaxDigits(1, 4);
 				/* We really don't know the width. We could determine it by scanning the NewGRFs,
 				 * but this is the status window for scanning them... */
 				size->width = max(400U, GetStringBoundingBox(STR_NEWGRF_SCAN_STATUS).width);

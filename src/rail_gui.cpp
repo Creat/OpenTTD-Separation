@@ -85,7 +85,7 @@ static bool IsStationAvailable(const StationSpec *statspec)
 
 void CcPlaySound1E(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 {
-	if (result.Succeeded()) SndPlayTileFx(SND_20_SPLAT_2, tile);
+	if (result.Succeeded() && _settings_client.sound.confirm) SndPlayTileFx(SND_20_SPLAT_2, tile);
 }
 
 static void GenericPlaceRail(TileIndex tile, int cmd)
@@ -132,7 +132,7 @@ void CcRailDepot(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2
 
 	DiagDirection dir = (DiagDirection)p2;
 
-	SndPlayTileFx(SND_20_SPLAT_2, tile);
+	if (_settings_client.sound.confirm) SndPlayTileFx(SND_20_SPLAT_2, tile);
 	if (!_settings_client.gui.persistent_buildingtools) ResetObjectToPlace();
 
 	tile += TileOffsByDiagDir(dir);
@@ -170,7 +170,7 @@ void CcStation(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 {
 	if (result.Failed()) return;
 
-	SndPlayTileFx(SND_20_SPLAT_2, tile);
+	if (_settings_client.sound.confirm) SndPlayTileFx(SND_20_SPLAT_2, tile);
 	/* Only close the station builder window if the default station and non persistent building is chosen. */
 	if (_railstation.station_class == STAT_CLASS_DFLT && _railstation.station_type == 0 && !_settings_client.gui.persistent_buildingtools) ResetObjectToPlace();
 }
@@ -271,7 +271,7 @@ static void PlaceRail_Bridge(TileIndex tile, Window *w)
 void CcBuildRailTunnel(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 {
 	if (result.Succeeded()) {
-		SndPlayTileFx(SND_20_SPLAT_2, tile);
+		if (_settings_client.sound.confirm) SndPlayTileFx(SND_20_SPLAT_2, tile);
 		if (!_settings_client.gui.persistent_buildingtools) ResetObjectToPlace();
 	} else {
 		SetRedErrorSquare(_build_tunnel_endtile);
@@ -321,7 +321,7 @@ static void BuildRailClick_Remove(Window *w)
 {
 	if (w->IsWidgetDisabled(WID_RAT_REMOVE)) return;
 	ToggleRailButton_Remove(w);
-	SndPlayFx(SND_15_BEEP);
+	if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 
 	/* handle station builder */
 	if (w->IsWidgetLowered(WID_RAT_BUILD_STATION)) {
@@ -1162,7 +1162,7 @@ public:
 				this->RaiseWidget(_railstation.orientation + WID_BRAS_PLATFORM_DIR_X);
 				_railstation.orientation = (Axis)(widget - WID_BRAS_PLATFORM_DIR_X);
 				this->LowerWidget(_railstation.orientation + WID_BRAS_PLATFORM_DIR_X);
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				DeleteWindowById(WC_SELECT_STATION, 0);
 				break;
@@ -1196,7 +1196,7 @@ public:
 
 				this->LowerWidget(_settings_client.gui.station_numtracks + WID_BRAS_PLATFORM_NUM_BEGIN);
 				this->LowerWidget(_settings_client.gui.station_platlength + WID_BRAS_PLATFORM_LEN_BEGIN);
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				DeleteWindowById(WC_SELECT_STATION, 0);
 				break;
@@ -1231,7 +1231,7 @@ public:
 
 				this->LowerWidget(_settings_client.gui.station_numtracks + WID_BRAS_PLATFORM_NUM_BEGIN);
 				this->LowerWidget(_settings_client.gui.station_platlength + WID_BRAS_PLATFORM_LEN_BEGIN);
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				DeleteWindowById(WC_SELECT_STATION, 0);
 				break;
@@ -1265,7 +1265,7 @@ public:
 
 				this->SetWidgetLoweredState(_settings_client.gui.station_numtracks + WID_BRAS_PLATFORM_NUM_BEGIN, !_settings_client.gui.station_dragdrop);
 				this->SetWidgetLoweredState(_settings_client.gui.station_platlength + WID_BRAS_PLATFORM_LEN_BEGIN, !_settings_client.gui.station_dragdrop);
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				DeleteWindowById(WC_SELECT_STATION, 0);
 				break;
@@ -1277,7 +1277,7 @@ public:
 
 				this->SetWidgetLoweredState(WID_BRAS_HIGHLIGHT_OFF, !_settings_client.gui.station_show_coverage);
 				this->SetWidgetLoweredState(WID_BRAS_HIGHLIGHT_ON, _settings_client.gui.station_show_coverage);
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				break;
 
@@ -1299,7 +1299,7 @@ public:
 							matrix->SetCount(_railstation.station_count);
 							matrix->SetClicked(_railstation.station_type);
 						}
-						SndPlayFx(SND_15_BEEP);
+						if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 						this->SetDirty();
 						DeleteWindowById(WC_SELECT_STATION, 0);
 						break;
@@ -1322,7 +1322,7 @@ public:
 				this->CheckSelectedSize(statspec);
 				this->GetWidget<NWidgetMatrix>(WID_BRAS_MATRIX)->SetClicked(_railstation.station_type);
 
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				DeleteWindowById(WC_SELECT_STATION, 0);
 				break;
@@ -1445,16 +1445,13 @@ struct BuildSignalWindow : public PickerWindowBase {
 private:
 	/**
 	 * Draw dynamic a signal-sprite in a button in the signal GUI
-	 * Draw the sprite +1px to the right and down if the button is lowered and change the sprite to sprite + 1 (red to green light)
+	 * Draw the sprite +1px to the right and down if the button is lowered
 	 *
 	 * @param widget_index index of this widget in the window
 	 * @param image        the sprite to draw
 	 */
 	void DrawSignalSprite(byte widget_index, SpriteID image) const
 	{
-		/* First get the right image, which is one later for 'green' signals. */
-		image += this->IsWidgetLowered(widget_index);
-
 		/* Next get the actual sprite so we can calculate the right offsets. */
 		const Sprite *sprite = GetSprite(image, ST_NORMAL);
 
@@ -1501,16 +1498,12 @@ public:
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
 		if (IsInsideMM(widget, WID_BS_SEMAPHORE_NORM, WID_BS_ELECTRIC_PBS_OWAY + 1)) {
-			/* We need to do some custom sprite widget drawing for the signals. */
-			const SpriteID _signal_lookup[] = {
-				SPR_IMG_SIGNAL_SEMAPHORE_NORM,  SPR_IMG_SIGNAL_SEMAPHORE_ENTRY, SPR_IMG_SIGNAL_SEMAPHORE_EXIT,
-				SPR_IMG_SIGNAL_SEMAPHORE_COMBO, SPR_IMG_SIGNAL_SEMAPHORE_PBS,   SPR_IMG_SIGNAL_SEMAPHORE_PBS_OWAY,
+			/* Extract signal from widget number. */
+			int type = (widget - WID_BS_SEMAPHORE_NORM) % SIGTYPE_END;
+			int var = SIG_SEMAPHORE - (widget - WID_BS_SEMAPHORE_NORM) / SIGTYPE_END; // SignalVariant order is reversed compared to the widgets.
+			SpriteID sprite = GetRailTypeInfo(_cur_railtype)->gui_sprites.signals[type][var][this->IsWidgetLowered(widget)];
 
-				SPR_IMG_SIGNAL_ELECTRIC_NORM,  SPR_IMG_SIGNAL_ELECTRIC_ENTRY, SPR_IMG_SIGNAL_ELECTRIC_EXIT,
-				SPR_IMG_SIGNAL_ELECTRIC_COMBO, SPR_IMG_SIGNAL_ELECTRIC_PBS,   SPR_IMG_SIGNAL_ELECTRIC_PBS_OWAY
-			};
-
-			this->DrawSignalSprite(widget, _signal_lookup[widget - WID_BS_SEMAPHORE_NORM]);
+			this->DrawSignalSprite(widget, sprite);
 		}
 	}
 
@@ -1624,7 +1617,7 @@ static const NWidgetPart _nested_signal_builder_widgets[] = {
 static const WindowDesc _signal_builder_desc(
 	WDP_AUTO, 0, 0,
 	WC_BUILD_SIGNAL, WC_BUILD_TOOLBAR,
-	WDF_UNCLICK_BUTTONS | WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION,
 	_nested_signal_builder_widgets, lengthof(_nested_signal_builder_widgets)
 );
 
@@ -1660,7 +1653,7 @@ struct BuildRailDepotWindow : public PickerWindowBase {
 				this->RaiseWidget(_build_depot_direction + WID_BRAD_DEPOT_NE);
 				_build_depot_direction = (DiagDirection)(widget - WID_BRAD_DEPOT_NE);
 				this->LowerWidget(_build_depot_direction + WID_BRAD_DEPOT_NE);
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				break;
 		}
@@ -1766,7 +1759,7 @@ struct BuildRailWaypointWindow : PickerWindowBase {
 
 				_cur_waypoint_type = type;
 				this->GetWidget<NWidgetMatrix>(WID_BRW_WAYPOINT_MATRIX)->SetClicked(_cur_waypoint_type);
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				break;
 			}
@@ -1782,7 +1775,7 @@ static const NWidgetPart _nested_build_waypoint_widgets[] = {
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL),
 		NWidget(NWID_MATRIX, COLOUR_DARK_GREEN, WID_BRW_WAYPOINT_MATRIX), SetPIP(3, 2, 3), SetScrollbar(WID_BRW_SCROLL),
-			NWidget(WWT_PANEL, COLOUR_DARK_GREEN, WID_BRW_WAYPOINT), SetMinimalSize(66, 60), SetDataTip(0x0, STR_WAYPOINT_GRAPHICS_TOOLTIP), EndContainer(),
+			NWidget(WWT_PANEL, COLOUR_DARK_GREEN, WID_BRW_WAYPOINT), SetMinimalSize(66, 60), SetDataTip(0x0, STR_WAYPOINT_GRAPHICS_TOOLTIP), SetScrollbar(WID_BRW_SCROLL), EndContainer(),
 		EndContainer(),
 		NWidget(NWID_VERTICAL),
 			NWidget(NWID_VSCROLLBAR, COLOUR_DARK_GREEN, WID_BRW_SCROLL),

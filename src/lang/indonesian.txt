@@ -217,6 +217,7 @@ STR_UNITS_HEIGHT_IMPERIAL                                       :{COMMA} ft
 STR_UNITS_HEIGHT_SI                                             :{COMMA} m
 
 # Common window strings
+STR_LIST_FILTER_TITLE                                           :{BLACK}Kata penyaring:
 STR_LIST_FILTER_OSKTITLE                                        :{BLACK}Masukkan kata penyaring
 STR_LIST_FILTER_TOOLTIP                                         :{BLACK}Masukkan kata kunci untuk menyaring daftar
 
@@ -347,9 +348,8 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :Keluar
 
 ############ range for settings menu starts
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Pengaturan permainan
-STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Pengaturan tingkat kesulitan
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Pengaturan lanjutan
-STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :Pengaturan AI / Permainan
+STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :Pengaturan AI / Skrip Permainan
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :Pengaturan NewGRF
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Pengaturan Transparansi
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Nama kota ditampilkan
@@ -360,7 +360,7 @@ STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Tampilan penand
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Animasi penuh
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Detail penuh
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Bangunan tembus pandang
-STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparasikan palang stasiun
+STR_SETTINGS_MENU_TRANSPARENT_SIGNS                             :Transparankan tanda-tanda
 ############ range ends here
 
 ############ range for file menu starts
@@ -398,10 +398,12 @@ STR_GRAPH_MENU_CARGO_PAYMENT_RATES                              :Daftar biaya ka
 ############ range for company league menu starts
 STR_GRAPH_MENU_COMPANY_LEAGUE_TABLE                             :Tabel Perusahaan
 STR_GRAPH_MENU_DETAILED_PERFORMANCE_RATING                      :Rating kemampuan secara rinci
+STR_GRAPH_MENU_HIGHSCORE                                        :Tabel Skor
 ############ range ends here
 
 ############ range for industry menu starts
 STR_INDUSTRY_MENU_INDUSTRY_DIRECTORY                            :Daftar Industri
+STR_INDUSTRY_MENU_INDUSTRY_CHAIN                                :Rantai industri
 STR_INDUSTRY_MENU_FUND_NEW_INDUSTRY                             :Danai industri baru
 ############ range ends here
 
@@ -437,7 +439,6 @@ STR_TOOLBAR_SOUND_MUSIC                                         :Suara/musik
 
 ############ range for message menu starts
 STR_NEWS_MENU_LAST_MESSAGE_NEWS_REPORT                          :Pesan/Berita terakhir
-STR_NEWS_MENU_MESSAGE_SETTINGS                                  :Pengaturan berita
 STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :Berita Lampau
 ############ range ends here
 
@@ -638,7 +639,7 @@ STR_PLAYLIST_TOOLTIP_CLICK_TO_ADD_TRACK                         :{BLACK}Klik pad
 STR_PLAYLIST_TOOLTIP_CLICK_TO_REMOVE_TRACK                      :{BLACK}Klik pada track musik untuk menghapusnya dari program saat ini. (Bebas 1 atau Bebas 2 saja)
 
 # Highscore window
-STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED                         :{BIG_FONT}{BLACK}Perusahaan tertinggi yang mencapai tahun {NUM}{}(Level {STRING})
+STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED                         :{BIG_FONT}{BLACK}Perusahaan tertinggi yang mencapai tahun {NUM}
 STR_HIGHSCORE_TOP_COMPANIES_NETWORK_GAME                        :{BIG_FONT}{BLACK}Tabel Liga Perusahaan {NUM}
 STR_HIGHSCORE_POSITION                                          :{BIG_FONT}{BLACK}{COMMA}.
 STR_HIGHSCORE_PERFORMANCE_TITLE_BUSINESSMAN                     :Pengusaha
@@ -726,32 +727,7 @@ STR_MESSAGE_HISTORY                                             :{WHITE}Pesan La
 STR_MESSAGE_HISTORY_TOOLTIP                                     :{BLACK}Daftar pesan berita-berita yang ada
 STR_MESSAGE_NEWS_FORMAT                                         :{STRING}  -  {STRING}
 
-# Message settings window
 STR_NEWS_MESSAGE_CAPTION                                        :{WHITE}Pesan
-STR_NEWS_MESSAGE_OPTIONS_CAPTION                                :{WHITE}Pilihan Pemberitaan
-STR_NEWS_MESSAGES_ALL                                           :{YELLOW}Atur semua jenis berita menjadi : Mati / Ringkas / Penuh
-STR_NEWS_MESSAGES_SOUND                                         :{YELLOW}Mainkan suara untuk berita yang diringkas
-STR_NEWS_MESSAGES_OFF                                           :Mati
-STR_NEWS_MESSAGES_SUMMARY                                       :Ringkasan
-STR_NEWS_MESSAGES_FULL                                          :Penuh
-
-STR_NEWS_MESSAGE_TYPES                                          :{BLACK}Jenis Berita
-STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OWN              :{YELLOW}Kedatangan kendaraan pertama pada stasiun pemain
-STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OTHER            :{YELLOW}Kedatangan kendaraan pertama pada stasiun lawan
-STR_NEWS_MESSAGE_TYPE_ACCIDENTS_DISASTERS                       :{YELLOW}Kecelakaan / bencana
-STR_NEWS_MESSAGE_TYPE_COMPANY_INFORMATION                       :{YELLOW}Informasi Perusahaan
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_OPEN                             :{YELLOW}Pembukaan Industri Baru
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CLOSE                            :{YELLOW}Penutupan Industri
-STR_NEWS_MESSAGE_TYPE_ECONOMY_CHANGES                           :{YELLOW}Perubahan ekonomi
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_COMPANY        :{YELLOW}Perubahan produksi pada industri yang ditangani oleh pemain
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_OTHER          :{YELLOW}Perubahan produksi pada industri yang ditangani oleh para pesaing
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_UNSERVED                 :{YELLOW}Perubahan pada produksi industri lainnya
-STR_NEWS_MESSAGE_TYPE_ADVICE_INFORMATION_ON_COMPANY             :{YELLOW}Saran / informasi pada kendaraan pemain.
-STR_NEWS_MESSAGE_TYPE_NEW_VEHICLES                              :{YELLOW}Kendaraan baru
-STR_NEWS_MESSAGE_TYPE_CHANGES_OF_CARGO_ACCEPTANCE               :{YELLOW}Perubahan penerimaan kargo
-STR_NEWS_MESSAGE_TYPE_SUBSIDIES                                 :{YELLOW}Subsidi
-STR_NEWS_MESSAGE_TYPE_GENERAL_INFORMATION                       :{YELLOW}Informasi umum
-
 STR_NEWS_CUSTOM_ITEM                                            :{BIG_FONT}{BLACK}{STRING}
 
 STR_NEWS_FIRST_TRAIN_ARRIVAL                                    :{BIG_FONT}{BLACK}Masyarakat bergembira . . .{}Kereta pertama tiba di {STATION}!
@@ -851,6 +827,8 @@ STR_NEWS_SERVICE_SUBSIDY_AWARDED_TRIPLE                         :{BIG_FONT}{BLAC
 STR_NEWS_SERVICE_SUBSIDY_AWARDED_QUADRUPLE                      :{BIG_FONT}{BLACK}Subsidi diberikan kepada {STRING}!{}{}Jasa transportasi {STRING} dari {STRING} ke {STRING} akan dibayar empat kali lipat hingga tahun depan!
 
 STR_NEWS_ROAD_REBUILDING                                        :{BIG_FONT}{BLACK}Kekacauan lalu lintas di {TOWN}!{}{}Program perbaikan jalan yang dibiayai oleh {STRING} mengakibat kesengsaraan bagi pengendara selama 6 bulan!
+STR_NEWS_EXCLUSIVE_RIGHTS_TITLE                                 :{BIG_FONT}{BLACK}Monopoli transportasi!
+STR_NEWS_EXCLUSIVE_RIGHTS_DESCRIPTION                           :{BIG_FONT}{BLACK}Pemkot Kota {TOWN} menandatangani kontrak dengan {STRING} untuk hak transportasi eksklusif selama 1 tahun!
 
 # Extra view window
 STR_EXTRA_VIEW_PORT_TITLE                                       :{WHITE}Viewport {COMMA}
@@ -893,6 +871,9 @@ STR_GAME_OPTIONS_CURRENCY_TRY                                   :Lira Turki (TRY
 STR_GAME_OPTIONS_CURRENCY_SKK                                   :Koruna Slovakia (SKK)
 STR_GAME_OPTIONS_CURRENCY_BRL                                   :Real Brazilia (BRL)
 STR_GAME_OPTIONS_CURRENCY_EEK                                   :Krooni Estonia (EEK)
+STR_GAME_OPTIONS_CURRENCY_LTL                                   :Litas Lithuania (LTL)
+STR_GAME_OPTIONS_CURRENCY_KRW                                   :Won Korea Selatan (KRW)
+STR_GAME_OPTIONS_CURRENCY_ZAR                                   :Rand Afrika Selatan (ZAR)
 STR_GAME_OPTIONS_CURRENCY_CUSTOM                                :Atur sendiri...
 ############ end of currency region
 
@@ -1001,37 +982,7 @@ STR_CURRENCY_PREVIEW                                            :{LTBLUE}Contoh:
 STR_CURRENCY_CUSTOM_CURRENCY_PREVIEW_TOOLTIP                    :{BLACK}10000 Pound (£) pada mata uang Anda
 STR_CURRENCY_CHANGE_PARAMETER                                   :{BLACK}Ubah sendiri parameter mata uang
 
-# Difficulty level window
-STR_DIFFICULTY_LEVEL_CAPTION                                    :{WHITE}Tingkat kesulitan
-
-############ range for difficulty levels starts
-STR_DIFFICULTY_LEVEL_EASY                                       :{BLACK}Mudah
-STR_DIFFICULTY_LEVEL_MEDIUM                                     :{BLACK}Sedang
-STR_DIFFICULTY_LEVEL_HARD                                       :{BLACK}Sulit
-STR_DIFFICULTY_LEVEL_CUSTOM                                     :{BLACK}Bebas
-############ range for difficulty levels ends
-
-STR_DIFFICULTY_LEVEL_HIGH_SCORE_BUTTON                          :{BLACK}Tampilkan tabel skor tertinggi
-STR_DIFFICULTY_LEVEL_SAVE                                       :{BLACK}Simpan
-
-############ range for difficulty settings starts
 STR_DIFFICULTY_LEVEL_SETTING_MAXIMUM_NO_COMPETITORS             :{LTBLUE}Jumlah pesaing maksimal: {ORANGE}{COMMA}
-STR_DIFFICULTY_LEVEL_SETTING_NO_OF_TOWNS                        :{LTBLUE}Jumlah kota: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_NO_OF_INDUSTRIES                   :{LTBLUE}Jumlah industri: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_MAXIMUM_INITIAL_LOAN_000           :{LTBLUE}Jumlah pinjaman maksimal: {ORANGE}{CURRENCY_LONG}
-STR_DIFFICULTY_LEVEL_SETTING_INITIAL_INTEREST_RATE              :{LTBLUE}Tingkat suku bunga awal: {ORANGE}{COMMA}%
-STR_DIFFICULTY_LEVEL_SETTING_VEHICLE_RUNNING_COSTS              :{LTBLUE}Biaya operasional kendaraan: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_CONSTRUCTION_SPEED_OF_COMPETITOR   :{LTBLUE}Kecepatan para pesaing membangun: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_VEHICLE_BREAKDOWNS                 :{LTBLUE}Bus/truk mogok : {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_SUBSIDY_MULTIPLIER                 :{LTBLUE}Faktor kali angka subsidi: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_COST_OF_CONSTRUCTION               :{LTBLUE}Biaya pembangunan: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_TERRAIN_TYPE                       :{LTBLUE}Jenis Dataran: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_QUANTITY_OF_SEA_LAKES              :{LTBLUE}Area perairan: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_ECONOMY                            :{LTBLUE}Ekonomi: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_TRAIN_REVERSING                    :{LTBLUE}Kereta berbalik arah: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_DISASTERS                          :{LTBLUE}Bencana alam: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_CITY_APPROVAL                      :{LTBLUE}Sikap pemkot saat restrukturisasi wilayah: {ORANGE}{STRING}
-############ range for difficulty settings ends
 
 STR_NONE                                                        :Tidak ada
 STR_FUNDING_ONLY                                                :Hanya pendanaan
@@ -1082,21 +1033,31 @@ STR_TERRAIN_TYPE_FLAT                                           :Datar
 STR_TERRAIN_TYPE_HILLY                                          :Berbukit
 STR_TERRAIN_TYPE_MOUNTAINOUS                                    :Pegunungan
 
-STR_ECONOMY_STEADY                                              :Stabil
-STR_ECONOMY_FLUCTUATING                                         :Fluktuatif
-
-STR_REVERSE_AT_END_OF_LINE_AND_AT_STATIONS                      :Pada ujung rel, dan pada stasiun
-STR_REVERSE_AT_END_OF_LINE_ONLY                                 :Hanya pada ujung rel
-
 STR_CITY_APPROVAL_PERMISSIVE                                    :Selalu boleh
 STR_CITY_APPROVAL_TOLERANT                                      :Toleran
 STR_CITY_APPROVAL_HOSTILE                                       :Bermusuhan
 
 STR_WARNING_NO_SUITABLE_AI                                      :{WHITE}Tidak terdapat pemain AI ...{}anda dapat mengunduh beberapa macam AI lewat "Cari Konten"
-STR_WARNING_DIFFICULTY_TO_CUSTOM                                :{WHITE}Tindakan ini menyebabkan tingkat kesulitan menjadi bebas
 
 # Advanced settings window
 STR_CONFIG_SETTING_CAPTION                                      :{WHITE}Pengaturan lanjutan
+STR_CONFIG_SETTING_FILTER_TITLE                                 :{BLACK}Penyaring kata:
+STR_CONFIG_SETTING_EXPAND_ALL                                   :{BLACK}Perluas semua
+STR_CONFIG_SETTING_COLLAPSE_ALL                                 :{BLACK}Persempit semua
+STR_CONFIG_SETTING_NO_EXPLANATION_AVAILABLE_HELPTEXT            :(penjelasan belum tersedia)
+
+STR_CONFIG_SETTING_RESTRICT_LABEL                               :{BLACK}Perlihatkan:
+STR_CONFIG_SETTING_RESTRICT_DROPDOWN_HELPTEXT                   :{BLACK}Hambat daftar dibawah, hanya tampilkan aturan yang diubah
+STR_CONFIG_SETTING_RESTRICT_BASIC                               :Pengaturan dasar
+STR_CONFIG_SETTING_RESTRICT_ADVANCED                            :Pengaturan lanjut
+STR_CONFIG_SETTING_RESTRICT_ALL                                 :Pengaturan mahir / semua aturan
+STR_CONFIG_SETTING_RESTRICT_CHANGED_AGAINST_DEFAULT             :Pengaturan dengan nilai berbeda dari nilai asli
+STR_CONFIG_SETTING_RESTRICT_CHANGED_AGAINST_NEW                 :Pengaturan dengan nilai berbeda dari pengaturan permainan baru
+
+STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_MENU                      :Pengaturan permainan (ikut tersimpan; hanya memiliki efek pada permainan baru)
+STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_INGAME                    :Pengaturan permainan (ikut tersimpan; hanya memiliki efek pada permainan aktif)
+STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_MENU                   :Pengaturan perusahaan (ikut tersimpan; hanya memiliki efek pada permainan baru)
+STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_INGAME                 :Pengaturan perusahaan (ikut tersimpan; hanya memiliki efek pada perusahaan aktif)
 
 STR_CONFIG_SETTING_OFF                                          :Tidak
 STR_CONFIG_SETTING_ON                                           :Ya
@@ -1114,240 +1075,250 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_LEFT                          :Kiri
 STR_CONFIG_SETTING_HORIZONTAL_POS_CENTER                        :Tengah
 STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Kanan
 
-STR_CONFIG_SETTING_BUILDONSLOPES                                :{LTBLUE}Ijinkan pembangunan di lereng dan pantai: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTOSLOPE                                    :{LTBLUE}Ijinkan pembentukan slop dibawah bangunan, rel, dsb. (otomatiskan): {ORANGE}{STRING}
-STR_CONFIG_SETTING_CATCHMENT                                    :{LTBLUE}Ijinkan ukuran jangkauan wilayah lebih realistik: {ORANGE}{STRING}
-STR_CONFIG_SETTING_EXTRADYNAMITE                                :{LTBLUE}Ijinkan menggusur lebih banyak jalan, jembatan, terowongan milik kota, dsb: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_LENGTH                                 :{LTBLUE}Panjang maksimum kereta: {ORANGE}{STRING} kotak
-STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}Banyaknya asap / percikan lokomotif: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :{LTBLUE}Model akselerasi kereta: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :{LTBLUE}Model kendaraan percepatan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Kecuraman dataran pada kereta: {ORANGE}{STRING}%
-STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Lereng kecuraman untuk kendaraan: {ORANGE}{STRING}%
-STR_CONFIG_SETTING_FORBID_90_DEG                                :{LTBLUE}Kereta dan kapal dilarang belok 90 derajat: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :{LTBLUE}Ijinkan menggabung stasiun meski tdk menempel: {ORANGE}{STRING}
-STR_CONFIG_SETTING_IMPROVEDLOAD                                 :{LTBLUE}Gunakan algoritma pengangkutan terbaru : {ORANGE}{STRING}
-STR_CONFIG_SETTING_GRADUAL_LOADING                              :{LTBLUE}Angkut secara bertahap: {ORANGE}{STRING}
-STR_CONFIG_SETTING_INFLATION                                    :{LTBLUE}Inflasi: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SELECTGOODS                                  :{LTBLUE}Menerima kargo di suatu stasiun hanya jika dibutuhkan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_BRIDGE_LENGTH                            :{LTBLUE}Panjang maksimum jembatan: {ORANGE}{STRING} kotak
-STR_CONFIG_SETTING_MAX_TUNNEL_LENGTH                            :{LTBLUE}Panjang maksimum terowongan: {ORANGE}{STRING} kotak
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD             :{LTBLUE}Metode pembangunan Industri primer : {ORANGE}{STRING}
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NONE        :tidak ada
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NORMAL      :seperti industri lainnya
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_PROSPECTING :lebih prospektif
-STR_CONFIG_SETTING_INDUSTRY_PLATFORM                            :{LTBLUE}Tanah datar di sekitar industri: {ORANGE}{STRING} kotak{P 0:1 ""}
-STR_CONFIG_SETTING_MULTIPINDTOWN                                :{LTBLUE}Ijinkan lebih dari satu industri sejenis dalam satu kota: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SIGNALSIDE                                   :{LTBLUE}Tampilkan sinyal pada lajur kendara: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SHOWFINANCES                                 :{LTBLUE}Tampilkan laporan keuangan pada akhir tahun: {ORANGE}{STRING}
-STR_CONFIG_SETTING_NONSTOP_BY_DEFAULT                           :{LTBLUE}Tujuan baru standarnya adalah 'non-stop': {ORANGE}{STRING}
-STR_CONFIG_SETTING_STOP_LOCATION                                :{LTBLUE}Order kereta yang baru aslinya berhenti {ORANGE}{STRING}{LTBLUE} dari stasiun
+
+STR_CONFIG_SETTING_BUILDONSLOPES                                :Ijinkan pembangunan di lereng dan pantai: {STRING}
+STR_CONFIG_SETTING_AUTOSLOPE                                    :Ijinkan pembentukan slop dibawah bangunan, rel, dsb. (otomatiskan): {STRING}
+STR_CONFIG_SETTING_AUTOSLOPE_HELPTEXT                           :Ijinkan pembentukan tanah dibawah bangunan dan trek tanpa merusaknya
+STR_CONFIG_SETTING_CATCHMENT                                    :Ijinkan ukuran jangkauan wilayah lebih realistik: {STRING}
+STR_CONFIG_SETTING_CATCHMENT_HELPTEXT                           :Gunakan area penarikan berbeda untuk tipe stasiun dan airport yang berbeda
+STR_CONFIG_SETTING_EXTRADYNAMITE                                :Ijinkan menggusur lebih banyak jalan, jembatan, terowongan milik kota, dsb: {STRING}
+STR_CONFIG_SETTING_EXTRADYNAMITE_HELPTEXT                       :Permudah membuang infrasturktur yang dimiliki kota
+STR_CONFIG_SETTING_TRAIN_LENGTH                                 :Panjang kereta maksimum: {STRING}
+STR_CONFIG_SETTING_TRAIN_LENGTH_HELPTEXT                        :Atur panjang kereta maksimum
+STR_CONFIG_SETTING_TILE_LENGTH                                  :{COMMA} ubin
+STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :Banyaknya asap / percikan lokomotif: {STRING}
+STR_CONFIG_SETTING_SMOKE_AMOUNT_HELPTEXT                        :Atur berapa banyak asap dan api dari kendaraan
+STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :Model akselerasi kereta: {STRING}
+STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL_HELPTEXT            :Pilih model fisik dari percepatan kereta. Model asli mengurangi kecepatan kendaraan dalam tikungan/tanjakan jumlah sama. Model realistis mengurangi kecepatan dalam tikungan/tanjakan berdasarkan berbagai hal seperti panjang kendaraan dan kekuatan traksi.
+STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :Model kendaraan percepatan: {STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL_HELPTEXT     :Pilih model fisik untuk asklerasi kendaraan. Model asli mengurangi kecepatan kendaraan dalam tikungan/tanjakan jumlah sama. Model realistis mengurangi kecepatan dalam tikungan/tanjakan berdasarkan berbagai hal seperti panjang kendaraan dan kekuatan traksi.
+STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :Kemiringan untuk kereta: {STRING}
+STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS_HELPTEXT               :Kemiringan untuk kereta. Nilai yang lebih tinggi membuat lebih sulit menaiki bukit
+STR_CONFIG_SETTING_PERCENTAGE                                   :{COMMA}%
+STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :Kemiringan untuk kendaraan: {STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS_HELPTEXT        :Kemiringan untuk kendaraan. Nilai yang lebih tinggi membuat lebih sulit menaiki bukit
+STR_CONFIG_SETTING_FORBID_90_DEG                                :Kereta dan kapal dilarang belok 90 derajat: {STRING}
+STR_CONFIG_SETTING_FORBID_90_DEG_HELPTEXT                       :Putar balik terjadi ketika trek horizontal diikuti langsung oleh trek vertikal di ubin berikutnya, jadi membuatnya berputar balik di ujung ubin daripada memutar 45 derajat ke kombinasi trek lain. Ini juga berlaku pada radius putaran kapal.
+STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :Ijinkan menggabung stasiun meski tdk menempel: {STRING}
+STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS_HELPTEXT               :Ijinkan penambahan bagian dari stasiun tanpa menyentuh bagian yang sudah ada. Perlu Ctrl+Klik ketika menambahkan bagian baru.
+STR_CONFIG_SETTING_IMPROVEDLOAD                                 :Gunakan algoritma pengangkutan terbaru : {STRING}
+STR_CONFIG_SETTING_GRADUAL_LOADING                              :Angkut secara bertahap: {STRING}
+STR_CONFIG_SETTING_INFLATION                                    :Inflasi: {STRING}
+STR_CONFIG_SETTING_SELECTGOODS                                  :Menerima kargo di suatu stasiun hanya jika dibutuhkan: {STRING}
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD             :Metode pembangunan Industri primer : {STRING}
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NONE        :Tidak ada
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NORMAL      :Seperti industri lainnya
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_PROSPECTING :Prospektif
+STR_CONFIG_SETTING_MULTIPINDTOWN                                :Ijinkan lebih dari satu industri sejenis dalam satu kota: {STRING}
+STR_CONFIG_SETTING_SHOWFINANCES                                 :Tampilkan laporan keuangan pada akhir tahun: {STRING}
+STR_CONFIG_SETTING_NONSTOP_BY_DEFAULT                           :Tujuan baru standarnya adalah 'non-stop': {STRING}
+STR_CONFIG_SETTING_STOP_LOCATION                                :Order kereta yang baru aslinya berhenti {STRING} dari stasiun
 STR_CONFIG_SETTING_STOP_LOCATION_NEAR_END                       :hampir selesai
 STR_CONFIG_SETTING_STOP_LOCATION_MIDDLE                         :tengah
 STR_CONFIG_SETTING_STOP_LOCATION_FAR_END                        :jauh di belakang
-STR_CONFIG_SETTING_ROAD_VEHICLE_QUEUEING                        :{LTBLUE}Kendaraan jalan raya mengantri (dengan efek kuantum): {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTOSCROLL                                   :{LTBLUE}Geser tampilan saat mouse ada di tepi: {ORANGE}{STRING}
-STR_CONFIG_SETTING_BRIBE                                        :{LTBLUE}Ijinkan kolusi pada penguasa setempat: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_EXCLUSIVE                              :{LTBLUE}Ijinkan pembelian hak ekslusif pengelolaan transportasi: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_FUND_BUILDINGS                         :{LTBLUE}Ijinkan mendanai bangunan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_FUND_ROAD                              :{LTBLUE}Ijinkan pendanaan rekonstruksi jalan lokal: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_GIVE_MONEY                             :{LTBLUE}Ijinkan pengiriman uang ke perusahaan lain: {ORANGE}{STRING}
-STR_CONFIG_SETTING_FREIGHT_TRAINS                               :{LTBLUE}Faktor kali muatan untuk simulasi kereta yang berat: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PLANE_SPEED                                  :{LTBLUE}Faktor kecepatan pesawat: {ORANGE}1 / {STRING}
-STR_CONFIG_SETTING_PLANE_CRASHES                                :{LTBLUE}Frekuensi kecelakaan pesawat: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PLANE_CRASHES_NONE                           :nihil
-STR_CONFIG_SETTING_PLANE_CRASHES_REDUCED                        :berkurang
-STR_CONFIG_SETTING_PLANE_CRASHES_NORMAL                         :normal
-STR_CONFIG_SETTING_STOP_ON_TOWN_ROAD                            :{LTBLUE}Ijinkan terminal drive-thru pada jalan milik kota: {ORANGE}{STRING}
-STR_CONFIG_SETTING_STOP_ON_COMPETITOR_ROAD                      :{LTBLUE}Ijinkan terminal drive-thru pada jalan milik pesaing: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ADJACENT_STATIONS                            :{LTBLUE}Ijinkan membangun stasiun berdampingan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DYNAMIC_ENGINES                              :{LTBLUE}Aktifkan beberapa pengaturan mesin NewGRF : {ORANGE}{STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_QUEUEING                        :Kendaraan jalan raya mengantri (dengan efek kuantum): {STRING}
+STR_CONFIG_SETTING_AUTOSCROLL                                   :Geser tampilan saat mouse ada di tepi: {STRING}
+STR_CONFIG_SETTING_BRIBE                                        :Ijinkan kolusi pada penguasa setempat: {STRING}
+STR_CONFIG_SETTING_ALLOW_EXCLUSIVE                              :Ijinkan pembelian hak ekslusif pengelolaan transportasi: {STRING}
+STR_CONFIG_SETTING_ALLOW_FUND_BUILDINGS                         :Ijinkan mendanai bangunan: {STRING}
+STR_CONFIG_SETTING_ALLOW_FUND_ROAD                              :Ijinkan pendanaan rekonstruksi jalan lokal: {STRING}
+STR_CONFIG_SETTING_ALLOW_GIVE_MONEY                             :Ijinkan pengiriman uang ke perusahaan lain: {STRING}
+STR_CONFIG_SETTING_FREIGHT_TRAINS                               :Faktor kali muatan untuk simulasi kereta yang berat: {STRING}
+STR_CONFIG_SETTING_PLANE_CRASHES                                :Frekuensi kecelakaan pesawat: {STRING}
+STR_CONFIG_SETTING_PLANE_CRASHES_NONE                           :Nihil
+STR_CONFIG_SETTING_PLANE_CRASHES_REDUCED                        :Dikurangi
+STR_CONFIG_SETTING_PLANE_CRASHES_NORMAL                         :Normal
+STR_CONFIG_SETTING_STOP_ON_TOWN_ROAD                            :Ijinkan terminal drive-thru pada jalan milik kota: {STRING}
+STR_CONFIG_SETTING_STOP_ON_COMPETITOR_ROAD                      :Ijinkan terminal drive-thru pada jalan milik pesaing: {STRING}
+STR_CONFIG_SETTING_ADJACENT_STATIONS                            :Ijinkan membangun stasiun berdampingan: {STRING}
+STR_CONFIG_SETTING_DYNAMIC_ENGINES                              :Aktifkan beberapa pengaturan mesin NewGRF : {STRING}
 STR_CONFIG_SETTING_DYNAMIC_ENGINES_EXISTING_VEHICLES            :{WHITE}Tidak diijinkan mengubah setting ini karena kendaraan sudah ada
-STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :{LTBLUE}Perawaran Infrastruktur: {ORANGE}{STRING}
+STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :Perawaran Infrastruktur: {STRING}
 
-STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :{LTBLUE}Bandara tidak kedaluarsa: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :Bandara tidak kedaluarsa: {STRING}
 
-STR_CONFIG_SETTING_WARN_LOST_VEHICLE                            :{LTBLUE}Ingatkan saat kendaraan tersesat: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ORDER_REVIEW                                 :{LTBLUE}Tinjau pemberhentian kendaraan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ORDER_REVIEW_OFF                             :tidak
+STR_CONFIG_SETTING_WARN_LOST_VEHICLE                            :Ingatkan saat kendaraan tersesat: {STRING}
+STR_CONFIG_SETTING_ORDER_REVIEW                                 :Tinjau pemberhentian kendaraan: {STRING}
+STR_CONFIG_SETTING_ORDER_REVIEW_OFF                             :Tidak
 STR_CONFIG_SETTING_ORDER_REVIEW_EXDEPOT                         :Ya, tetapi selain kendaraan yang berhenti
-STR_CONFIG_SETTING_ORDER_REVIEW_ON                              :semua kendaraan
-STR_CONFIG_SETTING_WARN_INCOME_LESS                             :{LTBLUE}Ingatkan jika ada kendaraan yg merugi: {ORANGE}{STRING}
-STR_CONFIG_SETTING_NEVER_EXPIRE_VEHICLES                        :{LTBLUE}Kendaraan tidak pernah kadaluarsa: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTORENEW_VEHICLE                            :{LTBLUE}Perbarui otomatis kendaraan yang telah tua: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTORENEW_MONTHS                             :{LTBLUE}Perbarui otomatis kendaraan pada {ORANGE}{STRING}{LTBLUE} bulan sblm/sesudah usia maksimalnya
-STR_CONFIG_SETTING_AUTORENEW_MONEY                              :{LTBLUE}Minimal dana tersedia untuk perbaruan otomatis: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ERRMSG_DURATION                              :{LTBLUE}Durasi pesan kesalahan: {ORANGE}{STRING} detik
-STR_CONFIG_SETTING_HOVER_DELAY                                  :{LTBLUE}Waktu tunggu tips muncul: {ORANGE}Hover selama {STRING} detik
-STR_CONFIG_SETTING_HOVER_DELAY_DISABLED                         :{LTBLUE}Perlihatkan tips: {ORANGE}Klik kanan
-STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}Tampilkan populasi kota di label nama kota: {ORANGE}{STRING}
-STR_CONFIG_SETTING_GRAPH_LINE_THICKNESS                         :{LTBLUE}Ketebalan garis pada grafik: {ORANGE}{STRING}
+STR_CONFIG_SETTING_ORDER_REVIEW_ON                              :Semua kendaraan
+STR_CONFIG_SETTING_WARN_INCOME_LESS                             :Ingatkan jika ada kendaraan yg merugi: {STRING}
+STR_CONFIG_SETTING_NEVER_EXPIRE_VEHICLES                        :Kendaraan tidak pernah kadaluarsa: {STRING}
+STR_CONFIG_SETTING_AUTORENEW_VEHICLE                            :Perbarui otomatis kendaraan yang telah tua: {STRING}
+STR_CONFIG_SETTING_AUTORENEW_MONEY                              :Minimal dana tersedia untuk perbaruan otomatis: {STRING}
+STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :Tampilkan populasi kota di label nama kota: {STRING}
+STR_CONFIG_SETTING_GRAPH_LINE_THICKNESS                         :Ketebalan garis pada grafik: {STRING}
 
-STR_CONFIG_SETTING_LAND_GENERATOR                               :{LTBLUE}Pembangkit dataran: {ORANGE}{STRING}
+STR_CONFIG_SETTING_LAND_GENERATOR                               :Pembangkit dataran: {STRING}
 STR_CONFIG_SETTING_LAND_GENERATOR_ORIGINAL                      :Asli
 STR_CONFIG_SETTING_LAND_GENERATOR_TERRA_GENESIS                 :TerraGenesis
-STR_CONFIG_SETTING_OIL_REF_EDGE_DISTANCE                        :{LTBLUE}Jarak maks. Kilang Minyak Dari tepi: {ORANGE}{STRING} kotak
-STR_CONFIG_SETTING_SNOWLINE_HEIGHT                              :{LTBLUE}Tinggi garis salju: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN                         :{LTBLUE}Kekasaran daratan(hanya TerraGenesis) : {ORANGE}{STRING}
+STR_CONFIG_SETTING_SNOWLINE_HEIGHT                              :Tinggi garis salju: {STRING}
+STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN                         :Kekasaran daratan(hanya TerraGenesis) : {STRING}
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_VERY_SMOOTH             :Sangat halus
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_SMOOTH                  :Halus
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_ROUGH                   :Kasar
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_VERY_ROUGH              :Sangat Kasar
-STR_CONFIG_SETTING_TREE_PLACER                                  :{LTBLUE}Algoritma penempatan pepohonan: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TREE_PLACER                                  :Algoritma penempatan pepohonan: {STRING}
 STR_CONFIG_SETTING_TREE_PLACER_NONE                             :Tidak ada
 STR_CONFIG_SETTING_TREE_PLACER_ORIGINAL                         :Orisinil
 STR_CONFIG_SETTING_TREE_PLACER_IMPROVED                         :Telah ditingkatkan
-STR_CONFIG_SETTING_HEIGHTMAP_ROTATION                           :{LTBLUE}Perputaran peta Heightmap: {ORANGE}{STRING}
+STR_CONFIG_SETTING_HEIGHTMAP_ROTATION                           :Perputaran peta Heightmap: {STRING}
 STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_COUNTER_CLOCKWISE         :Melawan arah jam
 STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_CLOCKWISE                 :Searah jam
-STR_CONFIG_SETTING_SE_FLAT_WORLD_HEIGHT                         :{LTBLUE}Tinggi dataran pada peta skenario datar : {ORANGE}{STRING}
-STR_CONFIG_SETTING_ENABLE_FREEFORM_EDGES                        :{LTBLUE}Ijinkan pembentukan lansekap pada pinggir peta: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SE_FLAT_WORLD_HEIGHT                         :Tinggi dataran pada peta skenario datar : {STRING}
+STR_CONFIG_SETTING_ENABLE_FREEFORM_EDGES                        :Ijinkan pembentukan lansekap pada pinggir peta: {STRING}
 STR_CONFIG_SETTING_EDGES_NOT_EMPTY                              :{WHITE}Kotak pada ujung utara tidak kosong
 STR_CONFIG_SETTING_EDGES_NOT_WATER                              :{WHITE}Kotak pada salah satu ujung peta bukanlah perairan
 
-STR_CONFIG_SETTING_STATION_SPREAD                               :{LTBLUE}Sebaran stasiun maks.: {ORANGE}{STRING} kotak {RED}Peringatan: Makin tinggi, makin memperlambat permainan
-STR_CONFIG_SETTING_SERVICEATHELIPAD                             :{LTBLUE}Perbaikan helikopter di helipad secara otomatis: {ORANGE}{STRING}
-STR_CONFIG_SETTING_LINK_TERRAFORM_TOOLBAR                       :{LTBLUE}Tempel toolbar Landsekap ke toolbar rel/jalan/air/bandara: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR                         :{LTBLUE}Warna daratan pada peta kecil: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SERVICEATHELIPAD                             :Perbaikan helikopter di helipad secara otomatis: {STRING}
+STR_CONFIG_SETTING_LINK_TERRAFORM_TOOLBAR                       :Tempel toolbar Landsekap ke toolbar rel/jalan/air/bandara: {STRING}
+STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR                         :Warna daratan pada peta kecil: {STRING}
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_GREEN                   :Hijau
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_DARK_GREEN              :Hijau Gelap
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_VIOLET                  :Violet
-STR_CONFIG_SETTING_REVERSE_SCROLLING                            :{LTBLUE}Berbalik Arah: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOOTH_SCROLLING                             :{LTBLUE}Pergeseran pandangan viewport secara halus: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MEASURE_TOOLTIP                              :{LTBLUE}Tampilkan ukuran ketika menggunakan alat pembangun: {ORANGE}{STRING}
-STR_CONFIG_SETTING_LIVERIES                                     :{LTBLUE}Tampilkan warna perusahaan: {ORANGE}{STRING}
+STR_CONFIG_SETTING_REVERSE_SCROLLING                            :Berbalik Arah: {STRING}
+STR_CONFIG_SETTING_SMOOTH_SCROLLING                             :Pergeseran pandangan viewport secara halus: {STRING}
+STR_CONFIG_SETTING_MEASURE_TOOLTIP                              :Tampilkan ukuran ketika menggunakan alat pembangun: {STRING}
+STR_CONFIG_SETTING_LIVERIES                                     :Tampilkan warna perusahaan: {STRING}
 STR_CONFIG_SETTING_LIVERIES_NONE                                :Tidak ada
 STR_CONFIG_SETTING_LIVERIES_OWN                                 :Perusahaan milik sendiri
 STR_CONFIG_SETTING_LIVERIES_ALL                                 :Semua Perusahaan
-STR_CONFIG_SETTING_PREFER_TEAMCHAT                              :{LTBLUE}Lebih suka Tim Chat dengan <ENTER>: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SCROLLWHEEL_SCROLLING                        :{LTBLUE}Fungsi tombol scroll mouse: {ORANGE}{STRING}
+STR_CONFIG_SETTING_PREFER_TEAMCHAT                              :Lebih suka Tim Chat dengan <ENTER>: {STRING}
+STR_CONFIG_SETTING_SCROLLWHEEL_SCROLLING                        :Fungsi tombol scroll mouse: {STRING}
 STR_CONFIG_SETTING_SCROLLWHEEL_ZOOM                             :Perbesar Peta
 STR_CONFIG_SETTING_SCROLLWHEEL_SCROLL                           :Geser Peta
 STR_CONFIG_SETTING_SCROLLWHEEL_OFF                              :Non-aktifkan
-STR_CONFIG_SETTING_SCROLLWHEEL_MULTIPLIER                       :{LTBLUE}Kecepatan pergeseran Peta: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SCROLLWHEEL_MULTIPLIER                       :Kecepatan pergeseran Peta: {STRING}
 
-STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU                          :{LTBLUE}Emulasikan klik kanan: {ORANGE}{STRING}
+STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU                          :Emulasikan klik kanan: {STRING}
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_COMMAND                  :Perintah-klik
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_CONTROL                  :Kontrol-klik
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_OFF                      :Non-aktifkan
 
-STR_CONFIG_SETTING_LEFT_MOUSE_BTN_SCROLLING                     :{LTBLUE}Geser dgn klik-kiri: {ORANGE}{STRING}
+STR_CONFIG_SETTING_LEFT_MOUSE_BTN_SCROLLING                     :Geser dgn klik-kiri: {STRING}
 
-STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES                    :{LTBLUE}Gunakan format tanggal {ORANGE}{STRING}{LTBLUE} untuk berkas simpanan
+STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES                    :Gunakan format tanggal {STRING} untuk berkas simpanan
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_LONG               :panjang (31st Dec 2008)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_SHORT              :pendek (31-12-2008)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :ISO (2008-12-31)
 
-STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE                       :{LTBLUE}Palette standard digunakan untuk NewGRFs yang tidak punya setting: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE                       :Palette standard digunakan untuk NewGRFs yang tidak punya setting: {STRING}
 STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_DOS                   :DOS palette
 STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_WIN                   :Windows palette
 
-STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :{LTBLUE}Selalu hentikan sementara permainan saat memulai : {ORANGE}{STRING}
-STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL                          :{LTBLUE}Saat berhenti, ijinkan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_NO_ACTIONS               :tidak ada tindakan
-STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_NON_CONSTRUCTION     :semua tindakan kecuali pembangunan
-STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_NON_LANDSCAPING      :semua kecuali mengubah dataran
-STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_ACTIONS              :semua tindakan
-STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS                       :{LTBLUE}Gunakan daftar kendaraan tingkat lanjut: {ORANGE}{STRING}
-STR_CONFIG_SETTING_LOADING_INDICATORS                           :{LTBLUE}Tampilkan indikator pengangkutan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TIMETABLE_IN_TICKS                           :{LTBLUE}Penjadwalan menggunakan satuan titik , bukan satuan hari: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TIMETABLE_SHOW_ARRIVAL_DEPARTURE             :{LTBLUE}Tampilkan keberangkatan dan kedatangan pada jadwal: {ORANGE}{STRING}
-STR_CONFIG_SETTING_QUICKGOTO                                    :{LTBLUE}Buat pemberhentian kendaraan secara cepat: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE                            :{LTBLUE}Jenis rel saat baru bermain/memuat permainan: {ORANGE}{STRING}
+STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :Selalu hentikan sementara permainan saat memulai : {STRING}
+STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL                          :Saat berhenti, ijinkan: {STRING}
+STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_NO_ACTIONS               :Tidak ada tindakan
+STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_NON_CONSTRUCTION     :Semua tindakan kecuali pembangunan
+STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_NON_LANDSCAPING      :Semua kecuali mengubah dataran
+STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_ACTIONS              :Semua tindakan
+STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS                       :Gunakan daftar kendaraan tingkat lanjut: {STRING}
+STR_CONFIG_SETTING_LOADING_INDICATORS                           :Tampilkan indikator pengangkutan: {STRING}
+STR_CONFIG_SETTING_TIMETABLE_IN_TICKS                           :Penjadwalan menggunakan satuan titik , bukan satuan hari: {STRING}
+STR_CONFIG_SETTING_TIMETABLE_SHOW_ARRIVAL_DEPARTURE             :Tampilkan keberangkatan dan kedatangan pada jadwal: {STRING}
+STR_CONFIG_SETTING_QUICKGOTO                                    :Buat pemberhentian kendaraan secara cepat: {STRING}
+STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE                            :Jenis rel saat baru bermain/memuat permainan: {STRING}
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_FIRST                      :Tersedia pertama
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_LAST                       :Tersedia terakhir
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_MOST_USED                  :Sering dipakai
-STR_CONFIG_SETTING_SHOW_TRACK_RESERVATION                       :{LTBLUE}Sorot rel yang akan terpakai: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS                     :{LTBLUE}Toolbar tetap aktif setelah dipakai: {ORANGE}{STRING}
-STR_CONFIG_SETTING_EXPENSES_LAYOUT                              :{LTBLUE}Kelompokkan pengeluaran perusahaan dalam neraca: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SHOW_TRACK_RESERVATION                       :Sorot rel yang akan terpakai: {STRING}
+STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS                     :Toolbar tetap aktif setelah dipakai: {STRING}
+STR_CONFIG_SETTING_EXPENSES_LAYOUT                              :Kelompokkan pengeluaran perusahaan dalam neraca: {STRING}
 
-STR_CONFIG_SETTING_DISABLE_UNSUITABLE_BUILDING                  :{LTBLUE}Matikan infrastruktur bangunan saat tak ada kendaraan yang tersedia: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_TRAINS                                   :{LTBLUE}Maks. kereta tiap pemain: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_ROAD_VEHICLES                            :{LTBLUE}Maks. kendaraan jalan raya tiap pemain: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_AIRCRAFT                                 :{LTBLUE}Maks. pesawat tiap pemain: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_SHIPS                                    :{LTBLUE}Maks. kapal tiap pemain: {ORANGE}{STRING}
 
-STR_CONFIG_SETTING_AI_BUILDS_TRAINS                             :{LTBLUE}Non-aktifkan kereta bagi pemain komputer: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_ROAD_VEHICLES                      :{LTBLUE}Non-aktifkan kendaraan jalan raya bagi pemain komputer: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_AIRCRAFT                           :{LTBLUE}Non-aktifkan pesawat bagi pemain komputer: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_SHIPS                              :{LTBLUE}Non-aktifkan kapal bagi pemain komputer: {ORANGE}{STRING}
+STR_CONFIG_SETTING_DISABLE_UNSUITABLE_BUILDING                  :Matikan infrastruktur bangunan saat tak ada kendaraan yang tersedia: {STRING}
+STR_CONFIG_SETTING_MAX_TRAINS                                   :Maks. kereta tiap pemain: {STRING}
+STR_CONFIG_SETTING_MAX_ROAD_VEHICLES                            :Maks. kendaraan jalan raya tiap pemain: {STRING}
+STR_CONFIG_SETTING_MAX_AIRCRAFT                                 :Maks. pesawat tiap pemain: {STRING}
+STR_CONFIG_SETTING_MAX_SHIPS                                    :Maks. kapal tiap pemain: {STRING}
 
-STR_CONFIG_SETTING_AI_IN_MULTIPLAYER                            :{LTBLUE}Ijinkan kecerdasan pada modus banyak pemain: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SCRIPT_MAX_OPCODES                           :{LTBLUE}#opcodes sebelum scripts di-tahan: {ORANGE}{STRING}
+STR_CONFIG_SETTING_AI_BUILDS_TRAINS                             :Non-aktifkan kereta bagi pemain komputer: {STRING}
+STR_CONFIG_SETTING_AI_BUILDS_ROAD_VEHICLES                      :Non-aktifkan kendaraan jalan raya bagi pemain komputer: {STRING}
+STR_CONFIG_SETTING_AI_BUILDS_AIRCRAFT                           :Non-aktifkan pesawat bagi pemain komputer: {STRING}
+STR_CONFIG_SETTING_AI_BUILDS_SHIPS                              :Non-aktifkan kapal bagi pemain komputer: {STRING}
 
-STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :{LTBLUE}Jangka waktu perbaikan dalam persen: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SERVINT_TRAINS                               :{LTBLUE}Standard jangka perbaikan berkala kereta: {ORANGE}{STRING} hari/%
-STR_CONFIG_SETTING_SERVINT_TRAINS_DISABLED                      :{LTBLUE}Standard jangka perbaikan berkala untuk kereta: {ORANGE}Non-aktif
-STR_CONFIG_SETTING_SERVINT_ROAD_VEHICLES                        :{LTBLUE}Standard jangka perbaikan berkala kendaraan jalan raya: {ORANGE}{STRING} hari/%
-STR_CONFIG_SETTING_SERVINT_ROAD_VEHICLES_DISABLED               :{LTBLUE}Standard jangka perbaikan berkala kendaraan jalan raya: {ORANGE}non-aktif
-STR_CONFIG_SETTING_SERVINT_AIRCRAFT                             :{LTBLUE}Standard jangka perbaikan berkala pesawat: {ORANGE}{STRING} hari/%
-STR_CONFIG_SETTING_SERVINT_AIRCRAFT_DISABLED                    :{LTBLUE}Standard jangka perbaikan berkala pesawat: {ORANGE}Non-aktif
-STR_CONFIG_SETTING_SERVINT_SHIPS                                :{LTBLUE}Standard jangka perbaikan berkala kapal: {ORANGE}{STRING} hari/%
-STR_CONFIG_SETTING_SERVINT_SHIPS_DISABLED                       :{LTBLUE}Standard jangka perbaikan berkala untuk kapal: {ORANGE}Non-aktif
-STR_CONFIG_SETTING_NOSERVICE                                    :{LTBLUE}Tidak perlu perbaikan jika tidak pernah mogok: {ORANGE}{STRING}
-STR_CONFIG_SETTING_WAGONSPEEDLIMITS                             :{LTBLUE}Aktifkan batas kecepatan gerbong: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DISABLE_ELRAILS                              :{LTBLUE}Non-aktifkan rel listrik: {ORANGE}{STRING}
 
-STR_CONFIG_SETTING_COLOURED_NEWS_YEAR                           :{LTBLUE}Berita berwarna tampil pada: {ORANGE}{STRING}
-STR_CONFIG_SETTING_STARTING_YEAR                                :{LTBLUE}Tahun mulai: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :{LTBLUE}Aktifkan pertumbuhan ekonomi yang stabil (jarang berubah): {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_SHARES                                 :{LTBLUE}Ijinkan pembelian saham perusahaan lain: {ORANGE}{STRING}
-STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :{LTBLUE}Persentase pembagian keuntungan pada sistem pengumpanan: {ORANGE}{STRING}%
-STR_CONFIG_SETTING_DRAG_SIGNALS_DENSITY                         :{LTBLUE}Ketika menarik, tempatkan sinyal setiap: {ORANGE}{STRING} kotak
-STR_CONFIG_SETTING_SEMAPHORE_BUILD_BEFORE_DATE                  :{LTBLUE}Gunakan sinyal semaphore sebelum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :{LTBLUE}Aktifkan antarmuka sinyal: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DEFAULT_SIGNAL_TYPE                          :{LTBLUE}Tipe sinyal standar: {ORANGE}{STRING}
+STR_CONFIG_SETTING_AI_IN_MULTIPLAYER                            :Ijinkan kecerdasan pada modus banyak pemain: {STRING}
+STR_CONFIG_SETTING_SCRIPT_MAX_OPCODES                           :#opcodes sebelum scripts di-tahan: {STRING}
+
+STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :Jangka waktu perbaikan dalam persen: {STRING}
+STR_CONFIG_SETTING_NOSERVICE                                    :Tidak perlu perbaikan jika tidak pernah mogok: {STRING}
+STR_CONFIG_SETTING_WAGONSPEEDLIMITS                             :Aktifkan batas kecepatan gerbong: {STRING}
+STR_CONFIG_SETTING_DISABLE_ELRAILS                              :Non-aktifkan rel listrik: {STRING}
+
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OWN               :Kedatangan kendaraan pertama pada stasiun pemain: {STRING}
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OTHER             :Kedatangan kendaraan pertama pada stasiun lawan: {STRING}
+STR_CONFIG_SETTING_NEWS_ACCIDENTS_DISASTERS                     :Kecelakaan / bencana: {STRING}
+STR_CONFIG_SETTING_NEWS_COMPANY_INFORMATION                     :Informasi Perusahaan: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_OPEN                           :Pembukaan Industri Baru: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CLOSE                          :Penutupan Industri: {STRING}
+STR_CONFIG_SETTING_NEWS_ECONOMY_CHANGES                         :Perubahan ekonomi: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_COMPANY                :Perubahan produksi pada industri yang ditangani oleh pemain: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_OTHER                  :Perubahan produksi pada industri yang ditangani oleh para pesaing: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_UNSERVED               :Perubahan pada produksi industri lainnya: {STRING}
+STR_CONFIG_SETTING_NEWS_ADVICE                                  :Saran / informasi pada kendaraan pemain.: {STRING}
+STR_CONFIG_SETTING_NEWS_NEW_VEHICLES                            :Kendaraan baru: {STRING}
+STR_CONFIG_SETTING_NEWS_CHANGES_ACCEPTANCE                      :Perubahan penerimaan kargo: {STRING}
+STR_CONFIG_SETTING_NEWS_SUBSIDIES                               :Subsidi: {STRING}
+STR_CONFIG_SETTING_NEWS_GENERAL_INFORMATION                     :Informasi umum: {STRING}
+
+STR_CONFIG_SETTING_NEWS_MESSAGES_OFF                            :Mati
+STR_CONFIG_SETTING_NEWS_MESSAGES_SUMMARY                        :Ringkasan
+STR_CONFIG_SETTING_NEWS_MESSAGES_FULL                           :Penuh
+
+STR_CONFIG_SETTING_COLOURED_NEWS_YEAR                           :Berita berwarna tampil pada: {STRING}
+STR_CONFIG_SETTING_STARTING_YEAR                                :Tahun mulai: {STRING}
+STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :Aktifkan pertumbuhan ekonomi yang stabil (jarang berubah): {STRING}
+STR_CONFIG_SETTING_ALLOW_SHARES                                 :Ijinkan pembelian saham perusahaan lain: {STRING}
+STR_CONFIG_SETTING_SEMAPHORE_BUILD_BEFORE_DATE                  :Gunakan sinyal semaphore sebelum: {STRING}
+STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :Aktifkan antarmuka sinyal: {STRING}
+STR_CONFIG_SETTING_DEFAULT_SIGNAL_TYPE                          :Tipe sinyal standar: {STRING}
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_NORMAL                        :Sinyal Blok
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_PBS                           :Sinyal Jalur
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_PBSOWAY                       :Sinyal jalur satu arah
-STR_CONFIG_SETTING_CYCLE_SIGNAL_TYPES                           :{LTBLUE}Pergantian jenis sinyal: {ORANGE}{STRING}
+STR_CONFIG_SETTING_CYCLE_SIGNAL_TYPES                           :Pergantian jenis sinyal: {STRING}
 STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Hanya sinyal blok
 STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Hanya sinyal jalur
 STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :Semua
 
-STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Tampilan jalan untuk kota baru: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :asli
-STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :jalan raya yang lebih baik
+STR_CONFIG_SETTING_TOWN_LAYOUT                                  :Tampilan jalan untuk kota baru: {STRING}
+STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :Asli
+STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :Jalan raya yang lebih baik
 STR_CONFIG_SETTING_TOWN_LAYOUT_2X2_GRID                         :kotak 2x2
 STR_CONFIG_SETTING_TOWN_LAYOUT_3X3_GRID                         :kotak 3x3
-STR_CONFIG_SETTING_TOWN_LAYOUT_RANDOM                           :acak
-STR_CONFIG_SETTING_ALLOW_TOWN_ROADS                             :{LTBLUE}Kota mengijinkan untuk membuat jalan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :{LTBLUE}Kota yang diperbolehkan untuk membangun perlintasan tingkat: {ORANGE}{STRING}
-STR_CONFIG_SETTING_NOISE_LEVEL                                  :{LTBLUE}Ijinkan kota mengatur tingkat kebisingan bandara : {ORANGE}{STRING}
-STR_CONFIG_SETTING_TOWN_FOUNDING                                :{LTBLUE}Mendirikan kota pada permainan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TOWN_FOUNDING_FORBIDDEN                      :dilarang
-STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED                        :diijinkan
-STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED_CUSTOM_LAYOUT          :diijinkan, rancangan kota dapat diubah sesuai kebiasaan
+STR_CONFIG_SETTING_TOWN_LAYOUT_RANDOM                           :Acak
+STR_CONFIG_SETTING_ALLOW_TOWN_ROADS                             :Kota mengijinkan untuk membuat jalan: {STRING}
+STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :Kota yang diperbolehkan untuk membangun perlintasan tingkat: {STRING}
+STR_CONFIG_SETTING_NOISE_LEVEL                                  :Ijinkan kota mengatur tingkat kebisingan bandara : {STRING}
+STR_CONFIG_SETTING_TOWN_FOUNDING                                :Mendirikan kota pada permainan: {STRING}
+STR_CONFIG_SETTING_TOWN_FOUNDING_FORBIDDEN                      :Dilarang
+STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED                        :Diijinkan
+STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED_CUSTOM_LAYOUT          :Diijinkan, layout kota sendiri
 
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT                         :{LTBLUE}Penempatan pohon dalam permainan: {ORANGE}{STRING}
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_NONE                    :tidak ada {RED}(memotong Pabrik Pengolahan Kayu Gelondongan)
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_RAINFOREST              :hanya pada hutan hujan
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_ALL                     :dimanapun
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT                         :Penempatan pohon dalam permainan: {STRING}
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_NONE                    :Tidak ada {RED}(memotong Pabrik Pengolahan Kayu Gelondongan)
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_RAINFOREST              :Hanya pada hutan hujan
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_ALL                     :Dimanapun
 
-STR_CONFIG_SETTING_TOOLBAR_POS                                  :{LTBLUE}Posisi toolbar utama: {ORANGE}{STRING}
-STR_CONFIG_SETTING_STATUSBAR_POS                                :{LTBLUE}Posisi status bar: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SNAP_RADIUS                                  :{LTBLUE}Lekatkan jendela pada: {ORANGE}{STRING} px
-STR_CONFIG_SETTING_SNAP_RADIUS_DISABLED                         :{LTBLUE}Pelekatan jendela: {ORANGE}dimatikan
-STR_CONFIG_SETTING_SOFT_LIMIT                                   :{LTBLUE}Batas jumlah jendela (tak lekat): {ORANGE}{STRING}
-STR_CONFIG_SETTING_SOFT_LIMIT_DISABLED                          :{LTBLUE}Batas jumlah jendela (tak lekat): {ORANGE}tak ada
-STR_CONFIG_SETTING_ZOOM_MIN                                     :{LTBLUE}Tingkat Perbesaran Maksimal: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ZOOM_MAX                                     :{LTBLUE}Tingkat zoom out Maksimal: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TOOLBAR_POS                                  :Posisi toolbar utama: {STRING}
+STR_CONFIG_SETTING_STATUSBAR_POS                                :Posisi status bar: {STRING}
+STR_CONFIG_SETTING_SOFT_LIMIT                                   :Batas jumlah jendela (tak lekat): {STRING}
+STR_CONFIG_SETTING_ZOOM_MIN                                     :Tingkat Perbesaran Maksimal: {STRING}
+STR_CONFIG_SETTING_ZOOM_MAX                                     :Tingkat zoom out Maksimal: {STRING}
 STR_CONFIG_SETTING_ZOOM_LVL_MIN                                 :4x
 STR_CONFIG_SETTING_ZOOM_LVL_IN_2X                               :2x
 STR_CONFIG_SETTING_ZOOM_LVL_NORMAL                              :Normal
 STR_CONFIG_SETTING_ZOOM_LVL_OUT_2X                              :2x
 STR_CONFIG_SETTING_ZOOM_LVL_OUT_4X                              :4x
 STR_CONFIG_SETTING_ZOOM_LVL_OUT_8X                              :8x
-STR_CONFIG_SETTING_TOWN_GROWTH                                  :{LTBLUE}Kecepatan pertumbuhan kota: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TOWN_GROWTH                                  :Kecepatan pertumbuhan kota: {STRING}
 STR_CONFIG_SETTING_TOWN_GROWTH_NONE                             :Tidak tumbuh
 STR_CONFIG_SETTING_TOWN_GROWTH_SLOW                             :Pelan
 STR_CONFIG_SETTING_TOWN_GROWTH_NORMAL                           :Normal
 STR_CONFIG_SETTING_TOWN_GROWTH_FAST                             :Cepat
 STR_CONFIG_SETTING_TOWN_GROWTH_VERY_FAST                        :Sangat cepat
-STR_CONFIG_SETTING_LARGER_TOWNS                                 :{LTBLUE}Proporsi desa yang akan menjadi kota: {ORANGE}1 banding {STRING}
-STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :{LTBLUE}Proporsi desa yang akan menjadi kota: {ORANGE}Tidak ada
-STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :{LTBLUE}Faktor kali ukuran kota awal: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MODIFIED_ROAD_REBUILD                        :{LTBLUE}Buang elemen jalan yang aneh saat membangun: {ORANGE}{STRING}
+STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Faktor kali ukuran kota awal: {STRING}
+STR_CONFIG_SETTING_MODIFIED_ROAD_REBUILD                        :Buang elemen jalan yang aneh saat membangun: {STRING}
 
 STR_CONFIG_SETTING_GUI                                          :{ORANGE}Antaramuka
 STR_CONFIG_SETTING_CONSTRUCTION                                 :{ORANGE}Konstruksi
@@ -1366,16 +1337,15 @@ STR_CONFIG_SETTING_VEHICLES_ROUTING                             :{ORANGE}Pengara
 STR_CONFIG_SETTING_VEHICLES_TRAINS                              :{ORANGE}Kereta
 STR_CONFIG_SETTING_ECONOMY_TOWNS                                :{ORANGE}Kota
 STR_CONFIG_SETTING_ECONOMY_INDUSTRIES                           :{ORANGE}Industri
-STR_CONFIG_SETTING_ECONOMY_SCRIPTS                              :{ORANGE}Scripts
 
 STR_CONFIG_SETTING_PATHFINDER_OPF                               :Asli
 STR_CONFIG_SETTING_PATHFINDER_NPF                               :NPF
 STR_CONFIG_SETTING_PATHFINDER_YAPF_RECOMMENDED                  :YAPF {BLUE}(Recommended)
 
-STR_CONFIG_SETTING_PATHFINDER_FOR_TRAINS                        :{LTBLUE}Pencari jejak untuk kereta: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PATHFINDER_FOR_ROAD_VEHICLES                 :{LTBLUE}Pencari jejak untuk kendaraan jalan raya: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS                         :{LTBLUE}Pencari jejak untuk kapal : {ORANGE}{STRING}
-STR_CONFIG_SETTING_REVERSE_AT_SIGNALS                           :{LTBLUE}Berputar otomatis di sinyal: {ORANGE}{STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_TRAINS                        :Pencari jejak untuk kereta: {STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_ROAD_VEHICLES                 :Pencari jejak untuk kendaraan jalan raya: {STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS                         :Pencari jejak untuk kapal : {STRING}
+STR_CONFIG_SETTING_REVERSE_AT_SIGNALS                           :Berputar otomatis di sinyal: {STRING}
 
 STR_CONFIG_SETTING_QUERY_CAPTION                                :{WHITE}Ganti nilai tetapan
 
@@ -1405,7 +1375,6 @@ STR_INTRO_SCENARIO_EDITOR                                       :{BLACK}Editor S
 STR_INTRO_MULTIPLAYER                                           :{BLACK}Bermain bersama
 
 STR_INTRO_GAME_OPTIONS                                          :{BLACK}Pengaturan Permainan
-STR_INTRO_DIFFICULTY                                            :{BLACK}Tingkat kesulitan ({STRING})
 STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Pengaturan lanjutan
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}Pengaturan NewGRF
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Cari konten
@@ -1425,7 +1394,6 @@ STR_INTRO_TOOLTIP_SUB_TROPICAL_LANDSCAPE                        :{BLACK}Pilih ga
 STR_INTRO_TOOLTIP_TOYLAND_LANDSCAPE                             :{BLACK}Pilih gaya lansekap 'Taman Bermain'
 
 STR_INTRO_TOOLTIP_GAME_OPTIONS                                  :{BLACK}Tampilkan opsi permainan
-STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}Tampilkan opsi tingkat kesulitan
 STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Tampilkan Pengaturan lanjutan
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Tampilkan setting NewGRF
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Cari konten baru dan pembaruan untuk diunduh
@@ -1482,8 +1450,8 @@ STR_LIVERY_TRAIN_TOOLTIP                                        :{BLACK}Tampilka
 STR_LIVERY_ROAD_VEHICLE_TOOLTIP                                 :{BLACK}Tampilkan skema warna kendaraan
 STR_LIVERY_SHIP_TOOLTIP                                         :{BLACK}Tampilkan skema warna kapal
 STR_LIVERY_AIRCRAFT_TOOLTIP                                     :{BLACK}Tampilkan skema warna pesawat
-STR_LIVERY_PRIMARY_TOOLTIP                                      :{BLACK}Pilih warna utama untuk skema terpilih
-STR_LIVERY_SECONDARY_TOOLTIP                                    :{BLACK}Pilih warna kedua untuk skema terpilih
+STR_LIVERY_PRIMARY_TOOLTIP                                      :{BLACK}Pilih warna utama untuk skema terpilih, Ctrl+Klik akan mengatur warna ini di semua skema
+STR_LIVERY_SECONDARY_TOOLTIP                                    :{BLACK}Pilih warna kedua untuk skema terpilih. Ctrl+Klik akan mengatur warna ini di semua skema
 STR_LIVERY_PANEL_TOOLTIP                                        :{BLACK}Pilih skema warna untuk diganti, atau banyak skema dengan CTRL+klik. Klik pada kotak untuk berganti dari skema warna yang digunakan
 
 STR_LIVERY_DEFAULT                                              :Warna Standar
@@ -1928,7 +1896,7 @@ STR_MISSING_GRAPHICS_NO_QUIT                                    :{BLACK}Tidak, t
 
 # Transparency settings window
 STR_TRANSPARENCY_CAPTION                                        :{WHITE}Pengaturan Transparasi
-STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Hidup/matikan transparansi sinyal stasiun. CTRL+klik untuk mengunci
+STR_TRANSPARENT_SIGNS_TOOLTIP                                   :{BLACK}Hidup/matikan transparansi tanda-tanda. CTRL+klik untuk mengunci
 STR_TRANSPARENT_TREES_TOOLTIP                                   :{BLACK}Hidup/matikan transparansi pepohonan. CTRL+klik untuk mengunci
 STR_TRANSPARENT_HOUSES_TOOLTIP                                  :{BLACK}Hidup/matikan transparansi perumahan. CTRL+klik untuk mengunci
 STR_TRANSPARENT_INDUSTRIES_TOOLTIP                              :{BLACK}Hidup/matikan transparansi industri. CTRL+klik untuk mengunci
@@ -2139,7 +2107,7 @@ STR_OBJECT_CLASS_TRNS                                           :Pemancar
 
 # Tree planting window (last two for SE only)
 STR_PLANT_TREE_CAPTION                                          :{WHITE}Pepohonan
-STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Pilih jenis pohon untuk ditanam
+STR_PLANT_TREE_TOOLTIP                                          :{BLACK}Pilih jenis pohon untuk ditanam. Jika pohon sudah tertanam, ini akan menambah jenis pohon secara acak dari tipe yang sama.
 STR_TREES_RANDOM_TYPE                                           :{BLACK}Tanam pohon secara acak
 STR_TREES_RANDOM_TYPE_TOOLTIP                                   :{BLACK}Tempatkan tipe tumbuhan secara acak. Shift untuk menampilkan perkiraan biaya
 STR_TREES_RANDOM_TREES_BUTTON                                   :{BLACK}Pohon Acak
@@ -2579,9 +2547,7 @@ STR_NEWGRF_SCAN_ARCHIVES                                        :Memindai arsip
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Daftar tanda - {COMMA} Tanda
 STR_SIGN_LIST_MATCH_CASE                                        :{BLACK}Persis besar-kecil
-STR_SIGN_LIST_CLEAR                                             :{BLACK}Hapus penyaringan
 STR_SIGN_LIST_MATCH_CASE_TOOLTIP                                :{BLACK}Hidup matikan pengecekan besar-kecil huruf pada pengenal dengan kotak pencarian
-STR_SIGN_LIST_CLEAR_TOOLTIP                                     :{BLACK}Hapus penyaringan
 
 # Sign window
 STR_EDIT_SIGN_CAPTION                                           :{WHITE}Ubah tulisan di tanda pengenal
@@ -2667,6 +2633,24 @@ STR_GOAL_QUESTION_CAPTION_WARNING                               :Peringatan
 STR_GOAL_QUESTION_CAPTION_ERROR                                 :Kesalahan
 
 ### Start of Goal Question button list
+STR_GOAL_QUESTION_BUTTON_CANCEL                                 :Batal
+STR_GOAL_QUESTION_BUTTON_OK                                     :Oke
+STR_GOAL_QUESTION_BUTTON_NO                                     :Tidak
+STR_GOAL_QUESTION_BUTTON_YES                                    :Ya
+STR_GOAL_QUESTION_BUTTON_DECLINE                                :Batalkan
+STR_GOAL_QUESTION_BUTTON_ACCEPT                                 :Setuju
+STR_GOAL_QUESTION_BUTTON_IGNORE                                 :Abaikan
+STR_GOAL_QUESTION_BUTTON_RETRY                                  :Ulangi
+STR_GOAL_QUESTION_BUTTON_PREVIOUS                               :Sebelumnya
+STR_GOAL_QUESTION_BUTTON_NEXT                                   :Berikutnya
+STR_GOAL_QUESTION_BUTTON_STOP                                   :Berhenti
+STR_GOAL_QUESTION_BUTTON_START                                  :Mulai
+STR_GOAL_QUESTION_BUTTON_GO                                     :Lanjut
+STR_GOAL_QUESTION_BUTTON_CONTINUE                               :Lanjutkan
+STR_GOAL_QUESTION_BUTTON_RESTART                                :Restart
+STR_GOAL_QUESTION_BUTTON_POSTPONE                               :Tunda
+STR_GOAL_QUESTION_BUTTON_SURRENDER                              :Menyerah
+STR_GOAL_QUESTION_BUTTON_CLOSE                                  :Tutup
 
 # Subsidies window
 STR_SUBSIDIES_CAPTION                                           :{WHITE}Subsidi
@@ -2698,6 +2682,9 @@ STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Menerima
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Tampilkan daftar kargo yang bisa diterima
 STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Menerima: {WHITE}{CARGO_LIST}
 
+STR_STATIOV_VIEW_EXCLUSIVE_RIGHTS_SELF                          :{BLACK}Stasiun memiliki hak transportasi eksklusif di kota ini
+STR_STATIOV_VIEW_EXCLUSIVE_RIGHTS_COMPANY                       :{YELLOW}{COMPANY}{BLACK} beli hak transportasi eksklusif di kota ini
+
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Peringkat
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Tampilkna peringkat dari stasiun
 STR_STATION_VIEW_CARGO_RATINGS_TITLE                            :{BLACK}Peringkat layanan transportasi (lokal):
@@ -2723,6 +2710,9 @@ STR_STATION_VIEW_SCHEDULED_AIRCRAFT_TOOLTIP                     :{BLACK}Tampilka
 STR_STATION_VIEW_SCHEDULED_SHIPS_TOOLTIP                        :{BLACK}Tampilkan semua kapal yang memiliki jadwal menuju pelabuhan ini.
 
 STR_STATION_VIEW_RENAME_STATION_CAPTION                         :Ubah nama stasiun/area bongkar muat
+
+STR_STATION_VIEW_CLOSE_AIRPORT                                  :{BLACK}Tutup bandara
+STR_STATION_VIEW_CLOSE_AIRPORT_TOOLTIP                          :{BLACK}Cegah pesawat mendarat di bandara ini
 
 # Waypoint/buoy view window
 STR_WAYPOINT_VIEW_CAPTION                                       :{WHITE}{WAYPOINT}
@@ -2805,8 +2795,8 @@ STR_COMPANY_VIEW_PRESIDENT_NAME_TOOLTIP                         :{BLACK}Ubah nam
 
 STR_COMPANY_VIEW_BUY_SHARE_BUTTON                               :{BLACK}Beli 25% saham perusahaan
 STR_COMPANY_VIEW_SELL_SHARE_BUTTON                              :{BLACK}Jual 25% saham perusahaan
-STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Beli 25% saham perusahaan ini. Shift untuk menampilkan perkiraan biaya
-STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Jual 25% saham perusahaan ini. Shift untuk menampilkan perkiraan biaya
+STR_COMPANY_VIEW_BUY_SHARE_TOOLTIP                              :{BLACK}Beli 25% saham perusahaan ini. Shift+klik untuk menampilkan perkiraan biaya tanpa membeli saham.
+STR_COMPANY_VIEW_SELL_SHARE_TOOLTIP                             :{BLACK}Jual 25% saham perusahaan ini. Shift untuk menampilkan perkiraan biaya tanpa menjual saham
 
 STR_COMPANY_VIEW_COMPANY_NAME_QUERY_CAPTION                     :Nama Perusahaan
 STR_COMPANY_VIEW_PRESIDENT_S_NAME_QUERY_CAPTION                 :Nama Pimpinan
@@ -3026,7 +3016,7 @@ STR_DEPOT_CLONE_SHIP                                            :{BLACK}Gandakan
 STR_DEPOT_CLONE_AIRCRAFT                                        :{BLACK}Gandakan
 
 STR_DEPOT_CLONE_TRAIN_DEPOT_INFO                                :{BLACK}Ini akan membeli satu unit kereta yang sama termasuk gerbongnya. Klik tombol ini lalu klik kereta yang ingin digandakan baik didalam maupun diluar depo. Ctrl+Click untuk berbagi perintah. Shift untuk menampilkan perkiraan biaya
-STR_DEPOT_CLONE_ROAD_VEHICLE_DEPOT_INFO                         :{BLACK}Ini akan membeli satu unit kendaraan yang sama. Klik tombol ini lalu klik kendaraan yang ingin digandakan, baik didalam maupun diluar bengkel.Ctrl+Click untuk berbagi perintah. Shift untuk menampilkan perkiraan biaya
+STR_DEPOT_CLONE_ROAD_VEHICLE_DEPOT_INFO                         :{BLACK}Ini akan membeli satu unit kendaraan yang sama. Klik tombol ini lalu klik kendaraan yang ingin digandakan, baik didalam maupun diluar bengkel.Ctrl+Click untuk berbagi perintah. Shift untuk menampilkan perkiraan biaya tanpa membeli
 STR_DEPOT_CLONE_SHIP_DEPOT_INFO                                 :{BLACK}Ini akan membeli satu unit kapal yang sama . Klik tombol ini dan kemudian pada satu kapal di dalam atau diluar galangan. Ctrl+Click untuk berbagi perintah. Shift untuk menampilkan perkiraan biaya
 STR_DEPOT_CLONE_AIRCRAFT_INFO_HANGAR_WINDOW                     :{BLACK}Ini akan membeli satu unit pesawat yang sama. Klik tombol ini dan kemudian pada satu pesawat didalam atau diluar hangar. Ctrl+Click untuk berbagi perintah. Shift untuk menampilkan perkiraan biaya
 
@@ -3080,9 +3070,12 @@ STR_REPLACE_HELP_LEFT_ARRAY                                     :{BLACK}Pilih je
 STR_REPLACE_HELP_RIGHT_ARRAY                                    :{BLACK}Pilih jenis mesin yang ingin digunakan sebagai pengganti mesin terpilih di sisi kiri
 
 STR_REPLACE_VEHICLES_START                                      :{BLACK}Mulai Mengganti
+STR_REPLACE_VEHICLES_NOW                                        :Ganti semua kendaraan sekarang
+STR_REPLACE_VEHICLES_WHEN_OLD                                   :Hanya mengganti kendaraan tua
 STR_REPLACE_HELP_START_BUTTON                                   :{BLACK}Tekan untuk memulai penggantian jenis kendaraan terpilih di sisi kiri dengan di sisi kanan
 STR_REPLACE_NOT_REPLACING                                       :{BLACK}Tidak Mengganti
 STR_REPLACE_NOT_REPLACING_VEHICLE_SELECTED                      :{BLACK}Tidak Ada Kendaraan yang dipilih
+STR_REPLACE_REPLACING_WHEN_OLD                                  :{ENGINE} saat tua
 STR_REPLACE_VEHICLES_STOP                                       :{BLACK}Berhenti Mengganti
 STR_REPLACE_HELP_STOP_BUTTON                                    :{BLACK}Tekan untuk menghentikan penggantian jenis kendaraan terpilih di sisi kiri
 
@@ -3233,8 +3226,8 @@ STR_VEHICLE_DETAILS_TRAIN_ARTICULATED_RV_CAPACITY               :{BLACK}Kapasita
 # Vehicle refit
 STR_REFIT_CAPTION                                               :{WHITE}{VEHICLE} (Renovasi)
 STR_REFIT_TITLE                                                 :{GOLD}Pilih jenis kargo yang akan dibawa:
-STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}Kapasitas baru: {GOLD}{CARGO_LONG}{}{BLACK}Biaya ubah kargo: {GOLD}{CURRENCY_LONG}
-STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT                   :{BLACK}Kapasitas baru: {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK}Biaya modifikasi: {GOLD}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}Kapasitas baru: {GOLD}{CARGO_LONG}{}{BLACK}Biaya ubah kargo: {RED}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT                   :{BLACK}Kapasitas baru: {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK}Biaya modifikasi: {RED}{CURRENCY_LONG}
 STR_REFIT_SELECT_VEHICLES_TOOLTIP                               :{BLACK}Pilih kendaraan yg akan dimodifikasi. Drag untuk memilih sekaligus beberapa kendaraan. Klik pada ruang kosong untuk memilih semua kendaraan. Ctrl+Klik untuk memilih kendaraan berikut rangkaiannya
 
 STR_REFIT_TRAIN_LIST_TOOLTIP                                    :{BLACK}Pilih jenis kargo yang akan dibawa kereta
@@ -3498,7 +3491,7 @@ STR_ERROR_AI_DEBUG_SERVER_ONLY                                  :{YELLOW}Jendela
 
 # AI configuration window
 STR_AI_CONFIG_CAPTION                                           :{WHITE}Konfigurasi AI
-STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}SkripPermainan yang akan di jalankan di permainan berikutnya
+STR_AI_CONFIG_GAMELIST_TOOLTIP                                  :{BLACK}Skrip Permainan yang akan di jalankan di permainan berikutnya
 STR_AI_CONFIG_AILIST_TOOLTIP                                    :{BLACK}AI yg akan dijalankan pada permainan berikutnya
 STR_AI_CONFIG_HUMAN_PLAYER                                      :Pemain Manusia
 STR_AI_CONFIG_RANDOM_AI                                         :AI Acak
@@ -3509,13 +3502,13 @@ STR_AI_CONFIG_MOVE_UP_TOOLTIP                                   :{BLACK}Naikkan 
 STR_AI_CONFIG_MOVE_DOWN                                         :{BLACK}Turunkan
 STR_AI_CONFIG_MOVE_DOWN_TOOLTIP                                 :{BLACK}Turunkan AI terpilih dalam daftar
 
-STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}SkripPermainan
+STR_AI_CONFIG_GAMESCRIPT                                        :{SILVER}Skrip Permainan
 STR_AI_CONFIG_AI                                                :{SILVER}AI
 
 STR_AI_CONFIG_CHANGE                                            :{BLACK}Pilih {STRING}
 STR_AI_CONFIG_CHANGE_NONE                                       :
 STR_AI_CONFIG_CHANGE_AI                                         :AI
-STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :SkripPermainan
+STR_AI_CONFIG_CHANGE_GAMESCRIPT                                 :Skrip Permainan
 STR_AI_CONFIG_CHANGE_TOOLTIP                                    :{BLACK}Muat skrip yang lain
 STR_AI_CONFIG_CONFIGURE                                         :{BLACK}Konfigurasikan
 STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Mengkonfigurasi parameter skrip AI
@@ -3523,12 +3516,12 @@ STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Mengkonf
 # Available AIs window
 STR_AI_LIST_CAPTION                                             :{WHITE}Tersedia {STRING}
 STR_AI_LIST_CAPTION_AI                                          :AI
-STR_AI_LIST_CAPTION_GAMESCRIPT                                  :SkripPermainan
+STR_AI_LIST_CAPTION_GAMESCRIPT                                  :Skrip Permainan
 STR_AI_LIST_TOOLTIP                                             :{BLACK}Klik untuk memilih skrip AI
 
-STR_AI_LIST_AUTHOR                                              :{BLACK}Pembuat: {STRING}
-STR_AI_LIST_VERSION                                             :{BLACK}Versi: {NUM}
-STR_AI_LIST_URL                                                 :{BLACK}URL: {STRING}
+STR_AI_LIST_AUTHOR                                              :{LTBLUE}Pembuat: {ORANGE}{STRING}
+STR_AI_LIST_VERSION                                             :{LTBLUE}Versi: {ORANGE}{NUM}
+STR_AI_LIST_URL                                                 :{LTBLUE}URL: {ORANGE}{STRING}
 
 STR_AI_LIST_ACCEPT                                              :{BLACK}Terapkan
 STR_AI_LIST_ACCEPT_TOOLTIP                                      :{BLACK}Pilih skrip AI yg disorot
@@ -3538,7 +3531,7 @@ STR_AI_LIST_CANCEL_TOOLTIP                                      :{BLACK}Jangan m
 # AI Parameters
 STR_AI_SETTINGS_CAPTION                                         :{WHITE}{STRING} Parameter
 STR_AI_SETTINGS_CAPTION_AI                                      :AI
-STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :SkripPermainan
+STR_AI_SETTINGS_CAPTION_GAMESCRIPT                              :Skrip Permainan
 STR_AI_SETTINGS_CLOSE                                           :{BLACK}Tutup
 STR_AI_SETTINGS_RESET                                           :{BLACK}Reset
 STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORANGE}{STRING}
@@ -3609,6 +3602,7 @@ STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}Ukuran 
 STR_WARNING_FALLBACK_SOUNDSET                                   :{WHITE}Hanya efek suara standar yang ditemukan. Jika anda ingin efek suara, unduhlah dari "Cari Konten"
 
 # Screenshot related messages
+
 STR_MESSAGE_SCREENSHOT_SUCCESSFULLY                             :{WHITE}Pengambilan gambar telah berhasil disimpan sebagai '{STRING}'
 STR_ERROR_SCREENSHOT_FAILED                                     :{WHITE}Pengambilan gambar gagal
 
@@ -3631,6 +3625,7 @@ STR_ERROR_OWNED_BY                                              :{WHITE}... dimi
 STR_ERROR_AREA_IS_OWNED_BY_ANOTHER                              :{WHITE}... area ini dimiliki oleh perusahaan lain
 STR_ERROR_TERRAFORM_LIMIT_REACHED                               :{WHITE}... batas pengubahan lansekap terlampaui
 STR_ERROR_CLEARING_LIMIT_REACHED                                :{WHITE}... batas penghapusan area terlampaui
+STR_ERROR_TREE_PLANT_LIMIT_REACHED                              :{WHITE}... batas penanaman pohon tercapai
 STR_ERROR_NAME_MUST_BE_UNIQUE                                   :{WHITE}Nama haruslah unik
 STR_ERROR_GENERIC_OBJECT_IN_THE_WAY                             :terhalang {WHITE}{1:STRING}
 STR_ERROR_NOT_ALLOWED_WHILE_PAUSED                              :{WHITE}Tidak diijinkan saat berhenti
@@ -3691,7 +3686,8 @@ STR_ERROR_ONLY_ONE_ALLOWED_PER_TOWN                             :{WHITE}... hany
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS_WITH_POPULATION_OF_1200    :{WHITE}... hanya dapat dibangun pada kota dengan populasi paling sedikit 1200
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_RAINFOREST                       :{WHITE}... hanya dapat dibangun di area hutan hujan
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_DESERT                           :{WHITE}... hanya dapat dibangun di area gurun
-STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... hanya dapat dibangun di kota
+STR_ERROR_CAN_ONLY_BE_BUILT_IN_TOWNS                            :{WHITE}... hanya dapat dibangun di kota (menggantikan rumah)
+STR_ERROR_CAN_ONLY_BE_BUILT_NEAR_TOWN_CENTER                    :{WHITE}... hanya dapat dibangun dekat dgn pusat kota
 STR_ERROR_CAN_ONLY_BE_BUILT_IN_LOW_AREAS                        :{WHITE}... hanya dapat dibangun di daerah rendah
 STR_ERROR_CAN_ONLY_BE_POSITIONED                                :{WHITE}... hanya dapat diletakkan didekat batas peta
 STR_ERROR_FOREST_CAN_ONLY_BE_PLANTED                            :{WHITE}... hutan hanya dapat ditanam diatas batas salju
@@ -4433,6 +4429,8 @@ STR_ORANGE_STRING                                               :{ORANGE}{STRING
 STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
+STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}
+STR_ORANGE_STRING1_LTBLUE                                       :{ORANGE}{STRING}{LTBLUE}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}
 STR_TINY_RIGHT_ARROW                                            :{TINY_FONT}{RIGHT_ARROW}

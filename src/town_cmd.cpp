@@ -847,6 +847,9 @@ static bool IsRoadAllowedHere(Town *t, TileIndex tile, DiagDirection dir)
 {
 	if (DistanceFromEdge(tile) == 0) return false;
 
+	/* Prevent towns from building roads under bridges along the bridge. Looks silly. */
+	if (MayHaveBridgeAbove(tile) && IsBridgeAbove(tile) && GetBridgeAxis(tile) == DiagDirToAxis(dir)) return false;
+
 	/* Check if there already is a road at this point? */
 	if (GetTownRoadBits(tile) == ROAD_NONE) {
 		/* No, try if we are able to build a road piece there.
@@ -1089,7 +1092,7 @@ static bool GrowTownWithBridge(const Town *t, const TileIndex tile, const DiagDi
 			return true;
 		}
 	}
-	/* Quit if it selecting an appropiate bridge type fails a large number of times. */
+	/* Quit if it selecting an appropriate bridge type fails a large number of times. */
 	return false;
 }
 
@@ -1694,7 +1697,7 @@ CommandCost CmdFoundTown(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 			SetDParamStr(0, cn);
 			SetDParam(1, t->index);
 
-			AddNewsItem(STR_NEWS_NEW_TOWN, NS_INDUSTRY_OPEN, NR_TILE, tile, NR_NONE, UINT32_MAX, cn);
+			AddTileNewsItem(STR_NEWS_NEW_TOWN, NT_INDUSTRY_OPEN, tile, cn);
 			AI::BroadcastNewEvent(new ScriptEventTownFounded(t->index));
 			Game::NewEvent(new ScriptEventTownFounded(t->index));
 		}
@@ -2700,7 +2703,9 @@ static CommandCost TownActionRoadRebuild(Town *t, DoCommandFlag flags)
 		SetDParam(0, t->index);
 		SetDParamStr(1, cn);
 
-		AddNewsItem(STR_NEWS_ROAD_REBUILDING, NS_GENERAL, NR_TOWN, t->index, NR_NONE, UINT32_MAX, cn);
+		AddNewsItem(STR_NEWS_ROAD_REBUILDING, NT_GENERAL, NF_NORMAL, NR_TOWN, t->index, NR_NONE, UINT32_MAX, cn);
+		AI::BroadcastNewEvent(new ScriptEventRoadReconstruction((ScriptCompany::CompanyID)(Owner)_current_company, t->index));
+		Game::NewEvent(new ScriptEventRoadReconstruction((ScriptCompany::CompanyID)(Owner)_current_company, t->index));
 	}
 	return CommandCost();
 }
@@ -2822,6 +2827,19 @@ static CommandCost TownActionBuyRights(Town *t, DoCommandFlag flags)
 		t->exclusivity = _current_company;
 
 		ModifyStationRatingAround(t->xy, _current_company, 130, 17);
+
+		SetWindowClassesDirty(WC_STATION_VIEW);
+
+		/* Spawn news message */
+		CompanyNewsInformation *cni = MallocT<CompanyNewsInformation>(1);
+		cni->FillData(Company::Get(_current_company));
+		SetDParam(0, STR_NEWS_EXCLUSIVE_RIGHTS_TITLE);
+		SetDParam(1, STR_NEWS_EXCLUSIVE_RIGHTS_DESCRIPTION);
+		SetDParam(2, t->index);
+		SetDParamStr(3, cni->company_name);
+		AddNewsItem(STR_MESSAGE_NEWS_FORMAT, NT_GENERAL, NF_COMPANY, NR_TOWN, t->index, NR_NONE, UINT32_MAX, cni);
+		AI::BroadcastNewEvent(new ScriptEventExclusiveTransportRights((ScriptCompany::CompanyID)(Owner)_current_company, t->index));
+		Game::NewEvent(new ScriptEventExclusiveTransportRights((ScriptCompany::CompanyID)(Owner)_current_company, t->index));
 	}
 	return CommandCost();
 }

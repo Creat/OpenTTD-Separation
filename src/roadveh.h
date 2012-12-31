@@ -80,6 +80,7 @@ static const uint RVC_DEPOT_STOP_FRAME                   = 11;
 static const byte RV_OVERTAKE_TIMEOUT = 35;
 
 void RoadVehUpdateCache(RoadVehicle *v, bool same_length = false);
+void GetRoadVehSpriteSize(EngineID engine, uint &width, uint &height, int &xoffs, int &yoffs, EngineImageType image_type);
 
 /**
  * Buses, trucks and trams belong to this class.
@@ -113,7 +114,6 @@ struct RoadVehicle FINAL : public GroundVehicle<RoadVehicle, VEH_ROAD> {
 	Money GetRunningCost() const;
 	int GetDisplayImageWidth(Point *offset = NULL) const;
 	bool IsInDepot() const { return this->state == RVSB_IN_DEPOT; }
-	bool IsStoppedInDepot() const;
 	bool Tick();
 	void OnNewDay();
 	uint Crash(bool flooded = false);

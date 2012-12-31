@@ -39,7 +39,7 @@
 void CcTerraform(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 {
 	if (result.Succeeded()) {
-		SndPlayTileFx(SND_1F_SPLAT, tile);
+		if (_settings_client.sound.confirm) SndPlayTileFx(SND_1F_SPLAT, tile);
 	} else {
 		extern TileIndex _terraform_err_tile;
 		SetRedErrorSquare(_terraform_err_tile);
@@ -87,7 +87,7 @@ static void GenerateRockyArea(TileIndex end, TileIndex start)
 		success = true;
 	}
 
-	if (success) SndPlayTileFx(SND_1F_SPLAT, end);
+	if (success && _settings_client.sound.confirm) SndPlayTileFx(SND_1F_SPLAT, end);
 }
 
 /**
@@ -197,8 +197,6 @@ struct TerraformToolbarWindow : Window {
 				break;
 
 			case WID_TT_PLANT_TREES: // Plant trees button
-				/* This button is NOT a place-push-button, so don't treat it as such */
-				this->HandleButtonClick(WID_TT_PLANT_TREES);
 				ShowBuildTreesToolbar();
 				break;
 
@@ -218,12 +216,6 @@ struct TerraformToolbarWindow : Window {
 
 			default: NOT_REACHED();
 		}
-	}
-
-	virtual void OnTimeout()
-	{
-		this->RaiseWidget(WID_TT_PLANT_TREES);
-		this->SetWidgetDirty(WID_TT_PLANT_TREES);
 	}
 
 	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
@@ -338,7 +330,7 @@ static const NWidgetPart _nested_terraform_widgets[] = {
 								SetFill(0, 1), SetDataTip(SPR_IMG_DYNAMITE, STR_TOOLTIP_DEMOLISH_BUILDINGS_ETC),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_TT_BUY_LAND), SetMinimalSize(22, 22),
 								SetFill(0, 1), SetDataTip(SPR_IMG_BUY_LAND, STR_LANDSCAPING_TOOLTIP_PURCHASE_LAND),
-		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_TT_PLANT_TREES), SetMinimalSize(22, 22),
+		NWidget(WWT_PUSHIMGBTN, COLOUR_DARK_GREEN, WID_TT_PLANT_TREES), SetMinimalSize(22, 22),
 								SetFill(0, 1), SetDataTip(SPR_IMG_PLANTTREES, STR_SCENEDIT_TOOLBAR_PLANT_TREES),
 		NWidget(WWT_IMGBTN, COLOUR_DARK_GREEN, WID_TT_PLACE_SIGN), SetMinimalSize(22, 22),
 								SetFill(0, 1), SetDataTip(SPR_IMG_SIGN, STR_SCENEDIT_TOOLBAR_PLACE_SIGN),
@@ -419,7 +411,7 @@ static void CommonRaiseLowerBigLand(TileIndex tile, int mode)
 
 		if (ta.w == 0 || ta.h == 0) return;
 
-		SndPlayTileFx(SND_1F_SPLAT, tile);
+		if (_settings_client.sound.confirm) SndPlayTileFx(SND_1F_SPLAT, tile);
 
 		uint h;
 		if (mode != 0) {
@@ -638,7 +630,7 @@ struct ScenarioEditorLandscapeGenerationWindow : Window {
 				if (!IsInsideMM(size, 1, 8 + 1)) return;
 				_terraform_size = size;
 
-				SndPlayFx(SND_15_BEEP);
+				if (_settings_client.sound.click_beep) SndPlayFx(SND_15_BEEP);
 				this->SetDirty();
 				break;
 			}

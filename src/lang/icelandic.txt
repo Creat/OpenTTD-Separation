@@ -167,7 +167,7 @@ STR_ABBREV_ALL                                                  :{TINY_FONT}ALLT
 
 # 'Mode' of transport for cargoes
 STR_PASSENGERS                                                  :{COMMA} farþeg{P i ar}
-STR_BAGS                                                        :{COMMA} pokar
+STR_BAGS                                                        :{COMMA} pokar{P "" s}
 STR_TONS                                                        :{COMMA} tonn
 STR_LITERS                                                      :{COMMA} lítrar
 STR_ITEMS                                                       :{COMMA} hlutir
@@ -218,6 +218,7 @@ STR_UNITS_HEIGHT_IMPERIAL                                       :{COMMA} ft
 STR_UNITS_HEIGHT_SI                                             :{COMMA} m
 
 # Common window strings
+STR_LIST_FILTER_TITLE                                           :{BLACK}Sía:
 STR_LIST_FILTER_OSKTITLE                                        :{BLACK}Sláðu inn leitarstreng
 STR_LIST_FILTER_TOOLTIP                                         :{BLACK}Sláðu inn leitarstreng til að sía listann
 
@@ -283,10 +284,12 @@ STR_SORT_BY_RATING_MIN                                          :Lægsta einkunn
 STR_SORT_BY_ENGINE_ID                                           :Einkenni (hefðbundin röðun)
 STR_SORT_BY_COST                                                :Kostnaður
 STR_SORT_BY_POWER                                               :Afl
+STR_SORT_BY_TRACTIVE_EFFORT                                     :Togkraftur
 STR_SORT_BY_INTRO_DATE                                          :Árgerð
 STR_SORT_BY_RUNNING_COST                                        :Rekstrarkostnaður
 STR_SORT_BY_POWER_VS_RUNNING_COST                               :Afl/Rekstrarkostnaður
 STR_SORT_BY_CARGO_CAPACITY                                      :Burðargeta
+STR_SORT_BY_RANGE                                               :Drægni
 
 # Tooltips for the main toolbar
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Stöðva leik
@@ -337,6 +340,7 @@ STR_SCENEDIT_TOOLBAR_PLACE_OBJECT                               :{BLACK}Setja hl
 ############ range for SE file menu starts
 STR_SCENEDIT_FILE_MENU_SAVE_SCENARIO                            :Vista kort
 STR_SCENEDIT_FILE_MENU_LOAD_SCENARIO                            :Opna kort
+STR_SCENEDIT_FILE_MENU_SAVE_HEIGHTMAP                           :Vista hæðakort
 STR_SCENEDIT_FILE_MENU_LOAD_HEIGHTMAP                           :Hlaða hæðakorti
 STR_SCENEDIT_FILE_MENU_QUIT_EDITOR                              :Hætta í kortagerð
 STR_SCENEDIT_FILE_MENU_SEPARATOR                                :
@@ -345,14 +349,15 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :Hætta
 
 ############ range for settings menu starts
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Stillingar
-STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Erfiðleikastig
-STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Þróaðri stillingar
+STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Ítarlegar stillingar
+STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :Gervigreind/leikjaforskrift
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :NewGRF stillingar
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Gegnsæisstillingar
 STR_SETTINGS_MENU_TOWN_NAMES_DISPLAYED                          :Bæjanöfn sýnd
 STR_SETTINGS_MENU_STATION_NAMES_DISPLAYED                       :Stöðvarnöfn sýnd
 STR_SETTINGS_MENU_WAYPOINTS_DISPLAYED                           :Millistöðvar sýndar
 STR_SETTINGS_MENU_SIGNS_DISPLAYED                               :Skilti sýnd
+STR_SETTINGS_MENU_SHOW_COMPETITOR_SIGNS                         :Skilti og nöfn keppinauta sýnd
 STR_SETTINGS_MENU_FULL_ANIMATION                                :Fullar myndhreyfingar
 STR_SETTINGS_MENU_FULL_DETAIL                                   :Full nákvæmni
 STR_SETTINGS_MENU_TRANSPARENT_BUILDINGS                         :Gegnsæjar byggingar
@@ -379,6 +384,7 @@ STR_TOWN_MENU_FOUND_TOWN                                        :Fann bæ
 
 ############ range for subsidies menu starts
 STR_SUBSIDIES_MENU_SUBSIDIES                                    :Samstarfssamningar
+STR_SUBSIDIES_MENU_GOAL                                         :Markmið
 ############ range ends here
 
 ############ range for graph menu starts
@@ -393,10 +399,12 @@ STR_GRAPH_MENU_CARGO_PAYMENT_RATES                              :Línurit: Flutn
 ############ range for company league menu starts
 STR_GRAPH_MENU_COMPANY_LEAGUE_TABLE                             :Stigatafla fyrirtækja
 STR_GRAPH_MENU_DETAILED_PERFORMANCE_RATING                      :Nákvæm frammistöðumæling
+STR_GRAPH_MENU_HIGHSCORE                                        :Stigatafla
 ############ range ends here
 
 ############ range for industry menu starts
 STR_INDUSTRY_MENU_INDUSTRY_DIRECTORY                            :Fyrirtækjaskrá
+STR_INDUSTRY_MENU_INDUSTRY_CHAIN                                :Tengdur iðnaður
 STR_INDUSTRY_MENU_FUND_NEW_INDUSTRY                             :Fjármagna nýjan iðnað
 ############ range ends here
 
@@ -404,7 +412,7 @@ STR_INDUSTRY_MENU_FUND_NEW_INDUSTRY                             :Fjármagna nýj
 STR_RAIL_MENU_RAILROAD_CONSTRUCTION                             :Járnbrautarlestarframkvæmdir
 STR_RAIL_MENU_ELRAIL_CONSTRUCTION                               :Rafmagnsteina framkvæmdir
 STR_RAIL_MENU_MONORAIL_CONSTRUCTION                             :Einteinungsframkvæmdir
-STR_RAIL_MENU_MAGLEV_CONSTRUCTION                               :MagLev framkvæmdir
+STR_RAIL_MENU_MAGLEV_CONSTRUCTION                               :Maglev framkvæmdir
 ############ range ends here
 
 ############ range for road construction menu starts
@@ -432,7 +440,6 @@ STR_TOOLBAR_SOUND_MUSIC                                         :Hljóð/tónlis
 
 ############ range for message menu starts
 STR_NEWS_MENU_LAST_MESSAGE_NEWS_REPORT                          :Síðustu skilaboð/frétt
-STR_NEWS_MENU_MESSAGE_SETTINGS                                  :Skilaboðastillingar
 STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :Saga skilaboða
 ############ range ends here
 
@@ -443,6 +450,7 @@ STR_ABOUT_MENU_TOGGLE_CONSOLE                                   :Kveikja á stý
 STR_ABOUT_MENU_AI_DEBUG                                         :Aflúsun gervigreindar
 STR_ABOUT_MENU_SCREENSHOT                                       :Skjámynd
 STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Þysjuð inn skjámynd
+STR_ABOUT_MENU_DEFAULTZOOM_SCREENSHOT                           :Taka skjáskot af súmi
 STR_ABOUT_MENU_GIANT_SCREENSHOT                                 :Risa skjámynd
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :Um 'OpenTTD'
 STR_ABOUT_MENU_SPRITE_ALIGNER                                   :Samstilla hreyfimynd
@@ -631,7 +639,7 @@ STR_PLAYLIST_TOOLTIP_CLICK_TO_ADD_TRACK                         :{BLACK}Veldu la
 STR_PLAYLIST_TOOLTIP_CLICK_TO_REMOVE_TRACK                      :{BLACK}Smelltu á lag til að fjarlægja það úr listanum (á aðeins við um Sérvalið1 og Sérvalið2)
 
 # Highscore window
-STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED                         :{BIG_FONT}{BLACK}Efstu fyrirtæki sem náðu {NUM}{}({STRING} stig)
+STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED                         :{BIG_FONT}{BLACK}Efstu fyrirtæki sem náðu {NUM}
 STR_HIGHSCORE_TOP_COMPANIES_NETWORK_GAME                        :{BIG_FONT}{BLACK}Sambandstafla fyrirtækis í {NUM}
 STR_HIGHSCORE_POSITION                                          :{BIG_FONT}{BLACK}{COMMA}.
 STR_HIGHSCORE_PERFORMANCE_TITLE_BUSINESSMAN                     :Viðskiptamaður
@@ -714,32 +722,7 @@ STR_MESSAGE_HISTORY                                             :{WHITE}Saga ski
 STR_MESSAGE_HISTORY_TOOLTIP                                     :{BLACK}Listi yfir nýlegar fréttir
 STR_MESSAGE_NEWS_FORMAT                                         :{STRING}  -  {STRING}
 
-# Message settings window
 STR_NEWS_MESSAGE_CAPTION                                        :{WHITE}Skilaboð
-STR_NEWS_MESSAGE_OPTIONS_CAPTION                                :{WHITE}Skilaboðastillingar
-STR_NEWS_MESSAGES_ALL                                           :{YELLOW}Stillingar fyrir allar gerðir skilaboða (á/af/úrtak)
-STR_NEWS_MESSAGES_SOUND                                         :{YELLOW}Spila hljóð með fréttaúrtaki
-STR_NEWS_MESSAGES_OFF                                           :Af
-STR_NEWS_MESSAGES_SUMMARY                                       :Úrtak
-STR_NEWS_MESSAGES_FULL                                          :Allt
-
-STR_NEWS_MESSAGE_TYPES                                          :{BLACK}Skilaboðategundir:
-STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OWN              :{YELLOW}Aðkoma fyrsta farartækis á stöð leikmanns
-STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OTHER            :{YELLOW}Aðkoma fyrsta farartækis á stöð andstæðings
-STR_NEWS_MESSAGE_TYPE_ACCIDENTS_DISASTERS                       :{YELLOW}Slys / hamfarir
-STR_NEWS_MESSAGE_TYPE_COMPANY_INFORMATION                       :{YELLOW}Fyrirtækisupplýsingar
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_OPEN                             :{YELLOW}Opnun Iðnaðar
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CLOSE                            :{YELLOW}Lokun Iðnaðar
-STR_NEWS_MESSAGE_TYPE_ECONOMY_CHANGES                           :{YELLOW}Efnahagsbreytingar
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_COMPANY        :{YELLOW}Framleiðslubreytingar á iðnaði þjónað af fyrirtækinu
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_OTHER          :{YELLOW}Framleiðslubreytingar fyrirtækja þjónustuð af mótherjum
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_UNSERVED                 :{YELLOW}Aðrar framleiðslubreytingar
-STR_NEWS_MESSAGE_TYPE_ADVICE_INFORMATION_ON_COMPANY             :{YELLOW}Ráð / upplýsingar um faratæki fyrirtækisins
-STR_NEWS_MESSAGE_TYPE_NEW_VEHICLES                              :{YELLOW}Ný farartæki
-STR_NEWS_MESSAGE_TYPE_CHANGES_OF_CARGO_ACCEPTANCE               :{YELLOW}Breyting á viðtöku farms
-STR_NEWS_MESSAGE_TYPE_SUBSIDIES                                 :{YELLOW}Samstarfssamningar
-STR_NEWS_MESSAGE_TYPE_GENERAL_INFORMATION                       :{YELLOW}Almennar upplýsingar
-
 
 STR_NEWS_FIRST_TRAIN_ARRIVAL                                    :{BIG_FONT}{BLACK}Bæjarbúar fagna . . .{}Fyrsta lest kemur við á {STATION}!
 STR_NEWS_FIRST_BUS_ARRIVAL                                      :{BIG_FONT}{BLACK}Bæjarbúar fagna . . .{}Fyrsti strætisvagn kemur við á {STATION}!
@@ -837,6 +820,8 @@ STR_NEWS_SERVICE_SUBSIDY_AWARDED_TRIPLE                         :{BIG_FONT}{BLAC
 STR_NEWS_SERVICE_SUBSIDY_AWARDED_QUADRUPLE                      :{BIG_FONT}{BLACK}Samstarfssamningur gerður við {STRING}!{}{}{STRING}flutningur frá {STRING} til {STRING} mun borga fjórfalt í heilt ár!
 
 STR_NEWS_ROAD_REBUILDING                                        :{BIG_FONT}{BLACK}Glundroði í umferð {TOWN}!{}{}Uppbygging vega kostuð af {STRING} veldur 6 mánaða vesæld meðal ökumanna!
+STR_NEWS_EXCLUSIVE_RIGHTS_TITLE                                 :{BIG_FONT}{BLACK}Flutninga einokun!
+STR_NEWS_EXCLUSIVE_RIGHTS_DESCRIPTION                           :{BIG_FONT}{BLACK}Bæjarstjórn {TOWN} skrifar undir eins árs sérleyfis samning við {STRING} til flutningar á öllum varningi.
 
 # Extra view window
 STR_EXTRA_VIEW_PORT_TITLE                                       :{WHITE}Sjónarhorn {COMMA}
@@ -987,37 +972,7 @@ STR_CURRENCY_PREVIEW                                            :{LTBLUE}Dæmi: 
 STR_CURRENCY_CUSTOM_CURRENCY_PREVIEW_TOOLTIP                    :{BLACK}10.000 pund (£) í þessum gjaldmiðli
 STR_CURRENCY_CHANGE_PARAMETER                                   :{BLACK}Breyta sérvöldum gjaldeyri
 
-# Difficulty level window
-STR_DIFFICULTY_LEVEL_CAPTION                                    :{WHITE}Erfiðleikastig
-
-############ range for difficulty levels starts
-STR_DIFFICULTY_LEVEL_EASY                                       :{BLACK}Auðvelt
-STR_DIFFICULTY_LEVEL_MEDIUM                                     :{BLACK}Miðlungs
-STR_DIFFICULTY_LEVEL_HARD                                       :{BLACK}Erfitt
-STR_DIFFICULTY_LEVEL_CUSTOM                                     :{BLACK}Sérsniðið
-############ range for difficulty levels ends
-
-STR_DIFFICULTY_LEVEL_HIGH_SCORE_BUTTON                          :{BLACK}Sýna topplistann
-STR_DIFFICULTY_LEVEL_SAVE                                       :{BLACK}Vista
-
-############ range for difficulty settings starts
 STR_DIFFICULTY_LEVEL_SETTING_MAXIMUM_NO_COMPETITORS             :{LTBLUE}Hámarksfjöldi keppinauta: {ORANGE}{COMMA}
-STR_DIFFICULTY_LEVEL_SETTING_NO_OF_TOWNS                        :{LTBLUE}Fjöldi bæja: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_NO_OF_INDUSTRIES                   :{LTBLUE}Fjöldi iðnaða: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_MAXIMUM_INITIAL_LOAN_000           :{LTBLUE}Hámarkslán í upphafi: {ORANGE}{CURRENCY_LONG}
-STR_DIFFICULTY_LEVEL_SETTING_INITIAL_INTEREST_RATE              :{LTBLUE}Vextir í upphafi: {ORANGE}{COMMA}%
-STR_DIFFICULTY_LEVEL_SETTING_VEHICLE_RUNNING_COSTS              :{LTBLUE}Rekstrarkostnaður farartækja: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_CONSTRUCTION_SPEED_OF_COMPETITOR   :{LTBLUE}Byggingarhraði keppinauta: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_VEHICLE_BREAKDOWNS                 :{LTBLUE}Bilanatíðni farartækja: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_SUBSIDY_MULTIPLIER                 :{LTBLUE}Margföldun ríkisstyrks: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_COST_OF_CONSTRUCTION               :{LTBLUE}Byggingarkostnaður: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_TERRAIN_TYPE                       :{LTBLUE}Gerð landslags: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_QUANTITY_OF_SEA_LAKES              :{LTBLUE}Magn sjávar/lækja: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_ECONOMY                            :{LTBLUE}Efnahagur: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_TRAIN_REVERSING                    :{LTBLUE}Snúningur lestar: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_DISASTERS                          :{LTBLUE}Hamfarir: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_CITY_APPROVAL                      :{LTBLUE}Afstaða borgaryfirvalda til landmótunar: {ORANGE}{STRING}
-############ range for difficulty settings ends
 
 STR_NONE                                                        :Engin
 STR_NUM_VERY_LOW                                                :Mjög Lágt
@@ -1059,25 +1014,44 @@ STR_TERRAIN_TYPE_FLAT                                           :Slétt
 STR_TERRAIN_TYPE_HILLY                                          :Hæðótt
 STR_TERRAIN_TYPE_MOUNTAINOUS                                    :Fjallótt
 
-STR_ECONOMY_STEADY                                              :Stöðugur
-STR_ECONOMY_FLUCTUATING                                         :Óstöðugur
-
-STR_REVERSE_AT_END_OF_LINE_AND_AT_STATIONS                      :Á enda brautar, og á lestarstöðvum
-STR_REVERSE_AT_END_OF_LINE_ONLY                                 :Aðeins á enda brautar
-
 STR_CITY_APPROVAL_PERMISSIVE                                    :Eftirgefin
 STR_CITY_APPROVAL_TOLERANT                                      :Umburðarlynd
 STR_CITY_APPROVAL_HOSTILE                                       :Fjandsamleg
 
 STR_WARNING_NO_SUITABLE_AI                                      :{WHITE}Engin nothæf gervigreind í boði...{}Þú getur hlaðið niður mörgum gervigreindum í gegnum 'Ná í viðbætur af netinu' viðmótið
-STR_WARNING_DIFFICULTY_TO_CUSTOM                                :{WHITE}Þessi stilling breytti erfiðleikastigi í sérsniðið
 
 # Advanced settings window
-STR_CONFIG_SETTING_CAPTION                                      :{WHITE}Þróaðar stillingar
+STR_CONFIG_SETTING_CAPTION                                      :{WHITE}Ítarlegar stillingar
+STR_CONFIG_SETTING_FILTER_TITLE                                 :{BLACK}Sía:
+STR_CONFIG_SETTING_EXPAND_ALL                                   :{BLACK}Þenja út
+STR_CONFIG_SETTING_COLLAPSE_ALL                                 :{BLACK}Draga saman
+STR_CONFIG_SETTING_DEFAULT_VALUE                                :{LTBLUE}Sjálfgefið gildi: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TYPE                                         :{LTBLUE}Gerð stillingar: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TYPE_CLIENT                                  :Tölvustilling (ekki geymt í vistunarskrám; hefur áhrif á alla leiki)
+STR_CONFIG_SETTING_TYPE_GAME_MENU                               :Leikjastillingar (geymdar í vistunarskrám; hefur bara áhrif á nýja leiki )
+STR_CONFIG_SETTING_TYPE_GAME_INGAME                             :Leikjastillingar (geymdar í vistunarskrám; hefur bara áhrif á núverandi leik )
+STR_CONFIG_SETTING_TYPE_COMPANY_MENU                            :Fyrirtækjastillingar (geymdar í vistunarskrám; hefur bara áhrif á nýja leiki)
+STR_CONFIG_SETTING_TYPE_COMPANY_INGAME                          :Fyrirtækjastillingar (geymdar í vistunarskrám; hefur bara áhrif á núverandi fyrirtæki)
+
+STR_CONFIG_SETTING_RESTRICT_LABEL                               :{BLACK}Sýna:
+STR_CONFIG_SETTING_RESTRICT_DROPDOWN_HELPTEXT                   :{BLACK}Takmarkar listan hér fyrir neðan við breyttar stillingar
+STR_CONFIG_SETTING_RESTRICT_BASIC                               :Grunnstillingar
+STR_CONFIG_SETTING_RESTRICT_ADVANCED                            :Ítarlegar stillingar
+STR_CONFIG_SETTING_RESTRICT_ALL                                 :Mjög ítarlegar stillingar / allar stillingar
+STR_CONFIG_SETTING_RESTRICT_CHANGED_AGAINST_DEFAULT             :Stillingar sem hefur verið breytt frá sjálfgefnum
+STR_CONFIG_SETTING_RESTRICT_CHANGED_AGAINST_NEW                 :Stillingar sem eru öðruvísi en þínar stillingar fyrir nýjan leik
+
+STR_CONFIG_SETTING_TYPE_DROPDOWN_HELPTEXT                       :{BLACK}Takmarkar listan hér fyrir neðan við ákveðnar stillingar
+STR_CONFIG_SETTING_TYPE_DROPDOWN_ALL                            :Allar stillingar
+STR_CONFIG_SETTING_TYPE_DROPDOWN_CLIENT                         :Tölvustilling (ekki geymt í vistunarskrám; hefur áhrif á alla leiki)
+STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_MENU                      :Leikjastillingar (geymdar í vistunarskrám; hefur bara áhrif á nýja leiki )
+STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_INGAME                    :Leikjastillingar (geymdar í vistunarskrám; hefur bara áhrif á núverandi leik )
+STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_MENU                   :Fyrirtækjastillingar (geymdar í vistunarskrám; hefur bara áhrif á nýja leiki)
+STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_INGAME                 :Fyrirtækjastillingar (geymdar í vistunarskrám; hefur bara áhrif á núverandi fyrirtæki)
 
 STR_CONFIG_SETTING_OFF                                          :Nei
 STR_CONFIG_SETTING_ON                                           :Já
-STR_CONFIG_SETTING_DISABLED                                     :óvirkt
+STR_CONFIG_SETTING_DISABLED                                     :Óvirkt
 
 STR_CONFIG_SETTING_COMPANIES_OFF                                :Af
 STR_CONFIG_SETTING_COMPANIES_OWN                                :Eigin fyrirtækis
@@ -1091,213 +1065,283 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_LEFT                          :Vinstri
 STR_CONFIG_SETTING_HORIZONTAL_POS_CENTER                        :Miðja
 STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :Hægri
 
-STR_CONFIG_SETTING_BUILDONSLOPES                                :{LTBLUE}Leyfilegt að byggja í halla og á strönd: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTOSLOPE                                    :{LTBLUE}Leyfa landslagsbreytingar undir byggingum, teinum o.fl. (landfylling): {ORANGE}{STRING}
-STR_CONFIG_SETTING_CATCHMENT                                    :{LTBLUE}Raunverulegri stærð svæðis sem stöðvar ná yfir: {ORANGE}{STRING}
-STR_CONFIG_SETTING_EXTRADYNAMITE                                :{LTBLUE}Leyfa meiri eyðingu vega, brúa, gangna o.s.frv. í eigu bæjar: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}Magn reyks/neista frá lestum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :{LTBLUE}Hröðun lesta: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :{LTBLUE}Hröðun bifreiða: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}Halli brekku fyrir lestar {ORANGE}{STRING}%
-STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}Halli brekku fyrir bifreiðar {ORANGE}{STRING}%
-STR_CONFIG_SETTING_FORBID_90_DEG                                :{LTBLUE}Banna lestum og skipum að taka 90° beygjur: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :{LTBLUE}Leyfa sameiningu stöðva sem ekki tengjast á korti: {ORANGE}{STRING}
-STR_CONFIG_SETTING_IMPROVEDLOAD                                 :{LTBLUE}Nota endurbættan algóriþma við hleðslu: {ORANGE}{STRING}
-STR_CONFIG_SETTING_GRADUAL_LOADING                              :{LTBLUE}Ferma farartæki smám saman: {ORANGE}{STRING}
-STR_CONFIG_SETTING_INFLATION                                    :{LTBLUE}Verðbólga: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SELECTGOODS                                  :{LTBLUE}Aðeins afhlaða farmi á stöðvum þar sem er eftirspurn: {ORANGE}{STRING}
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD             :{LTBLUE}Fjármögnun nýrra hráefnisiðnaða: {ORANGE}{STRING}
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NONE        :engin
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NORMAL      :eins og annarra iðnaða
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_PROSPECTING :með jarðefnisleit
-STR_CONFIG_SETTING_INDUSTRY_PLATFORM                            :{LTBLUE}Jafnslétt svæði í kringum iðnað: {ORANGE}{STRING} flötur{P 0:1 "" s}
-STR_CONFIG_SETTING_MULTIPINDTOWN                                :{LTBLUE}Leyfa marga svipaða iðnaði í sama bæ: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SIGNALSIDE                                   :{LTBLUE}Sýna umferðarljós akstursmegin: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SHOWFINANCES                                 :{LTBLUE}Sýna fjármálaglugga í lok árs: {ORANGE}{STRING}
-STR_CONFIG_SETTING_NONSTOP_BY_DEFAULT                           :{LTBLUE}Nýjar skipanir eru "hraðleiðar" sem sjálfgildi {ORANGE}{STRING}
-STR_CONFIG_SETTING_STOP_LOCATION                                :{LTBLUE}Við nýja áfangastaði stöðva lestir sjálfgefið við {ORANGE}{STRING}{LTBLUE} brautarpallsins
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :Hámarks lán: {STRING}
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :Hámarks upphæð sem fyrirtæki getur fengið lánað (ekki er gert ráð fyrir verðbólgu)
+STR_CONFIG_SETTING_INTEREST_RATE                                :Vextir: {STRING}
+STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :Vexti á lánum; stjórnar einnig verðbólgi ef hún ef kveikt er á henni
+STR_CONFIG_SETTING_RUNNING_COSTS                                :Rekstrarkostnaður: {STRING}
+STR_CONFIG_SETTING_RUNNING_COSTS_HELPTEXT                       :Stillingar á hversu dýrt er að reka farartæki og mannvirki teng þeim
+STR_CONFIG_SETTING_CONSTRUCTION_SPEED                           :Framkvæmdahraði: {STRING}
+STR_CONFIG_SETTING_CONSTRUCTION_SPEED_HELPTEXT                  :Minnka framkvæmdir hjá gervigreind
+STR_CONFIG_SETTING_VEHICLE_BREAKDOWNS                           :Bilun á farartækjum: {STRING}
+STR_CONFIG_SETTING_VEHICLE_BREAKDOWNS_HELPTEXT                  :Hversu oft farartæki sem eru ekki nægilega þjónustuð geta bilað
+STR_CONFIG_SETTING_SUBSIDY_MULTIPLIER                           :Styrkur vegna samstarfs: {STRING}
+STR_CONFIG_SETTING_SUBSIDY_MULTIPLIER_HELPTEXT                  :Stillingar fyrir hversu hátt er borgað fyrir samstarfssamninga
+STR_CONFIG_SETTING_CONSTRUCTION_COSTS                           :Mannvirkja kostnaður: {STRING}
+STR_CONFIG_SETTING_CONSTRUCTION_COSTS_HELPTEXT                  :Stillingar á byggingum og framkvæmdum
+STR_CONFIG_SETTING_RECESSIONS                                   :Efnahagslægð: {STRING}
+STR_CONFIG_SETTING_RECESSIONS_HELPTEXT                          :Ef virkt getur komið efnahagslægð á nokkurra ára fresti. Meðan á efnahagslægð stendur er öll framleiðsla marktækt minni (framleiðslan fellur í fyrra horf þegar efnahagslægðinni líkur)
+STR_CONFIG_SETTING_TRAIN_REVERSING                              :Banna lest að snúa í lestarstöð: {STRING}
+STR_CONFIG_SETTING_TRAIN_REVERSING_HELPTEXT                     :Ef þetta er virkt munu lestar ekki snúna við á lestartstöð, ef það er styttri leið á næsta áfangastað þegar þær snúa við
+STR_CONFIG_SETTING_DISASTERS                                    :Hörmungar: {STRING}
+STR_CONFIG_SETTING_DISASTERS_HELPTEXT                           :Kveikja eða slökkva á hörmungum, hörmungar sem af og til stoppa eða eyðileggja farartæki eða byggingar
+STR_CONFIG_SETTING_CITY_APPROVAL                                :Viðhörf bæjaryfirvalda til endurskipulagningar: {STRING}
+STR_CONFIG_SETTING_CITY_APPROVAL_HELPTEXT                       :Veldu hversu mikil áhrif hávaði og umhverfisspjöll frá fyrirtækjum hafa áhrif á mat bæja á fyrirtækinu og frekari framkvæmdir innan bæjarmarkanna
+
+STR_CONFIG_SETTING_BUILDONSLOPES                                :Leyfilegt að byggja í halla og á strönd: {STRING}
+STR_CONFIG_SETTING_BUILDONSLOPES_HELPTEXT                       :Ef þessi stilling er virk er hægt að byggja lestarteina og stöðvar í flestum brekkum. Ef hún er óvirk er það bara hægt í brekkum sem snúa í sömu átt og teinarnir og því þurfa þeir engar undirstöður
+STR_CONFIG_SETTING_AUTOSLOPE                                    :Leyfa landslagsbreytingar undir byggingum, teinum o.fl. (landfylling): {STRING}
+STR_CONFIG_SETTING_CATCHMENT                                    :Raunverulegri stærð svæðis sem stöðvar ná yfir: {STRING}
+STR_CONFIG_SETTING_EXTRADYNAMITE                                :Leyfa meiri eyðingu vega, brúa, gangna o.s.frv. í eigu bæjar: {STRING}
+STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :Magn reyks/neista frá lestum: {STRING}
+STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :Hröðun lesta: {STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :Hröðun bifreiða: {STRING}
+STR_CONFIG_SETTING_FORBID_90_DEG                                :Banna lestum og skipum að taka 90° beygjur: {STRING}
+STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :Leyfa sameiningu stöðva sem ekki tengjast á korti: {STRING}
+STR_CONFIG_SETTING_IMPROVEDLOAD                                 :Nota endurbættan algóriþma við hleðslu: {STRING}
+STR_CONFIG_SETTING_GRADUAL_LOADING                              :Ferma farartæki smám saman: {STRING}
+STR_CONFIG_SETTING_INFLATION                                    :Verðbólga: {STRING}
+STR_CONFIG_SETTING_SELECTGOODS                                  :Aðeins afhlaða farmi á stöðvum þar sem er eftirspurn: {STRING}
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD             :Fjármögnun nýrra hráefnisiðnaða: {STRING}
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NONE        :Engin
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NORMAL      :Eins og annar iðnaður
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_PROSPECTING :Með jarðefnisleit
+STR_CONFIG_SETTING_MULTIPINDTOWN                                :Leyfa marga svipaða iðnaði í sama bæ: {STRING}
+STR_CONFIG_SETTING_SHOWFINANCES                                 :Sýna fjármálaglugga í lok árs: {STRING}
+STR_CONFIG_SETTING_NONSTOP_BY_DEFAULT                           :Nýjar skipanir eru "hraðleiðar" sem sjálfgildi {STRING}
+STR_CONFIG_SETTING_STOP_LOCATION                                :Við nýja áfangastaði stöðva lestir sjálfgefið við {STRING} brautarpallsins
 STR_CONFIG_SETTING_STOP_LOCATION_NEAR_END                       :upphaf
 STR_CONFIG_SETTING_STOP_LOCATION_MIDDLE                         :miðju
 STR_CONFIG_SETTING_STOP_LOCATION_FAR_END                        :enda
-STR_CONFIG_SETTING_ROAD_VEHICLE_QUEUEING                        :{LTBLUE}Bifreiðir bíða í röð (með skömmtunaráhrifum): {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTOSCROLL                                   :{LTBLUE}Færa sjónarhorn þegar músin nálgast brún gluggans: {ORANGE}{STRING}
-STR_CONFIG_SETTING_BRIBE                                        :{LTBLUE}Leyfilegt að múta bæjaryfirvöldum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_EXCLUSIVE                              :{LTBLUE}Heimila sölu á sérleyfi til flutninga: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_GIVE_MONEY                             :{LTBLUE}Heimila peningagreiðslur til annarra fyrirtækja: {ORANGE}{STRING}
-STR_CONFIG_SETTING_FREIGHT_TRAINS                               :{LTBLUE}Margfalda þyngd farms til að líkja eftir þyngri lestum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PLANE_SPEED                                  :{LTBLUE}Hraðastuðull flugvéla: {ORANGE}1 / {STRING}
-STR_CONFIG_SETTING_PLANE_CRASHES                                :{LTBLUE}Fjöldi flugvélaslysa: {ORANGE}{STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_QUEUEING                        :Bifreiðir bíða í röð (með skömmtunaráhrifum): {STRING}
+STR_CONFIG_SETTING_AUTOSCROLL                                   :Færa sjónarhorn þegar músin nálgast brún gluggans: {STRING}
+STR_CONFIG_SETTING_AUTOSCROLL_DISABLED                          :Óvirkt
+STR_CONFIG_SETTING_AUTOSCROLL_MAIN_VIEWPORT_FULLSCREEN          :Aðal sjónarhorn, aðeins í fullum skjá
+STR_CONFIG_SETTING_AUTOSCROLL_MAIN_VIEWPORT                     :Aðal sjónarhorn
+STR_CONFIG_SETTING_AUTOSCROLL_EVERY_VIEWPORT                    :Öll sjónarhorn
+STR_CONFIG_SETTING_BRIBE                                        :Leyfilegt að múta bæjaryfirvöldum: {STRING}
+STR_CONFIG_SETTING_ALLOW_EXCLUSIVE                              :Heimila sölu á sérleyfi til flutninga: {STRING}
+STR_CONFIG_SETTING_ALLOW_EXCLUSIVE_HELPTEXT                     :Ef fyrirtæki kaupir sérleyfi af bæjaryfirvöldum munu stöðvar keppinauta (farþegar og farmur) ekki fá neinn farm í heilt ár
+STR_CONFIG_SETTING_ALLOW_GIVE_MONEY                             :Heimila peningagreiðslur til annarra fyrirtækja: {STRING}
+STR_CONFIG_SETTING_FREIGHT_TRAINS                               :Margfalda þyngd farms til að líkja eftir þyngri lestum: {STRING}
+STR_CONFIG_SETTING_PLANE_CRASHES                                :Fjöldi flugvélaslysa: {STRING}
 STR_CONFIG_SETTING_PLANE_CRASHES_NONE                           :Engin
 STR_CONFIG_SETTING_PLANE_CRASHES_REDUCED                        :fækkuð
 STR_CONFIG_SETTING_PLANE_CRASHES_NORMAL                         :miðlungs
-STR_CONFIG_SETTING_STOP_ON_TOWN_ROAD                            :{LTBLUE}Leyfa strætóstöðvar á gangstéttum bæja: {ORANGE}{STRING}
-STR_CONFIG_SETTING_STOP_ON_COMPETITOR_ROAD                      :{LTBLUE}Leyfa stöðvar á gangstéttum vega í eigu keppinauta: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ADJACENT_STATIONS                            :{LTBLUE}Heimila sambyggingu stöðva: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DYNAMIC_ENGINES                              :{LTBLUE}Virkja mörg NewGRF vélasöfn: {ORANGE}{STRING}
+STR_CONFIG_SETTING_STOP_ON_TOWN_ROAD                            :Leyfa strætóstöðvar á gangstéttum bæja: {STRING}
+STR_CONFIG_SETTING_STOP_ON_COMPETITOR_ROAD                      :Leyfa stöðvar á gangstéttum vega í eigu keppinauta: {STRING}
+STR_CONFIG_SETTING_ADJACENT_STATIONS                            :Heimila sambyggingu stöðva: {STRING}
+STR_CONFIG_SETTING_DYNAMIC_ENGINES                              :Virkja mörg NewGRF vélasöfn: {STRING}
 STR_CONFIG_SETTING_DYNAMIC_ENGINES_EXISTING_VEHICLES            :{WHITE}Ekki er hægt að breyta þessari stillingu þegar til eru farartæki.
 
-STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :{LTBLUE}Alltaf hægt að byggja allar gerðir flugvalla: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :Alltaf hægt að byggja allar gerðir flugvalla: {STRING}
 
-STR_CONFIG_SETTING_ORDER_REVIEW                                 :{LTBLUE}Fara yfir áætlanir farartækja: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ORDER_REVIEW_OFF                             :nei
-STR_CONFIG_SETTING_ORDER_REVIEW_EXDEPOT                         :allra nema kyrrstæðra farartækja
-STR_CONFIG_SETTING_ORDER_REVIEW_ON                              :allra farartækja
-STR_CONFIG_SETTING_WARN_INCOME_LESS                             :{LTBLUE}Birta viðvörun ef tap er af rekstri farartækis: {ORANGE}{STRING}
-STR_CONFIG_SETTING_NEVER_EXPIRE_VEHICLES                        :{LTBLUE}Farartæki úreldast aldrei: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTORENEW_VEHICLE                            :{LTBLUE}Uppfæra faratæki sjálfvirkt þegar þau eldast: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTORENEW_MONTHS                             :{LTBLUE}Sjálfvirk uppfæring {ORANGE}{STRING}{LTBLUE} {P mánuði mánuðum} fyrir/eftir hámarksaldur
-STR_CONFIG_SETTING_AUTORENEW_MONEY                              :{LTBLUE}Lágmarks bankainnistæða fyrir sjálfvirka uppfæringu: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ERRMSG_DURATION                              :{LTBLUE}Birtingartími villuskilaboða: {ORANGE}{STRING}
-STR_CONFIG_SETTING_HOVER_DELAY                                  :{LTBLUE}Seinkun á svifatburðum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_HOVER_DELAY_DISABLED                         :{LTBLUE}Seinkun á svifatburðum: {ORANGE}óvirkur
-STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}Sýna íbúafjölda í bæjarmerki: {ORANGE}{STRING}
+STR_CONFIG_SETTING_ORDER_REVIEW                                 :Fara yfir áætlanir farartækja: {STRING}
+STR_CONFIG_SETTING_ORDER_REVIEW_OFF                             :Nei
+STR_CONFIG_SETTING_ORDER_REVIEW_EXDEPOT                         :Allra nema kyrrstæðra farartækja
+STR_CONFIG_SETTING_ORDER_REVIEW_ON                              :Allra farartækja
+STR_CONFIG_SETTING_WARN_INCOME_LESS                             :Birta viðvörun ef tap er af rekstri farartækis: {STRING}
+STR_CONFIG_SETTING_NEVER_EXPIRE_VEHICLES                        :Farartæki úreldast aldrei: {STRING}
+STR_CONFIG_SETTING_AUTORENEW_VEHICLE                            :Uppfæra faratæki sjálfvirkt þegar þau eldast: {STRING}
+STR_CONFIG_SETTING_AUTORENEW_MONEY                              :Lágmarks bankainnistæða fyrir sjálfvirka uppfæringu: {STRING}
+STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :Sýna íbúafjölda í bæjarmerki: {STRING}
 
-STR_CONFIG_SETTING_LAND_GENERATOR                               :{LTBLUE}Landslagsmótun: {ORANGE}{STRING}
+STR_CONFIG_SETTING_LAND_GENERATOR                               :Landslagsmótun: {STRING}
 STR_CONFIG_SETTING_LAND_GENERATOR_ORIGINAL                      :Upphafleg
 STR_CONFIG_SETTING_LAND_GENERATOR_TERRA_GENESIS                 :TerraGenesis
-STR_CONFIG_SETTING_OIL_REF_EDGE_DISTANCE                        :{LTBLUE}Hámarfjarlægð olíuborpalla frá brún korts {ORANGE}{STRING}
-STR_CONFIG_SETTING_SNOWLINE_HEIGHT                              :{LTBLUE}Hæð snjólínu: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN                         :{LTBLUE}Hrjúfleiki landslags (TerraGenesis stilling) : {ORANGE}{STRING}
+STR_CONFIG_SETTING_OIL_REF_EDGE_DISTANCE_HELPTEXT               :Olíuhreinsistöðvar eru aðeins byggðar nálægt jöðrum á kortinu, það er að segja á ströndum á kortum sem eru af eyjum
+STR_CONFIG_SETTING_SNOWLINE_HEIGHT                              :Hæð snjólínu: {STRING}
+STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN                         :Hrjúfleiki landslags (TerraGenesis stilling) : {STRING}
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_VERY_SMOOTH             :Mjög slétt
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_SMOOTH                  :Slétt
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_ROUGH                   :Hrjúft
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_VERY_ROUGH              :Mjög hrjúft
-STR_CONFIG_SETTING_TREE_PLACER                                  :{LTBLUE}Staðsetning trjáa: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TREE_PLACER                                  :Staðsetning trjáa: {STRING}
 STR_CONFIG_SETTING_TREE_PLACER_NONE                             :Hvergi
 STR_CONFIG_SETTING_TREE_PLACER_ORIGINAL                         :Venjulega
 STR_CONFIG_SETTING_TREE_PLACER_IMPROVED                         :Nýstárlega
-STR_CONFIG_SETTING_HEIGHTMAP_ROTATION                           :{LTBLUE}Snúningur hæðakorts: {ORANGE}{STRING}
+STR_CONFIG_SETTING_HEIGHTMAP_ROTATION                           :Snúningur hæðakorts: {STRING}
 STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_COUNTER_CLOCKWISE         :Rangsælis
 STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_CLOCKWISE                 :Réttsælis
-STR_CONFIG_SETTING_SE_FLAT_WORLD_HEIGHT                         :{LTBLUE}Hæð jafnslétts lands yfir sjávarmáli: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ENABLE_FREEFORM_EDGES                        :{LTBLUE}Leyfa landslagsbreytingar á jöðrum korts: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SE_FLAT_WORLD_HEIGHT                         :Hæð jafnslétts lands yfir sjávarmáli: {STRING}
+STR_CONFIG_SETTING_ENABLE_FREEFORM_EDGES                        :Leyfa landslagsbreytingar á jöðrum korts: {STRING}
+STR_CONFIG_SETTING_ENABLE_FREEFORM_EDGES_HELPTEXT               :Ef þessi stilling er óvirk eru jaðrar kortsins alltaf sjór
 STR_CONFIG_SETTING_EDGES_NOT_EMPTY                              :{WHITE}Einn eða fleiri reitir við norðurjaðarinn eru ekki tómir
 STR_CONFIG_SETTING_EDGES_NOT_WATER                              :{WHITE}Einn eða fleiri reitir við eina hlið kortsins hafa ekki vatn
 
-STR_CONFIG_SETTING_STATION_SPREAD                               :{LTBLUE}Hámarksdreifing stöðva: {ORANGE}{STRING} {RED}Ath.: Há stilling hægir á leiknum
-STR_CONFIG_SETTING_SERVICEATHELIPAD                             :{LTBLUE}Skoða þyrlur sjálfvirkt á þyrlupalli: {ORANGE}{STRING}
-STR_CONFIG_SETTING_LINK_TERRAFORM_TOOLBAR                       :{LTBLUE}Opna landmótunarglugga samhliða öðrum framkvæmdum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR                         :{LTBLUE}Litur á landinu sem birtist á kortinu: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SERVICEATHELIPAD                             :Skoða þyrlur sjálfvirkt á þyrlupalli: {STRING}
+STR_CONFIG_SETTING_LINK_TERRAFORM_TOOLBAR                       :Opna landmótunarglugga samhliða öðrum framkvæmdum: {STRING}
+STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR                         :Litur á landinu sem birtist á kortinu: {STRING}
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_GREEN                   :Grænn
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_DARK_GREEN              :Dökkgrænn
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_VIOLET                  :Fjólublátt
-STR_CONFIG_SETTING_REVERSE_SCROLLING                            :{LTBLUE}Færa sjónarhorn í öfuga átt miðað við mús: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOOTH_SCROLLING                             :{LTBLUE}Mjúkt skrun í skjágluggum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MEASURE_TOOLTIP                              :{LTBLUE}Sýna mælstiku við byggingu: {ORANGE}{STRING}
-STR_CONFIG_SETTING_LIVERIES                                     :{LTBLUE}Sýna auka litastillingar: {ORANGE}{STRING}
+STR_CONFIG_SETTING_REVERSE_SCROLLING                            :Færa sjónarhorn í öfuga átt miðað við mús: {STRING}
+STR_CONFIG_SETTING_SMOOTH_SCROLLING                             :Mjúkt skrun í skjágluggum: {STRING}
+STR_CONFIG_SETTING_MEASURE_TOOLTIP                              :Sýna mælstiku við byggingu: {STRING}
+STR_CONFIG_SETTING_LIVERIES                                     :Sýna auka litastillingar: {STRING}
 STR_CONFIG_SETTING_LIVERIES_NONE                                :Aldrei
 STR_CONFIG_SETTING_LIVERIES_OWN                                 :Eigin fyrirtækis
 STR_CONFIG_SETTING_LIVERIES_ALL                                 :Allra fyrirtækja
-STR_CONFIG_SETTING_PREFER_TEAMCHAT                              :{LTBLUE}Nota liðsspjall með <ENTER>: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SCROLLWHEEL_SCROLLING                        :{LTBLUE}Virkni skrunhjóls: {ORANGE}{STRING}
+STR_CONFIG_SETTING_PREFER_TEAMCHAT                              :Nota liðsspjall með <ENTER>: {STRING}
+STR_CONFIG_SETTING_SCROLLWHEEL_SCROLLING                        :Virkni skrunhjóls: {STRING}
 STR_CONFIG_SETTING_SCROLLWHEEL_ZOOM                             :Víkka/þrengja sjónarhorn
 STR_CONFIG_SETTING_SCROLLWHEEL_SCROLL                           :Skruna á korti
 STR_CONFIG_SETTING_SCROLLWHEEL_OFF                              :Engin
-STR_CONFIG_SETTING_SCROLLWHEEL_MULTIPLIER                       :{LTBLUE}Hraði skrunhjóls á korti: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SCROLLWHEEL_MULTIPLIER                       :Hraði skrunhjóls á korti: {STRING}
+STR_CONFIG_SETTING_OSK_ACTIVATION                               :Lyklaborð á skjá: {STRING}
+STR_CONFIG_SETTING_OSK_ACTIVATION_HELPTEXT                      :Veldu hvernig á að fá fram lyklaborð á skjáinn þar sem hægt er að skrifa texta með að ýta á takana. Þetta er hugsað fyrir lítil tæki sem eru án lyklaborðs
+STR_CONFIG_SETTING_OSK_ACTIVATION_DISABLED                      :Óvirkt
+STR_CONFIG_SETTING_OSK_ACTIVATION_DOUBLE_CLICK                  :Tvísmella
+STR_CONFIG_SETTING_OSK_ACTIVATION_SINGLE_CLICK_FOCUS            :Ýta einusinni (þegar valið)
+STR_CONFIG_SETTING_OSK_ACTIVATION_SINGLE_CLICK                  :Ýta einusinni (birtist strax)
 
-STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU                          :{LTBLUE}Hægrismellshermun: {ORANGE}{STRING}
+STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU                          :Hægrismellshermun: {STRING}
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_COMMAND                  :Command-smella
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_CONTROL                  :Control-smella
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_OFF                      :Af
 
-STR_CONFIG_SETTING_LEFT_MOUSE_BTN_SCROLLING                     :{LTBLUE}Skrun með hægri músarhnappi: {ORANGE}{STRING}
+STR_CONFIG_SETTING_LEFT_MOUSE_BTN_SCROLLING                     :Skrun með hægri músarhnappi: {STRING}
 
-STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES                    :{LTBLUE}Nota dagsetningar á {ORANGE}{STRING}{LTBLUE} formi fyrir vistaða leiki.
+STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES                    :Nota dagsetningar á {STRING} formi fyrir vistaða leiki.
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_LONG               :löngu (31. Des 2008)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_SHORT              :stuttu (31-12-2008)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :ISO (2008-12-31)
 
 
-STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :{LTBLUE}Setja leik á bið þegar nýr leikur er hafinn: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS                       :{LTBLUE}Ítarlegur listi yfir farartæki: {ORANGE}{STRING}
-STR_CONFIG_SETTING_LOADING_INDICATORS                           :{LTBLUE}Sýna stöðu lestunar: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TIMETABLE_IN_TICKS                           :{LTBLUE}Birta áætlanir í slögum frekar en dögum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TIMETABLE_SHOW_ARRIVAL_DEPARTURE             :{LTBLUE}Sýna komu og brottfaratíma í áætlunum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_QUICKGOTO                                    :{LTBLUE}Fljótleg gerð áætlunar: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE                            :{LTBLUE}Valin lestartegund (eftir nýjan leik/opnaðan leik): {ORANGE}{STRING}
+STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :Setja leik á bið þegar nýr leikur er hafinn: {STRING}
+STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS                       :Ítarlegur listi yfir farartæki: {STRING}
+STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS_HELPTEXT              :Virkja möguleika á ítarlegum lista yfir farartæki sem notaður er til að flokka farartæki
+STR_CONFIG_SETTING_LOADING_INDICATORS                           :Sýna stöðu lestunar: {STRING}
+STR_CONFIG_SETTING_TIMETABLE_IN_TICKS                           :Birta áætlanir í slögum frekar en dögum: {STRING}
+STR_CONFIG_SETTING_TIMETABLE_SHOW_ARRIVAL_DEPARTURE             :Sýna komu og brottfaratíma í áætlunum: {STRING}
+STR_CONFIG_SETTING_QUICKGOTO                                    :Fljótleg gerð áætlunar: {STRING}
+STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE                            :Valin lestartegund (eftir nýjan leik/opnaðan leik): {STRING}
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_FIRST                      :Fyrsta mögulega
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_LAST                       :Síðasta mögulega
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_MOST_USED                  :Mest notuð
-STR_CONFIG_SETTING_SHOW_TRACK_RESERVATION                       :{LTBLUE}Sýna frátekin spor: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS                     :{LTBLUE}Halda byggingartólum virkum eftir notkun: {ORANGE}{STRING}
-STR_CONFIG_SETTING_EXPENSES_LAYOUT                              :{LTBLUE}Hópa saman útgjöld í fjármálaglugga: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SHOW_TRACK_RESERVATION                       :Sýna frátekin spor: {STRING}
+STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS                     :Halda byggingartólum virkum eftir notkun: {STRING}
+STR_CONFIG_SETTING_EXPENSES_LAYOUT                              :Hópa saman útgjöld í fjármálaglugga: {STRING}
 
-STR_CONFIG_SETTING_MAX_TRAINS                                   :{LTBLUE}Lestir á leikmann mest: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_ROAD_VEHICLES                            :{LTBLUE}Bifreiðir á leikmann mest: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_AIRCRAFT                                 :{LTBLUE}Flugvélar á leikmann mest: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_SHIPS                                    :{LTBLUE}Skip á leikmann mest: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SOUND_TICKER                                 :Frétta borði: {STRING}
+STR_CONFIG_SETTING_SOUND_TICKER_HELPTEXT                        :Spila hljóð fyrir samantekt á fréttatilkynningum
+STR_CONFIG_SETTING_SOUND_NEWS                                   :Dagblaðið: {STRING}
+STR_CONFIG_SETTING_SOUND_NEWS_HELPTEXT                          :Spila hljóð þegar dagblaðið er birt
+STR_CONFIG_SETTING_SOUND_NEW_YEAR                               :Lok árs: {STRING}
+STR_CONFIG_SETTING_SOUND_NEW_YEAR_HELPTEXT                      :Spila hljóð þegar árinu lýkur og staða fyrirtækisins er borin saman við síðasta ár
+STR_CONFIG_SETTING_SOUND_CONFIRM                                :Byggingarframkvæmd: {STRING}
+STR_CONFIG_SETTING_SOUND_CONFIRM_HELPTEXT                       :Spila hljóð þegar byggingarframkvæmd eða önnur framkvæmd heppnast
+STR_CONFIG_SETTING_SOUND_CLICK                                  :Ýtt á takka: {STRING}
+STR_CONFIG_SETTING_SOUND_CLICK_HELPTEXT                         :Píp þegar ýtt er á takka
+STR_CONFIG_SETTING_SOUND_DISASTER                               :Hamfarir/slys: {STRING}
+STR_CONFIG_SETTING_SOUND_DISASTER_HELPTEXT                      :Spila hljóð frá slysum og hamförum
+STR_CONFIG_SETTING_SOUND_VEHICLE                                :Bílar: {STRING}
+STR_CONFIG_SETTING_SOUND_VEHICLE_HELPTEXT                       :Spila hljóð frá bílum
+STR_CONFIG_SETTING_SOUND_AMBIENT                                :Umlykjandi: {STRING}
+STR_CONFIG_SETTING_SOUND_AMBIENT_HELPTEXT                       :Spila umlykjandi hljóð frá landslagi, iðnaði og bæjum
 
-STR_CONFIG_SETTING_AI_BUILDS_TRAINS                             :{LTBLUE}Útiloka lestir frá tölvu: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_ROAD_VEHICLES                      :{LTBLUE}Útiloka bifreiðir frá tölvu: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_AIRCRAFT                           :{LTBLUE}Útiloka flugvélar frá tölvu: {ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_SHIPS                              :{LTBLUE}Útiloka skip frá tölvu: {ORANGE}{STRING}
+STR_CONFIG_SETTING_MAX_TRAINS                                   :Lestir á leikmann mest: {STRING}
+STR_CONFIG_SETTING_MAX_ROAD_VEHICLES                            :Bifreiðir á leikmann mest: {STRING}
+STR_CONFIG_SETTING_MAX_AIRCRAFT                                 :Flugvélar á leikmann mest: {STRING}
+STR_CONFIG_SETTING_MAX_SHIPS                                    :Skip á leikmann mest: {STRING}
 
-STR_CONFIG_SETTING_AI_IN_MULTIPLAYER                            :{LTBLUE}Leyfa gervigreind í fjölspilun: {ORANGE}{STRING}
+STR_CONFIG_SETTING_AI_BUILDS_TRAINS                             :Útiloka lestir frá tölvu: {STRING}
+STR_CONFIG_SETTING_AI_BUILDS_ROAD_VEHICLES                      :Útiloka bifreiðir frá tölvu: {STRING}
+STR_CONFIG_SETTING_AI_BUILDS_AIRCRAFT                           :Útiloka flugvélar frá tölvu: {STRING}
+STR_CONFIG_SETTING_AI_BUILDS_SHIPS                              :Útiloka skip frá tölvu: {STRING}
 
-STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :{LTBLUE}Tími milli viðhalds farartækja sýndur í hundraðshlutum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SERVINT_TRAINS                               :{LTBLUE}Tími milli viðhalds lesta: {ORANGE}{STRING} dagar/%
-STR_CONFIG_SETTING_SERVINT_TRAINS_DISABLED                      :{LTBLUE}Tími milli viðhalds lesta: {ORANGE}óvirkt
-STR_CONFIG_SETTING_SERVINT_ROAD_VEHICLES                        :{LTBLUE}Tími milli viðhalds bifreiða: {ORANGE}{STRING} dagar/%
-STR_CONFIG_SETTING_SERVINT_ROAD_VEHICLES_DISABLED               :{LTBLUE}Tími milli viðhalds bifreiða: {ORANGE}óvrikt
-STR_CONFIG_SETTING_SERVINT_AIRCRAFT                             :{LTBLUE}Tími milli viðhalds flugvéla: {ORANGE}{STRING} dagar/%
-STR_CONFIG_SETTING_SERVINT_AIRCRAFT_DISABLED                    :{LTBLUE}Tími milli viðhalds flugvéla: {ORANGE}óvrikt
-STR_CONFIG_SETTING_SERVINT_SHIPS                                :{LTBLUE}Tími milli viðhalds skipa: {ORANGE}{STRING} dagar/%
-STR_CONFIG_SETTING_SERVINT_SHIPS_DISABLED                       :{LTBLUE}Tími milli viðhalds skipa: {ORANGE}óvirkt
-STR_CONFIG_SETTING_NOSERVICE                                    :{LTBLUE}Leggja niður viðhald þegar bilanir eru stilltar af: {ORANGE}{STRING}
-STR_CONFIG_SETTING_WAGONSPEEDLIMITS                             :{LTBLUE}Leyfa hraðatakmarkanir vagna: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DISABLE_ELRAILS                              :{LTBLUE}Ekki nota rafknúnar lestir: {ORANGE}{STRING}
+STR_CONFIG_SETTING_AI_PROFILE                                   :Erfiðleikastig: {STRING}
+STR_CONFIG_SETTING_AI_PROFILE_HELPTEXT                          :Veldu hvaða erfiðleikastig á að nota fyrir gervigreind eða leikja breytingar (Game Script)
+STR_CONFIG_SETTING_AI_PROFILE_EASY                              :Auðvelt
+STR_CONFIG_SETTING_AI_PROFILE_MEDIUM                            :Miðlungs
+STR_CONFIG_SETTING_AI_PROFILE_HARD                              :Erfitt
 
-STR_CONFIG_SETTING_COLOURED_NEWS_YEAR                           :{LTBLUE}Fréttir byrja að birtast í lit árið: {ORANGE}{STRING}
-STR_CONFIG_SETTING_STARTING_YEAR                                :{LTBLUE}Upphafsár: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :{LTBLUE}Virkja jafnan efnahag (fleiri og minni breytingar): {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_SHARES                                 :{LTBLUE}Leyfa hlutabréfakaup í öðrum fyrirtækjum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :{LTBLUE}Hlutfall af hagnaði borgað í leggjakerfum: {ORANGE}{STRING}%
-STR_CONFIG_SETTING_DRAG_SIGNALS_DENSITY                         :{LTBLUE}Þegar dregið er, setja skilti á: {ORANGE}{STRING} hvern reit
-STR_CONFIG_SETTING_SEMAPHORE_BUILD_BEFORE_DATE                  :{LTBLUE}Nota skilti í stað ljósa fyrir: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :{LTBLUE}Virkja valmynd lestarljósa: {ORANGE}{STRING}
-STR_CONFIG_SETTING_DEFAULT_SIGNAL_TYPE                          :{LTBLUE}Ljósagerð sem skal byggja sem sjálfgildi: {ORANGE}{STRING}
+STR_CONFIG_SETTING_AI_IN_MULTIPLAYER                            :Leyfa gervigreind í fjölspilun: {STRING}
+
+STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :Tími milli viðhalds farartækja sýndur í hundraðshlutum: {STRING}
+STR_CONFIG_SETTING_NOSERVICE                                    :Leggja niður viðhald þegar bilanir eru stilltar af: {STRING}
+STR_CONFIG_SETTING_WAGONSPEEDLIMITS                             :Leyfa hraðatakmarkanir vagna: {STRING}
+STR_CONFIG_SETTING_DISABLE_ELRAILS                              :Ekki nota rafknúnar lestir: {STRING}
+
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OWN               :Aðkoma fyrsta farartækis á stöð leikmanns: {STRING}
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OWN_HELPTEXT      :Birta dagblöð þegar fyrsta farartækið kemur á stöð í eigu nýs spilara
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OTHER             :Aðkoma fyrsta farartækis á stöð keppinauts: {STRING}
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OTHER_HELPTEXT    :Birta dagblöð þegar fyrsta farartækið kemur á nýja stöð í eigu keppinauts
+STR_CONFIG_SETTING_NEWS_ACCIDENTS_DISASTERS                     :Slys / hamfarir: {STRING}
+STR_CONFIG_SETTING_NEWS_ACCIDENTS_DISASTERS_HELPTEXT            :Birta dagblöð þegar slys eða hörmungar gerast
+STR_CONFIG_SETTING_NEWS_COMPANY_INFORMATION                     :Fyrirtækisupplýsingar: {STRING}
+STR_CONFIG_SETTING_NEWS_COMPANY_INFORMATION_HELPTEXT            :Birta dagblöð þegar nýtt fyrirtæki byrjar, eða þegar fyrirtæki eru í hættu á gjaldþroti
+STR_CONFIG_SETTING_NEWS_INDUSTRY_OPEN                           :Opnun Iðnaðar: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_OPEN_HELPTEXT                  :Birta dagblöð þegar iðnaður opnar
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CLOSE                          :Lokun Iðnaðar: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CLOSE_HELPTEXT                 :Birta dagblöð þegar iðnaður lokar
+STR_CONFIG_SETTING_NEWS_ECONOMY_CHANGES                         :Efnahagsbreytingar: {STRING}
+STR_CONFIG_SETTING_NEWS_ECONOMY_CHANGES_HELPTEXT                :Birta dagblöð um altækar breytingar á hagkerfinu
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_COMPANY                :Framleiðslubreytingar á iðnaði þjónað af fyrirtækinu: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_COMPANY_HELPTEXT       :Birta dagblöð þegar framleiðni í iðnaði breytist, þeim sem er þjónað fyrirtækinu
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_OTHER                  :Framleiðslubreytingar fyrirtækja þjónustuð af keppinautum: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_OTHER_HELPTEXT         :Birta dagblöð þegar framleiðni í iðnaði breytist, þeim sem er þjónað af keppinautum
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_UNSERVED               :Aðrar framleiðslubreytingar: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_UNSERVED_HELPTEXT      :Birta dagblöð þegar framleiðni í iðnaði breytist, þeim sem ekki er þjónað af fyrirtækinu eða keppinautum
+STR_CONFIG_SETTING_NEWS_ADVICE                                  :Ráð / upplýsingar um faratæki fyrirtækisins: {STRING}
+STR_CONFIG_SETTING_NEWS_ADVICE_HELPTEXT                         :Birta skilaboð þegar farartæki þarfnast athygli
+STR_CONFIG_SETTING_NEWS_NEW_VEHICLES                            :Ný farartæki: {STRING}
+STR_CONFIG_SETTING_NEWS_NEW_VEHICLES_HELPTEXT                   :Birta dagblöð þegar nýjar tegundir af farartækjum bjóðast
+STR_CONFIG_SETTING_NEWS_CHANGES_ACCEPTANCE                      :Breyting á viðtöku farms: {STRING}
+STR_CONFIG_SETTING_NEWS_CHANGES_ACCEPTANCE_HELPTEXT             :Birta skilaboð um breytingar á varningi sem stöðvar taka á móti
+STR_CONFIG_SETTING_NEWS_SUBSIDIES                               :Samstarfssamningar: {STRING}
+STR_CONFIG_SETTING_NEWS_SUBSIDIES_HELPTEXT                      :Birta dagblöð um atburði tengda samstarfssamningum
+STR_CONFIG_SETTING_NEWS_GENERAL_INFORMATION                     :Almennar upplýsingar: {STRING}
+STR_CONFIG_SETTING_NEWS_GENERAL_INFORMATION_HELPTEXT            :Birta dagblöð um viðburði, eins og kaup á sérleyfi eða fjármögnun á endurnýjun á vegum
+
+STR_CONFIG_SETTING_NEWS_MESSAGES_OFF                            :Af
+STR_CONFIG_SETTING_NEWS_MESSAGES_SUMMARY                        :Úrtak
+STR_CONFIG_SETTING_NEWS_MESSAGES_FULL                           :Allt
+
+STR_CONFIG_SETTING_COLOURED_NEWS_YEAR                           :Fréttir byrja að birtast í lit árið: {STRING}
+STR_CONFIG_SETTING_STARTING_YEAR                                :Upphafsár: {STRING}
+STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :Virkja jafnan efnahag (fleiri og minni breytingar): {STRING}
+STR_CONFIG_SETTING_ALLOW_SHARES                                 :Leyfa hlutabréfakaup í öðrum fyrirtækjum: {STRING}
+STR_CONFIG_SETTING_SEMAPHORE_BUILD_BEFORE_DATE                  :Nota skilti í stað ljósa fyrir: {STRING}
+STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :Virkja valmynd lestarljósa: {STRING}
+STR_CONFIG_SETTING_DEFAULT_SIGNAL_TYPE                          :Ljósagerð sem skal byggja sem sjálfgildi: {STRING}
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_NORMAL                        :venjuleg
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_PBS                           :Brautar ljós
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_PBSOWAY                       :Ein-stefnu ljós
-STR_CONFIG_SETTING_CYCLE_SIGNAL_TYPES                           :{LTBLUE}Skruna milli tegundir merkja: {ORANGE}{STRING}
+STR_CONFIG_SETTING_CYCLE_SIGNAL_TYPES                           :Skruna milli tegundir merkja: {STRING}
 STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :Aðeins stöðvunar-merki
 STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :Aðeins Leiðar-merki
 STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :Allt
 
-STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}Vegskipulag fyrir nýja bæji: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TOWN_LAYOUT                                  :Vegskipulag fyrir nýja bæji: {STRING}
 STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :sjálfgefið
 STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :betri vegi
 STR_CONFIG_SETTING_TOWN_LAYOUT_2X2_GRID                         :2x2 net
 STR_CONFIG_SETTING_TOWN_LAYOUT_3X3_GRID                         :3x3 net
 STR_CONFIG_SETTING_TOWN_LAYOUT_RANDOM                           :slembið
-STR_CONFIG_SETTING_ALLOW_TOWN_ROADS                             :{LTBLUE}Bæir geta lagt vegi: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :{LTBLUE}Heimila bæjum að byggja götu yfir lestarteina: {ORANGE}{STRING}
-STR_CONFIG_SETTING_NOISE_LEVEL                                  :{LTBLUE}Leyfa stjórn á hljóðstyrk frá flugvöllum af bæjum: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TOWN_FOUNDING                                :{LTBLUE}Stofna bæi í leik: {ORANGE}{STRING}
+STR_CONFIG_SETTING_ALLOW_TOWN_ROADS                             :Bæir geta lagt vegi: {STRING}
+STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :Heimila bæjum að byggja götu yfir lestarteina: {STRING}
+STR_CONFIG_SETTING_NOISE_LEVEL                                  :Leyfa stjórn á hljóðstyrk frá flugvöllum af bæjum: {STRING}
+STR_CONFIG_SETTING_TOWN_FOUNDING                                :Stofna bæi í leik: {STRING}
 STR_CONFIG_SETTING_TOWN_FOUNDING_FORBIDDEN                      :bannað
 STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED                        :leyft
-STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED_CUSTOM_LAYOUT          :leyft, venjulegt bæjarskipulag
+STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED_CUSTOM_LAYOUT          :Leyft, sérsniðið bæjarskipulag
 
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT                         :{LTBLUE}Staðsetning trjáa í leik: {ORANGE}{STRING}
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_NONE                    :Engin {RED}(ónýtir timburverksmiðju)
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT                         :Staðsetning trjáa í leik: {STRING}
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_NONE                    :Engin {RED}(skemmir timburverksmiðjur)
 STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_RAINFOREST              :aðeins í regnskógum
 STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_ALL                     :allstaðar
 
-STR_CONFIG_SETTING_TOOLBAR_POS                                  :{LTBLUE}Staðsetning tækjasláar: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SNAP_RADIUS                                  :{LTBLUE}Gluggar smella saman við: {ORANGE}{STRING} punkta radíus
-STR_CONFIG_SETTING_SNAP_RADIUS_DISABLED                         :{LTBLUE}Gluggar smella: {ORANGE}ekki saman
-STR_CONFIG_SETTING_SOFT_LIMIT                                   :{LTBLUE}Hámarksfjöldi glugga (ófestra): {ORANGE}{STRING}
-STR_CONFIG_SETTING_SOFT_LIMIT_DISABLED                          :{LTBLUE}Hámarksfjöldi glugga (ófestra): {ORANGE}ótakmarkaður
-STR_CONFIG_SETTING_TOWN_GROWTH                                  :{LTBLUE}Vaxtarhraði bæja: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TOOLBAR_POS                                  :Staðsetning tækjasláar: {STRING}
+STR_CONFIG_SETTING_SOFT_LIMIT                                   :Hámarksfjöldi glugga (ófestra): {STRING}
+STR_CONFIG_SETTING_TOWN_GROWTH                                  :Vaxtarhraði bæja: {STRING}
 STR_CONFIG_SETTING_TOWN_GROWTH_NONE                             :Enginn
 STR_CONFIG_SETTING_TOWN_GROWTH_SLOW                             :Hægur
 STR_CONFIG_SETTING_TOWN_GROWTH_NORMAL                           :Venjulegur
 STR_CONFIG_SETTING_TOWN_GROWTH_FAST                             :Hraður
 STR_CONFIG_SETTING_TOWN_GROWTH_VERY_FAST                        :Mjög hraður
-STR_CONFIG_SETTING_LARGER_TOWNS                                 :{LTBLUE}Hlutfall bæja sem verða að borgum: {ORANGE}1 af {STRING}
-STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :{LTBLUE}Hlutfall bæja sem verða að borgum: {ORANGE}Enginn
-STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :{LTBLUE}Upphaflegur margfaldari bogarstærðar: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MODIFIED_ROAD_REBUILD                        :{LTBLUE}Fjarlægja fráleita vegahluti þegar vegagerð stendur yfir: {ORANGE}{STRING}
+STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :Upphaflegur margfaldari bogarstærðar: {STRING}
+STR_CONFIG_SETTING_MODIFIED_ROAD_REBUILD                        :Fjarlægja fráleita vegahluti þegar vegagerð stendur yfir: {STRING}
 
 STR_CONFIG_SETTING_GUI                                          :{ORANGE}Viðmót
 STR_CONFIG_SETTING_CONSTRUCTION                                 :{ORANGE}Bygging
@@ -1307,6 +1351,8 @@ STR_CONFIG_SETTING_ECONOMY                                      :{ORANGE}Efnahag
 STR_CONFIG_SETTING_AI                                           :{ORANGE}Mótherji
 STR_CONFIG_SETTING_DISPLAY_OPTIONS                              :{ORANGE}Skjá-valmöguleikar
 STR_CONFIG_SETTING_INTERACTION                                  :{ORANGE}Viðmót
+STR_CONFIG_SETTING_SOUND                                        :{ORANGE}Hljóð
+STR_CONFIG_SETTING_NEWS                                         :{ORANGE}Fréttir og skilaboð
 STR_CONFIG_SETTING_CONSTRUCTION_SIGNALS                         :{ORANGE}Lestaljós og -merki
 STR_CONFIG_SETTING_STATIONS_CARGOHANDLING                       :{ORANGE}Meðhöndlun farms
 STR_CONFIG_SETTING_AI_NPC                                       :{ORANGE}Gervigreind
@@ -1320,13 +1366,16 @@ STR_CONFIG_SETTING_ECONOMY_INDUSTRIES                           :{ORANGE}Iðnað
 STR_CONFIG_SETTING_PATHFINDER_NPF                               :NPF
 STR_CONFIG_SETTING_PATHFINDER_YAPF_RECOMMENDED                  :YAPF {BLUE}(Ráðlegt)
 
-STR_CONFIG_SETTING_PATHFINDER_FOR_TRAINS                        :{LTBLUE}Leiðsagnarkerfi lesta: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PATHFINDER_FOR_ROAD_VEHICLES                 :{LTBLUE}Leiðsögukerfi bifreiða: {ORANGE}{STRING}
-STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS                         :{LTBLUE}Leiðsögukerfi skipa: {ORANGE}{STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_TRAINS                        :Leiðsagnarkerfi lesta: {STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_ROAD_VEHICLES                 :Leiðsögukerfi bifreiða: {STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS                         :Leiðsögukerfi skipa: {STRING}
 
 STR_CONFIG_SETTING_QUERY_CAPTION                                :{WHITE}Breyta gildi stillingar
 
 # Config errors
+STR_CONFIG_ERROR_INVALID_BASE_GRAPHICS_NOT_FOUND                :{WHITE}... sleppi grunngrafík '{STRING}': finnst ekki
+STR_CONFIG_ERROR_INVALID_BASE_SOUNDS_NOT_FOUND                  :{WHITE}... sleppi grunn hljóðsafni '{STRING}': finnst ekki
+STR_CONFIG_ERROR_INVALID_BASE_MUSIC_NOT_FOUND                   :{WHITE}... sleppi grunn tónlistarsafni '{STRING}': finnst ekki
 
 # Intro window
 STR_INTRO_CAPTION                                               :{WHITE}OpenTTD {REV}
@@ -1339,8 +1388,8 @@ STR_INTRO_SCENARIO_EDITOR                                       :{BLACK}Landslag
 STR_INTRO_MULTIPLAYER                                           :{BLACK}Fjölspilun
 
 STR_INTRO_GAME_OPTIONS                                          :{BLACK}Stillingar
-STR_INTRO_DIFFICULTY                                            :{BLACK}Erfiðleikastig ({STRING})
-STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Þróaðar Stillingar
+STR_INTRO_HIGHSCORE                                             :{BLACK}Stigatafla
+STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}Ítarlegar stillingar
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}NewGRF Stillingar
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}Ná í viðbætur af netinu
 STR_INTRO_QUIT                                                  :{BLACK}Hætta
@@ -1358,8 +1407,8 @@ STR_INTRO_TOOLTIP_SUB_TROPICAL_LANDSCAPE                        :{BLACK}Eyðimer
 STR_INTRO_TOOLTIP_TOYLAND_LANDSCAPE                             :{BLACK}Leikfangalandslag
 
 STR_INTRO_TOOLTIP_GAME_OPTIONS                                  :{BLACK}Stilla OpenTTD
-STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}Stilla erfiðleikastig
-STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Birta þróaðar stillingar
+STR_INTRO_TOOLTIP_HIGHSCORE                                     :{BLACK}Birta stigatöflu
+STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}Birta ítarlegar stillingar
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}Sýna NewGRF stillingar
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}Skoða viðbætur sem hægt er að ná í af netinu
 STR_INTRO_TOOLTIP_QUIT                                          :{BLACK}Hætta í OpenTTD
@@ -1869,7 +1918,7 @@ STR_JOIN_WAYPOINT_CREATE_SPLITTED_WAYPOINT                      :{YELLOW}Reisa a
 STR_RAIL_TOOLBAR_RAILROAD_CONSTRUCTION_CAPTION                  :Járnbrautarlestarframkvæmdir
 STR_RAIL_TOOLBAR_ELRAIL_CONSTRUCTION_CAPTION                    :Raflestaframkvæmdir
 STR_RAIL_TOOLBAR_MONORAIL_CONSTRUCTION_CAPTION                  :Einteinungsframkvæmdir
-STR_RAIL_TOOLBAR_MAGLEV_CONSTRUCTION_CAPTION                    :MagLev framkvæmdir
+STR_RAIL_TOOLBAR_MAGLEV_CONSTRUCTION_CAPTION                    :Maglev framkvæmdir
 
 STR_RAIL_TOOLBAR_TOOLTIP_BUILD_RAILROAD_TRACK                   :{BLACK}Leggja lestarteina. Ctrl velur byggja/fjarlægja fyrir lestarframkvæmdir
 STR_RAIL_TOOLBAR_TOOLTIP_BUILD_AUTORAIL                         :{BLACK}Leggja lestarteina í Sjálvirkiteina ham. Ctrl velur byggja/farjlæga fyrir lestarframkvæmdir
@@ -2117,6 +2166,10 @@ STR_INDUSTRY_DISPLAY_CHAIN                                      :{BLACK}Sýna ke
 STR_INDUSTRY_DISPLAY_CHAIN_TOOLTIP                              :{BLACK}Sýna framleiðanda farms og iðnaði sem taka á móti.
 STR_INDUSTRY_CARGOES_NOTIFY_SMALLMAP                            :{BLACK}Tengill á litla kort
 STR_INDUSTRY_CARGOES_NOTIFY_SMALLMAP_TOOLTIP                    :{BLACK}Veldu einnig sýndan iðnað á kortinu.
+STR_INDUSTRY_CARGOES_SELECT_CARGO                               :{BLACK}Veldu farm
+STR_INDUSTRY_CARGOES_SELECT_CARGO_TOOLTIP                       :{BLACK}Veldu farminn sem þú vilt sýna
+STR_INDUSTRY_CARGOES_SELECT_INDUSTRY                            :{BLACK}Veldu farm
+STR_INDUSTRY_CARGOES_SELECT_INDUSTRY_TOOLTIP                    :{BLACK}Veldu farminn sem þú vilt sýna
 
 # Land area window
 STR_LAND_AREA_INFORMATION_CAPTION                               :{WHITE}Landsvæðisupplýsingar
@@ -2405,6 +2458,7 @@ STR_NEWGRF_ERROR_TOO_MANY_NEWGRFS_LOADED                        :Of mörg NewGRF
 STR_NEWGRF_ERROR_STATIC_GRF_CAUSES_DESYNC                       :Ef {1:STRING} er hlaðið sem kyrrstæðu NewGRF ásamt {STRING} gætu orðið hnökrar á keyrslu leiksins.
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} inniheldur gallaða mynd. Allar gallaðar myndir munu birtast sem rauð spurningamerki (?).
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}Grunnteiknisafnið sem er í notkun vantar hluta af hreyfimyndunum.{}Vinsamlegast uppfærðu grunnteiknisafnið.
+STR_NEWGRF_ERROR_MISSING_SPRITES_UNSTABLE                       :{WHITE}Í Grafíska safnið sem nú er í notkun vantar nokkrar myndir.{}Vinsamlegast uppfærið grafíska safnið.{}Þar sem þú ert að spila {YELLOW}þróunar útgáfu af OpenTTD{WHITE}, gæti verið að þú þyrftir líka {YELLOW} þróunar útgáfu af grafíska safninu{WHITE}
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Varúð!
@@ -2446,9 +2500,7 @@ STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<invalid indust
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}Merkjalisti - {COMMA} Merki{P "" s}
 STR_SIGN_LIST_MATCH_CASE                                        :{BLACK}Stemma há-/lágstafi
-STR_SIGN_LIST_CLEAR                                             :{BLACK}Hreinsa síu
 STR_SIGN_LIST_MATCH_CASE_TOOLTIP                                :{BLACK}Skifta á milli há-/lágstafa stemmingu þegar nöfn skilta eru borin saman við síaðan texta
-STR_SIGN_LIST_CLEAR_TOOLTIP                                     :{BLACK}Hreinsa síu
 
 # Sign window
 STR_EDIT_SIGN_CAPTION                                           :{WHITE}Breyta texta skiltis
@@ -2501,7 +2553,7 @@ STR_LOCAL_AUTHORITY_ACTION_LARGE_ADVERTISING_CAMPAIGN           :Stór auglýsin
 STR_LOCAL_AUTHORITY_ACTION_ROAD_RECONSTRUCTION                  :Fjármagna endurbyggingu vegakerfis
 STR_LOCAL_AUTHORITY_ACTION_STATUE_OF_COMPANY                    :Byggja styttu af eiganda fyrirtækis
 STR_LOCAL_AUTHORITY_ACTION_NEW_BUILDINGS                        :Fjármagna nýjar byggingar
-STR_LOCAL_AUTHORITY_ACTION_EXCLUSIVE_TRANSPORT                  :Kaupa einkarétt á flutningi
+STR_LOCAL_AUTHORITY_ACTION_EXCLUSIVE_TRANSPORT                  :Kaupa sérleyfi til flutninga
 STR_LOCAL_AUTHORITY_ACTION_BRIBE                                :Múta bæjaryfirvöldum
 
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_SMALL_ADVERTISING            :{YELLOW}Hleypa af stokkunum lítilli auglýsingaherferð til að laða að fleiri farþega og meiri farm til að flytja.{} Kostnaður: {CURRENCY_LONG}
@@ -2510,7 +2562,7 @@ STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_LARGE_ADVERTISING            :{YELLOW} Hleypa
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_ROAD_RECONSTRUCTION          :{YELLOW}Kosta endurbætur á vegakerfi úthverfanna. Veldur töluverðri röskun á umferð í allt að 6 mánuði.{} Kostnaður: {CURRENCY_LONG}
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_STATUE_OF_COMPANY            :{YELLOW} Byggja styttu til heiðurs fyrirtækinu þínu.{} Kostnaður: {CURRENCY_LONG}
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_NEW_BUILDINGS                :{YELLOW}Kosta byggingu nýs verslunarhúsnæðis í bænum.{} Kostnaður: {CURRENCY_LONG}
-STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_EXCLUSIVE_TRANSPORT          :{YELLOW} Kaupa 1 árs flutningsrétt í þessum bæ. Bæjaryfirvöld munu aðeins leyfa notkun á þínum flutningsleiðum.{} Kostnaður: {CURRENCY_LONG}
+STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_EXCLUSIVE_TRANSPORT          :{YELLOW} Kaupa 1 árs sérleyfi í þessum bæ. Bæjaryfirvöld munu aðeins leyfa notkun á þínum flutningsleiðum.{} Kostnaður: {CURRENCY_LONG}
 STR_LOCAL_AUTHORITY_ACTION_TOOLTIP_BRIBE                        :{YELLOW}Múta bæjaryfirvöldum til að auka við fylgi þitt, með hættu á þungri refsingu komist það upp.{} Kostnaður: {CURRENCY_LONG}
 
 # Goal window
@@ -2550,6 +2602,7 @@ STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}Tekur vi
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}Sýna lista yfir móttækilegan varning
 STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Móttekur: {WHITE}{CARGO_LIST}
 
+
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}Einkunn
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}Sýna einkunn stöðvar
 STR_STATION_VIEW_CARGO_RATINGS_TITLE                            :{BLACK}Staðbundin einkunn flutningsþjónustu:
@@ -2575,6 +2628,7 @@ STR_STATION_VIEW_SCHEDULED_AIRCRAFT_TOOLTIP                     :{BLACK}Sýna al
 STR_STATION_VIEW_SCHEDULED_SHIPS_TOOLTIP                        :{BLACK}Sýna öll skip sem hafa þessa stöð á áætlun
 
 STR_STATION_VIEW_RENAME_STATION_CAPTION                         :Endurnefna stöð/lestunarsvæði
+
 
 # Waypoint/buoy view window
 STR_WAYPOINT_VIEW_CAPTION                                       :{WHITE}{WAYPOINT}
@@ -3053,7 +3107,9 @@ STR_VEHICLE_DETAILS_TRAIN_ARTICULATED_RV_CAPACITY               :{BLACK}Rými: {
 # Vehicle refit
 STR_REFIT_CAPTION                                               :{WHITE}{VEHICLE} (Breyta)
 STR_REFIT_TITLE                                                 :{GOLD}Veldu farm sem á að flytja:
-STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}Ný burðargeta: {GOLD}{CARGO_LONG}{}{BLACK}Breytingarkostnaður: {GOLD}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}Ný burðargeta: {GOLD}{CARGO_LONG}{}{BLACK}Breytingarkostnaður: {RED}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_INCOME_FROM_REFIT                        :{BLACK}Nýtt rými: {GOLD}{CARGO_LONG}{}{BLACK}Tekjur vegna endurnýjunar: {GREEN}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_INCOME_FROM_AIRCRAFT_REFIT               :{BLACK}Nýtt rými: {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK}Tekjur vegna endurnýjunar: {GREEN}{CURRENCY_LONG}
 
 STR_REFIT_TRAIN_LIST_TOOLTIP                                    :{BLACK}Veldu hvernig farm lestin á að flytja
 STR_REFIT_ROAD_VEHICLE_LIST_TOOLTIP                             :{BLACK}Veldu tegund farms sem bifreið mun flytja
@@ -3298,9 +3354,9 @@ STR_AI_CONFIG_CONFIGURE_TOOLTIP                                 :{BLACK}Stilltu 
 # Available AIs window
 STR_AI_LIST_TOOLTIP                                             :{BLACK}Smelltu til að merkja gervigreind
 
-STR_AI_LIST_AUTHOR                                              :{BLACK}Höfundur: {STRING}
-STR_AI_LIST_VERSION                                             :{BLACK}Útgáfa: {NUM}
-STR_AI_LIST_URL                                                 :{BLACK}Vefslóð: {STRING}
+STR_AI_LIST_AUTHOR                                              :{LTBLUE}Höfundur: {ORANGE}{STRING}
+STR_AI_LIST_VERSION                                             :{LTBLUE}Útgáfa: {ORANGE}{NUM}
+STR_AI_LIST_URL                                                 :{LTBLUE}Vefslóð: {ORANGE}{STRING}
 
 STR_AI_LIST_ACCEPT                                              :{BLACK}Í lagi
 STR_AI_LIST_ACCEPT_TOOLTIP                                      :{BLACK}Velja merkta gervigreind
@@ -3323,6 +3379,8 @@ STR_PERCENT_DOWN_SMALL                                          :{TINY_FONT}{WHI
 STR_PERCENT_DOWN                                                :{WHITE}{NUM}%{DOWN_ARROW}
 STR_PERCENT_UP_DOWN_SMALL                                       :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}{DOWN_ARROW}
 STR_PERCENT_UP_DOWN                                             :{WHITE}{NUM}%{UP_ARROW}{DOWN_ARROW}
+STR_PERCENT_NONE_SMALL                                          :{TINY_FONT}{WHITE}{NUM}%
+STR_PERCENT_NONE                                                :{WHITE}{NUM}%
 
 # Income 'floats'
 STR_INCOME_FLOAT_COST_SMALL                                     :{TINY_FONT}{RED}Kostnaður: {CURRENCY_LONG}
@@ -3370,6 +3428,9 @@ STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}Ekki er
 STR_WARNING_FALLBACK_SOUNDSET                                   :{WHITE}Fann aðeins varahljóðsafn. Ef þú vilt hljóð geturðu sett þau upp með innbyggðu efnisveitunni.
 
 # Screenshot related messages
+STR_WARNING_SCREENSHOT_SIZE_CAPTION                             :{WHITE}Stórt skjáskot
+STR_WARNING_SCREENSHOT_SIZE_MESSAGE                             :{YELLOW}Skjáskotið mun vera í upplausninni {COMMA} x {COMMA} pixlum. Að taka skjáskotið gæti tekið nokkra stund, viltu halda áfram?
+
 STR_MESSAGE_SCREENSHOT_SUCCESSFULLY                             :{WHITE}Skjámynd vistuð sem '{STRING}'
 STR_ERROR_SCREENSHOT_FAILED                                     :{WHITE}Ekki tókst að taka skjámynd!
 
@@ -3432,7 +3493,7 @@ STR_ERROR_TOO_CLOSE_TO_EDGE_OF_MAP_SUB                          :{WHITE}... of n
 STR_ERROR_TOO_CLOSE_TO_ANOTHER_TOWN                             :{WHITE}... of nálægt öðrum bæ
 STR_ERROR_TOO_MANY_TOWNS                                        :{WHITE}... of margir bæir
 STR_ERROR_NO_SPACE_FOR_TOWN                                     :{WHITE}... það er ekkert laust svæði á kortinu
-STR_ERROR_TOWN_EXPAND_WARN_NO_ROADS                             :{WHITE}Bærinn getur ekki lagt vegi. Því er hægt að breyta í Þróaðri stillingar->Efnahagur->Bæir.
+STR_ERROR_TOWN_EXPAND_WARN_NO_ROADS                             :{WHITE}Bærinn getur ekki lagt vegi. Því er hægt að breyta í Ítarlegar stillingar->Efnahagur->Bæir.
 STR_ERROR_ROAD_WORKS_IN_PROGRESS                                :{WHITE}Vegaframkvæmdir standa yfir
 STR_ERROR_TOWN_CAN_T_DELETE                                     :{WHITE}Ekki hægt að eyða bæ...{}Stöð eða skýli vísar í þennan bæ eða ekki hægt að fjarlægja reit í eigu bæjarins.
 STR_ERROR_STATUE_NO_SUITABLE_PLACE                              :{WHITE}... það er enginn ákjósanlegur staður fyrir styttu í miðbæ þessa bæjar
@@ -4180,6 +4241,8 @@ STR_ORANGE_STRING                                               :{ORANGE}{STRING
 STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
+STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}
+STR_ORANGE_STRING1_LTBLUE                                       :{ORANGE}{STRING}{LTBLUE}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}
 STR_TINY_RIGHT_ARROW                                            :{TINY_FONT}{RIGHT_ARROW}

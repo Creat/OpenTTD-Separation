@@ -101,7 +101,7 @@ const WindowDesc _dropdown_desc(
 struct DropdownWindow : Window {
 	WindowClass parent_wnd_class; ///< Parent window class.
 	WindowNumber parent_wnd_num;  ///< Parent window number.
-	byte parent_button;           ///< Parent widget number where the window is dropped from.
+	int parent_button;            ///< Parent widget number where the window is dropped from.
 	DropDownList *list;           ///< List with dropdown menu items.
 	int selected_index;           ///< Index of the selected item in the list.
 	byte click_delay;             ///< Timer to delay selection.
@@ -168,21 +168,18 @@ struct DropdownWindow : Window {
 
 	~DropdownWindow()
 	{
+		/* Make the dropdown "invisible", so it doesn't affect new window placement.
+		 * Also mark it dirty in case the callback deals with the screen. (e.g. screenshots). */
+		this->window_class = WC_INVALID;
+		this->SetDirty();
+
 		Window *w2 = FindWindowById(this->parent_wnd_class, this->parent_wnd_num);
 		if (w2 != NULL) {
-			if (w2->nested_array != NULL) {
-				NWidgetCore *nwi2 = w2->GetWidget<NWidgetCore>(this->parent_button);
-				if ((nwi2->type & WWT_MASK) == NWID_BUTTON_DROPDOWN) {
-					nwi2->disp_flags &= ~ND_DROPDOWN_ACTIVE;
-				} else {
-					w2->RaiseWidget(this->parent_button);
-				}
-			} else {
-				w2->RaiseWidget(this->parent_button);
-			}
-			w2->SetWidgetDirty(this->parent_button);
+			Point pt = _cursor.pos;
+			pt.x -= w2->left;
+			pt.y -= w2->top;
+			w2->OnDropdownClose(pt, this->parent_button, this->selected_index, this->instant_close);
 		}
-
 		DeleteDropDownList(this->list);
 	}
 
@@ -305,19 +302,7 @@ struct DropdownWindow : Window {
 			if (!_left_button_clicked) {
 				this->drag_mode = false;
 				if (!this->GetDropDownItem(item)) {
-					if (this->instant_close) {
-						/* Make the dropdown "invisible", so it doesn't affect new window placement.
-						 * Also mark it dirty in case the callback deals with the screen. (e.g. screenshots). */
-						this->window_class = WC_INVALID;
-						this->SetDirty();
-
-						if (GetWidgetFromPos(w2, _cursor.pos.x - w2->left, _cursor.pos.y - w2->top) == this->parent_button) {
-							/* Send event for selected option if we're still
-							 * on the parent button of the list. */
-							w2->OnDropdownSelect(this->parent_button, this->selected_index);
-						}
-						delete this;
-					}
+					if (this->instant_close) delete this;
 					return;
 				}
 				this->click_delay = 2;
@@ -343,32 +328,29 @@ struct DropdownWindow : Window {
 	}
 };
 
-void ShowDropDownList(Window *w, DropDownList *list, int selected, int button, uint width, bool auto_width, bool instant_close)
+/**
+ * Show a drop down list.
+ * @param w        Parent window for the list.
+ * @param list     Prepopulated DropDownList. Will be deleted when the list is
+ *                 closed.
+ * @param selected The initially selected list item.
+ * @param button   The widget which is passed to Window::OnDropdownSelect and OnDropdownClose.
+ *                 Unless you override those functions, this should be then widget index of the dropdown button.
+ * @param wi_rect  Coord of the parent drop down button, used to position the dropdown menu.
+ * @param auto_width The width is determined by the widest item in the list,
+ *                   in this case only one of \a left or \a right is used (depending on text direction).
+ * @param instant_close Set to true if releasing mouse button should close the
+ *                      list regardless of where the cursor is.
+ */
+void ShowDropDownListAt(Window *w, DropDownList *list, int selected, int button, Rect wi_rect, Colours wi_colour, bool auto_width, bool instant_close)
 {
 	DeleteWindowById(WC_DROPDOWN_MENU, 0);
-
-	/* Our parent's button widget is used to determine where to place the drop
-	 * down list window. */
-	Rect wi_rect;
-	Colours wi_colour;
-	NWidgetCore *nwi = w->GetWidget<NWidgetCore>(button);
-	wi_rect.left   = nwi->pos_x;
-	wi_rect.right  = nwi->pos_x + nwi->current_x - 1;
-	wi_rect.top    = nwi->pos_y;
-	wi_rect.bottom = nwi->pos_y + nwi->current_y - 1;
-	wi_colour = nwi->colour;
-
-	if ((nwi->type & WWT_MASK) == NWID_BUTTON_DROPDOWN) {
-		nwi->disp_flags |= ND_DROPDOWN_ACTIVE;
-	} else {
-		w->LowerWidget(button);
-	}
-	w->SetWidgetDirty(button);
 
 	/* The preferred position is just below the dropdown calling widget */
 	int top = w->top + wi_rect.bottom + 1;
 
-	if (width == 0) width = wi_rect.right - wi_rect.left + 1;
+	/* The preferred width equals the calling widget */
+	uint width = wi_rect.right - wi_rect.left + 1;
 
 	uint max_item_width = 0;
 
@@ -418,6 +400,49 @@ void ShowDropDownList(Window *w, DropDownList *list, int selected, int button, u
 	Point dw_pos = { w->left + (_current_text_dir == TD_RTL ? wi_rect.right + 1 - width : wi_rect.left), top};
 	Dimension dw_size = {width, height};
 	new DropdownWindow(w, list, selected, button, instant_close, dw_pos, dw_size, wi_colour, scroll);
+}
+
+/**
+ * Show a drop down list.
+ * @param w        Parent window for the list.
+ * @param list     Prepopulated DropDownList. Will be deleted when the list is
+ *                 closed.
+ * @param selected The initially selected list item.
+ * @param button   The widget within the parent window that is used to determine
+ *                 the list's location.
+ * @param width    Override the width determined by the selected widget.
+ * @param auto_width Maximum width is determined by the widest item in the list.
+ * @param instant_close Set to true if releasing mouse button should close the
+ *                      list regardless of where the cursor is.
+ */
+void ShowDropDownList(Window *w, DropDownList *list, int selected, int button, uint width, bool auto_width, bool instant_close)
+{
+	/* Our parent's button widget is used to determine where to place the drop
+	 * down list window. */
+	Rect wi_rect;
+	NWidgetCore *nwi = w->GetWidget<NWidgetCore>(button);
+	wi_rect.left   = nwi->pos_x;
+	wi_rect.right  = nwi->pos_x + nwi->current_x - 1;
+	wi_rect.top    = nwi->pos_y;
+	wi_rect.bottom = nwi->pos_y + nwi->current_y - 1;
+	Colours wi_colour = nwi->colour;
+
+	if ((nwi->type & WWT_MASK) == NWID_BUTTON_DROPDOWN) {
+		nwi->disp_flags |= ND_DROPDOWN_ACTIVE;
+	} else {
+		w->LowerWidget(button);
+	}
+	w->SetWidgetDirty(button);
+
+	if (width != 0) {
+		if (_current_text_dir == TD_RTL) {
+			wi_rect.left = wi_rect.right + 1 - width;
+		} else {
+			wi_rect.right = wi_rect.left + width - 1;
+		}
+	}
+
+	ShowDropDownListAt(w, list, selected, button, wi_rect, wi_colour, auto_width, instant_close);
 }
 
 /**

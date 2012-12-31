@@ -239,6 +239,10 @@
  *  173   23967   1.2.0-RC1
  *  174   23973   1.2.x
  *  175   24136
+ *  176   24446
+ *  177   24619
+ *  178   24789
+ *  179   24810
  */
 extern const uint16 SAVEGAME_VERSION = SL_TTSEP_VER; ///< Current savegame version of OpenTTD.
 
@@ -409,6 +413,7 @@ extern const ChunkHandler _station_chunk_handlers[];
 extern const ChunkHandler _industry_chunk_handlers[];
 extern const ChunkHandler _economy_chunk_handlers[];
 extern const ChunkHandler _subsidy_chunk_handlers[];
+extern const ChunkHandler _cargomonitor_chunk_handlers[];
 extern const ChunkHandler _goal_chunk_handlers[];
 extern const ChunkHandler _ai_chunk_handlers[];
 extern const ChunkHandler _game_chunk_handlers[];
@@ -437,6 +442,7 @@ static const ChunkHandler * const _chunk_handlers[] = {
 	_industry_chunk_handlers,
 	_economy_chunk_handlers,
 	_subsidy_chunk_handlers,
+	_cargomonitor_chunk_handlers,
 	_goal_chunk_handlers,
 	_engine_chunk_handlers,
 	_town_chunk_handlers,
@@ -1214,7 +1220,7 @@ static size_t ReferenceToInt(const void *obj, SLRefType rt)
 
 /**
  * Pointers cannot be loaded from a savegame, so this function
- * gets the index from the savegame and returns the appropiate
+ * gets the index from the savegame and returns the appropriate
  * pointer from the already loaded base.
  * Remember that an index of 0 is a NULL pointer so all indices
  * are +1 so vehicle 0 is saved as 1.
@@ -1671,7 +1677,7 @@ static void SlStubSaveProc()
 
 /**
  * Save a chunk of data (eg. vehicles, stations, etc.). Each chunk is
- * prefixed by an ID identifying it, followed by data, and terminator where appropiate
+ * prefixed by an ID identifying it, followed by data, and terminator where appropriate
  * @param ch The chunkhandler that will be used for the operation
  */
 static void SlSaveChunk(const ChunkHandler *ch)
@@ -1726,7 +1732,7 @@ static void SlSaveChunks()
  * Find the ChunkHandler that will be used for processing the found
  * chunk in the savegame or in memory
  * @param id the chunk in question
- * @return returns the appropiate chunkhandler
+ * @return returns the appropriate chunkhandler
  */
 static const ChunkHandler *SlFindChunkHandler(uint32 id)
 {
@@ -1909,7 +1915,7 @@ struct LZOLoadFilter : LoadFilter {
 		if (tmp[0] != lzo_adler32(0, out, size + sizeof(uint32))) SlErrorCorrupt("Bad checksum");
 
 		/* Decompress */
-		lzo1x_decompress(out + sizeof(uint32) * 1, size, buf, &len, NULL);
+		lzo1x_decompress_safe(out + sizeof(uint32) * 1, size, buf, &len, NULL);
 		return len;
 	}
 };
@@ -2404,7 +2410,7 @@ static void SaveFileError()
 
 /**
  * We have written the whole game into memory, _memory_savegame, now find
- * and appropiate compressor and start writing to file.
+ * and appropriate compressor and start writing to file.
  */
 static SaveOrLoadResult SaveFileToDisk(bool threaded)
 {

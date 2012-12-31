@@ -458,8 +458,8 @@ static uint FixVehicleInclination(Vehicle *v, Direction dir)
 	byte entry_z = GetSlopePixelZ(entry_x, entry_y);
 
 	/* Compute middle of the tile. */
-	int middle_x = (v->x_pos & ~TILE_UNIT_MASK) + HALF_TILE_SIZE;
-	int middle_y = (v->y_pos & ~TILE_UNIT_MASK) + HALF_TILE_SIZE;
+	int middle_x = (v->x_pos & ~TILE_UNIT_MASK) + TILE_SIZE / 2;
+	int middle_y = (v->y_pos & ~TILE_UNIT_MASK) + TILE_SIZE / 2;
 	byte middle_z = GetSlopePixelZ(middle_x, middle_y);
 
 	/* middle_z == entry_z, no height change. */
@@ -636,7 +636,7 @@ bool AfterLoadGame()
 	SetDate(_date, _date_fract);
 
 	/*
-	 * Force the old behaviour for compatability reasons with old savegames.
+	 * Force the old behaviour for compatibility reasons with old savegames.
 	 *
 	 * Note that there is no non-stop in here. This is because the setting could have
 	 * either value in TTDPatch. To convert it properly the user has to make sure the
@@ -717,6 +717,8 @@ bool AfterLoadGame()
 	 *   But this exeption is not true for non dedicated network_servers! */
 	if (!Company::IsValidID(COMPANY_FIRST) && (!_networking || (_networking && _network_server && !_network_dedicated))) {
 		DoStartupNewCompany(false);
+		Company *c = Company::Get(COMPANY_FIRST);
+		c->settings = _settings_client.company;
 	}
 
 	/* Fix the cache for cargo payments. */
@@ -2171,7 +2173,7 @@ bool AfterLoadGame()
 
 		/* Simulate the inflation, so we also get the payment inflation */
 		while (_economy.inflation_prices < aimed_inflation) {
-			AddInflation(false);
+			if (AddInflation(false)) break;
 		}
 	}
 
@@ -2740,6 +2742,23 @@ bool AfterLoadGame()
 		/* Introduced tree planting limit. */
 		Company *c;
 		FOR_ALL_COMPANIES(c) c->tree_limit = _settings_game.construction.tree_frame_burst << 16;
+	}
+
+	if (IsSavegameVersionBefore(177)) {
+		/* Fix too high inflation rates */
+		if (_economy.inflation_prices > MAX_INFLATION) _economy.inflation_prices = MAX_INFLATION;
+		if (_economy.inflation_payment > MAX_INFLATION) _economy.inflation_payment = MAX_INFLATION;
+
+		/* We have to convert the quarters of bankruptcy into months of bankruptcy */
+		FOR_ALL_COMPANIES(c) {
+			c->months_of_bankruptcy = 3 * c->months_of_bankruptcy;
+		}
+	}
+
+	if (IsSavegameVersionBefore(178)) {
+		extern uint8 _old_diff_level;
+		/* Initialise script settings profile */
+		_settings_game.script.settings_profile = IsInsideMM(_old_diff_level, SP_BEGIN, SP_END) ? _old_diff_level : (uint)SP_MEDIUM;
 	}
 
 	/* Road stops is 'only' updating some caches */

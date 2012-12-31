@@ -44,6 +44,7 @@
 #include "core/backup_type.hpp"
 #include "water.h"
 #include "game/game.hpp"
+#include "cargomonitor.h"
 
 #include "table/strings.h"
 #include "table/pricebase.h"
@@ -360,7 +361,7 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 	}
 	if (new_owner == INVALID_OWNER) RebuildSubsidisedSourceAndDestinationCache();
 
-	/* Take care of rating in towns */
+	/* Take care of rating and transport rights in towns */
 	FOR_ALL_TOWNS(t) {
 		/* If a company takes over, give the ratings to that company. */
 		if (new_owner != INVALID_OWNER) {
@@ -378,6 +379,16 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 		/* Reset the ratings for the old owner */
 		t->ratings[old_owner] = RATING_INITIAL;
 		ClrBit(t->have_ratings, old_owner);
+
+		/* Transfer exclusive rights */
+		if (t->exclusive_counter > 0 && t->exclusivity == old_owner) {
+			if (new_owner != INVALID_OWNER) {
+				t->exclusivity = new_owner;
+			} else {
+				t->exclusive_counter = 0;
+				t->exclusivity = INVALID_COMPANY;
+			}
+		}
 	}
 
 	{
@@ -512,33 +523,44 @@ void ChangeOwnershipOfCompanyItems(Owner old_owner, Owner new_owner)
 static void CompanyCheckBankrupt(Company *c)
 {
 	/*  If the company has money again, it does not go bankrupt */
-	if (c->money >= 0) {
-		c->quarters_of_bankruptcy = 0;
+	if (c->money - c->current_loan >= -_economy.max_loan) {
+		c->months_of_bankruptcy = 0;
 		c->bankrupt_asked = 0;
 		return;
 	}
 
-	c->quarters_of_bankruptcy++;
+	c->months_of_bankruptcy++;
 
-	switch (c->quarters_of_bankruptcy) {
+	switch (c->months_of_bankruptcy) {
+		/* All the boring cases (months) with a bad balance where no action is taken */
 		case 0:
 		case 1:
+		case 2:
+		case 3:
+
+		case 5:
+		case 6:
+
+		case 8:
+		case 9:
 			break;
 
-		case 2: {
+		/* Warn about bancruptcy after 3 months */
+		case 4: {
 			CompanyNewsInformation *cni = MallocT<CompanyNewsInformation>(1);
 			cni->FillData(c);
 			SetDParam(0, STR_NEWS_COMPANY_IN_TROUBLE_TITLE);
 			SetDParam(1, STR_NEWS_COMPANY_IN_TROUBLE_DESCRIPTION);
 			SetDParamStr(2, cni->company_name);
-			AddCompanyNewsItem(STR_MESSAGE_NEWS_FORMAT, NS_COMPANY_TROUBLE, cni);
+			AddCompanyNewsItem(STR_MESSAGE_NEWS_FORMAT, cni);
 			AI::BroadcastNewEvent(new ScriptEventCompanyInTrouble(c->index));
 			Game::NewEvent(new ScriptEventCompanyInTrouble(c->index));
 			break;
 		}
 
-		case 3: {
-			/* Check if the company has any value.. if not, declare it bankrupt
+		/* Offer company for sale after 6 months */
+		case 7: {
+			/* Check if the company has any value. If not, declare it bankrupt
 			 *  right now */
 			Money val = CalculateCompanyValue(c, false);
 			if (val > 0) {
@@ -547,10 +569,13 @@ static void CompanyCheckBankrupt(Company *c)
 				c->bankrupt_timeout = 0;
 				break;
 			}
-			/* FALL THROUGH to case 4... */
+			/* FALL THROUGH  to case 10 */
 		}
+
+		/* Bancrupt company after 6 months (if the company has no value) or latest
+		 * after 9 months (if it still had value after 6 months) */
 		default:
-		case 4:
+		case 10: {
 			if (!_networking && _local_company == c->index) {
 				/* If we are in offline mode, leave the company playing. Eg. there
 				 * is no THE-END, otherwise mark the client as spectator to make sure
@@ -571,6 +596,7 @@ static void CompanyCheckBankrupt(Company *c)
 			 * company and thus we won't be moved. */
 			if (!_networking || _network_server) DoCommandP(0, 2 | (c->index << 16), CRR_BANKRUPT, CMD_COMPANY_CTRL);
 			break;
+		}
 	}
 }
 
@@ -614,6 +640,11 @@ static void CompaniesGenStatistics()
 	}
 	cur_company.Restore();
 
+	/* Check for bankruptcy each month */
+	FOR_ALL_COMPANIES(c) {
+		CompanyCheckBankrupt(c);
+	}
+
 	/* Only run the economic statics and update company stats every 3rd month (1st of quarter). */
 	if (!HasBit(1 << 0 | 1 << 3 | 1 << 6 | 1 << 9, _cur_month)) return;
 
@@ -626,7 +657,6 @@ static void CompaniesGenStatistics()
 
 		UpdateCompanyRatingAndValue(c, true);
 		if (c->block_preview != 0) c->block_preview--;
-		CompanyCheckBankrupt(c);
 	}
 
 	SetWindowDirty(WC_INCOME_GRAPH, 0);
@@ -640,8 +670,9 @@ static void CompaniesGenStatistics()
 /**
  * Add monthly inflation
  * @param check_year Shall the inflation get stopped after 170 years?
+ * @return true if inflation is maxed and nothing was changed
  */
-void AddInflation(bool check_year)
+bool AddInflation(bool check_year)
 {
 	/* The cargo payment inflation differs from the normal inflation, so the
 	 * relative amount of money you make with a transport decreases slowly over
@@ -658,15 +689,22 @@ void AddInflation(bool check_year)
 	 * inflation doesn't add anything after that either; it even makes playing
 	 * it impossible due to the diverging cost and income rates.
 	 */
-	if (check_year && (_cur_year - _settings_game.game_creation.starting_year) >= (ORIGINAL_MAX_YEAR - ORIGINAL_BASE_YEAR)) return;
+	if (check_year && (_cur_year - _settings_game.game_creation.starting_year) >= (ORIGINAL_MAX_YEAR - ORIGINAL_BASE_YEAR)) return true;
+
+	if (_economy.inflation_prices == MAX_INFLATION || _economy.inflation_payment == MAX_INFLATION) return true;
 
 	/* Approximation for (100 + infl_amount)% ** (1 / 12) - 100%
 	 * scaled by 65536
 	 * 12 -> months per year
 	 * This is only a good approxiamtion for small values
 	 */
-	_economy.inflation_prices  += min((_economy.inflation_prices  * _economy.infl_amount    * 54) >> 16, MAX_INFLATION);
-	_economy.inflation_payment += min((_economy.inflation_payment * _economy.infl_amount_pr * 54) >> 16, MAX_INFLATION);
+	_economy.inflation_prices  += (_economy.inflation_prices  * _economy.infl_amount    * 54) >> 16;
+	_economy.inflation_payment += (_economy.inflation_payment * _economy.infl_amount_pr * 54) >> 16;
+
+	if (_economy.inflation_prices > MAX_INFLATION) _economy.inflation_prices = MAX_INFLATION;
+	if (_economy.inflation_payment > MAX_INFLATION) _economy.inflation_payment = MAX_INFLATION;
+
+	return false;
 }
 
 /**
@@ -755,8 +793,14 @@ static void CompaniesPayInterest()
 		 * what (total) should have been paid up to this month and you subtract
 		 * whatever has been paid in the previous months. This will mean one month
 		 * it'll be a bit more and the other it'll be a bit less than the average
-		 * monthly fee, but on average it will be exact. */
+		 * monthly fee, but on average it will be exact.
+		 * In order to prevent cheating or abuse (just not paying interest by not
+		 * taking a loan we make companies pay interest on negative cash as well
+		 */
 		Money yearly_fee = c->current_loan * _economy.interest_rate / 100;
+		if (c->money < 0) {
+			yearly_fee += -c->money *_economy.interest_rate / 100;
+		}
 		Money up_to_previous_month = yearly_fee * _cur_month / 12;
 		Money up_to_this_month = yearly_fee * (_cur_month + 1) / 12;
 
@@ -782,10 +826,10 @@ static void HandleEconomyFluctuations()
 
 	if (_economy.fluct == 0) {
 		_economy.fluct = -(int)GB(Random(), 0, 2);
-		AddNewsItem(STR_NEWS_BEGIN_OF_RECESSION, NS_ECONOMY);
+		AddNewsItem(STR_NEWS_BEGIN_OF_RECESSION, NT_ECONOMY, NF_NORMAL);
 	} else if (_economy.fluct == -12) {
 		_economy.fluct = GB(Random(), 0, 8) + 312;
-		AddNewsItem(STR_NEWS_END_OF_RECESSION, NS_ECONOMY);
+		AddNewsItem(STR_NEWS_END_OF_RECESSION, NT_ECONOMY, NF_NORMAL);
 	}
 }
 
@@ -852,6 +896,8 @@ void StartupEconomy()
 void InitializeEconomy()
 {
 	_economy.inflation_prices = _economy.inflation_payment = 1 << 16;
+	ClearCargoPickupMonitoring();
+	ClearCargoDeliveryMonitoring();
 }
 
 /**
@@ -1016,6 +1062,9 @@ static Money DeliverGoods(int num_pieces, CargoID cargo_type, StationID dest, Ti
 
 	/* Determine profit */
 	Money profit = GetTransportedGoodsIncome(accepted, DistanceManhattan(source_tile, st->xy), days_in_transit, cargo_type);
+
+	/* Update the cargo monitor. */
+	AddCargoDelivery(cargo_type, company->index, accepted, src_type, src, st);
 
 	/* Modify profit if a subsidy is in effect */
 	if (CheckSubsidised(cargo_type, company->index, src_type, src, st))  {
@@ -1220,6 +1269,16 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 		return;
 	}
 
+	bool use_autorefit = front->current_order.IsRefit() && front->current_order.GetRefitCargo() == CT_AUTO_REFIT;
+	CargoArray consist_capleft;
+	if (use_autorefit) {
+		/* Sum cargo, that can be loaded without refitting */
+		for (Vehicle *v = front; v != NULL; v = v->Next()) {
+			int cap_left = v->cargo_cap - v->cargo.Count();
+			if (cap_left > 0) consist_capleft[v->cargo_type] += cap_left;
+		}
+	}
+
 	int unloading_time = 0;
 	bool dirty_vehicle = false;
 	bool dirty_station = false;
@@ -1292,8 +1351,8 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 			if ((front->current_order.GetUnloadType() & (OUFB_UNLOAD | OUFB_TRANSFER)) && (!accepted || v->cargo.Count() == cargo_count)) {
 				remaining = v->cargo.MoveTo(&ge->cargo, amount_unloaded, front->current_order.GetUnloadType() & OUFB_TRANSFER ? VehicleCargoList::MTA_TRANSFER : VehicleCargoList::MTA_UNLOAD, payment);
 				if (!HasBit(ge->acceptance_pickup, GoodsEntry::GES_PICKUP)) {
-					InvalidateWindowData(WC_STATION_LIST, last_visited);
 					SetBit(ge->acceptance_pickup, GoodsEntry::GES_PICKUP);
+					InvalidateWindowData(WC_STATION_LIST, last_visited);
 				}
 
 				dirty_vehicle = dirty_station = true;
@@ -1336,6 +1395,13 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 			CargoID new_cid = front->current_order.GetRefitCargo();
 			byte new_subtype = front->current_order.GetRefitSubtype();
 
+			/* Remove old capacity from consist capacity */
+			consist_capleft[v_start->cargo_type] -= v_start->cargo_cap;
+			for (Vehicle *w = v_start; w->HasArticulatedPart(); ) {
+				w = w->GetNextArticulatedPart();
+				consist_capleft[w->cargo_type] -= w->cargo_cap;
+			}
+
 			Backup<CompanyByte> cur_company(_current_company, front->owner, FILE_LINE);
 
 			/* Check if all articulated parts are empty and collect refit mask. */
@@ -1352,13 +1418,15 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 				int amount = 0;
 				CargoID cid;
 				FOR_EACH_SET_CARGO_ID(cid, refit_mask) {
-					if (cargo_left[cid] > amount) {
+					/* Consider refitting to this cargo, if other vehicles of the consist cannot
+					 * already take the cargo without refitting */
+					if (cargo_left[cid] > (int)consist_capleft[cid] + amount) {
 						/* Try to find out if auto-refitting would succeed. In case the refit is allowed,
 						 * the returned refit capacity will be greater than zero. */
 						new_subtype = GetBestFittingSubType(v, v, cid);
 						DoCommand(v_start->tile, v_start->index, cid | 1U << 6 | new_subtype << 8 | 1U << 16, DC_QUERY_COST, GetCmdRefitVeh(v_start)); // Auto-refit and only this vehicle including artic parts.
 						if (_returned_refit_capacity > 0) {
-							amount = cargo_left[cid];
+							amount = cargo_left[cid] - consist_capleft[cid];
 							new_cid = cid;
 						}
 					}
@@ -1370,6 +1438,13 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 				CommandCost cost = DoCommand(v_start->tile, v_start->index, new_cid | 1U << 6 | new_subtype << 8 | 1U << 16, DC_EXEC, GetCmdRefitVeh(v_start)); // Auto-refit and only this vehicle including artic parts.
 				if (cost.Succeeded()) front->profit_this_year -= cost.GetCost() << 8;
 				ge = &st->goods[v->cargo_type];
+			}
+
+			/* Add new capacity to consist capacity */
+			consist_capleft[v_start->cargo_type] += v_start->cargo_cap;
+			for (Vehicle *w = v_start; w->HasArticulatedPart(); ) {
+				w = w->GetNextArticulatedPart();
+				consist_capleft[w->cargo_type] += w->cargo_cap;
 			}
 
 			cur_company.Restore();
@@ -1396,8 +1471,8 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 
 		/* if last speed is 0, we treat that as if no vehicle has ever visited the station. */
 		ge->last_speed = min(t, 255);
-		ge->last_age = _cur_year - front->build_year;
-		ge->days_since_pickup = 0;
+		ge->last_age = min(_cur_year - front->build_year, 255);
+		ge->time_since_pickup = 0;
 
 		/* If there's goods waiting at the station, and the vehicle
 		 * has capacity for it, load it on the vehicle. */
@@ -1422,7 +1497,17 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 				/* Don't load stuff that is already 'reserved' for other vehicles */
 				cap = min((uint)cargo_left[v->cargo_type], cap);
 				count = cargo_left[v->cargo_type];
-				cargo_left[v->cargo_type] -= cap;
+				if (use_autorefit) {
+					/* When using autorefit, reserve all cargo for this wagon to prevent other wagons
+					 * from feeling the need to refit. */
+					int total_cap_left = v->cargo_cap - v->cargo.Count();
+					cargo_left[v->cargo_type] -= total_cap_left;
+					consist_capleft[v->cargo_type] -= total_cap_left;
+				} else {
+					/* Update cargo left; but don't reserve everything yet, so other wagons
+					 * of the same consist load in parallel. */
+					cargo_left[v->cargo_type] -= cap;
+				}
 			}
 
 			/* Store whether the maximum possible load amount was loaded or not.*/
@@ -1473,11 +1558,13 @@ static void LoadUnloadVehicle(Vehicle *front, int *cargo_left)
 	/* Only set completely_emptied, if we just unloaded all remaining cargo */
 	completely_emptied &= anything_unloaded;
 
-	/* We update these variables here, so gradual loading still fills
-	 * all wagons at the same time instead of using the same 'improved'
-	 * loading algorithm for the wagons (only fill wagon when there is
-	 * enough to fill the previous wagons) */
-	if (_settings_game.order.improved_load && (front->current_order.GetLoadType() & OLFB_FULL_LOAD)) {
+	/* For consists without autorefit-order we adjust the reserved cargo at the station after loading,
+	 * so that all wagons start loading if the consist is the first consist.
+	 *
+	 * If we use autorefit otoh, we only want to load/refit a vehicle if the other wagons cannot already hold the cargo,
+	 * to keep the option to still refit the vehicle when new cargo of different type shows up.
+	 */
+	if (_settings_game.order.improved_load && (front->current_order.GetLoadType() & OLFB_FULL_LOAD) && !use_autorefit) {
 		/* Update left cargo */
 		for (Vehicle *v = front; v != NULL; v = v->Next()) {
 			int cap_left = v->cargo_cap - v->cargo.Count();
@@ -1640,7 +1727,7 @@ static void DoAcquireCompany(Company *c)
 	SetDParamStr(2, cni->company_name);
 	SetDParamStr(3, cni->other_company_name);
 	SetDParam(4, c->bankrupt_value);
-	AddCompanyNewsItem(STR_MESSAGE_NEWS_FORMAT, NS_COMPANY_MERGER, cni);
+	AddCompanyNewsItem(STR_MESSAGE_NEWS_FORMAT, cni);
 	AI::BroadcastNewEvent(new ScriptEventCompanyMerger(ci, _current_company));
 	Game::NewEvent(new ScriptEventCompanyMerger(ci, _current_company));
 

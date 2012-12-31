@@ -73,19 +73,7 @@ public:
 
 	void ClearTypeInformation();
 
-	/**
-	 * Read an int64 from the argument array. The offset is increased
-	 * so the next time GetInt64 is called the next value is read.
-	 */
-	int64 GetInt64(WChar type = 0)
-	{
-		assert(this->offset < this->num_param);
-		if (this->type != NULL) {
-			assert(this->type[this->offset] == 0 || this->type[this->offset] == type);
-			this->type[this->offset] = type;
-		}
-		return this->data[this->offset++];
-	}
+	int64 GetInt64(WChar type = 0);
 
 	/** Read an int32 from the argument array. @see GetInt64. */
 	int32 GetInt32(WChar type = 0)
@@ -166,6 +154,9 @@ static inline void SetDParam(uint n, uint64 v)
 {
 	_global_string_params.SetParam(n, v);
 }
+
+void SetDParamMaxValue(uint n, uint64 max_value, uint min_count = 0);
+void SetDParamMaxDigits(uint n, uint count);
 
 void SetDParamStr(uint n, const char *str);
 

@@ -18,6 +18,7 @@
 #include "tile_type.h"
 #include "widget_type.h"
 #include "core/smallvec_type.hpp"
+#include "core/smallmap_type.hpp"
 
 /** State of handling an event. */
 enum EventState {
@@ -175,7 +176,7 @@ struct WindowDesc : ZeroedMemoryAllocator {
 	int16 default_height;          ///< Prefered initial height of the window.
 	WindowClass cls;               ///< Class of the window, @see WindowClass.
 	WindowClass parent_cls;        ///< Class of the parent window. @see WindowClass
-	uint32 flags;                  ///< Flags. @see WindowDefaultFlags
+	uint32 flags;                  ///< Flags. @see WindowDefaultFlag
 	const NWidgetPart *nwid_parts; ///< Nested widget parts describing the window.
 	int16 nwid_length;             ///< Length of the #nwid_parts array.
 };
@@ -185,9 +186,8 @@ struct WindowDesc : ZeroedMemoryAllocator {
  */
 enum WindowDefaultFlag {
 	WDF_CONSTRUCTION    =   1 << 0, ///< This window is used for construction; close it whenever changing company.
-	WDF_UNCLICK_BUTTONS =   1 << 1, ///< Unclick buttons when the window event times out
-	WDF_MODAL           =   1 << 2, ///< The window is a modal child of some other window, meaning the parent is 'inactive'
-	WDF_NO_FOCUS        =   1 << 3, ///< This window won't get focus/make any other window lose focus when click
+	WDF_MODAL           =   1 << 1, ///< The window is a modal child of some other window, meaning the parent is 'inactive'
+	WDF_NO_FOCUS        =   1 << 2, ///< This window won't get focus/make any other window lose focus when click
 };
 
 /**
@@ -240,6 +240,8 @@ struct ViewportData : ViewPort {
 	int32 dest_scrollpos_x;   ///< Current destination x coordinate to display (virtual screen coordinate of topleft corner of the viewport).
 	int32 dest_scrollpos_y;   ///< Current destination y coordinate to display (virtual screen coordinate of topleft corner of the viewport).
 };
+
+struct QueryString;
 
 /**
  * Data structure for an opened window
@@ -296,6 +298,7 @@ public:
 	ViewportData *viewport;          ///< Pointer to viewport data, if present.
 	uint32 desc_flags;               ///< Window/widgets default flags setting. @see WindowDefaultFlag
 	const NWidgetCore *nested_focus; ///< Currently focused nested widget, or \c NULL if no nested widget has focus.
+	SmallMap<int, QueryString*> querystrings; ///< QueryString associated to WWT_EDITBOX widgets.
 	NWidgetBase *nested_root;        ///< Root of the nested tree.
 	NWidgetBase **nested_array;      ///< Array of pointers into the tree. Do not access directly, use #Window::GetWidget() instead.
 	uint nested_array_size;          ///< Size of the nested array.
@@ -315,6 +318,9 @@ public:
 
 	const Scrollbar *GetScrollbar(uint widnum) const;
 	Scrollbar *GetScrollbar(uint widnum);
+
+	const QueryString *GetQueryString(uint widnum) const;
+	QueryString *GetQueryString(uint widnum);
 
 	void InitNested(const WindowDesc *desc, WindowNumber number = 0);
 	void CreateNestedTree(const WindowDesc *desc, bool fill_nested = true);
@@ -457,7 +463,9 @@ public:
 	}
 
 	void UnfocusFocusedWidget();
-	bool SetFocusedWidget(byte widget_index);
+	bool SetFocusedWidget(int widget_index);
+
+	EventState HandleEditBoxKey(int wid, uint16 key, uint16 keycode);
 
 	void HandleButtonClick(byte widget);
 	int GetRowFromWidget(int clickpos, int widget, int padding, int line_height = -1) const;
@@ -664,6 +672,14 @@ public:
 	 * @param index  the element in the dropdown that is selected.
 	 */
 	virtual void OnDropdownSelect(int widget, int index) {}
+
+	virtual void OnDropdownClose(Point pt, int widget, int index, bool instant_close);
+
+	/**
+	 * The text in an editbox has been edited.
+	 * @param widget The widget of the editbox.
+	 */
+	virtual void OnEditboxChanged(int widget) {}
 
 	/**
 	 * The query window opened from this window has closed.

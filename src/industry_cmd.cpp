@@ -540,9 +540,11 @@ static void AnimateTile_Industry(TileIndex tile)
 		if ((_tick_counter & 1) == 0) {
 			byte m = GetAnimationFrame(tile) + 1;
 
-			switch (m & 7) {
-			case 2: SndPlayTileFx(SND_2D_RIP_2, tile); break;
-			case 6: SndPlayTileFx(SND_29_RIP, tile); break;
+			if (_settings_client.sound.ambient) {
+				switch (m & 7) {
+					case 2: SndPlayTileFx(SND_2D_RIP_2, tile); break;
+					case 6: SndPlayTileFx(SND_29_RIP, tile); break;
+				}
 			}
 
 			if (m >= 96) {
@@ -559,7 +561,7 @@ static void AnimateTile_Industry(TileIndex tile)
 		if ((_tick_counter & 3) == 0) {
 			byte m = GetAnimationFrame(tile);
 
-			if (_industry_anim_offs_toffee[m] == 0xFF) {
+			if (_industry_anim_offs_toffee[m] == 0xFF && _settings_client.sound.ambient) {
 				SndPlayTileFx(SND_30_CARTOON_SOUND, tile);
 			}
 
@@ -606,9 +608,9 @@ static void AnimateTile_Industry(TileIndex tile)
 			byte m = GetAnimationFrame(tile) + 1;
 
 			switch (m) {
-				case  1: SndPlayTileFx(SND_2C_MACHINERY, tile); break;
-				case 23: SndPlayTileFx(SND_2B_COMEDY_HIT, tile); break;
-				case 28: SndPlayTileFx(SND_2A_EXTRACT_AND_POP, tile); break;
+				case  1: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2C_MACHINERY, tile); break;
+				case 23: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2B_COMEDY_HIT, tile); break;
+				case 28: if (_settings_client.sound.ambient) SndPlayTileFx(SND_2A_EXTRACT_AND_POP, tile); break;
 				default:
 					if (m >= 50) {
 						int n = GetIndustryAnimationLoop(tile) + 1;
@@ -671,7 +673,7 @@ static void AnimateTile_Industry(TileIndex tile)
 					byte m = GetAnimationFrame(tile);
 					if (!(m & 0x40)) {
 						SetAnimationFrame(tile, m | 0x40);
-						SndPlayTileFx(SND_0B_MINING_MACHINERY, tile);
+						if (_settings_client.sound.ambient) SndPlayTileFx(SND_0B_MINING_MACHINERY, tile);
 					}
 					if (state & 7) return;
 				} else {
@@ -772,7 +774,7 @@ static void TileLoopIndustry_BubbleGenerator(TileIndex tile)
 		{ 49,  59, 60,  65 },
 	};
 
-	SndPlayTileFx(SND_2E_EXTRACT_AND_POP, tile);
+	if (_settings_client.sound.ambient) SndPlayTileFx(SND_2E_EXTRACT_AND_POP, tile);
 
 	int dir = Random() & 3;
 
@@ -860,7 +862,7 @@ static void TileLoop_Industry(TileIndex tile)
 
 	case GFX_POWERPLANT_SPARKS:
 		if (Chance16(1, 3)) {
-			SndPlayTileFx(SND_0C_ELECTRIC_SPARK, tile);
+			if (_settings_client.sound.ambient) SndPlayTileFx(SND_0C_ELECTRIC_SPARK, tile);
 			AddAnimatedTile(tile);
 		}
 		break;
@@ -1061,7 +1063,7 @@ static bool SearchLumberMillTrees(TileIndex tile, void *user_data)
 
 		_industry_sound_ctr = 1;
 		_industry_sound_tile = tile;
-		SndPlayTileFx(SND_38_CHAINSAW, tile);
+		if (_settings_client.sound.ambient) SndPlayTileFx(SND_38_CHAINSAW, tile);
 
 		DoCommand(tile, 0, 0, DC_EXEC, CMD_LANDSCAPE_CLEAR);
 
@@ -1098,7 +1100,7 @@ static void ProduceIndustryGoods(Industry *i)
 	if ((i->counter & 0x3F) == 0) {
 		uint32 r;
 		uint num;
-		if (Chance16R(1, 14, r) && (num = indsp->number_of_sounds) != 0) {
+		if (Chance16R(1, 14, r) && (num = indsp->number_of_sounds) != 0 && _settings_client.sound.ambient) {
 			SndPlayTileFx(
 				(SoundFx)(indsp->random_sounds[((r >> 16) * num) >> 16]),
 				i->location.tile);
@@ -1157,10 +1159,10 @@ void OnTick_Industry()
 		_industry_sound_ctr++;
 
 		if (_industry_sound_ctr == 75) {
-			SndPlayTileFx(SND_37_BALLOON_SQUEAK, _industry_sound_tile);
+			if (_settings_client.sound.ambient) SndPlayTileFx(SND_37_BALLOON_SQUEAK, _industry_sound_tile);
 		} else if (_industry_sound_ctr == 160) {
 			_industry_sound_ctr = 0;
-			SndPlayTileFx(SND_36_CARTOON_CRASH, _industry_sound_tile);
+			if (_settings_client.sound.ambient) SndPlayTileFx(SND_36_CARTOON_CRASH, _industry_sound_tile);
 		}
 	}
 
@@ -1595,7 +1597,7 @@ static void AdvertiseIndustryOpening(const Industry *ind)
 	} else {
 		SetDParam(1, ind->town->index);
 	}
-	AddIndustryNewsItem(ind_spc->new_industry_text, NS_INDUSTRY_OPEN, ind->index);
+	AddIndustryNewsItem(ind_spc->new_industry_text, NT_INDUSTRY_OPEN, ind->index);
 	AI::BroadcastNewEvent(new ScriptEventIndustryOpen(ind->index));
 	Game::NewEvent(new ScriptEventIndustryOpen(ind->index));
 }
@@ -1827,6 +1829,7 @@ static CommandCost CreateNewIndustryHelper(TileIndex tile, IndustryType type, Do
  * @param p1 various bitstuffed elements
  * - p1 = (bit  0 -  7) - industry type see build_industry.h and see industry.h
  * - p1 = (bit  8 - 15) - first layout to try
+ * - p1 = (bit 16     ) - 0 = prospect, 1 = fund (only valid if current company is DEITY)
  * @param p2 seed to use for desyncfree randomisations
  * @param text unused
  * @return the cost of this operation or an error
@@ -1843,11 +1846,11 @@ CommandCost CmdBuildIndustry(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
 
 	/* If the setting for raw-material industries is not on, you cannot build raw-material industries.
 	 * Raw material industries are industries that do not accept cargo (at least for now) */
-	if (_game_mode != GM_EDITOR && _settings_game.construction.raw_industry_construction == 0 && indspec->IsRawIndustry()) {
+	if (_game_mode != GM_EDITOR && _current_company != OWNER_DEITY && _settings_game.construction.raw_industry_construction == 0 && indspec->IsRawIndustry()) {
 		return CMD_ERROR;
 	}
 
-	if (_game_mode != GM_EDITOR && GetIndustryProbabilityCallback(it, IACT_USERCREATION, 1) == 0) {
+	if (_game_mode != GM_EDITOR && GetIndustryProbabilityCallback(it, _current_company == OWNER_DEITY ? IACT_RANDOMCREATION : IACT_USERCREATION, 1) == 0) {
 		return CMD_ERROR;
 	}
 
@@ -1857,16 +1860,17 @@ CommandCost CmdBuildIndustry(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
 	uint32 random_var8f = randomizer.Next();
 	int num_layouts = indspec->num_table;
 	CommandCost ret = CommandCost(STR_ERROR_SITE_UNSUITABLE);
+	const bool deity_prospect = _current_company == OWNER_DEITY && !HasBit(p1, 16);
 
 	Industry *ind = NULL;
-	if (_game_mode != GM_EDITOR && _settings_game.construction.raw_industry_construction == 2 && indspec->IsRawIndustry()) {
+	if (deity_prospect || (_game_mode != GM_EDITOR && _current_company != OWNER_DEITY && _settings_game.construction.raw_industry_construction == 2 && indspec->IsRawIndustry())) {
 		if (flags & DC_EXEC) {
 			/* Prospected industries are build as OWNER_TOWN to not e.g. be build on owned land of the founder */
 			Backup<CompanyByte> cur_company(_current_company, OWNER_TOWN, FILE_LINE);
 			/* Prospecting has a chance to fail, however we cannot guarantee that something can
 			 * be built on the map, so the chance gets lower when the map is fuller, but there
 			 * is nothing we can really do about that. */
-			if (Random() <= indspec->prospecting_chance) {
+			if (deity_prospect || Random() <= indspec->prospecting_chance) {
 				for (int i = 0; i < 5000; i++) {
 					/* We should not have more than one Random() in a function call
 					 * because parameter evaluation order is not guaranteed in the c++ standard
@@ -1877,7 +1881,7 @@ CommandCost CmdBuildIndustry(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
 					/* Check now each layout, starting with the random one */
 					for (int j = 0; j < num_layouts; j++) {
 						layout = (layout + 1) % num_layouts;
-						ret = CreateNewIndustryHelper(tile, it, flags, indspec, layout, random_var8f, random_initial_bits, cur_company.GetOriginalValue(), IACT_PROSPECTCREATION, &ind);
+						ret = CreateNewIndustryHelper(tile, it, flags, indspec, layout, random_var8f, random_initial_bits, cur_company.GetOriginalValue(), _current_company == OWNER_DEITY ? IACT_RANDOMCREATION : IACT_PROSPECTCREATION, &ind);
 						if (ret.Succeeded()) break;
 					}
 					if (ret.Succeeded()) break;
@@ -1892,7 +1896,7 @@ CommandCost CmdBuildIndustry(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
 		/* Check subsequently each layout, starting with the given layout in p1 */
 		for (int i = 0; i < num_layouts; i++) {
 			layout = (layout + 1) % num_layouts;
-			ret = CreateNewIndustryHelper(tile, it, flags, indspec, layout, random_var8f, random_initial_bits, _current_company, IACT_USERCREATION, &ind);
+			ret = CreateNewIndustryHelper(tile, it, flags, indspec, layout, random_var8f, random_initial_bits, _current_company, _current_company == OWNER_DEITY ? IACT_RANDOMCREATION : IACT_USERCREATION, &ind);
 			if (ret.Succeeded()) break;
 		}
 
@@ -2415,12 +2419,12 @@ static int WhoCanServiceIndustry(Industry *ind)
  */
 static void ReportNewsProductionChangeIndustry(Industry *ind, CargoID type, int percent)
 {
-	NewsSubtype ns;
+	NewsType nt;
 
 	switch (WhoCanServiceIndustry(ind)) {
-		case 0: ns = NS_INDUSTRY_NOBODY;  break;
-		case 1: ns = NS_INDUSTRY_OTHER;   break;
-		case 2: ns = NS_INDUSTRY_COMPANY; break;
+		case 0: nt = NT_INDUSTRY_NOBODY;  break;
+		case 1: nt = NT_INDUSTRY_OTHER;   break;
+		case 2: nt = NT_INDUSTRY_COMPANY; break;
 		default: NOT_REACHED();
 	}
 	SetDParam(2, abs(percent));
@@ -2428,7 +2432,7 @@ static void ReportNewsProductionChangeIndustry(Industry *ind, CargoID type, int 
 	SetDParam(1, ind->index);
 	AddIndustryNewsItem(
 		percent >= 0 ? STR_NEWS_INDUSTRY_PRODUCTION_INCREASE_SMOOTH : STR_NEWS_INDUSTRY_PRODUCTION_DECREASE_SMOOTH,
-		ns,
+		nt,
 		ind->index
 	);
 }
@@ -2600,17 +2604,17 @@ static void ChangeIndustryProduction(Industry *i, bool monthly)
 	}
 
 	if (!suppress_message && str != STR_NULL) {
-		NewsSubtype ns;
+		NewsType nt;
 		/* Compute news category */
 		if (closeit) {
-			ns = NS_INDUSTRY_CLOSE;
+			nt = NT_INDUSTRY_CLOSE;
 			AI::BroadcastNewEvent(new ScriptEventIndustryClose(i->index));
 			Game::NewEvent(new ScriptEventIndustryClose(i->index));
 		} else {
 			switch (WhoCanServiceIndustry(i)) {
-				case 0: ns = NS_INDUSTRY_NOBODY;  break;
-				case 1: ns = NS_INDUSTRY_OTHER;   break;
-				case 2: ns = NS_INDUSTRY_COMPANY; break;
+				case 0: nt = NT_INDUSTRY_NOBODY;  break;
+				case 1: nt = NT_INDUSTRY_OTHER;   break;
+				case 2: nt = NT_INDUSTRY_COMPANY; break;
 				default: NOT_REACHED();
 			}
 		}
@@ -2627,10 +2631,11 @@ static void ChangeIndustryProduction(Industry *i, bool monthly)
 			SetDParam(0, i->index);
 		}
 		/* and report the news to the user */
-		AddNewsItem(str,
-			ns,
-			closeit ? NR_TILE : NR_INDUSTRY,
-			closeit ? i->location.tile + TileDiffXY(1, 1) : i->index);
+		if (closeit) {
+			AddTileNewsItem(str, nt, i->location.tile + TileDiffXY(1, 1));
+		} else {
+			AddIndustryNewsItem(str, nt, i->index);
+		}
 	}
 }
 
@@ -2721,8 +2726,17 @@ void InitializeIndustries()
  */
 bool IndustrySpec::IsRawIndustry() const
 {
-	/* Lumber mills are extractive/organic, but can always be built like a non-raw industry */
-	return (this->life_type & (INDUSTRYLIFE_EXTRACTIVE | INDUSTRYLIFE_ORGANIC)) != 0 &&
+	return (this->life_type & (INDUSTRYLIFE_EXTRACTIVE | INDUSTRYLIFE_ORGANIC)) != 0;
+}
+
+/**
+ * Is an industry with the spec a processing industry?
+ * @return true if it should be handled as a processing industry
+ */
+bool IndustrySpec::IsProcessingIndustry() const
+{
+	/* Lumber mills are neither raw nor processing */
+	return (this->life_type & INDUSTRYLIFE_PROCESSING) != 0 &&
 			(this->behaviour & INDUSTRYBEH_CUT_TREES) == 0;
 }
 

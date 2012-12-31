@@ -217,6 +217,7 @@ STR_UNITS_HEIGHT_IMPERIAL                                       :{COMMA} 英呎
 STR_UNITS_HEIGHT_SI                                             :{COMMA} 公尺
 
 # Common window strings
+STR_LIST_FILTER_TITLE                                           :{BLACK}过滤字串:
 STR_LIST_FILTER_OSKTITLE                                        :{BLACK}输入过滤器字符串
 STR_LIST_FILTER_TOOLTIP                                         :{BLACK}输入用以过滤此列表的关键词
 
@@ -347,7 +348,6 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :退出
 
 ############ range for settings menu starts
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :游戏选项
-STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :难度设定
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :高级设置
 STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :AI / 脚本 设定
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :NewGRF 设置
@@ -398,10 +398,12 @@ STR_GRAPH_MENU_CARGO_PAYMENT_RATES                              :货物运费图
 ############ range for company league menu starts
 STR_GRAPH_MENU_COMPANY_LEAGUE_TABLE                             :公司评价排名
 STR_GRAPH_MENU_DETAILED_PERFORMANCE_RATING                      :公司评价明细
+STR_GRAPH_MENU_HIGHSCORE                                        :高分榜
 ############ range ends here
 
 ############ range for industry menu starts
 STR_INDUSTRY_MENU_INDUSTRY_DIRECTORY                            :工业列表
+STR_INDUSTRY_MENU_INDUSTRY_CHAIN                                :产业链
 STR_INDUSTRY_MENU_FUND_NEW_INDUSTRY                             :新建工业设施
 ############ range ends here
 
@@ -437,7 +439,6 @@ STR_TOOLBAR_SOUND_MUSIC                                         :声音/音乐
 
 ############ range for message menu starts
 STR_NEWS_MENU_LAST_MESSAGE_NEWS_REPORT                          :最新消息/新闻
-STR_NEWS_MENU_MESSAGE_SETTINGS                                  :消息选项
 STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :消息历史
 ############ range ends here
 
@@ -638,7 +639,7 @@ STR_PLAYLIST_TOOLTIP_CLICK_TO_ADD_TRACK                         :{BLACK}点击�
 STR_PLAYLIST_TOOLTIP_CLICK_TO_REMOVE_TRACK                      :{BLACK}点击音乐曲目以从当前播放列表中删除{}(仅限自定义1或自定义2)
 
 # Highscore window
-STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED                         :{BIG_FONT}{BLACK}达到 {NUM} 的顶级公司！{}({STRING} 级别)
+STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED                         :{BIG_FONT}{BLACK}达到 {NUM} 的顶级公司！
 STR_HIGHSCORE_TOP_COMPANIES_NETWORK_GAME                        :{BIG_FONT}{BLACK}在{NUM}年，公司表现值排名
 STR_HIGHSCORE_POSITION                                          :{BIG_FONT}{BLACK}{COMMA}.
 STR_HIGHSCORE_PERFORMANCE_TITLE_BUSINESSMAN                     :运输个体户
@@ -726,32 +727,7 @@ STR_MESSAGE_HISTORY                                             :{WHITE}消息�
 STR_MESSAGE_HISTORY_TOOLTIP                                     :{BLACK}最新的新闻列表
 STR_MESSAGE_NEWS_FORMAT                                         :{STRING}  -  {STRING}
 
-# Message settings window
 STR_NEWS_MESSAGE_CAPTION                                        :{WHITE}消息
-STR_NEWS_MESSAGE_OPTIONS_CAPTION                                :{WHITE}消息选项
-STR_NEWS_MESSAGES_ALL                                           :{YELLOW}将所有信息调整为：关闭/摘要/完全
-STR_NEWS_MESSAGES_SOUND                                         :{YELLOW}为摘要的信息播放声音
-STR_NEWS_MESSAGES_OFF                                           :关闭
-STR_NEWS_MESSAGES_SUMMARY                                       :摘要
-STR_NEWS_MESSAGES_FULL                                          :完全
-
-STR_NEWS_MESSAGE_TYPES                                          :{BLACK}消息类型：
-STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OWN              :{YELLOW}玩家车站的剪彩仪式
-STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OTHER            :{YELLOW}对手车站的剪彩仪式
-STR_NEWS_MESSAGE_TYPE_ACCIDENTS_DISASTERS                       :{YELLOW}事故/灾难
-STR_NEWS_MESSAGE_TYPE_COMPANY_INFORMATION                       :{YELLOW}公司信息
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_OPEN                             :{YELLOW}工业开业
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CLOSE                            :{YELLOW}工业倒闭
-STR_NEWS_MESSAGE_TYPE_ECONOMY_CHANGES                           :{YELLOW}经济变化
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_COMPANY        :{YELLOW}自家公司服务的工业产量变化信息
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_OTHER          :{YELLOW}对手公司服务的工业产量变化信息
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_UNSERVED                 :{YELLOW}其它工业产量变化信息
-STR_NEWS_MESSAGE_TYPE_ADVICE_INFORMATION_ON_COMPANY             :{YELLOW}对于企业车辆的建议及信息
-STR_NEWS_MESSAGE_TYPE_NEW_VEHICLES                              :{YELLOW}新车型
-STR_NEWS_MESSAGE_TYPE_CHANGES_OF_CARGO_ACCEPTANCE               :{YELLOW}货物接受情况变更
-STR_NEWS_MESSAGE_TYPE_SUBSIDIES                                 :{YELLOW}财政补贴
-STR_NEWS_MESSAGE_TYPE_GENERAL_INFORMATION                       :{YELLOW}综合信息
-
 STR_NEWS_CUSTOM_ITEM                                            :{BIG_FONT}{BLACK}{STRING}
 
 STR_NEWS_FIRST_TRAIN_ARRIVAL                                    :{BIG_FONT}{BLACK}市民举行庆祝仪式……{}第一列火车抵达 {STATION}！
@@ -851,6 +827,8 @@ STR_NEWS_SERVICE_SUBSIDY_AWARDED_TRIPLE                         :{BIG_FONT}{BLAC
 STR_NEWS_SERVICE_SUBSIDY_AWARDED_QUADRUPLE                      :{BIG_FONT}{BLACK}{STRING} 获得财政补贴！{}{}今后一年中将 {STRING} 从 {STRING} 运送到 {STRING} 将获得四倍的报酬！
 
 STR_NEWS_ROAD_REBUILDING                                        :{BIG_FONT}{BLACK}{TOWN}的交通陷入混乱！{}{}由 {STRING} 资助的市政道路重建导致市内交通瘫痪 6 个月！
+STR_NEWS_EXCLUSIVE_RIGHTS_TITLE                                 :{BIG_FONT}{BLACK}垄断运输!
+STR_NEWS_EXCLUSIVE_RIGHTS_DESCRIPTION                           :{BIG_FONT}{BLACK}{TOWN}一年期的运输专营权已经被{STRING}购买!
 
 # Extra view window
 STR_EXTRA_VIEW_PORT_TITLE                                       :{WHITE}视点 {COMMA}
@@ -893,6 +871,9 @@ STR_GAME_OPTIONS_CURRENCY_TRY                                   :土耳其里拉
 STR_GAME_OPTIONS_CURRENCY_SKK                                   :斯洛伐克克朗 (SKK)
 STR_GAME_OPTIONS_CURRENCY_BRL                                   :巴西里亚伊 (BRL)
 STR_GAME_OPTIONS_CURRENCY_EEK                                   :爱沙尼亚克鲁恩 (EEK)
+STR_GAME_OPTIONS_CURRENCY_LTL                                   :立陶宛立特（LTL）
+STR_GAME_OPTIONS_CURRENCY_KRW                                   :韩元（KRW）
+STR_GAME_OPTIONS_CURRENCY_ZAR                                   :南非兰特（ZAR）
 STR_GAME_OPTIONS_CURRENCY_CUSTOM                                :自定义…
 ############ end of currency region
 
@@ -1001,37 +982,7 @@ STR_CURRENCY_PREVIEW                                            :{LTBLUE}预览�
 STR_CURRENCY_CUSTOM_CURRENCY_PREVIEW_TOOLTIP                    :{BLACK}10000 英磅(£) 兑换自定义货币的数量
 STR_CURRENCY_CHANGE_PARAMETER                                   :{BLACK}改变当前的货币参数
 
-# Difficulty level window
-STR_DIFFICULTY_LEVEL_CAPTION                                    :{WHITE}难度设定
-
-############ range for difficulty levels starts
-STR_DIFFICULTY_LEVEL_EASY                                       :{BLACK}简单
-STR_DIFFICULTY_LEVEL_MEDIUM                                     :{BLACK}中等
-STR_DIFFICULTY_LEVEL_HARD                                       :{BLACK}困难
-STR_DIFFICULTY_LEVEL_CUSTOM                                     :{BLACK}自定义
-############ range for difficulty levels ends
-
-STR_DIFFICULTY_LEVEL_HIGH_SCORE_BUTTON                          :{BLACK}查看高分榜
-STR_DIFFICULTY_LEVEL_SAVE                                       :{BLACK}保存
-
-############ range for difficulty settings starts
 STR_DIFFICULTY_LEVEL_SETTING_MAXIMUM_NO_COMPETITORS             :{LTBLUE}最大竞争对手个数：{ORANGE}{COMMA}
-STR_DIFFICULTY_LEVEL_SETTING_NO_OF_TOWNS                        :{LTBLUE}城镇数量：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_NO_OF_INDUSTRIES                   :{LTBLUE}工业数量：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_MAXIMUM_INITIAL_LOAN_000           :{LTBLUE}初始贷款额度：{ORANGE}{CURRENCY_LONG}
-STR_DIFFICULTY_LEVEL_SETTING_INITIAL_INTEREST_RATE              :{LTBLUE}初始贷款利率：{ORANGE}{COMMA}%
-STR_DIFFICULTY_LEVEL_SETTING_VEHICLE_RUNNING_COSTS              :{LTBLUE}车辆运行费用：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_CONSTRUCTION_SPEED_OF_COMPETITOR   :{LTBLUE}竞争对手建设速度：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_VEHICLE_BREAKDOWNS                 :{LTBLUE}车辆故障：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_SUBSIDY_MULTIPLIER                 :{LTBLUE}财政援助项目倍率：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_COST_OF_CONSTRUCTION               :{LTBLUE}建设费用：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_TERRAIN_TYPE                       :{LTBLUE}地形：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_QUANTITY_OF_SEA_LAKES              :{LTBLUE}海面/湖面面积：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_ECONOMY                            :{LTBLUE}经济：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_TRAIN_REVERSING                    :{LTBLUE}列车调头：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_DISASTERS                          :{LTBLUE}灾难：{ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_CITY_APPROVAL                      :{LTBLUE}市政厅对辖区内建设的态度：{ORANGE}{STRING}
-############ range for difficulty settings ends
 
 STR_NONE                                                        :没有
 STR_FUNDING_ONLY                                                :不生成
@@ -1082,21 +1033,41 @@ STR_TERRAIN_TYPE_FLAT                                           :平整
 STR_TERRAIN_TYPE_HILLY                                          :丘陵
 STR_TERRAIN_TYPE_MOUNTAINOUS                                    :山地
 
-STR_ECONOMY_STEADY                                              :平稳
-STR_ECONOMY_FLUCTUATING                                         :波动
-
-STR_REVERSE_AT_END_OF_LINE_AND_AT_STATIONS                      :轨道尽头和车站
-STR_REVERSE_AT_END_OF_LINE_ONLY                                 :仅在轨道尽头
-
 STR_CITY_APPROVAL_PERMISSIVE                                    :宽容
 STR_CITY_APPROVAL_TOLERANT                                      :隐忍
 STR_CITY_APPROVAL_HOSTILE                                       :对立
 
 STR_WARNING_NO_SUITABLE_AI                                      :{WHITE}无合适的 AI 可用...{}你可以在线下载各种 AI 。
-STR_WARNING_DIFFICULTY_TO_CUSTOM                                :{WHITE}已将游戏难度设置为自定义级别
 
 # Advanced settings window
 STR_CONFIG_SETTING_CAPTION                                      :{WHITE}高级设置
+STR_CONFIG_SETTING_FILTER_TITLE                                 :{BLACK}关键字过滤:
+STR_CONFIG_SETTING_EXPAND_ALL                                   :{BLACK}展开全部
+STR_CONFIG_SETTING_COLLAPSE_ALL                                 :{BLACK}关闭全部
+STR_CONFIG_SETTING_NO_EXPLANATION_AVAILABLE_HELPTEXT            :（没有可用的提示）
+STR_CONFIG_SETTING_DEFAULT_VALUE                                :{LTBLUE}默认值: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TYPE                                         :{LTBLUE}设置类型: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TYPE_CLIENT                                  :当前客户端设置（不保存，影响所有游戏）
+STR_CONFIG_SETTING_TYPE_GAME_MENU                               :当前游戏设置（可保存在存档中，仅对新游戏生效）
+STR_CONFIG_SETTING_TYPE_GAME_INGAME                             :当前游戏设置（可保存在存档中，仅对当前游戏生效）
+STR_CONFIG_SETTING_TYPE_COMPANY_MENU                            :当前公司设置（可保存在存档中，仅对新游戏生效）
+STR_CONFIG_SETTING_TYPE_COMPANY_INGAME                          :当前公司设置（可保存在存档中，仅对现行公司生效）
+
+STR_CONFIG_SETTING_RESTRICT_LABEL                               :{BLACK}显示:
+STR_CONFIG_SETTING_RESTRICT_DROPDOWN_HELPTEXT                   :{BLACK}仅显示修改过的选项
+STR_CONFIG_SETTING_RESTRICT_BASIC                               :基础设置
+STR_CONFIG_SETTING_RESTRICT_ADVANCED                            :高级设置
+STR_CONFIG_SETTING_RESTRICT_ALL                                 :高级设置/全部设置
+STR_CONFIG_SETTING_RESTRICT_CHANGED_AGAINST_DEFAULT             :修改默认值
+STR_CONFIG_SETTING_RESTRICT_CHANGED_AGAINST_NEW                 :设置一个与当前游戏设置不同的值
+
+STR_CONFIG_SETTING_TYPE_DROPDOWN_HELPTEXT                       :{BLACK}限定某一类设置显示在下面列表中
+STR_CONFIG_SETTING_TYPE_DROPDOWN_ALL                            :所有设置
+STR_CONFIG_SETTING_TYPE_DROPDOWN_CLIENT                         :客户端设置（不保存在存档中，影响所有游戏）
+STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_MENU                      :当前游戏设置（可保存在存档中，仅对新游戏生效）
+STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_INGAME                    :当前游戏设置（可保存在存档中，仅对当前游戏生效）
+STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_MENU                   :当前公司设置（可保存在存档中，仅对新游戏生效）
+STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_INGAME                 :当前公司设置（可保存在存档中，仅对当前公司生效）
 
 STR_CONFIG_SETTING_OFF                                          :关闭
 STR_CONFIG_SETTING_ON                                           :打开
@@ -1114,239 +1085,325 @@ STR_CONFIG_SETTING_HORIZONTAL_POS_LEFT                          :左侧
 STR_CONFIG_SETTING_HORIZONTAL_POS_CENTER                        :中央
 STR_CONFIG_SETTING_HORIZONTAL_POS_RIGHT                         :右侧
 
-STR_CONFIG_SETTING_BUILDONSLOPES                                :{LTBLUE}允许在斜坡和河岸上建设：{ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTOSLOPE                                    :{LTBLUE}允许在建筑、轨道等下方改变地形（自动斜坡）： {ORANGE}{STRING}
-STR_CONFIG_SETTING_CATCHMENT                                    :{LTBLUE}允许更真实的客源范围：{ORANGE}{STRING}
-STR_CONFIG_SETTING_EXTRADYNAMITE                                :{LTBLUE}允许拆除更多的由城镇所有的公路、桥梁、隧道等：{ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_LENGTH                                 :{LTBLUE}火车最大长度: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}火车头产生的蒸气/火花数量: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :{LTBLUE}列车加速度： {ORANGE}{STRING}
-STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :{LTBLUE}汽车加速模型: {ORANGE}{STRING}
-STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :{LTBLUE}坡度对列车速度的影响： {ORANGE}{STRING}%
-STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :{LTBLUE}坡度对汽车速度的影响： {ORANGE}{STRING}%
-STR_CONFIG_SETTING_FORBID_90_DEG                                :{LTBLUE}禁止列车和轮船 90 度转弯：{ORANGE}{STRING}
-STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :{LTBLUE}允许非毗邻站台合并：{ORANGE}{STRING}
-STR_CONFIG_SETTING_IMPROVEDLOAD                                 :{LTBLUE}使用进阶的装货算法：{ORANGE}{STRING}
-STR_CONFIG_SETTING_GRADUAL_LOADING                              :{LTBLUE}装货时循序渐进：{ORANGE}{STRING}
-STR_CONFIG_SETTING_INFLATION                                    :{LTBLUE}通货膨胀：{ORANGE}{STRING}
-STR_CONFIG_SETTING_SELECTGOODS                                  :{LTBLUE}仅在车站接受此货物时卸货：{ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_BRIDGE_LENGTH                            :{LTBLUE}桥梁最大长度: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_TUNNEL_LENGTH                            :{LTBLUE}隧道最大长度: {ORANGE}{STRING}
-STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD             :{LTBLUE}原料工业建设方式： {ORANGE}{STRING}
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN                         :最大初始贷款: {STRING}
+STR_CONFIG_SETTING_MAXIMUM_INITIAL_LOAN_HELPTEXT                :公司最大贷款额（不考虑通货膨胀的影响）
+STR_CONFIG_SETTING_INTEREST_RATE                                :贷款利率: {STRING}
+STR_CONFIG_SETTING_INTEREST_RATE_HELPTEXT                       :贷款利率；如果通货膨胀启用，将同时影响通货膨胀率。
+STR_CONFIG_SETTING_RUNNING_COSTS                                :运营费用: {STRING}
+STR_CONFIG_SETTING_RUNNING_COSTS_HELPTEXT                       :设置维护费用、运营费用的难度
+STR_CONFIG_SETTING_CONSTRUCTION_SPEED                           :建设速度: {STRING}
+STR_CONFIG_SETTING_CONSTRUCTION_SPEED_HELPTEXT                  :AI建设频率的上限
+STR_CONFIG_SETTING_VEHICLE_BREAKDOWNS                           :车辆损坏: {STRING}
+STR_CONFIG_SETTING_VEHICLE_BREAKDOWNS_HELPTEXT                  :设置运输工具故障率
+STR_CONFIG_SETTING_SUBSIDY_MULTIPLIER                           :补贴系数: {STRING}
+STR_CONFIG_SETTING_SUBSIDY_MULTIPLIER_HELPTEXT                  :设置线路补贴额度
+STR_CONFIG_SETTING_CONSTRUCTION_COSTS                           :建设费用: {STRING}
+STR_CONFIG_SETTING_CONSTRUCTION_COSTS_HELPTEXT                  :设置建设费用和交易费用难度
+STR_CONFIG_SETTING_RECESSIONS                                   :经济衰退: {STRING}
+STR_CONFIG_SETTING_RECESSIONS_HELPTEXT                          :启用后，经济衰退将每隔几年就出现。在衰退期内，所有产出将大幅下降直至衰退结束。
+STR_CONFIG_SETTING_TRAIN_REVERSING                              :禁止列车在站台调头: {STRING}
+STR_CONFIG_SETTING_TRAIN_REVERSING_HELPTEXT                     :启用后，如果列车有到下一站的捷径，列车将不在非终点站台调头，
+STR_CONFIG_SETTING_DISASTERS                                    :灾难: {STRING}
+STR_CONFIG_SETTING_DISASTERS_HELPTEXT                           :灾难可能引起堵车或者车祸或者建筑损毁。
+STR_CONFIG_SETTING_CITY_APPROVAL                                :地区政府对区域改造的态度: {STRING}
+STR_CONFIG_SETTING_CITY_APPROVAL_HELPTEXT                       :设置相关参数以决定各公司造成的噪音及环境破坏时，各城镇对该公司的评价及未来区域建设的影响。
+
+STR_CONFIG_SETTING_BUILDONSLOPES                                :允许在斜坡和河岸上建设：{STRING}
+STR_CONFIG_SETTING_BUILDONSLOPES_HELPTEXT                       :启用时轨道和站台能够建造在斜坡上，禁止时只能建设与斜坡方向相同的轨道，因而不需要改变地形
+STR_CONFIG_SETTING_AUTOSLOPE                                    :允许在建筑、轨道等下方改变地形（自动斜坡）： {STRING}
+STR_CONFIG_SETTING_CATCHMENT                                    :允许更真实的客源范围：{STRING}
+STR_CONFIG_SETTING_CATCHMENT_HELPTEXT                           :启用时不同类型的车站和机场有不同的客源范围
+STR_CONFIG_SETTING_EXTRADYNAMITE                                :允许拆除更多的由城镇所有的公路、桥梁、隧道等：{STRING}
+STR_CONFIG_SETTING_EXTRADYNAMITE_HELPTEXT                       :启用时更容易拆除城市自有的设施和建筑
+STR_CONFIG_SETTING_TRAIN_LENGTH                                 :火车的最大长度：{STRING}
+STR_CONFIG_SETTING_TRAIN_LENGTH_HELPTEXT                        :设置火车的最大长度
+STR_CONFIG_SETTING_TILE_LENGTH                                  :{COMMA} 格
+STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :火车头产生的蒸气/火花数量: {STRING}
+STR_CONFIG_SETTING_SMOKE_AMOUNT_HELPTEXT                        :设置由火车头产生的蒸汽或者火花数量
+STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL                     :列车加速度： {STRING}
+STR_CONFIG_SETTING_TRAIN_ACCELERATION_MODEL_HELPTEXT            :选择列车加速度模型，选“原版”时斜坡对所有列车影响相同，“真实”时影响因素包括斜坡长度、转弯半径、牵引力等
+STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL              :汽车加速模型: {STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_ACCELERATION_MODEL_HELPTEXT     :选择汽车加速度模型，选“原版”时斜坡对所有汽车影响相同，选“真实”时依赖引擎性能，比如“牵引力”
+STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS                        :斜坡对火车的影响率：{STRING}
+STR_CONFIG_SETTING_TRAIN_SLOPE_STEEPNESS_HELPTEXT               :每一格斜坡对火车速度的影响率，数值越大，火车越难爬上山
+STR_CONFIG_SETTING_PERCENTAGE                                   :{COMMA}%
+STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS                 :斜坡对汽车速度影响率: {STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_SLOPE_STEEPNESS_HELPTEXT        :每一格斜坡对汽车速度的影响率，数值越大，汽车越难爬上山
+STR_CONFIG_SETTING_FORBID_90_DEG                                :禁止列车和轮船 90 度转弯：{STRING}
+STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS                        :允许非毗邻站台合并：{STRING}
+STR_CONFIG_SETTING_DISTANT_JOIN_STATIONS_HELPTEXT               :“打开”时允许为已经存在的车站添加不相邻的站台，建造新的部分时需要按住Ctrl键
+STR_CONFIG_SETTING_IMPROVEDLOAD                                 :使用进阶的装货算法：{STRING}
+STR_CONFIG_SETTING_IMPROVEDLOAD_HELPTEXT                        :“打开”时，多辆车在一个车站依次排队装货，只有当货物足够装满第一列车时才同时为下一列车装货
+STR_CONFIG_SETTING_GRADUAL_LOADING                              :装货时循序渐进：{STRING}
+STR_CONFIG_SETTING_INFLATION                                    :通货膨胀：{STRING}
+STR_CONFIG_SETTING_INFLATION_HELPTEXT                           :“打开”通货膨胀时，支出比收入增长得稍快
+STR_CONFIG_SETTING_SELECTGOODS                                  :仅在车站接受此货物时卸货：{STRING}
+STR_CONFIG_SETTING_SELECTGOODS_HELPTEXT                         :“打开”时只有车站接收此货物时才卸载
+STR_CONFIG_SETTING_MAX_BRIDGE_LENGTH                            :桥梁的最大长度: {STRING}
+STR_CONFIG_SETTING_MAX_BRIDGE_LENGTH_HELPTEXT                   :建设桥梁时允许的最大长度
+STR_CONFIG_SETTING_MAX_TUNNEL_LENGTH                            :隧道最大长度: {STRING}
+STR_CONFIG_SETTING_MAX_TUNNEL_LENGTH_HELPTEXT                   :建设隧道时允许的最大长度
+STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD             :原料工业建设方式： {STRING}
 STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NONE        :不允许
 STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_NORMAL      :同其他工业
 STR_CONFIG_SETTING_RAW_INDUSTRY_CONSTRUCTION_METHOD_PROSPECTING :探矿式
-STR_CONFIG_SETTING_INDUSTRY_PLATFORM                            :{LTBLUE}工业周围生成平整的土地： {ORANGE}{STRING} 格
-STR_CONFIG_SETTING_MULTIPINDTOWN                                :{LTBLUE}允许在一个城镇中建设多个同类工业设施：{ORANGE}{STRING}
-STR_CONFIG_SETTING_SIGNALSIDE                                   :{LTBLUE}在列车前进的方向显示信号灯：{ORANGE}{STRING}
-STR_CONFIG_SETTING_SHOWFINANCES                                 :{LTBLUE}在年终显示财务报表：{ORANGE}{STRING}
-STR_CONFIG_SETTING_NONSTOP_BY_DEFAULT                           :{LTBLUE}新的调度命令默认为“不停车”： {ORANGE}{STRING}
-STR_CONFIG_SETTING_STOP_LOCATION                                :{LTBLUE}新列车调度计划中默认命令为停靠车站月台 {ORANGE}{STRING}{LTBLUE} 位置
+STR_CONFIG_SETTING_MULTIPINDTOWN                                :允许在一个城镇中建设多个同类工业设施：{STRING}
+STR_CONFIG_SETTING_SHOWFINANCES                                 :在年终显示财务报表：{STRING}
+STR_CONFIG_SETTING_NONSTOP_BY_DEFAULT                           :新的调度命令默认为“不停车”： {STRING}
+STR_CONFIG_SETTING_STOP_LOCATION                                :新列车调度计划中默认命令为停靠车站月台 {STRING} 位置
 STR_CONFIG_SETTING_STOP_LOCATION_NEAR_END                       :近端
 STR_CONFIG_SETTING_STOP_LOCATION_MIDDLE                         :中间
 STR_CONFIG_SETTING_STOP_LOCATION_FAR_END                        :远端
-STR_CONFIG_SETTING_ROAD_VEHICLE_QUEUEING                        :{LTBLUE}汽车自动排队 (有量子效应)： {ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTOSCROLL                                   :{LTBLUE}当鼠标移动到屏幕边缘时移动屏幕：{ORANGE}{STRING}
-STR_CONFIG_SETTING_BRIBE                                        :{LTBLUE}允许贿赂地方政府：{ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_EXCLUSIVE                              :{LTBLUE}允许买断经营权： {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_FUND_BUILDINGS                         :{LTBLUE}允许新建房屋: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_FUND_ROAD                              :{LTBLUE}允许使用资助地方道路修整功能: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_GIVE_MONEY                             :{LTBLUE}允许向其他公司转移资金： {ORANGE}{STRING}
-STR_CONFIG_SETTING_FREIGHT_TRAINS                               :{LTBLUE}根据装载货物的数量模拟超重列车：{ORANGE}{STRING}
-STR_CONFIG_SETTING_PLANE_SPEED                                  :{LTBLUE}飞机速度比例： {ORANGE}1 / {STRING}
-STR_CONFIG_SETTING_PLANE_CRASHES                                :{LTBLUE}空难: {ORANGE}{STRING}
+STR_CONFIG_SETTING_ROAD_VEHICLE_QUEUEING                        :汽车自动排队 (有量子效应)： {STRING}
+STR_CONFIG_SETTING_AUTOSCROLL                                   :当鼠标移动到屏幕边缘时移动屏幕：{STRING}
+STR_CONFIG_SETTING_AUTOSCROLL_DISABLED                          :禁用
+STR_CONFIG_SETTING_AUTOSCROLL_MAIN_VIEWPORT_FULLSCREEN          :主视点，仅全屏模式
+STR_CONFIG_SETTING_AUTOSCROLL_MAIN_VIEWPORT                     :主视点
+STR_CONFIG_SETTING_AUTOSCROLL_EVERY_VIEWPORT                    :每个视角
+STR_CONFIG_SETTING_BRIBE                                        :允许贿赂地方政府：{STRING}
+STR_CONFIG_SETTING_ALLOW_EXCLUSIVE                              :允许买断经营权： {STRING}
+STR_CONFIG_SETTING_ALLOW_EXCLUSIVE_HELPTEXT                     :如果一家公司购买了城市独家经营权，其它公司的站台将在一年之内不再产生乘客或者货物。
+STR_CONFIG_SETTING_ALLOW_FUND_BUILDINGS                         :允许新建房屋: {STRING}
+STR_CONFIG_SETTING_ALLOW_FUND_ROAD                              :允许使用资助地方道路修整功能: {STRING}
+STR_CONFIG_SETTING_ALLOW_GIVE_MONEY                             :允许向其他公司转移资金： {STRING}
+STR_CONFIG_SETTING_FREIGHT_TRAINS                               :根据装载货物的数量模拟超重列车：{STRING}
+STR_CONFIG_SETTING_PLANE_CRASHES                                :空难: {STRING}
 STR_CONFIG_SETTING_PLANE_CRASHES_NONE                           :不出现
 STR_CONFIG_SETTING_PLANE_CRASHES_REDUCED                        :较少出现
 STR_CONFIG_SETTING_PLANE_CRASHES_NORMAL                         :正常
-STR_CONFIG_SETTING_STOP_ON_TOWN_ROAD                            :{LTBLUE}允许在城镇所属的道路上建通过式车站： {ORANGE}{STRING}
-STR_CONFIG_SETTING_STOP_ON_COMPETITOR_ROAD                      :{LTBLUE}允许在竞争对手所属的道路上建通过式车站： {ORANGE}{STRING}
-STR_CONFIG_SETTING_ADJACENT_STATIONS                            :{LTBLUE}允许建设临近站台： {ORANGE}{STRING}
-STR_CONFIG_SETTING_DYNAMIC_ENGINES                              :{LTBLUE}允许使用多GRF运输工具： {ORANGE}{STRING}
+STR_CONFIG_SETTING_STOP_ON_TOWN_ROAD                            :允许在城镇所属的道路上建通过式车站： {STRING}
+STR_CONFIG_SETTING_STOP_ON_COMPETITOR_ROAD                      :允许在竞争对手所属的道路上建通过式车站： {STRING}
+STR_CONFIG_SETTING_ADJACENT_STATIONS                            :允许建设临近站台： {STRING}
+STR_CONFIG_SETTING_DYNAMIC_ENGINES                              :允许使用多GRF运输工具： {STRING}
 STR_CONFIG_SETTING_DYNAMIC_ENGINES_EXISTING_VEHICLES            :{WHITE}当有车辆时，不可能更改此设定。
-STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :{LTBLUE}加强版固定资产维护: {ORANGE}{STRING}
+STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :加强版固定资产维护: {STRING}
 
-STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :{LTBLUE}总允许建设小型机场： {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :总允许建设小型机场： {STRING}
 
-STR_CONFIG_SETTING_WARN_LOST_VEHICLE                            :{LTBLUE}当列车无法找到路线时提示: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ORDER_REVIEW                                 :{LTBLUE}检查车辆的调度计划：{ORANGE}{STRING}
+STR_CONFIG_SETTING_WARN_LOST_VEHICLE                            :当列车无法找到路线时提示: {STRING}
+STR_CONFIG_SETTING_ORDER_REVIEW                                 :检查车辆的调度计划：{STRING}
 STR_CONFIG_SETTING_ORDER_REVIEW_OFF                             :不检查
 STR_CONFIG_SETTING_ORDER_REVIEW_EXDEPOT                         :检查 不包括停运的车辆
 STR_CONFIG_SETTING_ORDER_REVIEW_ON                              :检查 所有车辆
-STR_CONFIG_SETTING_WARN_INCOME_LESS                             :{LTBLUE}若线路亏损时发出提示： {ORANGE}{STRING}
-STR_CONFIG_SETTING_NEVER_EXPIRE_VEHICLES                        :{LTBLUE}车辆永不报废：{ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTORENEW_VEHICLE                            :{LTBLUE}当车辆报废时自动更新：{ORANGE}{STRING}
-STR_CONFIG_SETTING_AUTORENEW_MONTHS                             :{LTBLUE}当车辆在报废前(-)/后 {ORANGE}{STRING}{LTBLUE} 个月时自动更新
-STR_CONFIG_SETTING_AUTORENEW_MONEY                              :{LTBLUE}启动自动更新需要的最少现金：{ORANGE}{STRING}
-STR_CONFIG_SETTING_ERRMSG_DURATION                              :{LTBLUE}错误信息显示时间：{ORANGE}{STRING} 秒
-STR_CONFIG_SETTING_HOVER_DELAY                                  :{LTBLUE}鼠标停留时显示工具提示的延迟时间: {ORANGE}{STRING}
-STR_CONFIG_SETTING_HOVER_DELAY_DISABLED                         :{LTBLUE}显示提示： {ORANGE}右击
-STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :{LTBLUE}在城镇名称的标签中同时显示人口：{ORANGE}{STRING}
-STR_CONFIG_SETTING_GRAPH_LINE_THICKNESS                         :{LTBLUE}图表曲线宽度: {ORANGE}{STRING}
+STR_CONFIG_SETTING_WARN_INCOME_LESS                             :若线路亏损时发出提示： {STRING}
+STR_CONFIG_SETTING_NEVER_EXPIRE_VEHICLES                        :车辆永不报废：{STRING}
+STR_CONFIG_SETTING_AUTORENEW_VEHICLE                            :当车辆报废时自动更新：{STRING}
+STR_CONFIG_SETTING_AUTORENEW_MONEY                              :启动自动更新需要的最少现金：{STRING}
+STR_CONFIG_SETTING_POPULATION_IN_LABEL                          :在城镇名称的标签中同时显示人口：{STRING}
+STR_CONFIG_SETTING_GRAPH_LINE_THICKNESS                         :图表曲线宽度: {STRING}
 
-STR_CONFIG_SETTING_LAND_GENERATOR                               :{LTBLUE}生成地形：{ORANGE}{STRING}
+STR_CONFIG_SETTING_LAND_GENERATOR                               :生成地形：{STRING}
 STR_CONFIG_SETTING_LAND_GENERATOR_ORIGINAL                      :原始算法
 STR_CONFIG_SETTING_LAND_GENERATOR_TERRA_GENESIS                 :新算法
-STR_CONFIG_SETTING_OIL_REF_EDGE_DISTANCE                        :{LTBLUE}炼油厂与地图边缘的最大距离 {ORANGE}{STRING} 格
-STR_CONFIG_SETTING_SNOWLINE_HEIGHT                              :{LTBLUE}雪线高度：{ORANGE}{STRING}
-STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN                         :{LTBLUE}地面粗糙度 (仅限 TerraGenesis)：{ORANGE}{STRING}
+STR_CONFIG_SETTING_OIL_REF_EDGE_DISTANCE_HELPTEXT               :炼油厂只能在地图边缘建设或者海岛海岸。
+STR_CONFIG_SETTING_SNOWLINE_HEIGHT                              :雪线高度：{STRING}
+STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN                         :地面粗糙度 (仅限 TerraGenesis)：{STRING}
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_VERY_SMOOTH             :非常光滑
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_SMOOTH                  :光滑
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_ROUGH                   :粗糙
 STR_CONFIG_SETTING_ROUGHNESS_OF_TERRAIN_VERY_ROUGH              :非常粗糙
-STR_CONFIG_SETTING_TREE_PLACER                                  :{LTBLUE}森林算法：{ORANGE}{STRING}
+STR_CONFIG_SETTING_TREE_PLACER                                  :森林算法：{STRING}
 STR_CONFIG_SETTING_TREE_PLACER_NONE                             :没有
 STR_CONFIG_SETTING_TREE_PLACER_ORIGINAL                         :原始的
 STR_CONFIG_SETTING_TREE_PLACER_IMPROVED                         :增强的
-STR_CONFIG_SETTING_HEIGHTMAP_ROTATION                           :{LTBLUE}高度图旋转：{ORANGE}{STRING}
+STR_CONFIG_SETTING_HEIGHTMAP_ROTATION                           :高度图旋转：{STRING}
 STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_COUNTER_CLOCKWISE         :逆时针
 STR_CONFIG_SETTING_HEIGHTMAP_ROTATION_CLOCKWISE                 :顺时针
-STR_CONFIG_SETTING_SE_FLAT_WORLD_HEIGHT                         :{LTBLUE}由水面场景得到的高度：{ORANGE}{STRING}
-STR_CONFIG_SETTING_ENABLE_FREEFORM_EDGES                        :{LTBLUE}允许调整地图边缘的地块地形：{ORANGE}{STRING}
+STR_CONFIG_SETTING_SE_FLAT_WORLD_HEIGHT                         :由水面场景得到的高度：{STRING}
+STR_CONFIG_SETTING_ENABLE_FREEFORM_EDGES                        :允许调整地图边缘的地块地形：{STRING}
+STR_CONFIG_SETTING_ENABLE_FREEFORM_EDGES_HELPTEXT               :禁用后，地图边缘将变成海洋
 STR_CONFIG_SETTING_EDGES_NOT_EMPTY                              :{WHITE}一个或多个北边的地块不是闲置的
 STR_CONFIG_SETTING_EDGES_NOT_WATER                              :{WHITE}一个或多个地图某边的地块不是水域
 
-STR_CONFIG_SETTING_STATION_SPREAD                               :{LTBLUE}站台最大尺寸：{ORANGE}{STRING} 格 {RED}警告：站台过大会影响速度
-STR_CONFIG_SETTING_SERVICEATHELIPAD                             :{LTBLUE}直升机在降落平台自动保养：{ORANGE}{STRING}
-STR_CONFIG_SETTING_LINK_TERRAFORM_TOOLBAR                       :{LTBLUE}将景观美化工具栏与铁路/公路/船只/机场工具栏连接：{ORANGE}{STRING}
-STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR                         :{LTBLUE}缩略地图颜色选择: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SERVICEATHELIPAD                             :直升机在降落平台自动保养：{STRING}
+STR_CONFIG_SETTING_LINK_TERRAFORM_TOOLBAR                       :将景观美化工具栏与铁路/公路/船只/机场工具栏连接：{STRING}
+STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR                         :缩略地图颜色选择: {STRING}
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_GREEN                   :绿色
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_DARK_GREEN              :深绿色
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_VIOLET                  :紫色
-STR_CONFIG_SETTING_REVERSE_SCROLLING                            :{LTBLUE}拖动方向与屏幕移动方向相反：{ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOOTH_SCROLLING                             :{LTBLUE}平滑视角滚动： {ORANGE}{STRING}
-STR_CONFIG_SETTING_MEASURE_TOOLTIP                              :{LTBLUE}建设时显示测量数据：{ORANGE}{STRING}
-STR_CONFIG_SETTING_LIVERIES                                     :{LTBLUE}显示公司特别外观：{ORANGE}{STRING}
+STR_CONFIG_SETTING_REVERSE_SCROLLING                            :拖动方向与屏幕移动方向相反：{STRING}
+STR_CONFIG_SETTING_SMOOTH_SCROLLING                             :平滑视角滚动： {STRING}
+STR_CONFIG_SETTING_MEASURE_TOOLTIP                              :建设时显示测量数据：{STRING}
+STR_CONFIG_SETTING_LIVERIES                                     :显示公司特别外观：{STRING}
 STR_CONFIG_SETTING_LIVERIES_NONE                                :不显示
 STR_CONFIG_SETTING_LIVERIES_OWN                                 :本公司
 STR_CONFIG_SETTING_LIVERIES_ALL                                 :所有公司
-STR_CONFIG_SETTING_PREFER_TEAMCHAT                              :{LTBLUE}使用<ENTER>与团队交谈：{ORANGE}{STRING}
-STR_CONFIG_SETTING_SCROLLWHEEL_SCROLLING                        :{LTBLUE}鼠标滚轮的作用：{ORANGE}{STRING}
+STR_CONFIG_SETTING_PREFER_TEAMCHAT                              :使用<ENTER>与团队交谈：{STRING}
+STR_CONFIG_SETTING_SCROLLWHEEL_SCROLLING                        :鼠标滚轮的作用：{STRING}
 STR_CONFIG_SETTING_SCROLLWHEEL_ZOOM                             :缩放地图
 STR_CONFIG_SETTING_SCROLLWHEEL_SCROLL                           :滚动地图
 STR_CONFIG_SETTING_SCROLLWHEEL_OFF                              :关闭
-STR_CONFIG_SETTING_SCROLLWHEEL_MULTIPLIER                       :{LTBLUE}地图滚动速度：{ORANGE}{STRING}
+STR_CONFIG_SETTING_SCROLLWHEEL_MULTIPLIER                       :地图滚动速度：{STRING}
+STR_CONFIG_SETTING_OSK_ACTIVATION                               :开启屏幕键盘: {STRING}
+STR_CONFIG_SETTING_OSK_ACTIVATION_HELPTEXT                      :当输入文本或编辑框里是否使用屏幕键盘。适用于没有物理键盘的设备。
+STR_CONFIG_SETTING_OSK_ACTIVATION_DISABLED                      :禁止
+STR_CONFIG_SETTING_OSK_ACTIVATION_DOUBLE_CLICK                  :双击
+STR_CONFIG_SETTING_OSK_ACTIVATION_SINGLE_CLICK_FOCUS            :单击(当前焦点)
+STR_CONFIG_SETTING_OSK_ACTIVATION_SINGLE_CLICK                  :单击 (立即)
 
-STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU                          :{LTBLUE}右键模拟： {ORANGE}{STRING}
+STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU                          :右键模拟： {STRING}
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_COMMAND                  :按住Command键 点击
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_CONTROL                  :按住Ctrl键 点击
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_OFF                      :关闭
 
-STR_CONFIG_SETTING_LEFT_MOUSE_BTN_SCROLLING                     :{LTBLUE}左击滚动： {ORANGE}{STRING}
+STR_CONFIG_SETTING_LEFT_MOUSE_BTN_SCROLLING                     :左击滚动： {STRING}
 
-STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES                    :{LTBLUE}使用 {ORANGE}{STRING}{LTBLUE} 形式的文件名存档
+STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES                    :使用 {STRING} 形式的文件名存档
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_LONG               :完整时间 (2008年12月31日)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_SHORT              :英式时间 (31-12-2008)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :简短形式 (2008-12-31)
 
-STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE                       :{LTBLUE}当NewGRF没有指定调色板时，使用: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE                       :当NewGRF没有指定调色板时，使用: {STRING}
 STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_DOS                   :DOS调色板
 STR_CONFIG_SETTING_NEWGRF_DEFAULT_PALETTE_WIN                   :Windows调色板
 
-STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :{LTBLUE}开始新游戏时自动暂停： {ORANGE}{STRING}
-STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL                          :{LTBLUE}暂停时允许: {ORANGE}{STRING}
+STR_CONFIG_SETTING_PAUSE_ON_NEW_GAME                            :开始新游戏时自动暂停： {STRING}
+STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL                          :暂停时允许: {STRING}
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_NO_ACTIONS               :没有操作
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_NON_CONSTRUCTION     :除建设面板外全部操作
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_NON_LANDSCAPING      :除景观面板操作外全部操作
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_ACTIONS              :所有操作
-STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS                       :{LTBLUE}使用高级车辆列表： {ORANGE}{STRING}
-STR_CONFIG_SETTING_LOADING_INDICATORS                           :{LTBLUE}使用装货进度指示： {ORANGE}{STRING}
-STR_CONFIG_SETTING_TIMETABLE_IN_TICKS                           :{LTBLUE}使用时间标记而不是天为单位： {ORANGE}{STRING}
-STR_CONFIG_SETTING_TIMETABLE_SHOW_ARRIVAL_DEPARTURE             :{LTBLUE}在时刻表中显示到达时间和出发时间： {ORANGE}{STRING}
-STR_CONFIG_SETTING_QUICKGOTO                                    :{LTBLUE}快速创建车辆调度计划：{ORANGE}{STRING}
-STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE                            :{LTBLUE}默认铁路类型 (新建/读取游戏后)： {ORANGE}{STRING}
+STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS                       :使用高级车辆列表： {STRING}
+STR_CONFIG_SETTING_LOADING_INDICATORS                           :使用装货进度指示： {STRING}
+STR_CONFIG_SETTING_TIMETABLE_IN_TICKS                           :使用时间标记而不是天为单位： {STRING}
+STR_CONFIG_SETTING_TIMETABLE_SHOW_ARRIVAL_DEPARTURE             :在时刻表中显示到达时间和出发时间： {STRING}
+STR_CONFIG_SETTING_QUICKGOTO                                    :快速创建车辆调度计划：{STRING}
+STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE                            :默认铁路类型 (新建/读取游戏后)： {STRING}
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_FIRST                      :第一个可用的
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_LAST                       :第后一个可用的
 STR_CONFIG_SETTING_DEFAULT_RAIL_TYPE_MOST_USED                  :最常用的
-STR_CONFIG_SETTING_SHOW_TRACK_RESERVATION                       :{LTBLUE}显示预留的轨道： {ORANGE}{STRING}
-STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS                     :{LTBLUE}建造工具使用后仍选中： {ORANGE}{STRING}
-STR_CONFIG_SETTING_EXPENSES_LAYOUT                              :{LTBLUE}企业财政窗口中的组群支出：{ORANGE}{STRING}
+STR_CONFIG_SETTING_SHOW_TRACK_RESERVATION                       :显示预留的轨道： {STRING}
+STR_CONFIG_SETTING_PERSISTENT_BUILDINGTOOLS                     :建造工具使用后仍选中： {STRING}
+STR_CONFIG_SETTING_EXPENSES_LAYOUT                              :企业财政窗口中的组群支出：{STRING}
 
-STR_CONFIG_SETTING_DISABLE_UNSUITABLE_BUILDING                  :{LTBLUE}不显示没有对应车辆的轨道建设面板: {ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_TRAINS                                   :{LTBLUE}每间公司最大火车数量：{ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_ROAD_VEHICLES                            :{LTBLUE}每间公司最大汽车数量：{ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_AIRCRAFT                                 :{LTBLUE}每间公司最大飞机数量：{ORANGE}{STRING}
-STR_CONFIG_SETTING_MAX_SHIPS                                    :{LTBLUE}每间公司最大船只数量：{ORANGE}{STRING}
+STR_CONFIG_SETTING_SOUND_TICKER                                 :产业新闻: {STRING}
+STR_CONFIG_SETTING_SOUND_TICKER_HELPTEXT                        :每月初产业新闻音效
+STR_CONFIG_SETTING_SOUND_NEWS                                   :报纸: {STRING}
+STR_CONFIG_SETTING_SOUND_NEWS_HELPTEXT                          :显示报纸时的音效
+STR_CONFIG_SETTING_SOUND_NEW_YEAR                               :年终: {STRING}
+STR_CONFIG_SETTING_SOUND_NEW_YEAR_HELPTEXT                      :在年末弹出报表时，播放相应音效
+STR_CONFIG_SETTING_SOUND_CONFIRM                                :建设: {STRING}
+STR_CONFIG_SETTING_SOUND_CONFIRM_HELPTEXT                       :播放成功建设或其它动作时的音效
+STR_CONFIG_SETTING_SOUND_CLICK                                  :点击按钮: {STRING}
+STR_CONFIG_SETTING_SOUND_CLICK_HELPTEXT                         :按一下按钮时发出蜂鸣声
+STR_CONFIG_SETTING_SOUND_DISASTER                               :灾难/事故: {STRING}
+STR_CONFIG_SETTING_SOUND_DISASTER_HELPTEXT                      :播放灾难和事故音效
+STR_CONFIG_SETTING_SOUND_VEHICLE                                :交通工具: {STRING}
+STR_CONFIG_SETTING_SOUND_VEHICLE_HELPTEXT                       :播放运输工具音效
+STR_CONFIG_SETTING_SOUND_AMBIENT                                :音效：{STRING}
+STR_CONFIG_SETTING_SOUND_AMBIENT_HELPTEXT                       :播放环境、工业和城镇音效
 
-STR_CONFIG_SETTING_AI_BUILDS_TRAINS                             :{LTBLUE}禁止电脑使用火车：{ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_ROAD_VEHICLES                      :{LTBLUE}禁止电脑使用汽车：{ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_AIRCRAFT                           :{LTBLUE}禁止电脑使用飞机：{ORANGE}{STRING}
-STR_CONFIG_SETTING_AI_BUILDS_SHIPS                              :{LTBLUE}禁止电脑使用船只：{ORANGE}{STRING}
+STR_CONFIG_SETTING_DISABLE_UNSUITABLE_BUILDING                  :不显示没有对应车辆的轨道建设面板: {STRING}
+STR_CONFIG_SETTING_MAX_TRAINS                                   :每间公司最大火车数量：{STRING}
+STR_CONFIG_SETTING_MAX_ROAD_VEHICLES                            :每间公司最大汽车数量：{STRING}
+STR_CONFIG_SETTING_MAX_AIRCRAFT                                 :每间公司最大飞机数量：{STRING}
+STR_CONFIG_SETTING_MAX_SHIPS                                    :每间公司最大船只数量：{STRING}
 
-STR_CONFIG_SETTING_AI_IN_MULTIPLAYER                            :{LTBLUE}联机游戏时允许电脑玩家(AI)： {ORANGE}{STRING}
+STR_CONFIG_SETTING_AI_BUILDS_TRAINS                             :禁止电脑使用火车：{STRING}
+STR_CONFIG_SETTING_AI_BUILDS_ROAD_VEHICLES                      :禁止电脑使用汽车：{STRING}
+STR_CONFIG_SETTING_AI_BUILDS_AIRCRAFT                           :禁止电脑使用飞机：{STRING}
+STR_CONFIG_SETTING_AI_BUILDS_SHIPS                              :禁止电脑使用船只：{STRING}
 
-STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :{LTBLUE}保养周期(百分数)： {ORANGE}{STRING}
-STR_CONFIG_SETTING_SERVINT_TRAINS                               :{LTBLUE}火车的默认保养周期：{ORANGE}{STRING} 天/%
-STR_CONFIG_SETTING_SERVINT_TRAINS_DISABLED                      :{LTBLUE}火车的默认保养周期：{ORANGE}禁用
-STR_CONFIG_SETTING_SERVINT_ROAD_VEHICLES                        :{LTBLUE}汽车的默认保养周期：{ORANGE}{STRING} 天/%
-STR_CONFIG_SETTING_SERVINT_ROAD_VEHICLES_DISABLED               :{LTBLUE}汽车的默认保养周期：{ORANGE}禁用
-STR_CONFIG_SETTING_SERVINT_AIRCRAFT                             :{LTBLUE}飞机的默认保养周期：{ORANGE}{STRING} 天/%
-STR_CONFIG_SETTING_SERVINT_AIRCRAFT_DISABLED                    :{LTBLUE}飞机的默认保养周期：{ORANGE}禁用
-STR_CONFIG_SETTING_SERVINT_SHIPS                                :{LTBLUE}船只的默认保养周期：{ORANGE}{STRING} 天/%
-STR_CONFIG_SETTING_SERVINT_SHIPS_DISABLED                       :{LTBLUE}船只的默认保养周期：{ORANGE}禁用
-STR_CONFIG_SETTING_NOSERVICE                                    :{LTBLUE}在无故障模式下禁用保养周期：{ORANGE}{STRING}
-STR_CONFIG_SETTING_WAGONSPEEDLIMITS                             :{LTBLUE}启动车辆限速：{ORANGE}{STRING}
-STR_CONFIG_SETTING_DISABLE_ELRAILS                              :{LTBLUE}禁用电气化铁路：{ORANGE}{STRING}
+STR_CONFIG_SETTING_AI_PROFILE                                   :默认设置属性: {STRING}
+STR_CONFIG_SETTING_AI_PROFILE_HELPTEXT                          :设置随机添加AI或脚本时的AI初始属性。
+STR_CONFIG_SETTING_AI_PROFILE_EASY                              :简单
+STR_CONFIG_SETTING_AI_PROFILE_MEDIUM                            :中等
+STR_CONFIG_SETTING_AI_PROFILE_HARD                              :困难
 
-STR_CONFIG_SETTING_COLOURED_NEWS_YEAR                           :{LTBLUE}彩色新闻出现在 {ORANGE}{STRING} 年以后
-STR_CONFIG_SETTING_STARTING_YEAR                                :{LTBLUE}开始年份：{ORANGE}{STRING}
-STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :{LTBLUE}启用平滑经济模式 (更多小的经济变化)：{ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_SHARES                                 :{LTBLUE}允许购买其他公司的股份：{ORANGE}{STRING}
-STR_CONFIG_SETTING_FEEDER_PAYMENT_SHARE                         :{LTBLUE}联运各运输方式的收入比例 (避免出现亏损): {ORANGE}{STRING}%
-STR_CONFIG_SETTING_DRAG_SIGNALS_DENSITY                         :{LTBLUE}当拖动的时候每 {ORANGE}{STRING} 个地块放置一个信号灯
-STR_CONFIG_SETTING_SEMAPHORE_BUILD_BEFORE_DATE                  :{LTBLUE}在 {ORANGE}{STRING} 年前自动设置悬臂信号
-STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :{LTBLUE}使用信号GUI： {ORANGE}{STRING}
-STR_CONFIG_SETTING_DEFAULT_SIGNAL_TYPE                          :{LTBLUE}默认建造的信号灯类型： {ORANGE}{STRING}
+STR_CONFIG_SETTING_AI_IN_MULTIPLAYER                            :联机游戏时允许电脑玩家(AI)： {STRING}
+
+STR_CONFIG_SETTING_SERVINT_ISPERCENT                            :保养周期(百分数)： {STRING}
+STR_CONFIG_SETTING_NOSERVICE                                    :在无故障模式下禁用保养周期：{STRING}
+STR_CONFIG_SETTING_WAGONSPEEDLIMITS                             :启动车辆限速：{STRING}
+STR_CONFIG_SETTING_DISABLE_ELRAILS                              :禁用电气化铁路：{STRING}
+
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OWN               :玩家车站的剪彩仪式: {STRING}
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OWN_HELPTEXT      :报纸报道运输工具到达新玩家的站台情况
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OTHER             :对手车站的剪彩仪式: {STRING}
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OTHER_HELPTEXT    :报纸报道竞争对手运输工具新到一个站台的情况
+STR_CONFIG_SETTING_NEWS_ACCIDENTS_DISASTERS                     :事故/灾难: {STRING}
+STR_CONFIG_SETTING_NEWS_ACCIDENTS_DISASTERS_HELPTEXT            :报纸报道事故或灾难发生情况
+STR_CONFIG_SETTING_NEWS_COMPANY_INFORMATION                     :公司信息: {STRING}
+STR_CONFIG_SETTING_NEWS_COMPANY_INFORMATION_HELPTEXT            :报纸报道新公司开业或者预警倒闭风险
+STR_CONFIG_SETTING_NEWS_INDUSTRY_OPEN                           :工业开业: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_OPEN_HELPTEXT                  :报纸报道产业投产
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CLOSE                          :工业倒闭: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CLOSE_HELPTEXT                 :报纸报道产业倒闭
+STR_CONFIG_SETTING_NEWS_ECONOMY_CHANGES                         :经济变化: {STRING}
+STR_CONFIG_SETTING_NEWS_ECONOMY_CHANGES_HELPTEXT                :报纸报道全球经济变化情况
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_COMPANY                :自家公司服务的工业产量变化信息: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_COMPANY_HELPTEXT       :报纸报道玩家产业的产量变化情况
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_OTHER                  :对手公司服务的工业产量变化信息: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_OTHER_HELPTEXT         :报纸报道竞争对手的产业产量变化情况
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_UNSERVED               :其它工业产量变化信息: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_UNSERVED_HELPTEXT      :报纸报道非玩家或竞争对手的工业产量变化
+STR_CONFIG_SETTING_NEWS_ADVICE                                  :对于企业车辆的建议及信息: {STRING}
+STR_CONFIG_SETTING_NEWS_ADVICE_HELPTEXT                         :显示运输工具需要关注的消息
+STR_CONFIG_SETTING_NEWS_NEW_VEHICLES                            :新车型: {STRING}
+STR_CONFIG_SETTING_NEWS_NEW_VEHICLES_HELPTEXT                   :显示新运输工具上市的消息
+STR_CONFIG_SETTING_NEWS_CHANGES_ACCEPTANCE                      :货物接受情况变更: {STRING}
+STR_CONFIG_SETTING_NEWS_CHANGES_ACCEPTANCE_HELPTEXT             :显示站台接受货物种类变更的消息
+STR_CONFIG_SETTING_NEWS_SUBSIDIES                               :财政补贴: {STRING}
+STR_CONFIG_SETTING_NEWS_GENERAL_INFORMATION                     :综合信息: {STRING}
+STR_CONFIG_SETTING_NEWS_GENERAL_INFORMATION_HELPTEXT            :显示普通事件新闻，例如购买运输专营权或市场道路整修。
+
+STR_CONFIG_SETTING_NEWS_MESSAGES_OFF                            :关闭
+STR_CONFIG_SETTING_NEWS_MESSAGES_SUMMARY                        :摘要
+STR_CONFIG_SETTING_NEWS_MESSAGES_FULL                           :完全
+
+STR_CONFIG_SETTING_COLOURED_NEWS_YEAR                           :彩色新闻出现在 {STRING} 年以后
+STR_CONFIG_SETTING_STARTING_YEAR                                :开始年份：{STRING}
+STR_CONFIG_SETTING_SMOOTH_ECONOMY                               :启用平滑经济模式 (更多小的经济变化)：{STRING}
+STR_CONFIG_SETTING_ALLOW_SHARES                                 :允许购买其他公司的股份：{STRING}
+STR_CONFIG_SETTING_SEMAPHORE_BUILD_BEFORE_DATE                  :在 {STRING} 年前自动设置悬臂信号
+STR_CONFIG_SETTING_ENABLE_SIGNAL_GUI                            :使用信号GUI： {STRING}
+STR_CONFIG_SETTING_DEFAULT_SIGNAL_TYPE                          :默认建造的信号灯类型： {STRING}
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_NORMAL                        :普通
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_PBS                           :高级
 STR_CONFIG_SETTING_DEFAULT_SIGNAL_PBSOWAY                       :高级单向
-STR_CONFIG_SETTING_CYCLE_SIGNAL_TYPES                           :{LTBLUE}在以下信号类型中循环： {ORANGE}{STRING}
+STR_CONFIG_SETTING_CYCLE_SIGNAL_TYPES                           :在以下信号类型中循环： {STRING}
 STR_CONFIG_SETTING_CYCLE_SIGNAL_NORMAL                          :仅有普通
 STR_CONFIG_SETTING_CYCLE_SIGNAL_PBS                             :仅有高级
 STR_CONFIG_SETTING_CYCLE_SIGNAL_ALL                             :全部
 
-STR_CONFIG_SETTING_TOWN_LAYOUT                                  :{LTBLUE}新建城镇道路自动延伸： {ORANGE}{STRING}
+STR_CONFIG_SETTING_TOWN_LAYOUT                                  :新建城镇道路自动延伸： {STRING}
 STR_CONFIG_SETTING_TOWN_LAYOUT_DEFAULT                          :默认
 STR_CONFIG_SETTING_TOWN_LAYOUT_BETTER_ROADS                     :改良道路
 STR_CONFIG_SETTING_TOWN_LAYOUT_2X2_GRID                         :2x2格
 STR_CONFIG_SETTING_TOWN_LAYOUT_3X3_GRID                         :3x3格
 STR_CONFIG_SETTING_TOWN_LAYOUT_RANDOM                           :随机
-STR_CONFIG_SETTING_ALLOW_TOWN_ROADS                             :{LTBLUE}允许城镇建设道路： {ORANGE}{STRING}
-STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :{LTBLUE}允许城镇建设平交道: {ORANGE}{STRING}
-STR_CONFIG_SETTING_NOISE_LEVEL                                  :{LTBLUE}允许城镇控制机场噪音： {ORANGE}{STRING}
-STR_CONFIG_SETTING_TOWN_FOUNDING                                :{LTBLUE}在游戏中建立城镇： {ORANGE}{STRING}
+STR_CONFIG_SETTING_ALLOW_TOWN_ROADS                             :允许城镇建设道路： {STRING}
+STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :允许城镇建设平交道: {STRING}
+STR_CONFIG_SETTING_NOISE_LEVEL                                  :允许城镇控制机场噪音： {STRING}
+STR_CONFIG_SETTING_TOWN_FOUNDING                                :在游戏中建立城镇： {STRING}
 STR_CONFIG_SETTING_TOWN_FOUNDING_FORBIDDEN                      :禁止
 STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED                        :允许
 STR_CONFIG_SETTING_TOWN_FOUNDING_ALLOWED_CUSTOM_LAYOUT          :允许，自定义城镇布局
 
-STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT                         :{LTBLUE}树木自动生长： {ORANGE}{STRING}
+STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT                         :树木自动生长： {STRING}
 STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_NONE                    :无 {RED}(损坏伐木场)
 STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_RAINFOREST              :仅在雨林中
 STR_CONFIG_SETTING_EXTRA_TREE_PLACEMENT_ALL                     :任意地点
 
-STR_CONFIG_SETTING_TOOLBAR_POS                                  :{LTBLUE}主工具栏位置：{ORANGE}{STRING}
-STR_CONFIG_SETTING_STATUSBAR_POS                                :{LTBLUE}状态栏位置: {ORANGE}{STRING}
-STR_CONFIG_SETTING_SNAP_RADIUS                                  :{LTBLUE}窗口依附半径：{ORANGE}{STRING} 像素
-STR_CONFIG_SETTING_SNAP_RADIUS_DISABLED                         :{LTBLUE}窗口依附半径：{ORANGE}禁用
-STR_CONFIG_SETTING_SOFT_LIMIT                                   :{LTBLUE}窗口软性限制（非粘滞）： {ORANGE}{STRING}
-STR_CONFIG_SETTING_SOFT_LIMIT_DISABLED                          :{LTBLUE}窗口软性限制（非粘滞）： {ORANGE}禁止
-STR_CONFIG_SETTING_ZOOM_MIN                                     :{LTBLUE}最大放大倍数: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ZOOM_MAX                                     :{LTBLUE}最大视角缩小倍数: {ORANGE}{STRING}
+STR_CONFIG_SETTING_TOOLBAR_POS                                  :主工具栏位置：{STRING}
+STR_CONFIG_SETTING_STATUSBAR_POS                                :状态栏位置: {STRING}
+STR_CONFIG_SETTING_SOFT_LIMIT                                   :窗口软性限制（非粘滞）： {STRING}
+STR_CONFIG_SETTING_ZOOM_MIN                                     :最大放大倍数: {STRING}
+STR_CONFIG_SETTING_ZOOM_MAX                                     :最大视角缩小倍数: {STRING}
 STR_CONFIG_SETTING_ZOOM_LVL_MIN                                 :4倍
 STR_CONFIG_SETTING_ZOOM_LVL_IN_2X                               :2倍
 STR_CONFIG_SETTING_ZOOM_LVL_NORMAL                              :普通
 STR_CONFIG_SETTING_ZOOM_LVL_OUT_2X                              :2倍
 STR_CONFIG_SETTING_ZOOM_LVL_OUT_4X                              :4倍
 STR_CONFIG_SETTING_ZOOM_LVL_OUT_8X                              :8倍
-STR_CONFIG_SETTING_TOWN_GROWTH                                  :{LTBLUE}城镇发展速度：{ORANGE}{STRING}
+STR_CONFIG_SETTING_TOWN_GROWTH                                  :城镇发展速度：{STRING}
 STR_CONFIG_SETTING_TOWN_GROWTH_NONE                             :无
 STR_CONFIG_SETTING_TOWN_GROWTH_SLOW                             :慢
 STR_CONFIG_SETTING_TOWN_GROWTH_NORMAL                           :正常
 STR_CONFIG_SETTING_TOWN_GROWTH_FAST                             :快
 STR_CONFIG_SETTING_TOWN_GROWTH_VERY_FAST                        :非常快
-STR_CONFIG_SETTING_LARGER_TOWNS                                 :{LTBLUE}城镇发展为城市的比例：{ORANGE}1 / {STRING}
-STR_CONFIG_SETTING_LARGER_TOWNS_DISABLED                        :{LTBLUE}城镇发展为城市的比例：{ORANGE}无
-STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :{LTBLUE}初始城市规模因子：{ORANGE}{STRING}
-STR_CONFIG_SETTING_MODIFIED_ROAD_REBUILD                        :{LTBLUE}在道路建设过程中移除荒废的道路元素：{ORANGE}{STRING}
+STR_CONFIG_SETTING_CITY_SIZE_MULTIPLIER                         :初始城市规模因子：{STRING}
+STR_CONFIG_SETTING_MODIFIED_ROAD_REBUILD                        :在道路建设过程中移除荒废的道路元素：{STRING}
 
 STR_CONFIG_SETTING_GUI                                          :{ORANGE}界面
 STR_CONFIG_SETTING_CONSTRUCTION                                 :{ORANGE}建设
@@ -1356,6 +1413,8 @@ STR_CONFIG_SETTING_ECONOMY                                      :{ORANGE}经济
 STR_CONFIG_SETTING_AI                                           :{ORANGE}竞争
 STR_CONFIG_SETTING_DISPLAY_OPTIONS                              :{ORANGE}显示选项
 STR_CONFIG_SETTING_INTERACTION                                  :{ORANGE}互动
+STR_CONFIG_SETTING_SOUND                                        :{ORANGE}音响效果
+STR_CONFIG_SETTING_NEWS                                         :{ORANGE}新闻和消息
 STR_CONFIG_SETTING_CONSTRUCTION_SIGNALS                         :{ORANGE}信号灯
 STR_CONFIG_SETTING_STATIONS_CARGOHANDLING                       :{ORANGE}货物处理
 STR_CONFIG_SETTING_AI_NPC                                       :{ORANGE}电脑玩家
@@ -1365,16 +1424,15 @@ STR_CONFIG_SETTING_VEHICLES_ROUTING                             :{ORANGE}经由
 STR_CONFIG_SETTING_VEHICLES_TRAINS                              :{ORANGE}列车
 STR_CONFIG_SETTING_ECONOMY_TOWNS                                :{ORANGE}城镇
 STR_CONFIG_SETTING_ECONOMY_INDUSTRIES                           :{ORANGE}工业设施
-STR_CONFIG_SETTING_ECONOMY_SCRIPTS                              :{ORANGE}脚本
 
 STR_CONFIG_SETTING_PATHFINDER_OPF                               :原始的
 STR_CONFIG_SETTING_PATHFINDER_NPF                               :NPF
 STR_CONFIG_SETTING_PATHFINDER_YAPF_RECOMMENDED                  :YAPF {BLUE}(推荐)
 
-STR_CONFIG_SETTING_PATHFINDER_FOR_TRAINS                        :{LTBLUE}火车寻路： {ORANGE}{STRING}
-STR_CONFIG_SETTING_PATHFINDER_FOR_ROAD_VEHICLES                 :{LTBLUE}汽车寻路： {ORANGE}{STRING}
-STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS                         :{LTBLUE}船只寻路： {ORANGE}{STRING}
-STR_CONFIG_SETTING_REVERSE_AT_SIGNALS                           :{LTBLUE}遇到红灯时自动掉头 {ORANGE}{STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_TRAINS                        :火车寻路： {STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_ROAD_VEHICLES                 :汽车寻路： {STRING}
+STR_CONFIG_SETTING_PATHFINDER_FOR_SHIPS                         :船只寻路： {STRING}
+STR_CONFIG_SETTING_REVERSE_AT_SIGNALS                           :遇到红灯时自动掉头 {STRING}
 
 STR_CONFIG_SETTING_QUERY_CAPTION                                :{WHITE}改变设置值
 
@@ -1391,6 +1449,9 @@ STR_CONFIG_ERROR_INVALID_GRF_INCOMPATIBLE                       :与当前版本
 STR_CONFIG_ERROR_INVALID_GRF_UNKNOWN                            :未知
 STR_CONFIG_ERROR_INVALID_SAVEGAME_COMPRESSION_LEVEL             :{WHITE}... 压缩等级 '{STRING}' 无效
 STR_CONFIG_ERROR_INVALID_SAVEGAME_COMPRESSION_ALGORITHM         :{WHITE}...存档格式 '{STRING}' 不适用. 请转换成 '{STRING}'
+STR_CONFIG_ERROR_INVALID_BASE_GRAPHICS_NOT_FOUND                :{WHITE}... 禁用基础图形设置 '{STRING}': 未找到
+STR_CONFIG_ERROR_INVALID_BASE_SOUNDS_NOT_FOUND                  :{WHITE}... 禁用基础意义设置 '{STRING}': 未找到
+STR_CONFIG_ERROR_INVALID_BASE_MUSIC_NOT_FOUND                   :{WHITE}... 禁用基础音乐设置 '{STRING}': 未找到
 
 # Intro window
 STR_INTRO_CAPTION                                               :{WHITE}OpenTTD {REV}
@@ -1403,7 +1464,7 @@ STR_INTRO_SCENARIO_EDITOR                                       :{BLACK}场景�
 STR_INTRO_MULTIPLAYER                                           :{BLACK}联机游戏
 
 STR_INTRO_GAME_OPTIONS                                          :{BLACK}游戏选项
-STR_INTRO_DIFFICULTY                                            :{BLACK}难度 ({STRING})
+STR_INTRO_HIGHSCORE                                             :{BLACK}高分榜
 STR_INTRO_ADVANCED_SETTINGS                                     :{BLACK}高级设置
 STR_INTRO_NEWGRF_SETTINGS                                       :{BLACK}NewGRF 设置
 STR_INTRO_ONLINE_CONTENT                                        :{BLACK}在线查找扩展包
@@ -1423,7 +1484,7 @@ STR_INTRO_TOOLTIP_SUB_TROPICAL_LANDSCAPE                        :{BLACK}选择 '
 STR_INTRO_TOOLTIP_TOYLAND_LANDSCAPE                             :{BLACK}选择 '玩具' 景观风格
 
 STR_INTRO_TOOLTIP_GAME_OPTIONS                                  :{BLACK}显示游戏选项
-STR_INTRO_TOOLTIP_DIFFICULTY_OPTIONS                            :{BLACK}显示难度选项
+STR_INTRO_TOOLTIP_HIGHSCORE                                     :{BLACK}显示高分榜
 STR_INTRO_TOOLTIP_ADVANCED_SETTINGS                             :{BLACK}显示高级设置
 STR_INTRO_TOOLTIP_NEWGRF_SETTINGS                               :{BLACK}显示GRF设定
 STR_INTRO_TOOLTIP_ONLINE_CONTENT                                :{BLACK}连接服务器并查找扩展包
@@ -2212,6 +2273,10 @@ STR_INDUSTRY_DISPLAY_CHAIN                                      :{BLACK}显示�
 STR_INDUSTRY_DISPLAY_CHAIN_TOOLTIP                              :{BLACK}显示货物的上下游工业
 STR_INDUSTRY_CARGOES_NOTIFY_SMALLMAP                            :{BLACK}在缩略地图显示
 STR_INDUSTRY_CARGOES_NOTIFY_SMALLMAP_TOOLTIP                    :{BLACK}将该产业链的工业显示在缩略地图中
+STR_INDUSTRY_CARGOES_SELECT_CARGO                               :{BLACK}选择货物
+STR_INDUSTRY_CARGOES_SELECT_CARGO_TOOLTIP                       :{BLACK}选择需要显示的货物
+STR_INDUSTRY_CARGOES_SELECT_INDUSTRY                            :{BLACK}选择工业
+STR_INDUSTRY_CARGOES_SELECT_INDUSTRY_TOOLTIP                    :{BLACK}选择需要显示的工业
 
 # Land area window
 STR_LAND_AREA_INFORMATION_CAPTION                               :{WHITE}地块信息
@@ -2535,6 +2600,7 @@ STR_NEWGRF_ERROR_INVALID_ID                                     :尝试使用非
 STR_NEWGRF_ERROR_CORRUPT_SPRITE                                 :{YELLOW}{STRING} 含有损坏的图形元素{}所有损坏的图形元素{}将显示为红色的问号（？）
 STR_NEWGRF_ERROR_MULTIPLE_ACTION_8                              :具有多个Action 8 (sprite {3:NUM})
 STR_NEWGRF_ERROR_MISSING_SPRITES                                :{WHITE}当前基础图组缺失参数.{}请进行修正
+STR_NEWGRF_ERROR_MISSING_SPRITES_UNSTABLE                       :{WHITE}当前使用的基础图形包参数有误。{}请更新基础图形包。{}如果你正在使用 {YELLOW}OPENTTD的开发测试版{WHITE}，你需要 {YELLOW}相应配套的基础图形包。{WHITE}
 STR_NEWGRF_ERROR_GRM_FAILED                                     :GRF源文件不可访问 (sprite {3:NUM})
 STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} 被 {STRING} 禁用
 STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :错误/未知的sprite输出格式 (sprite {3:NUM})
@@ -2584,9 +2650,7 @@ STR_NEWGRF_SCAN_ARCHIVES                                        :正在扫描压
 # Sign list window
 STR_SIGN_LIST_CAPTION                                           :{WHITE}标志列表 - {COMMA} 个标志
 STR_SIGN_LIST_MATCH_CASE                                        :{BLACK}符合大小写
-STR_SIGN_LIST_CLEAR                                             :{BLACK}消除过滤条件
 STR_SIGN_LIST_MATCH_CASE_TOOLTIP                                :{BLACK}显示大小写符合过滤字符串的标志列表
-STR_SIGN_LIST_CLEAR_TOOLTIP                                     :{BLACK}清除过滤字符串
 
 # Sign window
 STR_EDIT_SIGN_CAPTION                                           :{WHITE}标记标志文字
@@ -2719,6 +2783,7 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 STR_STATION_VIEW_ACCEPTS_BUTTON                                 :{BLACK}接受
 STR_STATION_VIEW_ACCEPTS_TOOLTIP                                :{BLACK}显示接受的货物列表
 STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}接受：{WHITE}{CARGO_LIST}
+
 
 STR_STATION_VIEW_RATINGS_BUTTON                                 :{BLACK}评价
 STR_STATION_VIEW_RATINGS_TOOLTIP                                :{BLACK}显示车站评价
@@ -3258,8 +3323,10 @@ STR_VEHICLE_DETAILS_TRAIN_ARTICULATED_RV_CAPACITY               :{BLACK}运力�
 # Vehicle refit
 STR_REFIT_CAPTION                                               :{WHITE}{VEHICLE} (改装)
 STR_REFIT_TITLE                                                 :{GOLD}选择要运输的货物类型：
-STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}新的装载能力：{GOLD}{CARGO_LONG}{}{BLACK}改装费用：{GOLD}{CURRENCY_LONG}
-STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT                   :{BLACK}新的运载类型： {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK}改装所需： {GOLD}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}新的装载能力：{GOLD}{CARGO_LONG}{}{BLACK}改装费用：{RED}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_INCOME_FROM_REFIT                        :{BLACK}新装载量: {GOLD}{CARGO_LONG}{}{BLACK}改装后收入: {GREEN}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT                   :{BLACK}新的运载类型： {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK}改装所需： {RED}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_INCOME_FROM_AIRCRAFT_REFIT               :{BLACK}新装载量: {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK}改装后收入: {GREEN}{CURRENCY_LONG}
 STR_REFIT_SELECT_VEHICLES_TOOLTIP                               :{BLACK}请选择要改装的车辆. 拖动鼠标可多选.点击空白区域选择整辆列车. Ctrl+左键 选定该车厢及其之后车厢。
 
 STR_REFIT_TRAIN_LIST_TOOLTIP                                    :{BLACK}选择希望列车装载的货物类型
@@ -3551,9 +3618,9 @@ STR_AI_LIST_CAPTION_AI                                          :AI
 STR_AI_LIST_CAPTION_GAMESCRIPT                                  :游戏脚本
 STR_AI_LIST_TOOLTIP                                             :{BLACK}点击选择 AI
 
-STR_AI_LIST_AUTHOR                                              :{BLACK}作者: {STRING}
-STR_AI_LIST_VERSION                                             :{BLACK}版本: {NUM}
-STR_AI_LIST_URL                                                 :{BLACK}URL： {STRING}
+STR_AI_LIST_AUTHOR                                              :{LTBLUE}作者: {ORANGE}{STRING}
+STR_AI_LIST_VERSION                                             :{LTBLUE}版本: {ORANGE}{NUM}
+STR_AI_LIST_URL                                                 :{LTBLUE}URL: {ORANGE}{STRING}
 
 STR_AI_LIST_ACCEPT                                              :{BLACK}接受
 STR_AI_LIST_ACCEPT_TOOLTIP                                      :{BLACK}选择高亮的 AI
@@ -3586,6 +3653,8 @@ STR_PERCENT_DOWN_SMALL                                          :{TINY_FONT}{WHI
 STR_PERCENT_DOWN                                                :{WHITE}{NUM}%{DOWN_ARROW}
 STR_PERCENT_UP_DOWN_SMALL                                       :{TINY_FONT}{WHITE}{NUM}%{UP_ARROW}{DOWN_ARROW}
 STR_PERCENT_UP_DOWN                                             :{WHITE}{NUM}%{UP_ARROW}{DOWN_ARROW}
+STR_PERCENT_NONE_SMALL                                          :{TINY_FONT}{WHITE}{NUM}%
+STR_PERCENT_NONE                                                :{WHITE}{NUM}%
 
 # Income 'floats'
 STR_INCOME_FLOAT_COST_SMALL                                     :{TINY_FONT}{RED}支出：{CURRENCY_LONG}
@@ -3634,6 +3703,9 @@ STR_WARNING_HEIGHTMAP_SCALE_MESSAGE                             :{YELLOW}不推�
 STR_WARNING_FALLBACK_SOUNDSET                                   :{WHITE}只找到一个备用音效库；若您需要正式版音效，请通过在线扩展包下载安装音效库
 
 # Screenshot related messages
+STR_WARNING_SCREENSHOT_SIZE_CAPTION                             :{WHITE}超大截图
+STR_WARNING_SCREENSHOT_SIZE_MESSAGE                             :{YELLOW}屏幕截图需要 {COMMA} x {COMMA} 像素。 截图将需要一段时间。确认继续截图？
+
 STR_MESSAGE_SCREENSHOT_SUCCESSFULLY                             :{WHITE}屏幕截图已经被成功保存为{} '{STRING}'
 STR_ERROR_SCREENSHOT_FAILED                                     :{WHITE}屏幕截图失败！
 
@@ -4459,6 +4531,8 @@ STR_ORANGE_STRING                                               :{ORANGE}{STRING
 STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
+STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}
+STR_ORANGE_STRING1_LTBLUE                                       :{ORANGE}{STRING}{LTBLUE}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}
 STR_TINY_RIGHT_ARROW                                            :{TINY_FONT}{RIGHT_ARROW}

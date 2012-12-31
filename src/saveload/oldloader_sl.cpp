@@ -445,7 +445,8 @@ static bool FixTTOEngines()
 			e->info.climates = 1;
 		}
 
-		e->preview_company_rank = 0;
+		e->preview_company = INVALID_COMPANY;
+		e->preview_asked = (CompanyMask)-1;
 		e->preview_wait = 0;
 		e->name = NULL;
 	}
@@ -687,7 +688,7 @@ static uint8  _cargo_days;
 
 static const OldChunks goods_chunk[] = {
 	OCL_VAR ( OC_UINT16, 1,          &_waiting_acceptance ),
-	OCL_SVAR(  OC_UINT8, GoodsEntry, days_since_pickup ),
+	OCL_SVAR(  OC_UINT8, GoodsEntry, time_since_pickup ),
 	OCL_SVAR(  OC_UINT8, GoodsEntry, rating ),
 	OCL_VAR (  OC_UINT8, 1,          &_cargo_source ),
 	OCL_VAR (  OC_UINT8, 1,          &_cargo_days ),
@@ -926,7 +927,7 @@ static const OldChunks _company_chunk[] = {
 
 	OCL_SVAR(  OC_UINT8, Company, colour ),
 	OCL_SVAR(  OC_UINT8, Company, money_fraction ),
-	OCL_SVAR(  OC_UINT8, Company, quarters_of_bankruptcy ),
+	OCL_SVAR(  OC_UINT8, Company, months_of_bankruptcy ),
 	OCL_SVAR( OC_FILE_U8  | OC_VAR_U16, Company, bankrupt_asked ),
 	OCL_SVAR( OC_FILE_U32 | OC_VAR_I64, Company, bankrupt_value ),
 	OCL_SVAR( OC_UINT16, Company, bankrupt_timeout ),
@@ -1401,7 +1402,7 @@ static const OldChunks engine_chunk[] = {
 
 	OCL_NULL( 1 ), // lifelength
 	OCL_SVAR(  OC_UINT8, Engine, flags ),
-	OCL_SVAR(  OC_UINT8, Engine, preview_company_rank ),
+	OCL_NULL( 1 ), // preview_company_rank
 	OCL_SVAR(  OC_UINT8, Engine, preview_wait ),
 
 	OCL_CNULL( OC_TTD, 2 ), ///< railtype + junk
@@ -1573,6 +1574,7 @@ extern TileIndex _cur_tileloop_tile;
 extern uint16 _disaster_delay;
 extern byte _trees_tick_ctr;
 extern byte _age_cargo_skip_counter; // From misc_sl.cpp
+extern uint8 _old_diff_level;
 static const OldChunks main_chunk[] = {
 	OCL_ASSERT( OC_TTD, 0 ),
 	OCL_ASSERT( OC_TTO, 0 ),
@@ -1718,7 +1720,7 @@ static const OldChunks main_chunk[] = {
 
 	OCL_ASSERT( OC_TTD, 0x77130 ),
 
-	OCL_VAR (  OC_UINT8,    1, &_settings_game.difficulty.diff_level ),
+	OCL_VAR (  OC_UINT8,    1, &_old_diff_level ),
 
 	OCL_VAR ( OC_TTD | OC_UINT8,    1, &_settings_game.game_creation.landscape ),
 	OCL_VAR ( OC_TTD | OC_UINT8,    1, &_trees_tick_ctr ),
@@ -1777,7 +1779,7 @@ bool LoadTTDMain(LoadgameState *ls)
 	FixOldVehicles();
 
 	/* We have a new difficulty setting */
-	_settings_game.difficulty.town_council_tolerance = Clamp(_settings_game.difficulty.diff_level, 0, 2);
+	_settings_game.difficulty.town_council_tolerance = Clamp(_old_diff_level, 0, 2);
 
 	DEBUG(oldloader, 3, "Finished converting game data");
 	DEBUG(oldloader, 1, "TTD(Patch) savegame successfully converted");
@@ -1820,7 +1822,7 @@ bool LoadTTOMain(LoadgameState *ls)
 	FixTTOCompanies();
 
 	/* We have a new difficulty setting */
-	_settings_game.difficulty.town_council_tolerance = Clamp(_settings_game.difficulty.diff_level, 0, 2);
+	_settings_game.difficulty.town_council_tolerance = Clamp(_old_diff_level, 0, 2);
 
 	/* SVXConverter about cargo payment rates correction:
 	 * "increase them to compensate for the faster time advance in TTD compared to TTO

@@ -118,7 +118,7 @@ static const NWidgetPart _bootstrap_query_widgets[] = {
 static const WindowDesc _bootstrap_query_desc(
 	WDP_CENTER, 0, 0,
 	WC_CONFIRM_POPUP_QUERY, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_bootstrap_query_widgets, lengthof(_bootstrap_query_widgets)
 );
 
@@ -218,7 +218,7 @@ bool HandleBootstrap()
 	if (BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth() == 0) goto failure;
 
 	/* If there is no network or no freetype, then there is nothing we can do. Go straight to failure. */
-#if defined(ENABLE_NETWORK) && defined(WITH_FREETYPE) && !defined(__APPLE__)
+#if defined(ENABLE_NETWORK) && defined(WITH_FREETYPE) && !defined(__APPLE__) && (defined(WITH_FONTCONFIG) || defined(WIN32))
 	if (!_network_available) goto failure;
 
 	/* First tell the game we're bootstrapping. */

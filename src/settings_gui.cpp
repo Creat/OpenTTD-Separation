@@ -12,7 +12,7 @@
 #include "stdafx.h"
 #include "currency.h"
 #include "error.h"
-#include "gui.h"
+#include "settings_gui.h"
 #include "textbuf_gui.h"
 #include "command_func.h"
 #include "screenshot.h"
@@ -35,7 +35,8 @@
 #include "blitter/factory.hpp"
 #include "language.h"
 #include "textfile_gui.h"
-
+#include "stringfilter_type.h"
+#include "querystring_gui.h"
 
 
 static const StringID _units_dropdown[] = {
@@ -63,6 +64,8 @@ static const StringID _autosave_dropdown[] = {
 int _nb_orig_names = SPECSTR_TOWNNAME_LAST - SPECSTR_TOWNNAME_START + 1; ///< Number of original town names.
 static StringID *_grf_names = NULL; ///< Pointer to town names defined by NewGRFs.
 static int _nb_grf_names = 0;       ///< Number of town names defined by NewGRFs.
+
+static const void *ResolveVariableAddress(const GameSettings *settings_ptr, const SettingDesc *sd);
 
 /** Allocate memory for the NewGRF town names. */
 void InitGRFTownGeneratorNames()
@@ -127,8 +130,6 @@ struct BaseSetTextfileWindow : public TextfileWindow {
 
 	BaseSetTextfileWindow(TextfileType file_type, const TBaseSet* baseset, StringID content_type) : TextfileWindow(file_type), baseset(baseset), content_type(content_type)
 	{
-		this->GetWidget<NWidgetCore>(WID_TF_CAPTION)->SetDataTip(STR_TEXTFILE_README_CAPTION + file_type, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS);
-
 		const char *textfile = this->baseset->GetTextfile(file_type);
 		this->LoadTextfile(textfile, BASESET_DIR);
 	}
@@ -670,7 +671,7 @@ static const NWidgetPart _nested_game_options_widgets[] = {
 static const WindowDesc _game_options_desc(
 	WDP_CENTER, 0, 0,
 	WC_GAME_OPTIONS, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_game_options_widgets, lengthof(_nested_game_options_widgets)
 );
 
@@ -679,282 +680,6 @@ void ShowGameOptions()
 {
 	DeleteWindowByClass(WC_GAME_OPTIONS);
 	new GameOptionsWindow(&_game_options_desc);
-}
-
-extern void StartupEconomy();
-
-void SetDifficultyLevel(int mode, DifficultySettings *gm_opt);
-
-class GameDifficultyWindow : public Window {
-private:
-	/* Temporary holding place of values in the difficulty window until 'Save' is clicked */
-	GameSettings opt_mod_temp;
-
-public:
-	/** The number of difficulty settings */
-	static const uint GAME_DIFFICULTY_NUM = 18;
-	/** The number of widgets per difficulty setting */
-	static const uint WIDGETS_PER_DIFFICULTY = 3;
-
-	GameDifficultyWindow(const WindowDesc *desc) : Window()
-	{
-		this->InitNested(desc, WN_GAME_OPTIONS_GAME_DIFFICULTY);
-
-		/* Setup disabled buttons when creating window
-		 * disable all other difficulty buttons during gameplay except for 'custom' */
-		this->SetWidgetsDisabledState(_game_mode != GM_MENU,
-			WID_GD_LVL_EASY,
-			WID_GD_LVL_MEDIUM,
-			WID_GD_LVL_HARD,
-			WID_GD_LVL_CUSTOM,
-			WIDGET_LIST_END);
-		this->SetWidgetDisabledState(WID_GD_HIGHSCORE, _game_mode == GM_EDITOR || _networking); // highscore chart in multiplayer
-		this->SetWidgetDisabledState(WID_GD_ACCEPT, _networking && !_network_server); // Save-button in multiplayer (and if client)
-
-		/* Read data */
-		this->OnInvalidateData(GOID_DIFFICULTY_CHANGED);
-	}
-
-	virtual void SetStringParameters(int widget) const
-	{
-		widget -= WID_GD_OPTIONS_START;
-		if (widget < 0 || (widget % 3) != 2) return;
-
-		widget /= 3;
-
-		uint i;
-		const SettingDesc *sd = GetSettingFromName("difficulty.max_no_competitors", &i) + widget;
-		int32 value = (int32)ReadValue(GetVariableAddress(&this->opt_mod_temp, &sd->save), sd->save.conv);
-		SetDParam(0, sd->desc.val_str + value);
-	}
-
-	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
-	{
-		/* Only for the 'descriptions' */
-		int index = widget - WID_GD_OPTIONS_START;
-		if (index < 0 || (index % 3) != 2) return;
-
-		index /= 3;
-
-		uint i;
-		const SettingDesc *sd = GetSettingFromName("difficulty.max_no_competitors", &i) + index;
-		const SettingDescBase *sdb = &sd->desc;
-
-		/* Get the string and try all strings from the smallest to the highest value */
-		StringID str = this->GetWidget<NWidgetCore>(widget)->widget_data;
-		for (int32 value = sdb->min; (uint32)value <= sdb->max; value += sdb->interval) {
-			SetDParam(0, sdb->val_str + value);
-			*size = maxdim(*size, GetStringBoundingBox(str));
-		}
-	}
-
-	virtual void OnClick(Point pt, int widget, int click_count)
-	{
-		if (widget >= WID_GD_OPTIONS_START) {
-			widget -= WID_GD_OPTIONS_START;
-			if ((widget % 3) == 2) return;
-
-			/* Don't allow clients to make any changes */
-			if (_networking && !_network_server) return;
-
-			uint i;
-			const SettingDesc *sd = GetSettingFromName("difficulty.max_no_competitors", &i) + (widget / 3);
-			const SettingDescBase *sdb = &sd->desc;
-
-			int32 val = (int32)ReadValue(GetVariableAddress(&this->opt_mod_temp, &sd->save), sd->save.conv);
-			if (widget % 3 == 1) {
-				/* Increase button clicked */
-				val = min(val + sdb->interval, (int32)sdb->max);
-			} else {
-				/* Decrease button clicked */
-				val -= sdb->interval;
-				val = max(val, sdb->min);
-			}
-
-			/* save value in temporary variable */
-			WriteValue(GetVariableAddress(&this->opt_mod_temp, &sd->save), sd->save.conv, val);
-			this->RaiseWidget(WID_GD_LVL_EASY + this->opt_mod_temp.difficulty.diff_level);
-			SetDifficultyLevel(3, &this->opt_mod_temp.difficulty); // set difficulty level to custom
-			this->LowerWidget(WID_GD_LVL_CUSTOM);
-			this->InvalidateData();
-
-			if (widget / 3 == 0 &&
-					AI::GetInfoList()->size() == 0 &&
-					this->opt_mod_temp.difficulty.max_no_competitors != 0) {
-				ShowErrorMessage(STR_WARNING_NO_SUITABLE_AI, INVALID_STRING_ID, WL_CRITICAL);
-			}
-			return;
-		}
-
-		switch (widget) {
-			case WID_GD_LVL_EASY:
-			case WID_GD_LVL_MEDIUM:
-			case WID_GD_LVL_HARD:
-			case WID_GD_LVL_CUSTOM:
-				/* temporarily change difficulty level */
-				this->RaiseWidget(WID_GD_LVL_EASY + this->opt_mod_temp.difficulty.diff_level);
-				SetDifficultyLevel(widget - WID_GD_LVL_EASY, &this->opt_mod_temp.difficulty);
-				this->LowerWidget(WID_GD_LVL_EASY + this->opt_mod_temp.difficulty.diff_level);
-				this->InvalidateData();
-				break;
-
-			case WID_GD_HIGHSCORE: // Highscore Table
-				ShowHighscoreTable(this->opt_mod_temp.difficulty.diff_level, -1);
-				break;
-
-			case WID_GD_ACCEPT: { // Save button - save changes
-				GameSettings *opt_ptr = &GetGameSettings();
-
-				uint i;
-				GetSettingFromName("difficulty.diff_level", &i);
-				DoCommandP(0, i, this->opt_mod_temp.difficulty.diff_level, CMD_CHANGE_SETTING);
-
-				const SettingDesc *sd = GetSettingFromName("difficulty.max_no_competitors", &i);
-				for (uint btn = 0; btn != GAME_DIFFICULTY_NUM; btn++, sd++) {
-					int32 new_val = (int32)ReadValue(GetVariableAddress(&this->opt_mod_temp, &sd->save), sd->save.conv);
-					int32 cur_val = (int32)ReadValue(GetVariableAddress(opt_ptr, &sd->save), sd->save.conv);
-					/* if setting has changed, change it */
-					if (new_val != cur_val) {
-						DoCommandP(0, i + btn, new_val, CMD_CHANGE_SETTING);
-					}
-				}
-				delete this;
-				/* If we are in the editor, we should reload the economy.
-				 * This way when you load a game, the max loan and interest rate
-				 * are loaded correctly. */
-				if (_game_mode == GM_EDITOR) StartupEconomy();
-				break;
-			}
-
-			case WID_GD_CANCEL: // Cancel button - close window, abandon changes
-				delete this;
-				break;
-		}
-	}
-
-	/**
-	 * Some data on this window has become invalid.
-	 * @param data Information about the changed data. @see GameOptionsInvalidationData
-	 * @param gui_scope Whether the call is done from GUI scope. You may not do everything when not in GUI scope. See #InvalidateWindowData() for details.
-	 */
-	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
-	{
-		if (!gui_scope) return;
-
-		if (data == GOID_DIFFICULTY_CHANGED) {
-			/* Window was created or settings were changed on server. Reread everything. */
-
-			/* Copy current settings (ingame or in intro) to temporary holding place
-			 * change that when setting stuff, copy back on clicking 'OK' */
-			this->opt_mod_temp = GetGameSettings();
-
-			this->LowerWidget(WID_GD_LVL_EASY + this->opt_mod_temp.difficulty.diff_level);
-		}
-
-		uint i;
-		const SettingDesc *sd = GetSettingFromName("difficulty.max_no_competitors", &i);
-		for (i = 0; i < GAME_DIFFICULTY_NUM; i++, sd++) {
-			const SettingDescBase *sdb = &sd->desc;
-			/* skip deprecated difficulty options */
-			if (!SlIsObjectCurrentlyValid(sd->save.version_from, sd->save.version_to)) continue;
-			int32 value = (int32)ReadValue(GetVariableAddress(&this->opt_mod_temp, &sd->save), sd->save.conv);
-			bool disable = (sd->desc.flags & SGF_NEWGAME_ONLY) &&
-					(_game_mode == GM_NORMAL ||
-					(_game_mode == GM_EDITOR && (sd->desc.flags & SGF_SCENEDIT_TOO) == 0));
-
-			this->SetWidgetDisabledState(WID_GD_OPTIONS_START + i * 3 + 0, disable || sdb->min == value);
-			this->SetWidgetDisabledState(WID_GD_OPTIONS_START + i * 3 + 1, disable || sdb->max == (uint32)value);
-		}
-	}
-};
-
-static NWidgetBase *MakeDifficultyOptionsWidgets(int *biggest_index)
-{
-	NWidgetVertical *vert_desc = new NWidgetVertical;
-
-	int widnum = WID_GD_OPTIONS_START;
-	uint i, j;
-	const SettingDesc *sd = GetSettingFromName("difficulty.max_no_competitors", &i);
-
-	for (i = 0, j = 0; i < GameDifficultyWindow::GAME_DIFFICULTY_NUM; i++, sd++, widnum += GameDifficultyWindow::WIDGETS_PER_DIFFICULTY) {
-		if (!SlIsObjectCurrentlyValid(sd->save.version_from, sd->save.version_to)) continue;
-
-		NWidgetHorizontal *hor = new NWidgetHorizontal;
-
-		/* [<] button. */
-		NWidgetLeaf *leaf = new NWidgetLeaf(WWT_PUSHARROWBTN, COLOUR_YELLOW, widnum, AWV_DECREASE, STR_TOOLTIP_HSCROLL_BAR_SCROLLS_LIST);
-		hor->Add(leaf);
-
-		/* [>] button. */
-		leaf = new NWidgetLeaf(WWT_PUSHARROWBTN, COLOUR_YELLOW, widnum + 1, AWV_INCREASE, STR_TOOLTIP_HSCROLL_BAR_SCROLLS_LIST);
-		hor->Add(leaf);
-
-		/* Some spacing between the text and the description */
-		NWidgetSpacer *spacer = new NWidgetSpacer(5, 0);
-		hor->Add(spacer);
-
-		/* Descriptive text. */
-		leaf = new NWidgetLeaf(WWT_TEXT, COLOUR_YELLOW, widnum + 2, STR_DIFFICULTY_LEVEL_SETTING_MAXIMUM_NO_COMPETITORS + (j++), STR_NULL);
-		leaf->SetFill(1, 0);
-		hor->Add(leaf);
-		vert_desc->Add(hor);
-
-		/* Space vertically */
-		vert_desc->Add(new NWidgetSpacer(0, 2));
-	}
-	*biggest_index = widnum - 1;
-	return vert_desc;
-}
-
-
-/** Widget definition for the game difficulty settings window */
-static const NWidgetPart _nested_game_difficulty_widgets[] = {
-	NWidget(WWT_CAPTION, COLOUR_MAUVE), SetDataTip(STR_DIFFICULTY_LEVEL_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
-	NWidget(WWT_PANEL, COLOUR_MAUVE),
-		NWidget(NWID_VERTICAL), SetPIP(2, 0, 2),
-			NWidget(NWID_HORIZONTAL, NC_EQUALSIZE), SetPIP(10, 0, 10),
-				NWidget(WWT_TEXTBTN, COLOUR_YELLOW, WID_GD_LVL_EASY), SetDataTip(STR_DIFFICULTY_LEVEL_EASY, STR_NULL), SetFill(1, 0),
-				NWidget(WWT_TEXTBTN, COLOUR_YELLOW, WID_GD_LVL_MEDIUM), SetDataTip(STR_DIFFICULTY_LEVEL_MEDIUM, STR_NULL), SetFill(1, 0),
-				NWidget(WWT_TEXTBTN, COLOUR_YELLOW, WID_GD_LVL_HARD), SetDataTip(STR_DIFFICULTY_LEVEL_HARD, STR_NULL), SetFill(1, 0),
-				NWidget(WWT_TEXTBTN, COLOUR_YELLOW, WID_GD_LVL_CUSTOM), SetDataTip(STR_DIFFICULTY_LEVEL_CUSTOM, STR_NULL), SetFill(1, 0),
-			EndContainer(),
-			NWidget(NWID_HORIZONTAL), SetPIP(10, 0, 10),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_GREEN, WID_GD_HIGHSCORE), SetDataTip(STR_DIFFICULTY_LEVEL_HIGH_SCORE_BUTTON, STR_NULL), SetFill(1, 0),
-			EndContainer(),
-		EndContainer(),
-	EndContainer(),
-	NWidget(WWT_PANEL, COLOUR_MAUVE),
-		NWidget(NWID_VERTICAL), SetPIP(3, 0, 1),
-			NWidget(NWID_HORIZONTAL), SetPIP(5, 0, 5),
-				NWidgetFunction(MakeDifficultyOptionsWidgets),
-			EndContainer(),
-		EndContainer(),
-	EndContainer(),
-	NWidget(WWT_PANEL, COLOUR_MAUVE),
-		NWidget(NWID_VERTICAL), SetPIP(2, 0, 2),
-			NWidget(NWID_HORIZONTAL, NC_EQUALSIZE), SetPIP(10, 0, 10),
-				NWidget(NWID_SPACER), SetFill(1, 0),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, WID_GD_ACCEPT), SetDataTip(STR_DIFFICULTY_LEVEL_SAVE, STR_NULL), SetFill(1, 0),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_YELLOW, WID_GD_CANCEL), SetDataTip(STR_BUTTON_CANCEL, STR_NULL), SetFill(1, 0),
-				NWidget(NWID_SPACER), SetFill(1, 0),
-			EndContainer(),
-		EndContainer(),
-	EndContainer(),
-};
-
-/** Window definition for the game difficulty settings window */
-static const WindowDesc _game_difficulty_desc(
-	WDP_CENTER, 0, 0,
-	WC_GAME_OPTIONS, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
-	_nested_game_difficulty_widgets, lengthof(_nested_game_difficulty_widgets)
-);
-
-/** Open the game-difficulty window. */
-void ShowGameDifficulty()
-{
-	DeleteWindowByClass(WC_GAME_OPTIONS);
-	new GameDifficultyWindow(&_game_difficulty_desc);
 }
 
 static int SETTING_HEIGHT = 11;    ///< Height of a single setting in the tree view in pixels
@@ -970,6 +695,7 @@ enum SettingEntryFlags {
 	SEF_BUTTONS_MASK = (SEF_LEFT_DEPRESSED | SEF_RIGHT_DEPRESSED), ///< Bit-mask for button flags
 
 	SEF_LAST_FIELD = 0x04, ///< This entry is the last one in a (sub-)page
+	SEF_FILTERED   = 0x08, ///< Entry is hidden by the string filter
 
 	/* Entry kind */
 	SEF_SETTING_KIND = 0x10, ///< Entry kind: Entry is a setting
@@ -993,6 +719,23 @@ struct SettingEntrySetting {
 	uint index;                 ///< Index of the setting in the settings table
 };
 
+/** How the list of advanced settings is filtered. */
+enum RestrictionMode {
+	RM_BASIC,                            ///< Display settings associated to the "basic" list.
+	RM_ADVANCED,                         ///< Display settings associated to the "advanced" list.
+	RM_ALL,                              ///< List all settings regardless of the default/newgame/... values.
+	RM_CHANGED_AGAINST_DEFAULT,          ///< Show only settings which are different compared to default values.
+	RM_CHANGED_AGAINST_NEW,              ///< Show only settings which are different compared to the user's new game setting values.
+	RM_END,                              ///< End for iteration.
+};
+
+/** Filter for settings list. */
+struct SettingFilter {
+	StringFilter string;     ///< Filter string.
+	RestrictionMode mode;    ///< Filter based on category.
+	SettingType type;       ///< Filter based on type.
+};
+
 /** Data structure describing a single setting in a tab */
 struct SettingEntry {
 	byte flags; ///< Flags of the setting entry. @see SettingEntryFlags
@@ -1005,17 +748,43 @@ struct SettingEntry {
 	SettingEntry(const char *nm);
 	SettingEntry(SettingsPage *sub, StringID title);
 
-	void Init(byte level, bool last_field);
+	void Init(byte level);
 	void FoldAll();
+	void UnFoldAll();
 	void SetButtons(byte new_val);
 
-	uint Length() const;
-	SettingEntry *FindEntry(uint row, uint *cur_row);
+	/**
+	 * Set whether this is the last visible entry of the parent node.
+	 * @param last_field Value to set
+	 */
+	void SetLastField(bool last_field) { if (last_field) SETBITS(this->flags, SEF_LAST_FIELD); else CLRBITS(this->flags, SEF_LAST_FIELD); }
 
-	uint Draw(GameSettings *settings_ptr, int base_x, int base_y, int max_x, uint first_row, uint max_row, uint cur_row, uint parent_last);
+	uint Length() const;
+	void GetFoldingState(bool &all_folded, bool &all_unfolded) const;
+	bool IsVisible(const SettingEntry *item) const;
+	SettingEntry *FindEntry(uint row, uint *cur_row);
+	uint GetMaxHelpHeight(int maxw);
+
+	bool IsFiltered() const;
+	bool UpdateFilterState(SettingFilter &filter, bool force_visible);
+
+	uint Draw(GameSettings *settings_ptr, int base_x, int base_y, int max_x, uint first_row, uint max_row, uint cur_row, uint parent_last, SettingEntry *selected);
+
+	/**
+	 * Get the help text of a single setting.
+	 * @return The requested help text.
+	 */
+	inline StringID GetHelpText()
+	{
+		assert((this->flags & SEF_KIND_MASK) == SEF_SETTING_KIND);
+		return this->d.entry.setting->desc.str_help;
+	}
+
+	void SetValueDParams(uint first_param, int32 value);
 
 private:
-	void DrawSetting(GameSettings *settings_ptr, const SettingDesc *sd, int x, int y, int max_x, int state);
+	void DrawSetting(GameSettings *settings_ptr, int x, int y, int max_x, int state, bool highlight);
+	bool IsVisibleByRestrictionMode(RestrictionMode mode) const;
 };
 
 /** Data structure describing one page of settings in the settings window. */
@@ -1025,11 +794,17 @@ struct SettingsPage {
 
 	void Init(byte level = 0);
 	void FoldAll();
+	void UnFoldAll();
 
 	uint Length() const;
+	void GetFoldingState(bool &all_folded, bool &all_unfolded) const;
+	bool IsVisible(const SettingEntry *item) const;
 	SettingEntry *FindEntry(uint row, uint *cur_row) const;
+	uint GetMaxHelpHeight(int maxw);
 
-	uint Draw(GameSettings *settings_ptr, int base_x, int base_y, int max_x, uint first_row, uint max_row, uint cur_row = 0, uint parent_last = 0) const;
+	bool UpdateFilterState(SettingFilter &filter, bool force_visible);
+
+	uint Draw(GameSettings *settings_ptr, int base_x, int base_y, int max_x, uint first_row, uint max_row, SettingEntry *selected, uint cur_row = 0, uint parent_last = 0) const;
 };
 
 
@@ -1065,12 +840,10 @@ SettingEntry::SettingEntry(SettingsPage *sub, StringID title)
 /**
  * Initialization of a setting entry
  * @param level      Page nesting level of this entry
- * @param last_field Boolean indicating this entry is the last at the (sub-)page
  */
-void SettingEntry::Init(byte level, bool last_field)
+void SettingEntry::Init(byte level)
 {
 	this->level = level;
-	if (last_field) this->flags |= SEF_LAST_FIELD;
 
 	switch (this->flags & SEF_KIND_MASK) {
 		case SEF_SETTING_KIND:
@@ -1084,9 +857,10 @@ void SettingEntry::Init(byte level, bool last_field)
 	}
 }
 
-/** Recursively close all folds of sub-pages */
+/** Recursively close all (filtered) folds of sub-pages */
 void SettingEntry::FoldAll()
 {
+	if (this->IsFiltered()) return;
 	switch (this->flags & SEF_KIND_MASK) {
 		case SEF_SETTING_KIND:
 			break;
@@ -1100,6 +874,69 @@ void SettingEntry::FoldAll()
 	}
 }
 
+/** Recursively open all (filtered) folds of sub-pages */
+void SettingEntry::UnFoldAll()
+{
+	if (this->IsFiltered()) return;
+	switch (this->flags & SEF_KIND_MASK) {
+		case SEF_SETTING_KIND:
+			break;
+
+		case SEF_SUBTREE_KIND:
+			this->d.sub.folded = false;
+			this->d.sub.page->UnFoldAll();
+			break;
+
+		default: NOT_REACHED();
+	}
+}
+
+/**
+ * Recursively accumulate the folding state of the (filtered) tree.
+ * @param[in,out] all_folded Set to false, if one entry is not folded.
+ * @param[in,out] all_unfolded Set to false, if one entry is folded.
+ */
+void SettingEntry::GetFoldingState(bool &all_folded, bool &all_unfolded) const
+{
+	if (this->IsFiltered()) return;
+	switch (this->flags & SEF_KIND_MASK) {
+		case SEF_SETTING_KIND:
+			break;
+
+		case SEF_SUBTREE_KIND:
+			if (this->d.sub.folded) {
+				all_unfolded = false;
+			} else {
+				all_folded = false;
+			}
+			this->d.sub.page->GetFoldingState(all_folded, all_unfolded);
+			break;
+
+		default: NOT_REACHED();
+	}
+}
+
+/**
+ * Check whether an entry is visible and not folded or filtered away.
+ * Note: This does not consider the scrolling range; it might still require scrolling ot make the setting really visible.
+ * @param item Entry to search for.
+ * @return true if entry is visible.
+ */
+bool SettingEntry::IsVisible(const SettingEntry *item) const
+{
+	if (this->IsFiltered()) return false;
+	if (this == item) return true;
+
+	switch (this->flags & SEF_KIND_MASK) {
+		case SEF_SETTING_KIND:
+			return false;
+
+		case SEF_SUBTREE_KIND:
+			return !this->d.sub.folded && this->d.sub.page->IsVisible(item);
+
+		default: NOT_REACHED();
+	}
+}
 
 /**
  * Set the button-depressed flags (#SEF_LEFT_DEPRESSED and #SEF_RIGHT_DEPRESSED) to a specified value
@@ -1112,9 +949,10 @@ void SettingEntry::SetButtons(byte new_val)
 	this->flags = (this->flags & ~SEF_BUTTONS_MASK) | new_val;
 }
 
-/** Return numbers of rows needed to display the entry */
+/** Return numbers of rows needed to display the (filtered) entry */
 uint SettingEntry::Length() const
 {
+	if (this->IsFiltered()) return 0;
 	switch (this->flags & SEF_KIND_MASK) {
 		case SEF_SETTING_KIND:
 			return 1;
@@ -1130,10 +968,11 @@ uint SettingEntry::Length() const
  * Find setting entry at row \a row_num
  * @param row_num Index of entry to return
  * @param cur_row Current row number
- * @return The requested setting entry or \c NULL if it not found
+ * @return The requested setting entry or \c NULL if it not found (folded or filtered)
  */
 SettingEntry *SettingEntry::FindEntry(uint row_num, uint *cur_row)
 {
+	if (this->IsFiltered()) return NULL;
 	if (row_num == *cur_row) return this;
 
 	switch (this->flags & SEF_KIND_MASK) {
@@ -1154,6 +993,121 @@ SettingEntry *SettingEntry::FindEntry(uint row_num, uint *cur_row)
 }
 
 /**
+ * Get the biggest height of the help text(s), if the width is at least \a maxw. Help text gets wrapped if needed.
+ * @param maxw Maximal width of a line help text.
+ * @return Biggest height needed to display any help text of this node (and its descendants).
+ */
+uint SettingEntry::GetMaxHelpHeight(int maxw)
+{
+	switch (this->flags & SEF_KIND_MASK) {
+		case SEF_SETTING_KIND: return GetStringHeight(this->GetHelpText(), maxw);
+		case SEF_SUBTREE_KIND: return this->d.sub.page->GetMaxHelpHeight(maxw);
+		default:               NOT_REACHED();
+	}
+}
+
+/**
+ * Check whether an entry is hidden due to filters
+ * @return true if hidden.
+ */
+bool SettingEntry::IsFiltered() const
+{
+	return (this->flags & SEF_FILTERED) != 0;
+}
+
+/**
+ * Checks whether an entry shall be made visible based on the restriction mode.
+ * @param mode The current status of the restriction drop down box.
+ * @return true if the entry shall be visible.
+ */
+bool SettingEntry::IsVisibleByRestrictionMode(RestrictionMode mode) const
+{
+	/* There shall not be any restriction, i.e. all settings shall be visible. */
+	if (mode == RM_ALL) return true;
+
+	GameSettings *settings_ptr = &GetGameSettings();
+	assert((this->flags & SEF_KIND_MASK) == SEF_SETTING_KIND);
+	const SettingDesc *sd = this->d.entry.setting;
+
+	if (mode == RM_BASIC) return (this->d.entry.setting->desc.cat & SC_BASIC_LIST) != 0;
+	if (mode == RM_ADVANCED) return (this->d.entry.setting->desc.cat & SC_ADVANCED_LIST) != 0;
+
+	/* Read the current value. */
+	const void *var = ResolveVariableAddress(settings_ptr, sd);
+	int64 current_value = ReadValue(var, sd->save.conv);
+
+	int64 filter_value;
+
+	if (mode == RM_CHANGED_AGAINST_DEFAULT) {
+		/* This entry shall only be visible, if the value deviates from its default value. */
+
+		/* Read the default value. */
+		filter_value = ReadValue(&sd->desc.def, sd->save.conv);
+	} else {
+		assert(mode == RM_CHANGED_AGAINST_NEW);
+		/* This entry shall only be visible, if the value deviates from
+		 * its value is used when starting a new game. */
+
+		/* Make sure we're not comparing the new game settings against itself. */
+		assert(settings_ptr != &_settings_newgame);
+
+		/* Read the new game's value. */
+		var = ResolveVariableAddress(&_settings_newgame, sd);
+		filter_value = ReadValue(var, sd->save.conv);
+	}
+
+	return current_value != filter_value;
+}
+
+/**
+ * Update the filter state.
+ * @param filter Filter
+ * @param force_visible Whether to force all items visible, no matter what (due to filter text; not affected by restriction drop down box).
+ * @return true if item remains visible
+ */
+bool SettingEntry::UpdateFilterState(SettingFilter &filter, bool force_visible)
+{
+	CLRBITS(this->flags, SEF_FILTERED);
+
+	bool visible = true;
+	switch (this->flags & SEF_KIND_MASK) {
+		case SEF_SETTING_KIND: {
+			const SettingDesc *sd = this->d.entry.setting;
+			if (!force_visible && !filter.string.IsEmpty()) {
+				/* Process the search text filter for this item. */
+				filter.string.ResetState();
+
+				const SettingDescBase *sdb = &sd->desc;
+
+				SetDParam(0, STR_EMPTY);
+				filter.string.AddLine(sdb->str);
+				filter.string.AddLine(this->GetHelpText());
+
+				visible = filter.string.GetState();
+			}
+			if (filter.type != ST_ALL) visible = visible && sd->GetType() == filter.type;
+			visible = visible && this->IsVisibleByRestrictionMode(filter.mode);
+			break;
+		}
+		case SEF_SUBTREE_KIND: {
+			if (!force_visible && !filter.string.IsEmpty()) {
+				filter.string.ResetState();
+				filter.string.AddLine(this->d.sub.title);
+				force_visible = filter.string.GetState();
+			}
+			visible = this->d.sub.page->UpdateFilterState(filter, force_visible);
+			break;
+		}
+		default: NOT_REACHED();
+	}
+
+	if (!visible) SETBITS(this->flags, SEF_FILTERED);
+	return visible;
+}
+
+
+
+/**
  * Draw a row in the settings panel.
  *
  * See SettingsPage::Draw() for an explanation about how drawing is performed.
@@ -1167,7 +1121,7 @@ SettingEntry *SettingEntry::FindEntry(uint row_num, uint *cur_row)
  *  |    |-- setting
  * \endverbatim
  * The left-most vertical line is not wanted. It is prevented by setting the
- * appropiate bit in the \a parent_last parameter.
+ * appropriate bit in the \a parent_last parameter.
  *
  * @param settings_ptr Pointer to current values of all settings
  * @param left         Left-most position in window/panel to start drawing \a first_row
@@ -1177,10 +1131,12 @@ SettingEntry *SettingEntry::FindEntry(uint row_num, uint *cur_row)
  * @param max_row      Row-number to stop drawing (the row-number of the row below the last row to draw)
  * @param cur_row      Current row number (internal variable)
  * @param parent_last  Last-field booleans of parent page level (page level \e i sets bit \e i to 1 if it is its last field)
+ * @param selected     Selected entry by the user.
  * @return Row number of the next row to draw
  */
-uint SettingEntry::Draw(GameSettings *settings_ptr, int left, int right, int base_y, uint first_row, uint max_row, uint cur_row, uint parent_last)
+uint SettingEntry::Draw(GameSettings *settings_ptr, int left, int right, int base_y, uint first_row, uint max_row, uint cur_row, uint parent_last, SettingEntry *selected)
 {
+	if (this->IsFiltered()) return cur_row;
 	if (cur_row >= max_row) return cur_row;
 
 	bool rtl = _current_text_dir == TD_RTL;
@@ -1210,7 +1166,8 @@ uint SettingEntry::Draw(GameSettings *settings_ptr, int left, int right, int bas
 	switch (this->flags & SEF_KIND_MASK) {
 		case SEF_SETTING_KIND:
 			if (cur_row >= first_row) {
-				DrawSetting(settings_ptr, this->d.entry.setting, rtl ? left : x, rtl ? x : right, y, this->flags & SEF_BUTTONS_MASK);
+				this->DrawSetting(settings_ptr, rtl ? left : x, rtl ? x : right, y, this->flags & SEF_BUTTONS_MASK,
+						this == selected);
 			}
 			cur_row++;
 			break;
@@ -1226,7 +1183,7 @@ uint SettingEntry::Draw(GameSettings *settings_ptr, int left, int right, int bas
 					SetBit(parent_last, this->level); // Add own last-field state
 				}
 
-				cur_row = this->d.sub.page->Draw(settings_ptr, left, right, base_y, first_row, max_row, cur_row, parent_last);
+				cur_row = this->d.sub.page->Draw(settings_ptr, left, right, base_y, first_row, max_row, selected, cur_row, parent_last);
 			}
 			break;
 		default: NOT_REACHED();
@@ -1248,61 +1205,68 @@ static const void *ResolveVariableAddress(const GameSettings *settings_ptr, cons
 }
 
 /**
+ * Set the DParams for drawing the value of a setting.
+ * @param first_param First DParam to use
+ * @param value Setting value to set params for.
+ */
+void SettingEntry::SetValueDParams(uint first_param, int32 value)
+{
+	assert((this->flags & SEF_KIND_MASK) == SEF_SETTING_KIND);
+	const SettingDescBase *sdb = &this->d.entry.setting->desc;
+	if (sdb->cmd == SDT_BOOLX) {
+		SetDParam(first_param++, value != 0 ? STR_CONFIG_SETTING_ON : STR_CONFIG_SETTING_OFF);
+	} else {
+		if ((sdb->flags & SGF_MULTISTRING) != 0) {
+			SetDParam(first_param++, sdb->str_val - sdb->min + value);
+		} else if ((sdb->flags & SGF_DISPLAY_ABS) != 0) {
+			SetDParam(first_param++, sdb->str_val + ((value >= 0) ? 1 : 0));
+			value = abs(value);
+		} else {
+			SetDParam(first_param++, sdb->str_val + ((value == 0 && (sdb->flags & SGF_0ISDISABLED) != 0) ? 1 : 0));
+		}
+		SetDParam(first_param++, value);
+	}
+}
+
+/**
  * Private function to draw setting value (button + text + current value)
  * @param settings_ptr Pointer to current values of all settings
- * @param sd           Pointer to value description of setting to draw
  * @param left         Left-most position in window/panel to start drawing
  * @param right        Right-most position in window/panel to draw
  * @param y            Upper-most position in window/panel to start drawing
  * @param state        State of the left + right arrow buttons to draw for the setting
+ * @param highlight    Highlight entry.
  */
-void SettingEntry::DrawSetting(GameSettings *settings_ptr, const SettingDesc *sd, int left, int right, int y, int state)
+void SettingEntry::DrawSetting(GameSettings *settings_ptr, int left, int right, int y, int state, bool highlight)
 {
+	const SettingDesc *sd = this->d.entry.setting;
 	const SettingDescBase *sdb = &sd->desc;
 	const void *var = ResolveVariableAddress(settings_ptr, sd);
-	bool editable = true;
-	bool disabled = false;
 
 	bool rtl = _current_text_dir == TD_RTL;
-	uint buttons_left = rtl ? right - 19 : left;
-	uint text_left  = left + (rtl ? 0 : 25);
-	uint text_right = right - (rtl ? 25 : 0);
-	uint button_y = y + (SETTING_HEIGHT - 11) / 2;
+	uint buttons_left = rtl ? right + 1 - SETTING_BUTTON_WIDTH : left;
+	uint text_left  = left + (rtl ? 0 : SETTING_BUTTON_WIDTH + 5);
+	uint text_right = right - (rtl ? SETTING_BUTTON_WIDTH + 5 : 0);
+	uint button_y = y + (SETTING_HEIGHT - SETTING_BUTTON_HEIGHT) / 2;
 
 	/* We do not allow changes of some items when we are a client in a networkgame */
-	if (!(sd->save.conv & SLF_NO_NETWORK_SYNC) && _networking && !_network_server && !(sdb->flags & SGF_PER_COMPANY)) editable = false;
-	if ((sdb->flags & SGF_NETWORK_ONLY) && !_networking) editable = false;
-	if ((sdb->flags & SGF_NO_NETWORK) && _networking) editable = false;
+	bool editable = sd->IsEditable();
 
+	SetDParam(0, highlight ? STR_ORANGE_STRING1_WHITE : STR_ORANGE_STRING1_LTBLUE);
+	int32 value = (int32)ReadValue(var, sd->save.conv);
 	if (sdb->cmd == SDT_BOOLX) {
 		/* Draw checkbox for boolean-value either on/off */
-		bool on = ReadValue(var, sd->save.conv) != 0;
-
-		DrawBoolButton(buttons_left, button_y, on, editable);
-		SetDParam(0, on ? STR_CONFIG_SETTING_ON : STR_CONFIG_SETTING_OFF);
+		DrawBoolButton(buttons_left, button_y, value != 0, editable);
+	} else if ((sdb->flags & SGF_MULTISTRING) != 0) {
+		/* Draw [v] button for settings of an enum-type */
+		DrawDropDownButton(buttons_left, button_y, COLOUR_YELLOW, state != 0, editable);
 	} else {
-		int32 value;
-
-		value = (int32)ReadValue(var, sd->save.conv);
-
 		/* Draw [<][>] boxes for settings of an integer-type */
-		DrawArrowButtons(buttons_left, button_y, COLOUR_YELLOW, state, editable && value != (sdb->flags & SGF_0ISDISABLED ? 0 : sdb->min), editable && (uint32)value != sdb->max);
-
-		disabled = (value == 0) && (sdb->flags & SGF_0ISDISABLED);
-		if (disabled) {
-			SetDParam(0, STR_CONFIG_SETTING_DISABLED);
-		} else {
-			if (sdb->flags & SGF_CURRENCY) {
-				SetDParam(0, STR_JUST_CURRENCY_LONG);
-			} else if (sdb->flags & SGF_MULTISTRING) {
-				SetDParam(0, sdb->val_str - sdb->min + value);
-			} else {
-				SetDParam(0, (sdb->flags & SGF_NOCOMMA) ? STR_JUST_INT : STR_JUST_COMMA);
-			}
-			SetDParam(1, value);
-		}
+		DrawArrowButtons(buttons_left, button_y, COLOUR_YELLOW, state,
+				editable && value != (sdb->flags & SGF_0ISDISABLED ? 0 : sdb->min), editable && (uint32)value != sdb->max);
 	}
-	DrawString(text_left, text_right, y, (sdb->str) + disabled);
+	this->SetValueDParams(1, value);
+	DrawString(text_left, text_right, y, sdb->str, highlight ? TC_WHITE : TC_LIGHT_BLUE);
 }
 
 
@@ -1315,7 +1279,7 @@ void SettingEntry::DrawSetting(GameSettings *settings_ptr, const SettingDesc *sd
 void SettingsPage::Init(byte level)
 {
 	for (uint field = 0; field < this->num; field++) {
-		this->entries[field].Init(level, field + 1 == num);
+		this->entries[field].Init(level);
 	}
 }
 
@@ -1325,6 +1289,59 @@ void SettingsPage::FoldAll()
 	for (uint field = 0; field < this->num; field++) {
 		this->entries[field].FoldAll();
 	}
+}
+
+/** Recursively open all folds of sub-pages */
+void SettingsPage::UnFoldAll()
+{
+	for (uint field = 0; field < this->num; field++) {
+		this->entries[field].UnFoldAll();
+	}
+}
+
+/**
+ * Recursively accumulate the folding state of the tree.
+ * @param[in,out] all_folded Set to false, if one entry is not folded.
+ * @param[in,out] all_unfolded Set to false, if one entry is folded.
+ */
+void SettingsPage::GetFoldingState(bool &all_folded, bool &all_unfolded) const
+{
+	for (uint field = 0; field < this->num; field++) {
+		this->entries[field].GetFoldingState(all_folded, all_unfolded);
+	}
+}
+
+/**
+ * Update the filter state.
+ * @param filter Filter
+ * @param force_visible Whether to force all items visible, no matter what
+ * @return true if item remains visible
+ */
+bool SettingsPage::UpdateFilterState(SettingFilter &filter, bool force_visible)
+{
+	bool visible = false;
+	bool first_visible = true;
+	for (int field = this->num - 1; field >= 0; field--) {
+		visible |= this->entries[field].UpdateFilterState(filter, force_visible);
+		this->entries[field].SetLastField(first_visible);
+		if (visible && first_visible) first_visible = false;
+	}
+	return visible;
+}
+
+
+/**
+ * Check whether an entry is visible and not folded or filtered away.
+ * Note: This does not consider the scrolling range; it might still require scrolling ot make the setting really visible.
+ * @param item Entry to search for.
+ * @return true if entry is visible.
+ */
+bool SettingsPage::IsVisible(const SettingEntry *item) const
+{
+	for (uint field = 0; field < this->num; field++) {
+		if (this->entries[field].IsVisible(item)) return true;
+	}
+	return false;
 }
 
 /** Return number of rows needed to display the whole page */
@@ -1357,6 +1374,20 @@ SettingEntry *SettingsPage::FindEntry(uint row_num, uint *cur_row) const
 }
 
 /**
+ * Get the biggest height of the help texts, if the width is at least \a maxw. Help text gets wrapped if needed.
+ * @param maxw Maximal width of a line help text.
+ * @return Biggest height needed to display any help text of this (sub-)tree.
+ */
+uint SettingsPage::GetMaxHelpHeight(int maxw)
+{
+	uint biggest = 0;
+	for (uint field = 0; field < this->num; field++) {
+		biggest = max(biggest, this->entries[field].GetMaxHelpHeight(maxw));
+	}
+	return biggest;
+}
+
+/**
  * Draw a selected part of the settings page.
  *
  * The scrollbar uses rows of the page, while the page data strucure is a tree of #SettingsPage and #SettingEntry objects.
@@ -1371,14 +1402,15 @@ SettingEntry *SettingsPage::FindEntry(uint row_num, uint *cur_row) const
  * @param max_row      Row-number to stop drawing (the row-number of the row below the last row to draw)
  * @param cur_row      Current row number (internal variable)
  * @param parent_last  Last-field booleans of parent page level (page level \e i sets bit \e i to 1 if it is its last field)
+ * @param selected     Selected entry by the user.
  * @return Row number of the next row to draw
  */
-uint SettingsPage::Draw(GameSettings *settings_ptr, int left, int right, int base_y, uint first_row, uint max_row, uint cur_row, uint parent_last) const
+uint SettingsPage::Draw(GameSettings *settings_ptr, int left, int right, int base_y, uint first_row, uint max_row, SettingEntry *selected, uint cur_row, uint parent_last) const
 {
 	if (cur_row >= max_row) return cur_row;
 
 	for (uint i = 0; i < this->num; i++) {
-		cur_row = this->entries[i].Draw(settings_ptr, left, right, base_y, first_row, max_row, cur_row, parent_last);
+		cur_row = this->entries[i].Draw(settings_ptr, left, right, base_y, first_row, max_row, cur_row, parent_last, selected);
 		if (cur_row >= max_row) {
 			break;
 		}
@@ -1408,7 +1440,7 @@ static SettingEntry _settings_ui_interaction[] = {
 	SettingEntry("gui.window_soft_limit"),
 	SettingEntry("gui.link_terraform_toolbar"),
 	SettingEntry("gui.prefer_teamchat"),
-	SettingEntry("gui.autoscroll"),
+	SettingEntry("gui.auto_scrolling"),
 	SettingEntry("gui.reverse_scroll"),
 	SettingEntry("gui.smooth_scroll"),
 	SettingEntry("gui.left_mouse_btn_scrolling"),
@@ -1417,6 +1449,7 @@ static SettingEntry _settings_ui_interaction[] = {
 	 *  Since it's also able to completely disable the scrollwheel will we display it on all platforms anyway */
 	SettingEntry("gui.scrollwheel_scrolling"),
 	SettingEntry("gui.scrollwheel_multiplier"),
+	SettingEntry("gui.osk_activation"),
 #ifdef __APPLE__
 	/* We might need to emulate a right mouse button on mac */
 	SettingEntry("gui.right_mouse_btn_emulation"),
@@ -1425,9 +1458,45 @@ static SettingEntry _settings_ui_interaction[] = {
 /** Interaction sub-page */
 static SettingsPage _settings_ui_interaction_page = {_settings_ui_interaction, lengthof(_settings_ui_interaction)};
 
+static SettingEntry _settings_ui_sound[] = {
+	SettingEntry("sound.click_beep"),
+	SettingEntry("sound.confirm"),
+	SettingEntry("sound.news_ticker"),
+	SettingEntry("sound.news_full"),
+	SettingEntry("sound.new_year"),
+	SettingEntry("sound.disaster"),
+	SettingEntry("sound.vehicle"),
+	SettingEntry("sound.ambient"),
+};
+/** Sound effects sub-page */
+static SettingsPage _settings_ui_sound_page = {_settings_ui_sound, lengthof(_settings_ui_sound)};
+
+static SettingEntry _settings_ui_news[] = {
+	SettingEntry("news_display.arrival_player"),
+	SettingEntry("news_display.arrival_other"),
+	SettingEntry("news_display.accident"),
+	SettingEntry("news_display.company_info"),
+	SettingEntry("news_display.open"),
+	SettingEntry("news_display.close"),
+	SettingEntry("news_display.economy"),
+	SettingEntry("news_display.production_player"),
+	SettingEntry("news_display.production_other"),
+	SettingEntry("news_display.production_nobody"),
+	SettingEntry("news_display.advice"),
+	SettingEntry("news_display.new_vehicles"),
+	SettingEntry("news_display.acceptance"),
+	SettingEntry("news_display.subsidies"),
+	SettingEntry("news_display.general"),
+	SettingEntry("gui.coloured_news_year"),
+};
+/** News sub-page */
+static SettingsPage _settings_ui_news_page = {_settings_ui_news, lengthof(_settings_ui_news)};
+
 static SettingEntry _settings_ui[] = {
 	SettingEntry(&_settings_ui_display_page, STR_CONFIG_SETTING_DISPLAY_OPTIONS),
 	SettingEntry(&_settings_ui_interaction_page, STR_CONFIG_SETTING_INTERACTION),
+	SettingEntry(&_settings_ui_sound_page, STR_CONFIG_SETTING_SOUND),
+	SettingEntry(&_settings_ui_news_page, STR_CONFIG_SETTING_NEWS),
 	SettingEntry("gui.show_finances"),
 	SettingEntry("gui.errmsg_duration"),
 	SettingEntry("gui.hover_delay"),
@@ -1442,15 +1511,13 @@ static SettingEntry _settings_ui[] = {
 	SettingEntry("gui.default_rail_type"),
 	SettingEntry("gui.disable_unsuitable_building"),
 	SettingEntry("gui.persistent_buildingtools"),
-	SettingEntry("gui.coloured_news_year"),
 };
 /** Interface subpage */
 static SettingsPage _settings_ui_page = {_settings_ui, lengthof(_settings_ui)};
 
 static SettingEntry _settings_construction_signals[] = {
-	SettingEntry("construction.signal_side"),
+	SettingEntry("construction.train_signal_side"),
 	SettingEntry("gui.enable_signal_gui"),
-	SettingEntry("gui.drag_signals_density"),
 	SettingEntry("gui.drag_signals_fixed_distance"),
 	SettingEntry("gui.semaphore_build_before"),
 	SettingEntry("gui.default_signal_type"),
@@ -1496,6 +1563,7 @@ static SettingEntry _settings_stations[] = {
 static SettingsPage _settings_stations_page = {_settings_stations, lengthof(_settings_stations)};
 
 static SettingEntry _settings_economy_towns[] = {
+	SettingEntry("difficulty.town_council_tolerance"),
 	SettingEntry("economy.bribe"),
 	SettingEntry("economy.exclusive_rights"),
 	SettingEntry("economy.fund_roads"),
@@ -1521,25 +1589,29 @@ static SettingEntry _settings_economy_industries[] = {
 /** Industries sub-page */
 static SettingsPage _settings_economy_industries_page = {_settings_economy_industries, lengthof(_settings_economy_industries)};
 
-static SettingEntry _settings_economy_scripts[] = {
-	SettingEntry("script.script_max_opcode_till_suspend"),
-};
-/** Scripts sub-page */
-static SettingsPage _settings_economy_scripts_page = {_settings_economy_scripts, lengthof(_settings_economy_scripts)};
 
 static SettingEntry _settings_economy[] = {
 	SettingEntry(&_settings_economy_towns_page, STR_CONFIG_SETTING_ECONOMY_TOWNS),
 	SettingEntry(&_settings_economy_industries_page, STR_CONFIG_SETTING_ECONOMY_INDUSTRIES),
-	SettingEntry(&_settings_economy_scripts_page, STR_CONFIG_SETTING_ECONOMY_SCRIPTS),
 	SettingEntry("economy.inflation"),
+	SettingEntry("difficulty.initial_interest"),
+	SettingEntry("difficulty.max_loan"),
+	SettingEntry("difficulty.subsidy_multiplier"),
+	SettingEntry("difficulty.economy"),
 	SettingEntry("economy.smooth_economy"),
 	SettingEntry("economy.feeder_payment_share"),
 	SettingEntry("economy.infrastructure_maintenance"),
+	SettingEntry("difficulty.vehicle_costs"),
+	SettingEntry("difficulty.construction_cost"),
+	SettingEntry("difficulty.disasters"),
 };
 /** Economy sub-page */
 static SettingsPage _settings_economy_page = {_settings_economy, lengthof(_settings_economy)};
 
 static SettingEntry _settings_ai_npc[] = {
+	SettingEntry("script.settings_profile"),
+	SettingEntry("script.script_max_opcode_till_suspend"),
+	SettingEntry("difficulty.competitor_speed"),
 	SettingEntry("ai.ai_in_multiplayer"),
 	SettingEntry("ai.ai_disable_veh_train"),
 	SettingEntry("ai.ai_disable_veh_roadveh"),
@@ -1581,6 +1653,7 @@ static SettingEntry _settings_vehicles_servicing[] = {
 	SettingEntry("vehicle.servint_roadveh"),
 	SettingEntry("vehicle.servint_ships"),
 	SettingEntry("vehicle.servint_aircraft"),
+	SettingEntry("difficulty.vehicle_breakdowns"),
 	SettingEntry("order.no_servicing_if_no_breakdowns"),
 	SettingEntry("order.serviceathelipad"),
 };
@@ -1588,6 +1661,7 @@ static SettingEntry _settings_vehicles_servicing[] = {
 static SettingsPage _settings_vehicles_servicing_page = {_settings_vehicles_servicing, lengthof(_settings_vehicles_servicing)};
 
 static SettingEntry _settings_vehicles_trains[] = {
+	SettingEntry("difficulty.line_reverse_mode"),
 	SettingEntry("pf.reverse_at_signals"),
 	SettingEntry("vehicle.train_acceleration_model"),
 	SettingEntry("vehicle.train_slope_steepness"),
@@ -1637,23 +1711,41 @@ static SettingEntry _settings_main[] = {
 /** Main page, holding all advanced settings */
 static SettingsPage _settings_main_page = {_settings_main, lengthof(_settings_main)};
 
+static const StringID _game_settings_restrict_dropdown[] = {
+	STR_CONFIG_SETTING_RESTRICT_BASIC,                            // RM_BASIC
+	STR_CONFIG_SETTING_RESTRICT_ADVANCED,                         // RM_ADVANCED
+	STR_CONFIG_SETTING_RESTRICT_ALL,                              // RM_ALL
+	STR_CONFIG_SETTING_RESTRICT_CHANGED_AGAINST_DEFAULT,          // RM_CHANGED_AGAINST_DEFAULT
+	STR_CONFIG_SETTING_RESTRICT_CHANGED_AGAINST_NEW,              // RM_CHANGED_AGAINST_NEW
+};
+assert_compile(lengthof(_game_settings_restrict_dropdown) == RM_END);
+
 struct GameSettingsWindow : Window {
 	static const int SETTINGTREE_LEFT_OFFSET   = 5; ///< Position of left edge of setting values
 	static const int SETTINGTREE_RIGHT_OFFSET  = 5; ///< Position of right edge of setting values
 	static const int SETTINGTREE_TOP_OFFSET    = 5; ///< Position of top edge of setting values
 	static const int SETTINGTREE_BOTTOM_OFFSET = 5; ///< Position of bottom edge of setting values
 
-	static GameSettings *settings_ptr;  ///< Pointer to the game settings being displayed and modified
+	static GameSettings *settings_ptr; ///< Pointer to the game settings being displayed and modified.
 
-	SettingEntry *valuewindow_entry; ///< If non-NULL, pointer to setting for which a value-entering window has been opened
-	SettingEntry *clicked_entry; ///< If non-NULL, pointer to a clicked numeric setting (with a depressed left or right button)
+	SettingEntry *valuewindow_entry;   ///< If non-NULL, pointer to setting for which a value-entering window has been opened.
+	SettingEntry *clicked_entry;       ///< If non-NULL, pointer to a clicked numeric setting (with a depressed left or right button).
+	SettingEntry *last_clicked;        ///< If non-NULL, pointer to the last clicked setting.
+	SettingEntry *valuedropdown_entry; ///< If non-NULL, pointer to the value for which a dropdown window is currently opened.
+	bool closing_dropdown;             ///< True, if the dropdown list is currently closing.
+
+	SettingFilter filter;              ///< Filter for the list.
+	QueryString filter_editbox;        ///< Filter editbox;
+	bool manually_changed_folding;     ///< Whether the user expanded/collapsed something manually.
 
 	Scrollbar *vscroll;
 
-	GameSettingsWindow(const WindowDesc *desc) : Window()
+	GameSettingsWindow(const WindowDesc *desc) : filter_editbox(50)
 	{
 		static bool first_time = true;
 
+		filter.mode = (RestrictionMode)_settings_client.gui.settings_restriction_mode;
+		filter.type = ST_ALL;
 		settings_ptr = &GetGameSettings();
 
 		/* Build up the dynamic settings-array only once per OpenTTD session */
@@ -1666,37 +1758,189 @@ struct GameSettingsWindow : Window {
 
 		this->valuewindow_entry = NULL; // No setting entry for which a entry window is opened
 		this->clicked_entry = NULL; // No numeric setting buttons are depressed
+		this->last_clicked = NULL;
+		this->valuedropdown_entry = NULL;
+		this->closing_dropdown = false;
+		this->manually_changed_folding = false;
 
 		this->CreateNestedTree(desc);
 		this->vscroll = this->GetScrollbar(WID_GS_SCROLLBAR);
 		this->FinishInitNested(desc, WN_GAME_OPTIONS_GAME_SETTINGS);
 
-		this->vscroll->SetCount(_settings_main_page.Length());
+		this->querystrings[WID_GS_FILTER] = &this->filter_editbox;
+		this->filter_editbox.cancel_button = QueryString::ACTION_CLEAR;
+		this->SetFocusedWidget(WID_GS_FILTER);
+
+		this->InvalidateData();
 	}
 
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 	{
-		if (widget != WID_GS_OPTIONSPANEL) return;
+		switch (widget) {
+			case WID_GS_OPTIONSPANEL:
+				resize->height = SETTING_HEIGHT = max(11, FONT_HEIGHT_NORMAL + 1);
+				resize->width  = 1;
 
-		resize->height = SETTING_HEIGHT = max(11, FONT_HEIGHT_NORMAL + 1);
-		resize->width  = 1;
+				size->height = 5 * resize->height + SETTINGTREE_TOP_OFFSET + SETTINGTREE_BOTTOM_OFFSET;
+				break;
 
-		size->height = 5 * resize->height + SETTINGTREE_TOP_OFFSET + SETTINGTREE_BOTTOM_OFFSET;
+			case WID_GS_HELP_TEXT: {
+				static const StringID setting_types[] = {
+					STR_CONFIG_SETTING_TYPE_CLIENT,
+					STR_CONFIG_SETTING_TYPE_COMPANY_MENU, STR_CONFIG_SETTING_TYPE_COMPANY_INGAME,
+					STR_CONFIG_SETTING_TYPE_GAME_MENU, STR_CONFIG_SETTING_TYPE_GAME_INGAME,
+				};
+				for (uint i = 0; i < lengthof(setting_types); i++) {
+					SetDParam(0, setting_types[i]);
+					size->width = max(size->width, GetStringBoundingBox(STR_CONFIG_SETTING_TYPE).width);
+				}
+				size->height = 2 * FONT_HEIGHT_NORMAL + WD_PAR_VSEP_NORMAL +
+						max(size->height, _settings_main_page.GetMaxHelpHeight(size->width));
+				break;
+			}
+
+			default:
+				break;
+		}
+	}
+
+	virtual void OnPaint()
+	{
+		if (this->closing_dropdown) {
+			this->closing_dropdown = false;
+			assert(this->valuedropdown_entry != NULL);
+			this->valuedropdown_entry->SetButtons(0);
+			this->valuedropdown_entry = NULL;
+		}
+		this->DrawWidgets();
+	}
+
+	virtual void SetStringParameters(int widget) const
+	{
+		switch (widget) {
+			case WID_GS_RESTRICT_DROPDOWN:
+				SetDParam(0, _game_settings_restrict_dropdown[this->filter.mode]);
+				break;
+
+			case WID_GS_TYPE_DROPDOWN:
+				switch (this->filter.type) {
+					case ST_GAME:    SetDParam(0, _game_mode == GM_MENU ? STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_MENU : STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_INGAME); break;
+					case ST_COMPANY: SetDParam(0, _game_mode == GM_MENU ? STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_MENU : STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_INGAME); break;
+					case ST_CLIENT:  SetDParam(0, STR_CONFIG_SETTING_TYPE_DROPDOWN_CLIENT); break;
+					default:         SetDParam(0, STR_CONFIG_SETTING_TYPE_DROPDOWN_ALL); break;
+				}
+				break;
+		}
+	}
+
+	DropDownList *BuildDropDownList(int widget) const
+	{
+		DropDownList *list = NULL;
+		switch (widget) {
+			case WID_GS_RESTRICT_DROPDOWN:
+				list = new DropDownList();
+
+				for (int mode = 0; mode != RM_END; mode++) {
+					/* If we are in adv. settings screen for the new game's settings,
+					 * we don't want to allow comparing with new game's settings. */
+					bool disabled = mode == RM_CHANGED_AGAINST_NEW && settings_ptr == &_settings_newgame;
+
+					list->push_back(new DropDownListStringItem(_game_settings_restrict_dropdown[mode], mode, disabled));
+				}
+				break;
+
+			case WID_GS_TYPE_DROPDOWN:
+				list = new DropDownList();
+				list->push_back(new DropDownListStringItem(STR_CONFIG_SETTING_TYPE_DROPDOWN_ALL, ST_ALL, false));
+				list->push_back(new DropDownListStringItem(_game_mode == GM_MENU ? STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_MENU : STR_CONFIG_SETTING_TYPE_DROPDOWN_GAME_INGAME, ST_GAME, false));
+				list->push_back(new DropDownListStringItem(_game_mode == GM_MENU ? STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_MENU : STR_CONFIG_SETTING_TYPE_DROPDOWN_COMPANY_INGAME, ST_COMPANY, false));
+				list->push_back(new DropDownListStringItem(STR_CONFIG_SETTING_TYPE_DROPDOWN_CLIENT, ST_CLIENT, false));
+				break;
+		}
+		return list;
 	}
 
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
-		if (widget != WID_GS_OPTIONSPANEL) return;
+		switch (widget) {
+			case WID_GS_OPTIONSPANEL:
+				_settings_main_page.Draw(settings_ptr, r.left + SETTINGTREE_LEFT_OFFSET, r.right - SETTINGTREE_RIGHT_OFFSET, r.top + SETTINGTREE_TOP_OFFSET,
+						this->vscroll->GetPosition(), this->vscroll->GetPosition() + this->vscroll->GetCapacity(), this->last_clicked);
+				break;
 
-		_settings_main_page.Draw(settings_ptr, r.left + SETTINGTREE_LEFT_OFFSET, r.right - SETTINGTREE_RIGHT_OFFSET, r.top + SETTINGTREE_TOP_OFFSET,
-				this->vscroll->GetPosition(), this->vscroll->GetPosition() + this->vscroll->GetCapacity());
+			case WID_GS_HELP_TEXT:
+				if (this->last_clicked != NULL) {
+					const SettingDesc *sd = this->last_clicked->d.entry.setting;
+
+					int y = r.top;
+					switch (sd->GetType()) {
+						case ST_COMPANY: SetDParam(0, _game_mode == GM_MENU ? STR_CONFIG_SETTING_TYPE_COMPANY_MENU : STR_CONFIG_SETTING_TYPE_COMPANY_INGAME); break;
+						case ST_CLIENT:  SetDParam(0, STR_CONFIG_SETTING_TYPE_CLIENT); break;
+						case ST_GAME:    SetDParam(0, _game_mode == GM_MENU ? STR_CONFIG_SETTING_TYPE_GAME_MENU : STR_CONFIG_SETTING_TYPE_GAME_INGAME); break;
+						default: NOT_REACHED();
+					}
+					DrawString(r.left, r.right, y, STR_CONFIG_SETTING_TYPE);
+					y += FONT_HEIGHT_NORMAL;
+
+					int32 default_value = ReadValue(&sd->desc.def, sd->save.conv);
+					this->last_clicked->SetValueDParams(0, default_value);
+					DrawString(r.left, r.right, y, STR_CONFIG_SETTING_DEFAULT_VALUE);
+					y += FONT_HEIGHT_NORMAL + WD_PAR_VSEP_NORMAL;
+
+					DrawStringMultiLine(r.left, r.right, y, r.bottom, this->last_clicked->GetHelpText(), TC_WHITE);
+				}
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * Set the entry that should have its help text displayed, and mark the window dirty so it gets repainted.
+	 * @param pe Setting to display help text of, use \c NULL to stop displaying help of the currently displayed setting.
+	 */
+	void SetDisplayedHelpText(SettingEntry *pe)
+	{
+		if (this->last_clicked != pe) this->SetDirty();
+		this->last_clicked = pe;
 	}
 
 	virtual void OnClick(Point pt, int widget, int click_count)
 	{
+		switch (widget) {
+			case WID_GS_EXPAND_ALL:
+				this->manually_changed_folding = true;
+				_settings_main_page.UnFoldAll();
+				this->InvalidateData();
+				break;
+
+			case WID_GS_COLLAPSE_ALL:
+				this->manually_changed_folding = true;
+				_settings_main_page.FoldAll();
+				this->InvalidateData();
+				break;
+
+			case WID_GS_RESTRICT_DROPDOWN: {
+				DropDownList *list = this->BuildDropDownList(widget);
+				if (list != NULL) {
+					ShowDropDownList(this, list, this->filter.mode, widget);
+				}
+				break;
+			}
+
+			case WID_GS_TYPE_DROPDOWN: {
+				DropDownList *list = this->BuildDropDownList(widget);
+				if (list != NULL) {
+					ShowDropDownList(this, list, this->filter.type, widget);
+				}
+				break;
+			}
+		}
+
 		if (widget != WID_GS_OPTIONSPANEL) return;
 
-		uint btn = this->vscroll->GetScrolledRowFromWidget(pt.y, this, WID_GS_OPTIONSPANEL, SETTINGTREE_TOP_OFFSET - 1);
+		uint btn = this->vscroll->GetScrolledRowFromWidget(pt.y, this, WID_GS_OPTIONSPANEL, SETTINGTREE_TOP_OFFSET);
 		if (btn == INT_MAX) return;
 
 		uint cur_row = 0;
@@ -1704,14 +1948,16 @@ struct GameSettingsWindow : Window {
 
 		if (pe == NULL) return;  // Clicked below the last setting of the page
 
-		int x = (_current_text_dir == TD_RTL ? this->width - pt.x : pt.x) - SETTINGTREE_LEFT_OFFSET - (pe->level + 1) * LEVEL_WIDTH;  // Shift x coordinate
+		int x = (_current_text_dir == TD_RTL ? this->width - 1 - pt.x : pt.x) - SETTINGTREE_LEFT_OFFSET - (pe->level + 1) * LEVEL_WIDTH;  // Shift x coordinate
 		if (x < 0) return;  // Clicked left of the entry
 
 		if ((pe->flags & SEF_KIND_MASK) == SEF_SUBTREE_KIND) {
+			this->SetDisplayedHelpText(NULL);
 			pe->d.sub.folded = !pe->d.sub.folded; // Flip 'folded'-ness of the sub-page
 
-			this->vscroll->SetCount(_settings_main_page.Length());
-			this->SetDirty();
+			this->manually_changed_folding = true;
+
+			this->InvalidateData();
 			return;
 		}
 
@@ -1719,15 +1965,54 @@ struct GameSettingsWindow : Window {
 		const SettingDesc *sd = pe->d.entry.setting;
 
 		/* return if action is only active in network, or only settable by server */
-		if (!(sd->save.conv & SLF_NO_NETWORK_SYNC) && _networking && !_network_server && !(sd->desc.flags & SGF_PER_COMPANY)) return;
-		if ((sd->desc.flags & SGF_NETWORK_ONLY) && !_networking) return;
-		if ((sd->desc.flags & SGF_NO_NETWORK) && _networking) return;
+		if (!sd->IsEditable()) {
+			this->SetDisplayedHelpText(pe);
+			return;
+		}
 
 		const void *var = ResolveVariableAddress(settings_ptr, sd);
 		int32 value = (int32)ReadValue(var, sd->save.conv);
 
-		/* clicked on the icon on the left side. Either scroller or bool on/off */
-		if (x < 21) {
+		/* clicked on the icon on the left side. Either scroller, bool on/off or dropdown */
+		if (x < SETTING_BUTTON_WIDTH && (sd->desc.flags & SGF_MULTISTRING)) {
+			const SettingDescBase *sdb = &sd->desc;
+			this->SetDisplayedHelpText(pe);
+
+			if (this->valuedropdown_entry == pe) {
+				/* unclick the dropdown */
+				HideDropDownMenu(this);
+				this->closing_dropdown = false;
+				this->valuedropdown_entry->SetButtons(0);
+				this->valuedropdown_entry = NULL;
+			} else {
+				if (this->valuedropdown_entry != NULL) this->valuedropdown_entry->SetButtons(0);
+				this->closing_dropdown = false;
+
+				const NWidgetBase *wid = this->GetWidget<NWidgetBase>(WID_GS_OPTIONSPANEL);
+				int rel_y = (pt.y - (int)wid->pos_y - SETTINGTREE_TOP_OFFSET) % wid->resize_y;
+
+				Rect wi_rect;
+				wi_rect.left = pt.x - (_current_text_dir == TD_RTL ? SETTING_BUTTON_WIDTH - 1 - x : x);
+				wi_rect.right = wi_rect.left + SETTING_BUTTON_WIDTH - 1;
+				wi_rect.top = pt.y - rel_y + (SETTING_HEIGHT - SETTING_BUTTON_HEIGHT) / 2;
+				wi_rect.bottom = wi_rect.top + SETTING_BUTTON_HEIGHT - 1;
+
+				/* For dropdowns we also have to check the y position thoroughly, the mouse may not above the just opening dropdown */
+				if (pt.y >= wi_rect.top && pt.y <= wi_rect.bottom) {
+					this->valuedropdown_entry = pe;
+					this->valuedropdown_entry->SetButtons(SEF_LEFT_DEPRESSED);
+
+					DropDownList *list = new DropDownList();
+					for (int i = sdb->min; i <= (int)sdb->max; i++) {
+						list->push_back(new DropDownListStringItem(sdb->str_val + i - sdb->min, i, false));
+					}
+
+					ShowDropDownListAt(this, list, value, -1, wi_rect, COLOUR_ORANGE, true);
+				}
+			}
+			this->SetDirty();
+		} else if (x < SETTING_BUTTON_WIDTH) {
+			this->SetDisplayedHelpText(pe);
 			const SettingDescBase *sdb = &sd->desc;
 			int32 oldvalue = value;
 
@@ -1749,7 +2034,7 @@ struct GameSettingsWindow : Window {
 					}
 
 					/* Increase or decrease the value and clamp it to extremes */
-					if (x >= 10) {
+					if (x >= SETTING_BUTTON_WIDTH / 2) {
 						value += step;
 						if (sdb->min < 0) {
 							assert((int32)sdb->max >= 0);
@@ -1764,12 +2049,12 @@ struct GameSettingsWindow : Window {
 					}
 
 					/* Set up scroller timeout for numeric values */
-					if (value != oldvalue && !(sd->desc.flags & SGF_MULTISTRING)) {
+					if (value != oldvalue) {
 						if (this->clicked_entry != NULL) { // Release previous buttons if any
 							this->clicked_entry->SetButtons(0);
 						}
 						this->clicked_entry = pe;
-						this->clicked_entry->SetButtons((x >= 10) != (_current_text_dir == TD_RTL) ? SEF_RIGHT_DEPRESSED : SEF_LEFT_DEPRESSED);
+						this->clicked_entry->SetButtons((x >= SETTING_BUTTON_WIDTH / 2) != (_current_text_dir == TD_RTL) ? SEF_RIGHT_DEPRESSED : SEF_LEFT_DEPRESSED);
 						this->SetTimeout();
 						_left_button_clicked = false;
 					}
@@ -1788,8 +2073,8 @@ struct GameSettingsWindow : Window {
 				this->SetDirty();
 			}
 		} else {
-			/* only open editbox for types that its sensible for */
-			if (sd->desc.cmd != SDT_BOOLX && !(sd->desc.flags & SGF_MULTISTRING)) {
+			/* Only open editbox if clicked for the second time, and only for types where it is sensible for. */
+			if (this->last_clicked == pe && sd->desc.cmd != SDT_BOOLX && !(sd->desc.flags & SGF_MULTISTRING)) {
 				/* Show the correct currency-translated value */
 				if (sd->desc.flags & SGF_CURRENCY) value *= _currency->rate;
 
@@ -1797,6 +2082,7 @@ struct GameSettingsWindow : Window {
 				SetDParam(0, value);
 				ShowQueryString(STR_JUST_INT, STR_CONFIG_SETTING_QUERY_CAPTION, 10, this, CS_NUMERAL, QSF_ENABLE_DEFAULT);
 			}
+			this->SetDisplayedHelpText(pe);
 		}
 	}
 
@@ -1836,6 +2122,101 @@ struct GameSettingsWindow : Window {
 		this->SetDirty();
 	}
 
+	virtual void OnDropdownSelect(int widget, int index)
+	{
+		switch (widget) {
+			case WID_GS_RESTRICT_DROPDOWN:
+				this->filter.mode = (RestrictionMode)index;
+				if (this->filter.mode == RM_CHANGED_AGAINST_DEFAULT ||
+						this->filter.mode == RM_CHANGED_AGAINST_NEW) {
+
+					if (!this->manually_changed_folding) {
+						/* Expand all when selecting 'changes'. Update the filter state first, in case it becomes less restrictive in some cases. */
+						_settings_main_page.UpdateFilterState(this->filter, false);
+						_settings_main_page.UnFoldAll();
+					}
+				} else {
+					/* Non-'changes' filter. Save as default. */
+					_settings_client.gui.settings_restriction_mode = this->filter.mode;
+				}
+				this->InvalidateData();
+				break;
+
+			case WID_GS_TYPE_DROPDOWN:
+				this->filter.type = (SettingType)index;
+				this->InvalidateData();
+				break;
+
+			default:
+				if (widget < 0) {
+					/* Deal with drop down boxes on the panel. */
+					assert(this->valuedropdown_entry != NULL);
+					const SettingDesc *sd = this->valuedropdown_entry->d.entry.setting;
+					assert(sd->desc.flags & SGF_MULTISTRING);
+
+					if ((sd->desc.flags & SGF_PER_COMPANY) != 0) {
+						SetCompanySetting(this->valuedropdown_entry->d.entry.index, index);
+					} else {
+						SetSettingValue(this->valuedropdown_entry->d.entry.index, index);
+					}
+
+					this->SetDirty();
+				}
+				break;
+		}
+	}
+
+	virtual void OnDropdownClose(Point pt, int widget, int index, bool instant_close)
+	{
+		if (widget >= 0) {
+			/* Normally the default implementation of OnDropdownClose() takes care of
+			 * a few things. We want that behaviour here too, but only for
+			 * "normal" dropdown boxes. The special dropdown boxes added for every
+			 * setting that needs one can't have this call. */
+			Window::OnDropdownClose(pt, widget, index, instant_close);
+		} else {
+			/* We cannot raise the dropdown button just yet. OnClick needs some hint, whether
+			 * the same dropdown button was clicked again, and then not open the dropdown again.
+			 * So, we only remember that it was closed, and process it on the next OnPaint, which is
+			 * after OnClick. */
+			assert(this->valuedropdown_entry != NULL);
+			this->closing_dropdown = true;
+			this->SetDirty();
+		}
+	}
+
+	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
+	{
+		if (!gui_scope) return;
+
+		_settings_main_page.UpdateFilterState(this->filter, false);
+
+		this->vscroll->SetCount(_settings_main_page.Length());
+
+		if (this->last_clicked != NULL && !_settings_main_page.IsVisible(this->last_clicked)) {
+			this->SetDisplayedHelpText(NULL);
+		}
+
+		bool all_folded = true;
+		bool all_unfolded = true;
+		_settings_main_page.GetFoldingState(all_folded, all_unfolded);
+		this->SetWidgetDisabledState(WID_GS_EXPAND_ALL, all_unfolded);
+		this->SetWidgetDisabledState(WID_GS_COLLAPSE_ALL, all_folded);
+	}
+
+	virtual void OnEditboxChanged(int wid)
+	{
+		if (wid == WID_GS_FILTER) {
+			this->filter.string.SetFilterTerm(this->filter_editbox.text.buf);
+			if (!this->filter.string.IsEmpty() && !this->manually_changed_folding) {
+				/* User never expanded/collapsed single pages and entered a filter term.
+				 * Expand everything, to save weird expand clicks, */
+				_settings_main_page.UnFoldAll();
+			}
+			this->InvalidateData();
+		}
+	}
+
 	virtual void OnResize()
 	{
 		this->vscroll->SetCapacityFromWidget(this, WID_GS_OPTIONSPANEL, SETTINGTREE_TOP_OFFSET + SETTINGTREE_BOTTOM_OFFSET);
@@ -1849,17 +2230,46 @@ static const NWidgetPart _nested_settings_selection_widgets[] = {
 		NWidget(WWT_CLOSEBOX, COLOUR_MAUVE),
 		NWidget(WWT_CAPTION, COLOUR_MAUVE), SetDataTip(STR_CONFIG_SETTING_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 	EndContainer(),
+	NWidget(WWT_PANEL, COLOUR_MAUVE),
+		NWidget(NWID_HORIZONTAL), SetPadding(WD_TEXTPANEL_TOP, 0, WD_TEXTPANEL_BOTTOM, 0),
+				SetPIP(WD_FRAMETEXT_LEFT, WD_FRAMETEXT_RIGHT, WD_FRAMETEXT_RIGHT),
+			NWidget(WWT_TEXT, COLOUR_MAUVE, WID_GS_RESTRICT_LABEL), SetDataTip(STR_CONFIG_SETTING_RESTRICT_LABEL, STR_NULL),
+			NWidget(NWID_VERTICAL), SetPIP(0, WD_PAR_VSEP_NORMAL, 0),
+				NWidget(WWT_DROPDOWN, COLOUR_MAUVE, WID_GS_RESTRICT_DROPDOWN), SetMinimalSize(100, 12), SetDataTip(STR_BLACK_STRING, STR_CONFIG_SETTING_RESTRICT_DROPDOWN_HELPTEXT), SetFill(1, 0), SetResize(1, 0),
+				NWidget(WWT_DROPDOWN, COLOUR_MAUVE, WID_GS_TYPE_DROPDOWN), SetMinimalSize(100, 12), SetDataTip(STR_BLACK_STRING, STR_CONFIG_SETTING_TYPE_DROPDOWN_HELPTEXT), SetFill(1, 0), SetResize(1, 0),
+			EndContainer(),
+		EndContainer(),
+		NWidget(NWID_HORIZONTAL), SetPadding(0, 0, WD_TEXTPANEL_BOTTOM, 0),
+				SetPIP(WD_FRAMETEXT_LEFT, WD_FRAMETEXT_RIGHT, WD_FRAMETEXT_RIGHT),
+			NWidget(WWT_TEXT, COLOUR_MAUVE), SetFill(0, 1), SetDataTip(STR_CONFIG_SETTING_FILTER_TITLE, STR_NULL),
+			NWidget(WWT_EDITBOX, COLOUR_MAUVE, WID_GS_FILTER), SetFill(1, 0), SetMinimalSize(50, 12), SetResize(1, 0),
+					SetDataTip(STR_LIST_FILTER_OSKTITLE, STR_LIST_FILTER_TOOLTIP),
+		EndContainer(),
+	EndContainer(),
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_PANEL, COLOUR_MAUVE, WID_GS_OPTIONSPANEL), SetMinimalSize(400, 174), SetScrollbar(WID_GS_SCROLLBAR), EndContainer(),
 		NWidget(NWID_VERTICAL),
 			NWidget(NWID_VSCROLLBAR, COLOUR_MAUVE, WID_GS_SCROLLBAR),
+		EndContainer(),
+	EndContainer(),
+	NWidget(WWT_PANEL, COLOUR_MAUVE), SetMinimalSize(400, 40),
+		NWidget(WWT_EMPTY, INVALID_COLOUR, WID_GS_HELP_TEXT), SetMinimalSize(300, 25), SetFill(1, 1), SetResize(1, 0),
+				SetPadding(WD_FRAMETEXT_TOP, WD_FRAMETEXT_RIGHT, WD_FRAMETEXT_BOTTOM, WD_FRAMETEXT_LEFT),
+		NWidget(NWID_HORIZONTAL),
+			NWidget(WWT_PANEL, COLOUR_MAUVE),
+				NWidget(NWID_HORIZONTAL),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, WID_GS_EXPAND_ALL), SetDataTip(STR_CONFIG_SETTING_EXPAND_ALL, STR_NULL),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_MAUVE, WID_GS_COLLAPSE_ALL), SetDataTip(STR_CONFIG_SETTING_COLLAPSE_ALL, STR_NULL),
+					NWidget(NWID_SPACER, INVALID_COLOUR), SetFill(1, 1), SetResize(1, 0),
+				EndContainer(),
+			EndContainer(),
 			NWidget(WWT_RESIZEBOX, COLOUR_MAUVE),
 		EndContainer(),
 	EndContainer(),
 };
 
 static const WindowDesc _settings_selection_desc(
-	WDP_CENTER, 450, 397,
+	WDP_CENTER, 510, 450,
 	WC_GAME_OPTIONS, WC_NONE,
 	0,
 	_nested_settings_selection_widgets, lengthof(_nested_settings_selection_widgets)
@@ -1886,18 +2296,40 @@ void DrawArrowButtons(int x, int y, Colours button_colour, byte state, bool clic
 {
 	int colour = _colour_gradient[button_colour][2];
 
-	DrawFrameRect(x,      y + 1, x +  9, y + 9, button_colour, (state == 1) ? FR_LOWERED : FR_NONE);
-	DrawFrameRect(x + 10, y + 1, x + 19, y + 9, button_colour, (state == 2) ? FR_LOWERED : FR_NONE);
+	DrawFrameRect(x,                            y, x + SETTING_BUTTON_WIDTH / 2 - 1, y + SETTING_BUTTON_HEIGHT - 1, button_colour, (state == 1) ? FR_LOWERED : FR_NONE);
+	DrawFrameRect(x + SETTING_BUTTON_WIDTH / 2, y, x + SETTING_BUTTON_WIDTH     - 1, y + SETTING_BUTTON_HEIGHT - 1, button_colour, (state == 2) ? FR_LOWERED : FR_NONE);
 	DrawSprite(SPR_ARROW_LEFT, PAL_NONE, x + WD_IMGBTN_LEFT, y + WD_IMGBTN_TOP);
-	DrawSprite(SPR_ARROW_RIGHT, PAL_NONE, x + WD_IMGBTN_LEFT + 10, y + WD_IMGBTN_TOP);
+	DrawSprite(SPR_ARROW_RIGHT, PAL_NONE, x + WD_IMGBTN_LEFT + SETTING_BUTTON_WIDTH / 2, y + WD_IMGBTN_TOP);
 
 	/* Grey out the buttons that aren't clickable */
 	bool rtl = _current_text_dir == TD_RTL;
 	if (rtl ? !clickable_right : !clickable_left) {
-		GfxFillRect(x +  1, y + 1, x +  1 + 8, y + 8, colour, FILLRECT_CHECKER);
+		GfxFillRect(x                            + 1, y, x + SETTING_BUTTON_WIDTH / 2 - 1, y + SETTING_BUTTON_HEIGHT - 2, colour, FILLRECT_CHECKER);
 	}
 	if (rtl ? !clickable_left : !clickable_right) {
-		GfxFillRect(x + 11, y + 1, x + 11 + 8, y + 8, colour, FILLRECT_CHECKER);
+		GfxFillRect(x + SETTING_BUTTON_WIDTH / 2 + 1, y, x + SETTING_BUTTON_WIDTH     - 1, y + SETTING_BUTTON_HEIGHT - 2, colour, FILLRECT_CHECKER);
+	}
+}
+
+/**
+ * Draw a dropdown button.
+ * @param x the x position to draw
+ * @param y the y position to draw
+ * @param button_colour the colour of the button
+ * @param state true = lowered
+ * @param clickable is the button clickable?
+ */
+void DrawDropDownButton(int x, int y, Colours button_colour, bool state, bool clickable)
+{
+	static const char *DOWNARROW = "\xEE\x8A\xAA";
+
+	int colour = _colour_gradient[button_colour][2];
+
+	DrawFrameRect(x, y, x + SETTING_BUTTON_WIDTH - 1, y + SETTING_BUTTON_HEIGHT - 1, button_colour, state ? FR_LOWERED : FR_NONE);
+	DrawString(x + (state ? 1 : 0), x + SETTING_BUTTON_WIDTH - (state ? 0 : 1), y + (state ? 2 : 1), DOWNARROW, TC_BLACK, SA_HOR_CENTER);
+
+	if (!clickable) {
+		GfxFillRect(x +  1, y, x + SETTING_BUTTON_WIDTH - 1, y + SETTING_BUTTON_HEIGHT - 2, colour, FILLRECT_CHECKER);
 	}
 }
 
@@ -1911,7 +2343,7 @@ void DrawArrowButtons(int x, int y, Colours button_colour, byte state, bool clic
 void DrawBoolButton(int x, int y, bool state, bool clickable)
 {
 	static const Colours _bool_ctabs[2][2] = {{COLOUR_CREAM, COLOUR_RED}, {COLOUR_DARK_GREEN, COLOUR_GREEN}};
-	DrawFrameRect(x, y + 1, x + 19, y + 9, _bool_ctabs[state][clickable], state ? FR_LOWERED : FR_NONE);
+	DrawFrameRect(x, y, x + SETTING_BUTTON_WIDTH - 1, y + SETTING_BUTTON_HEIGHT - 1, _bool_ctabs[state][clickable], state ? FR_LOWERED : FR_NONE);
 }
 
 struct CustomCurrencyWindow : Window {
@@ -2132,7 +2564,7 @@ static const NWidgetPart _nested_cust_currency_widgets[] = {
 static const WindowDesc _cust_currency_desc(
 	WDP_CENTER, 0, 0,
 	WC_CUSTOM_CURRENCY, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_cust_currency_widgets, lengthof(_nested_cust_currency_widgets)
 );
 

@@ -49,11 +49,11 @@ enum WidgetType {
 
 	WWT_PANEL,      ///< Simple depressed panel
 	WWT_INSET,      ///< Pressed (inset) panel, most commonly used as combo box _text_ area
-	WWT_IMGBTN,     ///< Button with image
-	WWT_IMGBTN_2,   ///< Button with diff image when clicked
-	WWT_ARROWBTN,   ///< Button with an arrow
-	WWT_TEXTBTN,    ///< Button with text
-	WWT_TEXTBTN_2,  ///< Button with diff text when clicked
+	WWT_IMGBTN,     ///< (Toggle) Button with image
+	WWT_IMGBTN_2,   ///< (Toggle) Button with diff image when clicked
+	WWT_ARROWBTN,   ///< (Toggle) Button with an arrow
+	WWT_TEXTBTN,    ///< (Toggle) Button with text
+	WWT_TEXTBTN_2,  ///< (Toggle) Button with diff text when clicked
 	WWT_LABEL,      ///< Centered label
 	WWT_TEXT,       ///< Pure simple text
 	WWT_MATRIX,     ///< Grid of rows and columns. @see MatrixWidgetValues
@@ -98,10 +98,10 @@ enum WidgetType {
 
 	WWB_PUSHBUTTON    = 1 << 7,
 
-	WWT_PUSHBTN       = WWT_PANEL    | WWB_PUSHBUTTON,
-	WWT_PUSHTXTBTN    = WWT_TEXTBTN  | WWB_PUSHBUTTON,
-	WWT_PUSHIMGBTN    = WWT_IMGBTN   | WWB_PUSHBUTTON,
-	WWT_PUSHARROWBTN  = WWT_ARROWBTN | WWB_PUSHBUTTON,
+	WWT_PUSHBTN       = WWT_PANEL    | WWB_PUSHBUTTON,    ///< Normal push-button (no toggle button) with custom drawing
+	WWT_PUSHTXTBTN    = WWT_TEXTBTN  | WWB_PUSHBUTTON,    ///< Normal push-button (no toggle button) with text caption
+	WWT_PUSHIMGBTN    = WWT_IMGBTN   | WWB_PUSHBUTTON,    ///< Normal push-button (no toggle button) with image caption
+	WWT_PUSHARROWBTN  = WWT_ARROWBTN | WWB_PUSHBUTTON,    ///< Normal push-button (no toggle button) with arrow caption
 	NWID_PUSHBUTTON_DROPDOWN = NWID_BUTTON_DROPDOWN | WWB_PUSHBUTTON,
 };
 
@@ -281,10 +281,10 @@ DECLARE_ENUM_AS_BIT_SET(NWidgetDisplay)
  */
 class NWidgetCore : public NWidgetResizeBase {
 public:
-	NWidgetCore(WidgetType tp, Colours colour, uint fill_x, uint fill_y, uint16 widget_data, StringID tool_tip);
+	NWidgetCore(WidgetType tp, Colours colour, uint fill_x, uint fill_y, uint32 widget_data, StringID tool_tip);
 
 	void SetIndex(int index);
-	void SetDataTip(uint16 widget_data, StringID tool_tip);
+	void SetDataTip(uint32 widget_data, StringID tool_tip);
 
 	inline void SetLowered(bool lowered);
 	inline bool IsLowered() const;
@@ -300,7 +300,7 @@ public:
 	NWidgetDisplay disp_flags; ///< Flags that affect display and interaction with the widget.
 	Colours colour;            ///< Colour of this widget.
 	int index;                 ///< Index of the nested widget in the widget array of the window (\c -1 means 'not used').
-	uint16 widget_data;        ///< Data of the widget. @see Widget::data
+	uint32 widget_data;        ///< Data of the widget. @see Widget::data
 	StringID tool_tip;         ///< Tooltip of the widget. @see Widget::tootips
 	int scrollbar_index;       ///< Index of an attached scrollbar.
 	TextColour highlight_colour; ///< Colour of highlight.

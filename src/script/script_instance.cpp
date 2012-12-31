@@ -27,6 +27,7 @@
 
 #include "../company_base.h"
 #include "../company_func.h"
+#include "../fileio_func.h"
 
 ScriptStorage::~ScriptStorage()
 {
@@ -55,6 +56,7 @@ ScriptInstance::ScriptInstance(const char *APIName) :
 	is_dead(false),
 	is_save_data_on_stack(false),
 	suspend(0),
+	is_paused(false),
 	callback(NULL)
 {
 	this->storage = new ScriptStorage();
@@ -104,6 +106,28 @@ void ScriptInstance::RegisterAPI()
 	squirrel_register_std(this->engine);
 }
 
+bool ScriptInstance::LoadCompatibilityScripts(const char *api_version, Subdirectory dir)
+{
+	char script_name[32];
+	seprintf(script_name, lastof(script_name), "compat_%s.nut", api_version);
+	char buf[MAX_PATH];
+	Searchpath sp;
+	FOR_ALL_SEARCHPATHS(sp) {
+		FioAppendDirectory(buf, MAX_PATH, sp, dir);
+		ttd_strlcat(buf, script_name, MAX_PATH);
+		if (!FileExists(buf)) continue;
+
+		if (this->engine->LoadScript(buf)) return true;
+
+		ScriptLog::Error("Failed to load API compatibility script");
+		DEBUG(script, 0, "Error compiling / running API compatibility script: %s", buf);
+		return false;
+	}
+
+	ScriptLog::Warning("API compatibility script not found");
+	return true;
+}
+
 ScriptInstance::~ScriptInstance()
 {
 	ScriptObject::ActiveInstance active(this);
@@ -142,6 +166,7 @@ void ScriptInstance::GameLoop()
 		this->Died();
 		return;
 	}
+	if (this->is_paused) return;
 	this->controller->ticks++;
 
 	if (this->suspend   < -1) this->suspend++; // Multiplayer suspend, increase up to -1.
@@ -497,10 +522,23 @@ void ScriptInstance::Save()
 	}
 }
 
-void ScriptInstance::Suspend()
+void ScriptInstance::Pause()
 {
+	/* Suspend script. */
 	HSQUIRRELVM vm = this->engine->GetVM();
 	Squirrel::DecreaseOps(vm, _settings_game.script.script_max_opcode_till_suspend);
+
+	this->is_paused = true;
+}
+
+void ScriptInstance::Unpause()
+{
+	this->is_paused = false;
+}
+
+bool ScriptInstance::IsPaused()
+{
+	return this->is_paused;
 }
 
 /* static */ bool ScriptInstance::LoadObjects(HSQUIRRELVM vm)

@@ -296,6 +296,7 @@
     <ClCompile Include="..\src\articulated_vehicles.cpp" />
     <ClCompile Include="..\src\autoreplace.cpp" />
     <ClCompile Include="..\src\bmp.cpp" />
+    <ClCompile Include="..\src\cargomonitor.cpp" />
     <ClCompile Include="..\src\cargopacket.cpp" />
     <ClCompile Include="..\src\cargotype.cpp" />
     <ClCompile Include="..\src\cheat.cpp" />
@@ -316,6 +317,7 @@
     <ClCompile Include="..\src\fileio.cpp" />
     <ClCompile Include="..\src\fios.cpp" />
     <ClCompile Include="..\src\fontcache.cpp" />
+    <ClCompile Include="..\src\base_consist.cpp" />
     <ClCompile Include="..\src\gamelog.cpp" />
     <ClCompile Include="..\src\genworld.cpp" />
     <ClCompile Include="..\src\gfx.cpp" />
@@ -360,8 +362,10 @@
     <ClCompile Include="..\src\station.cpp" />
     <ClCompile Include="..\src\strgen\strgen_base.cpp" />
     <ClCompile Include="..\src\string.cpp" />
+    <ClCompile Include="..\src\stringfilter.cpp" />
     <ClCompile Include="..\src\strings.cpp" />
     <ClCompile Include="..\src\subsidy.cpp" />
+    <ClCompile Include="..\src\textbuf.cpp" />
     <ClCompile Include="..\src\texteff.cpp" />
     <ClCompile Include="..\src\tgp.cpp" />
     <ClCompile Include="..\src\tile_map.cpp" />
@@ -388,6 +392,7 @@
     <ClInclude Include="..\src\bmp.h" />
     <ClInclude Include="..\src\bridge.h" />
     <ClInclude Include="..\src\cargo_type.h" />
+    <ClInclude Include="..\src\cargomonitor.h" />
     <ClInclude Include="..\src\cargopacket.h" />
     <ClInclude Include="..\src\cargotype.h" />
     <ClInclude Include="..\src\cheat_func.h" />
@@ -435,6 +440,7 @@
     <ClInclude Include="..\src\fileio_type.h" />
     <ClInclude Include="..\src\fios.h" />
     <ClInclude Include="..\src\fontcache.h" />
+    <ClInclude Include="..\src\base_consist.h" />
     <ClInclude Include="..\src\gamelog.h" />
     <ClInclude Include="..\src\gamelog_internal.h" />
     <ClInclude Include="..\src\genworld.h" />
@@ -539,6 +545,7 @@
     <ClInclude Include="..\src\sound\sdl_s.h" />
     <ClInclude Include="..\src\video\sdl_v.h" />
     <ClInclude Include="..\src\settings_func.h" />
+    <ClInclude Include="..\src\settings_gui.h" />
     <ClInclude Include="..\src\settings_internal.h" />
     <ClInclude Include="..\src\settings_type.h" />
     <ClInclude Include="..\src\ship.h" />
@@ -564,6 +571,7 @@
     <ClInclude Include="..\src\strgen\strgen.h" />
     <ClInclude Include="..\src\string_func.h" />
     <ClInclude Include="..\src\string_type.h" />
+    <ClInclude Include="..\src\stringfilter_type.h" />
     <ClInclude Include="..\src\strings_func.h" />
     <ClInclude Include="..\src\strings_type.h" />
     <ClInclude Include="..\src\subsidy_base.h" />
@@ -572,6 +580,7 @@
     <ClInclude Include="..\src\tar_type.h" />
     <ClInclude Include="..\src\terraform_gui.h" />
     <ClInclude Include="..\src\textbuf_gui.h" />
+    <ClInclude Include="..\src\textbuf_type.h" />
     <ClInclude Include="..\src\texteff.hpp" />
     <ClInclude Include="..\src\textfile_gui.h" />
     <ClInclude Include="..\src\textfile_type.h" />
@@ -783,6 +792,7 @@
     <ClCompile Include="..\src\saveload\airport_sl.cpp" />
     <ClCompile Include="..\src\saveload\animated_tile_sl.cpp" />
     <ClCompile Include="..\src\saveload\autoreplace_sl.cpp" />
+    <ClCompile Include="..\src\saveload\cargomonitor_sl.cpp" />
     <ClCompile Include="..\src\saveload\cargopacket_sl.cpp" />
     <ClCompile Include="..\src\saveload\cheat_sl.cpp" />
     <ClCompile Include="..\src\saveload\company_sl.cpp" />
@@ -947,6 +957,7 @@
     <ClInclude Include="..\src\script\api\script_bridgelist.hpp" />
     <ClInclude Include="..\src\script\api\script_cargo.hpp" />
     <ClInclude Include="..\src\script\api\script_cargolist.hpp" />
+    <ClInclude Include="..\src\script\api\script_cargomonitor.hpp" />
     <ClInclude Include="..\src\script\api\script_company.hpp" />
     <ClInclude Include="..\src\script\api\script_companymode.hpp" />
     <ClInclude Include="..\src\script\api\script_controller.hpp" />
@@ -1008,6 +1019,7 @@
     <ClCompile Include="..\src\script\api\script_bridgelist.cpp" />
     <ClCompile Include="..\src\script\api\script_cargo.cpp" />
     <ClCompile Include="..\src\script\api\script_cargolist.cpp" />
+    <ClCompile Include="..\src\script\api\script_cargomonitor.cpp" />
     <ClCompile Include="..\src\script\api\script_company.cpp" />
     <ClCompile Include="..\src\script\api\script_companymode.cpp" />
     <ClCompile Include="..\src\script\api\script_controller.cpp" />

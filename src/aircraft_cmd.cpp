@@ -136,6 +136,11 @@ static StationID FindNearestHangar(const Aircraft *v)
 
 		/* v->tile can't be used here, when aircraft is flying v->tile is set to 0 */
 		uint distance = DistanceSquare(vtile, st->airport.tile);
+		if (v->acache.cached_max_range_sqr != 0) {
+			/* Check if our current destination can be reached from the depot airport. */
+			const Station *cur_dest = GetTargetAirportIfValid(v);
+			if (cur_dest != NULL && DistanceSquare(st->airport.tile, cur_dest->airport.tile) > v->acache.cached_max_range_sqr) continue;
+		}
 		if (distance < best || index == INVALID_STATION) {
 			best = distance;
 			index = st->index;
@@ -202,17 +207,22 @@ void DrawAircraftEngine(int left, int right, int preferred_x, int y, EngineID en
 }
 
 /**
- * Get the size of the sprite of an aircraft sprite heading west (used for lists)
- * @param engine The engine to get the sprite from
- * @param width The width of the sprite
- * @param height The height of the sprite
+ * Get the size of the sprite of an aircraft sprite heading west (used for lists).
+ * @param engine The engine to get the sprite from.
+ * @param[out] width The width of the sprite.
+ * @param[out] height The height of the sprite.
+ * @param[out] xoffs Number of pixels to shift the sprite to the right.
+ * @param[out] yoffs Number of pixels to shift the sprite downwards.
+ * @param image_type Context the sprite is used in.
  */
-void GetAircraftSpriteSize(EngineID engine, uint &width, uint &height, EngineImageType image_type)
+void GetAircraftSpriteSize(EngineID engine, uint &width, uint &height, int &xoffs, int &yoffs, EngineImageType image_type)
 {
 	const Sprite *spr = GetSprite(GetAircraftIcon(engine, image_type), ST_NORMAL);
 
 	width  = UnScaleByZoom(spr->width, ZOOM_LVL_GUI);
 	height = UnScaleByZoom(spr->height, ZOOM_LVL_GUI);
+	xoffs  = UnScaleByZoom(spr->x_offs, ZOOM_LVL_GUI);
+	yoffs  = UnScaleByZoom(spr->y_offs, ZOOM_LVL_GUI);
 }
 
 /**
@@ -365,7 +375,7 @@ bool Aircraft::FindClosestDepot(TileIndex *location, DestinationID *destination,
 static void CheckIfAircraftNeedsService(Aircraft *v)
 {
 	if (Company::Get(v->owner)->settings.vehicle.servint_aircraft == 0 || !v->NeedsAutomaticServicing()) return;
-	if (v->IsInDepot()) {
+	if (v->IsChainInDepot()) {
 		VehicleServiceInDepot(v);
 		return;
 	}
@@ -1163,13 +1173,10 @@ static void CrashAirplane(Aircraft *v)
 	AI::NewEvent(v->owner, new ScriptEventVehicleCrashed(v->index, v->tile, st == NULL ? ScriptEventVehicleCrashed::CRASH_AIRCRAFT_NO_AIRPORT : ScriptEventVehicleCrashed::CRASH_PLANE_LANDING));
 	Game::NewEvent(new ScriptEventVehicleCrashed(v->index, v->tile, st == NULL ? ScriptEventVehicleCrashed::CRASH_AIRCRAFT_NO_AIRPORT : ScriptEventVehicleCrashed::CRASH_PLANE_LANDING));
 
-	AddVehicleNewsItem(newsitem,
-		NS_ACCIDENT,
-		v->index,
-		st != NULL ? st->index : INVALID_STATION);
+	AddVehicleNewsItem(newsitem, NT_ACCIDENT, v->index, st != NULL ? st->index : INVALID_STATION);
 
 	ModifyStationRatingAround(v->tile, v->owner, -160, 30);
-	SndPlayVehicleFx(SND_12_EXPLOSION, v);
+	if (_settings_client.sound.disaster) SndPlayVehicleFx(SND_12_EXPLOSION, v);
 }
 
 /**
@@ -1222,7 +1229,7 @@ static void AircraftEntersTerminal(Aircraft *v)
 		/* show newsitem of celebrating citizens */
 		AddVehicleNewsItem(
 			STR_NEWS_FIRST_AIRCRAFT_ARRIVAL,
-			(v->owner == _local_company) ? NS_ARRIVAL_COMPANY : NS_ARRIVAL_OTHER,
+			(v->owner == _local_company) ? NT_ARRIVAL_COMPANY : NT_ARRIVAL_OTHER,
 			v->index,
 			st->index
 		);
@@ -1862,7 +1869,7 @@ static void AircraftHandleDestTooFar(Aircraft *v, bool too_far)
 			if (v->owner == _local_company) {
 				/* Post a news message. */
 				SetDParam(0, v->index);
-				AddVehicleNewsItem(STR_NEWS_AIRCRAFT_DEST_TOO_FAR, NS_ADVICE, v->index);
+				AddVehicleAdviceNewsItem(STR_NEWS_AIRCRAFT_DEST_TOO_FAR, v->index);
 			}
 		}
 		return;

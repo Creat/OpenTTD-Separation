@@ -76,7 +76,7 @@ static void DisasterClearSquare(TileIndex tile)
 
 	switch (GetTileType(tile)) {
 		case MP_RAILWAY:
-			if (Company::IsHumanID(GetTileOwner(tile))) {
+			if (Company::IsHumanID(GetTileOwner(tile)) && !IsRailDepot(tile)) {
 				Backup<CompanyByte> cur_company(_current_company, OWNER_WATER, FILE_LINE);
 				DoCommand(tile, 0, 0, DC_EXEC, CMD_LANDSCAPE_CLEAR);
 				cur_company.Restore();
@@ -218,9 +218,7 @@ static bool DisasterTick_Zeppeliner(DisasterVehicle *v)
 				v->age = 0;
 
 				SetDParam(0, GetStationIndex(v->tile));
-				AddVehicleNewsItem(STR_NEWS_DISASTER_ZEPPELIN,
-					NS_ACCIDENT,
-					v->index); // Delete the news, when the zeppelin is gone
+				AddVehicleNewsItem(STR_NEWS_DISASTER_ZEPPELIN, NT_ACCIDENT, v->index); // Delete the news, when the zeppelin is gone
 				AI::NewEvent(GetTileOwner(v->tile), new ScriptEventDisasterZeppelinerCrashed(GetStationIndex(v->tile)));
 			}
 		}
@@ -255,7 +253,7 @@ static bool DisasterTick_Zeppeliner(DisasterVehicle *v)
 
 	if (++v->age == 1) {
 		CreateEffectVehicleRel(v, 0, 7, 8, EV_EXPLOSION_LARGE);
-		SndPlayVehicleFx(SND_12_EXPLOSION, v);
+		if (_settings_client.sound.disaster) SndPlayVehicleFx(SND_12_EXPLOSION, v);
 		v->image_override = SPR_BLIMP_CRASHING;
 	} else if (v->age == 70) {
 		v->image_override = SPR_BLIMP_CRASHED;
@@ -353,9 +351,7 @@ static bool DisasterTick_Ufo(DisasterVehicle *v)
 			if (u->crashed_ctr == 0) {
 				u->Crash();
 
-				AddVehicleNewsItem(STR_NEWS_DISASTER_SMALL_UFO,
-					NS_ACCIDENT,
-					u->index); // delete the news, when the roadvehicle is gone
+				AddVehicleNewsItem(STR_NEWS_DISASTER_SMALL_UFO, NT_ACCIDENT, u->index); // delete the news, when the roadvehicle is gone
 
 				AI::NewEvent(u->owner, new ScriptEventVehicleCrashed(u->index, u->tile, ScriptEventVehicleCrashed::CRASH_RV_UFO));
 				Game::NewEvent(new ScriptEventVehicleCrashed(u->index, u->tile, ScriptEventVehicleCrashed::CRASH_RV_UFO));
@@ -365,7 +361,7 @@ static bool DisasterTick_Ufo(DisasterVehicle *v)
 		/* Destroy? */
 		if (v->age > 50) {
 			CreateEffectVehicleRel(v, 0, 7, 8, EV_EXPLOSION_LARGE);
-			SndPlayVehicleFx(SND_12_EXPLOSION, v);
+			if (_settings_client.sound.disaster) SndPlayVehicleFx(SND_12_EXPLOSION, v);
 			delete v;
 			return false;
 		}
@@ -434,8 +430,8 @@ static bool DisasterTick_Aircraft(DisasterVehicle *v, uint16 image_override, boo
 			DestructIndustry(i);
 
 			SetDParam(0, i->town->index);
-			AddIndustryNewsItem(news_message, NS_ACCIDENT, i->index); // delete the news, when the industry closes
-			SndPlayTileFx(SND_12_EXPLOSION, i->location.tile);
+			AddIndustryNewsItem(news_message, NT_ACCIDENT, i->index); // delete the news, when the industry closes
+			if (_settings_client.sound.disaster) SndPlayTileFx(SND_12_EXPLOSION, i->location.tile);
 		}
 	} else if (v->current_order.GetDestination() == 0) {
 		int x = v->x_pos + ((leave_at_top ? -15 : 15) * TILE_SIZE);
@@ -530,10 +526,7 @@ static bool DisasterTick_Big_Ufo(DisasterVehicle *v)
 
 		Town *t = ClosestTownFromTile(v->dest_tile, UINT_MAX);
 		SetDParam(0, t->index);
-		AddNewsItem(STR_NEWS_DISASTER_BIG_UFO,
-			NS_ACCIDENT,
-			NR_TILE,
-			v->tile);
+		AddTileNewsItem(STR_NEWS_DISASTER_BIG_UFO, NT_ACCIDENT, v->tile);
 
 		if (!Vehicle::CanAllocateItem(2)) {
 			delete v;
@@ -603,7 +596,7 @@ static bool DisasterTick_Big_Ufo_Destroyer(DisasterVehicle *v)
 		v->current_order.SetDestination(1);
 
 		CreateEffectVehicleRel(u, 0, 7, 8, EV_EXPLOSION_LARGE);
-		SndPlayVehicleFx(SND_12_EXPLOSION, u);
+		if (_settings_client.sound.disaster) SndPlayVehicleFx(SND_12_EXPLOSION, u);
 
 		delete u;
 
@@ -878,8 +871,7 @@ static void Disaster_CoalMine_Init()
 		FOR_ALL_INDUSTRIES(i) {
 			if ((GetIndustrySpec(i->type)->behaviour & INDUSTRYBEH_CAN_SUBSIDENCE) && --index < 0) {
 				SetDParam(0, i->town->index);
-				AddNewsItem(STR_NEWS_DISASTER_COAL_MINE_SUBSIDENCE,
-					NS_ACCIDENT, NR_TILE, i->location.tile + TileDiffXY(1, 1)); // keep the news, even when the mine closes
+				AddTileNewsItem(STR_NEWS_DISASTER_COAL_MINE_SUBSIDENCE, NT_ACCIDENT, i->location.tile + TileDiffXY(1, 1)); // keep the news, even when the mine closes
 
 				{
 					TileIndex tile = i->location.tile;

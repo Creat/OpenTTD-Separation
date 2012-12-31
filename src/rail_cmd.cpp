@@ -44,6 +44,18 @@ RailtypeInfo _railtypes[RAILTYPE_END];
 
 assert_compile(sizeof(_original_railtypes) <= sizeof(_railtypes));
 
+/** Enum holding the signal offset in the sprite sheet according to the side it is representing. */
+enum SignalOffsets {
+	SIGNAL_TO_SOUTHWEST,
+	SIGNAL_TO_NORTHEAST,
+	SIGNAL_TO_SOUTHEAST,
+	SIGNAL_TO_NORTHWEST,
+	SIGNAL_TO_EAST,
+	SIGNAL_TO_WEST,
+	SIGNAL_TO_SOUTH,
+	SIGNAL_TO_NORTH,
+};
+
 /**
  * Reset all rail type information to its default values.
  */
@@ -73,6 +85,24 @@ void ResolveRailTypeGUISprites(RailtypeInfo *rti)
 		rti->cursor.depot     = cursors_base + 13;
 		rti->cursor.tunnel    = cursors_base + 14;
 		rti->cursor.convert   = cursors_base + 15;
+	}
+
+	/* Array of default GUI signal sprite numbers. */
+	const SpriteID _signal_lookup[2][SIGTYPE_END] = {
+		{SPR_IMG_SIGNAL_ELECTRIC_NORM,  SPR_IMG_SIGNAL_ELECTRIC_ENTRY, SPR_IMG_SIGNAL_ELECTRIC_EXIT,
+		 SPR_IMG_SIGNAL_ELECTRIC_COMBO, SPR_IMG_SIGNAL_ELECTRIC_PBS,   SPR_IMG_SIGNAL_ELECTRIC_PBS_OWAY},
+
+		{SPR_IMG_SIGNAL_SEMAPHORE_NORM,  SPR_IMG_SIGNAL_SEMAPHORE_ENTRY, SPR_IMG_SIGNAL_SEMAPHORE_EXIT,
+		 SPR_IMG_SIGNAL_SEMAPHORE_COMBO, SPR_IMG_SIGNAL_SEMAPHORE_PBS,   SPR_IMG_SIGNAL_SEMAPHORE_PBS_OWAY},
+	};
+
+	for (SignalType type = SIGTYPE_NORMAL; type < SIGTYPE_END; type = (SignalType)(type + 1)) {
+		for (SignalVariant var = SIG_ELECTRIC; var <= SIG_SEMAPHORE; var = (SignalVariant)(var + 1)) {
+			SpriteID red   = GetCustomSignalSprite(rti, INVALID_TILE, type, var, SIGNAL_STATE_RED, true);
+			SpriteID green = GetCustomSignalSprite(rti, INVALID_TILE, type, var, SIGNAL_STATE_GREEN, true);
+			rti->gui_sprites.signals[type][var][0] = (red != 0)   ? red + SIGNAL_TO_SOUTH   : _signal_lookup[var][type];
+			rti->gui_sprites.signals[type][var][1] = (green != 0) ? green + SIGNAL_TO_SOUTH : _signal_lookup[var][type] + 1;
+		}
 	}
 }
 
@@ -812,7 +842,7 @@ static CommandCost CmdRailTrackHelper(TileIndex tile, DoCommandFlag flags, uint3
 	CommandCost ret = ValidateAutoDrag(&trackdir, tile, end_tile);
 	if (ret.Failed()) return ret;
 
-	if (flags & DC_EXEC) SndPlayTileFx(SND_20_SPLAT_2, tile);
+	if ((flags & DC_EXEC) && _settings_client.sound.confirm) SndPlayTileFx(SND_20_SPLAT_2, tile);
 
 	bool had_success = false;
 	CommandCost last_error = CMD_ERROR;
@@ -986,13 +1016,10 @@ CommandCost CmdBuildSingleSignal(TileIndex tile, DoCommandFlag flags, uint32 p1,
 			!HasTrack(tile, track)) {
 		return_cmd_error(STR_ERROR_THERE_IS_NO_RAILROAD_TRACK);
 	}
-	CommandCost ret = EnsureNoTrainOnTrack(tile, track);
-	if (ret.Failed()) return ret;
-
 	/* Protect against invalid signal copying */
 	if (p2 != 0 && (p2 & SignalOnTrack(track)) == 0) return CMD_ERROR;
 
-	ret = CheckTileOwnership(tile);
+	CommandCost ret = CheckTileOwnership(tile);
 	if (ret.Failed()) return ret;
 
 	{
@@ -1400,8 +1427,6 @@ CommandCost CmdRemoveSingleSignal(TileIndex tile, DoCommandFlag flags, uint32 p1
 	if (!HasSignalOnTrack(tile, track)) {
 		return_cmd_error(STR_ERROR_THERE_ARE_NO_SIGNALS);
 	}
-	CommandCost ret = EnsureNoTrainOnTrack(tile, track);
-	if (ret.Failed()) return ret;
 
 	/* Only water can remove signals from anyone */
 	if (_current_company != OWNER_WATER) {
@@ -1766,8 +1791,9 @@ static CommandCost ClearTile_Track(TileIndex tile, DoCommandFlag flags)
 				cost.AddCost(ret);
 			}
 
-			/* when bankrupting, don't make water dirty, there could be a ship on lower halftile */
-			if (water_ground && !(flags & DC_BANKRUPT)) {
+			/* When bankrupting, don't make water dirty, there could be a ship on lower halftile.
+			 * Same holds for non-companies clearing the tile, e.g. disasters. */
+			if (water_ground && !(flags & DC_BANKRUPT) && Company::IsValidID(_current_company)) {
 				CommandCost ret = EnsureNoVehicleOnGround(tile);
 				if (ret.Failed()) return ret;
 
@@ -1803,9 +1829,14 @@ static uint GetSaveSlopeZ(uint x, uint y, Track track)
 	return GetSlopePixelZ(x, y);
 }
 
-static void DrawSingleSignal(TileIndex tile, Track track, byte condition, uint image, uint pos)
+static void DrawSingleSignal(TileIndex tile, const RailtypeInfo *rti, Track track, SignalState condition, SignalOffsets image, uint pos)
 {
-	bool side = (_settings_game.vehicle.road_side != 0) && _settings_game.construction.signal_side;
+	bool side;
+	switch (_settings_game.construction.train_signal_side) {
+		case 0:  side = false;                                 break; // left
+		case 2:  side = true;                                  break; // right
+		default: side = _settings_game.vehicle.road_side != 0; break; // driving side
+	}
 	static const Point SignalPositions[2][12] = {
 		{ // Signals on the left side
 		/*  LEFT      LEFT      RIGHT     RIGHT     UPPER     UPPER */
@@ -1823,17 +1854,16 @@ static void DrawSingleSignal(TileIndex tile, Track track, byte condition, uint i
 	uint x = TileX(tile) * TILE_SIZE + SignalPositions[side][pos].x;
 	uint y = TileY(tile) * TILE_SIZE + SignalPositions[side][pos].y;
 
-	SpriteID sprite;
-
 	SignalType type       = GetSignalType(tile, track);
 	SignalVariant variant = GetSignalVariant(tile, track);
 
-	if (type == SIGTYPE_NORMAL && variant == SIG_ELECTRIC) {
-		/* Normal electric signals are picked from original sprites. */
-		sprite = SPR_ORIGINAL_SIGNALS_BASE + image + condition;
+	SpriteID sprite = GetCustomSignalSprite(rti, tile, type, variant, condition);
+	if (sprite != 0) {
+		sprite += image;
 	} else {
-		/* All other signals are picked from add on sprites. */
-		sprite = SPR_SIGNALS_BASE + (type - 1) * 16 + variant * 64 + image + condition + (type > SIGTYPE_LAST_NOPBS ? 64 : 0);
+		/* Normal electric signals are stored in a different sprite block than all other signals. */
+		sprite = (type == SIGTYPE_NORMAL && variant == SIG_ELECTRIC) ? SPR_ORIGINAL_SIGNALS_BASE : SPR_SIGNALS_BASE - 16;
+		sprite += type * 16 + variant * 64 + image * 2 + condition + (type > SIGTYPE_LAST_NOPBS ? 64 : 0);
 	}
 
 	AddSortableSpriteToDraw(sprite, PAL_NONE, x, y, 1, 1, BB_HEIGHT_UNDER_BRIDGE, GetSaveSlopeZ(x, y, track));
@@ -2277,27 +2307,9 @@ static void DrawTrackBits(TileInfo *ti, TrackBits track)
 	}
 }
 
-/**
- * Enums holding the offsets from base signal sprite,
- * according to the side it is representing.
- * The addtion of 2 per enum is necessary in order to "jump" over the
- * green state sprite, all signal sprites being in pair,
- * starting with the off-red state
- */
-enum SignalOffsets {
-	SIGNAL_TO_SOUTHWEST =  0,
-	SIGNAL_TO_NORTHEAST =  2,
-	SIGNAL_TO_SOUTHEAST =  4,
-	SIGNAL_TO_NORTHWEST =  6,
-	SIGNAL_TO_EAST      =  8,
-	SIGNAL_TO_WEST      = 10,
-	SIGNAL_TO_SOUTH     = 12,
-	SIGNAL_TO_NORTH     = 14,
-};
-
-static void DrawSignals(TileIndex tile, TrackBits rails)
+static void DrawSignals(TileIndex tile, TrackBits rails, const RailtypeInfo *rti)
 {
-#define MAYBE_DRAW_SIGNAL(x, y, z, t) if (IsSignalPresent(tile, x)) DrawSingleSignal(tile, t, GetSingleSignalState(tile, x), y, z)
+#define MAYBE_DRAW_SIGNAL(x, y, z, t) if (IsSignalPresent(tile, x)) DrawSingleSignal(tile, rti, t, GetSingleSignalState(tile, x), y, z)
 
 	if (!(rails & TRACK_BIT_Y)) {
 		if (!(rails & TRACK_BIT_X)) {
@@ -2342,7 +2354,7 @@ static void DrawTile_Track(TileInfo *ti)
 
 		if (HasCatenaryDrawn(GetRailType(ti->tile))) DrawCatenary(ti);
 
-		if (HasSignals(ti->tile)) DrawSignals(ti->tile, rails);
+		if (HasSignals(ti->tile)) DrawSignals(ti->tile, rails, rti);
 	} else {
 		/* draw depot */
 		const DrawTileSprites *dts;
@@ -2598,7 +2610,7 @@ set_ground:
 static TrackStatus GetTileTrackStatus_Track(TileIndex tile, TransportType mode, uint sub_mode, DiagDirection side)
 {
 	/* Case of half tile slope with water. */
-	if (mode == TRANSPORT_WATER && IsPlainRail(tile) && GetRailGroundType(tile) == RAIL_GROUND_WATER) {
+	if (mode == TRANSPORT_WATER && IsPlainRail(tile) && GetRailGroundType(tile) == RAIL_GROUND_WATER && IsSlopeWithOneCornerRaised(GetTileSlope(tile))) {
 		TrackBits tb = GetTrackBits(tile);
 		switch (tb) {
 			default: NOT_REACHED();
@@ -2919,6 +2931,14 @@ static CommandCost TestAutoslopeOnRailTile(TileIndex tile, uint flags, int z_old
 	return  cost;
 }
 
+/**
+ * Test-procedure for HasVehicleOnPos to check for a ship.
+ */
+static Vehicle *EnsureNoShipProc(Vehicle *v, void *data)
+{
+	return v->type == VEH_SHIP ? v : NULL;
+}
+
 static CommandCost TerraformTile_Track(TileIndex tile, DoCommandFlag flags, int z_new, Slope tileh_new)
 {
 	int z_old;
@@ -2927,6 +2947,9 @@ static CommandCost TerraformTile_Track(TileIndex tile, DoCommandFlag flags, int 
 		TrackBits rail_bits = GetTrackBits(tile);
 		/* Is there flat water on the lower halftile that must be cleared expensively? */
 		bool was_water = (GetRailGroundType(tile) == RAIL_GROUND_WATER && IsSlopeWithOneCornerRaised(tileh_old));
+
+		/* Allow clearing the water only if there is no ship */
+		if (was_water && HasVehicleOnPos(tile, NULL, &EnsureNoShipProc)) return_cmd_error(STR_ERROR_SHIP_IN_THE_WAY);
 
 		/* First test autoslope. However if it succeeds we still have to test the rest, because non-autoslope terraforming is cheaper. */
 		CommandCost autoslope_result = TestAutoslopeOnRailTile(tile, flags, z_old, tileh_old, z_new, tileh_new, rail_bits);

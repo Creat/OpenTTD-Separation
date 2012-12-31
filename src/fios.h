@@ -15,6 +15,7 @@
 #include "gfx_type.h"
 #include "company_base.h"
 #include "newgrf_config.h"
+#include "network/core/tcp_content.h"
 
 
 typedef SmallMap<uint, CompanyProperties *> CompanyPropertiesMap;

@@ -117,6 +117,9 @@
     <ClCompile Include="..\src\bmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\cargomonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\cargopacket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -175,6 +178,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\fontcache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\base_consist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gamelog.cpp">
@@ -309,10 +315,16 @@
     <ClCompile Include="..\src\string.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\stringfilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\strings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\subsidy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\textbuf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\texteff.cpp">
@@ -391,6 +403,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\cargo_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\cargomonitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\cargopacket.h">
@@ -532,6 +547,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\fontcache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base_consist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gamelog.h">
@@ -846,6 +864,9 @@
     <ClInclude Include="..\src\settings_func.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\settings_gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\settings_internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -921,6 +942,9 @@
     <ClInclude Include="..\src\string_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\stringfilter_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\strings_func.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -943,6 +967,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\textbuf_gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\textbuf_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\texteff.hpp">
@@ -1578,6 +1605,9 @@
     <ClCompile Include="..\src\saveload\autoreplace_sl.cpp">
       <Filter>Save/Load handlers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\saveload\cargomonitor_sl.cpp">
+      <Filter>Save/Load handlers</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\saveload\cargopacket_sl.cpp">
       <Filter>Save/Load handlers</Filter>
     </ClCompile>
@@ -2070,6 +2100,9 @@
     <ClInclude Include="..\src\script\api\script_cargolist.hpp">
       <Filter>Script API</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\script\api\script_cargomonitor.hpp">
+      <Filter>Script API</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\script\api\script_company.hpp">
       <Filter>Script API</Filter>
     </ClInclude>
@@ -2251,6 +2284,9 @@
       <Filter>Script API Implementation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\script\api\script_cargolist.cpp">
+      <Filter>Script API Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\script\api\script_cargomonitor.cpp">
       <Filter>Script API Implementation</Filter>
     </ClCompile>
     <ClCompile Include="..\src\script\api\script_company.cpp">

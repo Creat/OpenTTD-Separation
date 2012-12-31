@@ -338,7 +338,6 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :Gevst
 
 ############ range for settings menu starts
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :Spæl møguleikar
-STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Sværheidsgrad
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :Víðka innstilling
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :NýggjGRF innstilling
 STR_SETTINGS_MENU_TRANSPARENCY_OPTIONS                          :Gjøgnumskygnis møguleikar
@@ -421,7 +420,6 @@ STR_TOOLBAR_SOUND_MUSIC                                         :Ljóð/ tónlei
 
 ############ range for message menu starts
 STR_NEWS_MENU_LAST_MESSAGE_NEWS_REPORT                          :Seinastu boð/tíðinda frásøgn
-STR_NEWS_MENU_MESSAGE_SETTINGS                                  :Boð innstilling
 ############ range ends here
 
 ############ range for about menu starts
@@ -576,9 +574,6 @@ STR_STATUSBAR_COMPANY_NAME                                      :{SILVER}- -  {C
 # News message history
 STR_MESSAGE_NEWS_FORMAT                                         :{STRING}  -  {STRING}
 
-# Message settings window
-
-
 
 
 
@@ -690,16 +685,6 @@ STR_GAME_OPTIONS_TOWN_NAME_HUNGARIAN                            :Ungarsk
 
 
 
-# Difficulty level window
-
-############ range for difficulty levels starts
-############ range for difficulty levels ends
-
-
-############ range for difficulty settings starts
-############ range for difficulty settings ends
-
-
 
 
 
@@ -724,7 +709,14 @@ STR_GAME_OPTIONS_TOWN_NAME_HUNGARIAN                            :Ungarsk
 
 
 
+
+
+
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :ISO (2008-12-31)
+
+
+
+
 
 
 
@@ -1016,10 +1008,12 @@ STR_STATION_VIEW_CAPTION                                        :{WHITE}{STATION
 STR_STATION_VIEW_WAITING_CARGO                                  :{WHITE}{CARGO_LONG}
 
 
+
 STR_STATION_VIEW_CARGO_RATING                                   :{WHITE}{STRING}: {YELLOW}{STRING} ({COMMA}%)
 
 ############ range for rating starts
 ############ range for rating ends
+
 
 
 
@@ -1255,6 +1249,7 @@ STR_PERCENT_UP_DOWN                                             :{WHITE}{NUM}%{U
 
 # Screenshot related messages
 
+
 # Error message titles
 
 # Generic construction errors
@@ -1435,6 +1430,8 @@ STR_ORANGE_STRING                                               :{ORANGE}{STRING
 STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
+STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}
+STR_ORANGE_STRING1_LTBLUE                                       :{ORANGE}{STRING}{LTBLUE}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}
 STR_TINY_RIGHT_ARROW                                            :{TINY_FONT}{RIGHT_ARROW}

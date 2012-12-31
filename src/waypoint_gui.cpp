@@ -107,7 +107,7 @@ public:
 				break;
 
 			case WID_W_SHOW_VEHICLES: // show list of vehicles having this waypoint in their orders
-				ShowVehicleListWindow(this->owner, this->vt, this->wp->index);
+				ShowVehicleListWindow(this->wp->owner, this->vt, this->wp->index);
 				break;
 		}
 	}
@@ -173,7 +173,7 @@ static const NWidgetPart _nested_waypoint_view_widgets[] = {
 static const WindowDesc _waypoint_view_desc(
 	WDP_AUTO, 260, 118,
 	WC_WAYPOINT_VIEW, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_waypoint_view_widgets, lengthof(_nested_waypoint_view_widgets)
 );
 

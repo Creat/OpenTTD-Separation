@@ -282,11 +282,20 @@ bool VideoDriver_Win32::MakeWindow(bool full_screen)
 		settings.dmPelsHeight = _wnd.height_org;
 		settings.dmDisplayFrequency = _display_hz;
 
+		/* Check for 8 bpp support. */
+		if (settings.dmBitsPerPel != 32 && ChangeDisplaySettings(&settings, CDS_FULLSCREEN | CDS_TEST) != DISP_CHANGE_SUCCESSFUL) {
+			settings.dmBitsPerPel = 32;
+		}
+
 		/* Test fullscreen with current resolution, if it fails use desktop resolution. */
 		if (ChangeDisplaySettings(&settings, CDS_FULLSCREEN | CDS_TEST) != DISP_CHANGE_SUCCESSFUL) {
 			RECT r;
 			GetWindowRect(GetDesktopWindow(), &r);
-			return this->ChangeResolution(r.right - r.left, r.bottom - r.top);
+			/* Guard against recursion. If we already failed here once, just fall through to
+			 * the next ChangeDisplaySettings call which will fail and error out appropriately. */
+			if ((int)settings.dmPelsWidth != r.right - r.left || (int)settings.dmPelsHeight != r.bottom - r.top) {
+				return this->ChangeResolution(r.right - r.left, r.bottom - r.top);
+			}
 		}
 
 		if (ChangeDisplaySettings(&settings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL) {
@@ -296,13 +305,16 @@ bool VideoDriver_Win32::MakeWindow(bool full_screen)
 	} else if (_wnd.fullscreen) {
 		/* restore display? */
 		ChangeDisplaySettings(NULL, 0);
+		/* restore the resolution */
+		_wnd.width = _bck_resolution.width;
+		_wnd.height = _bck_resolution.height;
 	}
 #endif
 
 	{
 		RECT r;
 		DWORD style, showstyle;
-		int x, y, w, h;
+		int w, h;
 
 		showstyle = SW_SHOWNORMAL;
 		_wnd.fullscreen = full_screen;
@@ -321,14 +333,13 @@ bool VideoDriver_Win32::MakeWindow(bool full_screen)
 #endif
 		w = r.right - r.left;
 		h = r.bottom - r.top;
-		x = (GetSystemMetrics(SM_CXSCREEN) - w) / 2;
-		y = (GetSystemMetrics(SM_CYSCREEN) - h) / 2;
 
-		if (_wnd.main_wnd) {
-			ShowWindow(_wnd.main_wnd, SW_SHOWNORMAL); // remove maximize-flag
-			SetWindowPos(_wnd.main_wnd, 0, x, y, w, h, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+		if (_wnd.main_wnd != NULL) {
+			if (!_window_maximize) SetWindowPos(_wnd.main_wnd, 0, 0, 0, w, h, SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOMOVE);
 		} else {
 			TCHAR Windowtitle[50];
+			int x = (GetSystemMetrics(SM_CXSCREEN) - w) / 2;
+			int y = (GetSystemMetrics(SM_CYSCREEN) - h) / 2;
 
 			_sntprintf(Windowtitle, lengthof(Windowtitle), _T("OpenTTD %s"), MB_TO_WIDE(_openttd_revision));
 
@@ -630,7 +641,7 @@ static LRESULT CALLBACK WndProcGdi(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 				/* Set maximized flag when we maximize (obviously), but also when we
 				 * switched to fullscreen from a maximized state */
 				_window_maximize = (wParam == SIZE_MAXIMIZED || (_window_maximize && _fullscreen));
-				if (_window_maximize) _bck_resolution = _cur_resolution;
+				if (_window_maximize || _fullscreen) _bck_resolution = _cur_resolution;
 				ClientSizeChanged(LOWORD(lParam), HIWORD(lParam));
 			}
 			return 0;
@@ -1054,6 +1065,8 @@ void VideoDriver_Win32::MainLoop()
 
 bool VideoDriver_Win32::ChangeResolution(int w, int h)
 {
+	if (_window_maximize) ShowWindow(_wnd.main_wnd, SW_SHOWNORMAL);
+
 	_wnd.width = _wnd.width_org = w;
 	_wnd.height = _wnd.height_org = h;
 

@@ -21,6 +21,7 @@
 #include "order_func.h"
 #include "transport_type.h"
 #include "group_type.h"
+#include "base_consist.h"
 
 /** Vehicle status bits in #Vehicle::vehstatus. */
 enum VehStatus {
@@ -121,7 +122,7 @@ extern void FixOldVehicles();
 struct GRFFile;
 
 /** %Vehicle data structure. */
-struct Vehicle : VehiclePool::PoolItem<&_vehicle_pool>, BaseVehicle {
+struct Vehicle : VehiclePool::PoolItem<&_vehicle_pool>, BaseVehicle, BaseConsist {
 private:
 	Vehicle *next;                      ///< pointer to the next vehicle in the chain
 	Vehicle *previous;                  ///< NOSAVE: pointer to the previous vehicle in the chain
@@ -134,8 +135,6 @@ public:
 	friend void FixOldVehicles();
 	friend void AfterLoadVehicles(bool part_of_load);             ///< So we can set the #previous and #first pointers while loading
 	friend bool LoadOldVehicle(LoadgameState *ls, int num);       ///< So we can set the proper next pointer while loading
-
-	char *name;                         ///< Name of vehicle
 
 	TileIndex tile;                     ///< Current tile index
 
@@ -151,11 +150,6 @@ public:
 	Money value;                        ///< Value of the vehicle
 
 	CargoPayment *cargo_payment;        ///< The cargo payment we're currently in
-
-	/* Used for timetabling. */
-	uint32 current_order_time;          ///< How many ticks have passed since this order started.
-	int32 lateness_counter;             ///< How many ticks late (or early if negative) this vehicle is.
-	Date timetable_start;               ///< When the vehicle is supposed to start the timetable.
 
 	Rect coord;                         ///< NOSAVE: Graphical bounding box of the vehicle, i.e. what to redraw on moves.
 
@@ -173,7 +167,6 @@ public:
 	Date age;                           ///< Age in days
 	Date max_age;                       ///< Maximum age
 	Date date_of_last_service;          ///< Last date the vehicle had a service at a depot.
-	Date service_interval;              ///< The interval for (automatic) servicing; either in days or %.
 	uint16 reliability;                 ///< Reliability.
 	uint16 reliability_spd_dec;         ///< Reliability decrease speed.
 	byte breakdown_ctr;                 ///< Counter for managing breakdown events. @see Vehicle::HandleBreakdown
@@ -229,15 +222,11 @@ public:
 
 	byte vehstatus;                     ///< Status
 	Order current_order;                ///< The current order (+ status, like: loading)
-	VehicleOrderID cur_real_order_index;///< The index to the current real (non-implicit) order
-	VehicleOrderID cur_implicit_order_index;///< The index to the current implicit order
 
 	union {
 		OrderList *list;            ///< Pointer to the order list for this vehicle
 		Order     *old;             ///< Only used during conversion of old save games
 	} orders;                           ///< The orders currently assigned to the vehicle.
-
-	byte vehicle_flags;                 ///< Used for gradual loading and other miscellaneous things (@see VehicleFlags enum)
 
 	uint16 load_unload_ticks;           ///< Ticks to wait before starting next cycle.
 	GroupID group_id;                   ///< Index of group Pool array
@@ -399,6 +388,12 @@ public:
 	virtual int GetDisplayMaxSpeed() const { return 0; }
 
 	/**
+	 * Calculates the maximum speed of the vehicle under its current conditions.
+	 * @return Current maximum speed in native units.
+	 */
+	virtual int GetCurrentMaxSpeed() const { return 0; }
+
+	/**
 	 * Gets the running cost of a vehicle
 	 * @return the vehicle's running cost
 	 */
@@ -411,10 +406,22 @@ public:
 	virtual bool IsInDepot() const { return false; }
 
 	/**
+	 * Check whether the whole vehicle chain is in the depot.
+	 * @return true if and only if the whole chain is in the depot.
+	 */
+	virtual bool IsChainInDepot() const { return this->IsInDepot(); }
+
+	/**
 	 * Check whether the vehicle is in the depot *and* stopped.
 	 * @return true if and only if the vehicle is in the depot and stopped.
 	 */
-	virtual bool IsStoppedInDepot() const { return this->IsInDepot() && (this->vehstatus & VS_STOPPED) != 0; }
+	bool IsStoppedInDepot() const
+	{
+		assert(this == this->First());
+		/* Free wagons have no VS_STOPPED state */
+		if (this->IsPrimaryVehicle() && !(this->vehstatus & VS_STOPPED)) return false;
+		return this->IsChainInDepot();
+	}
 
 	/**
 	 * Calls the tick handler of the vehicle
@@ -527,6 +534,22 @@ public:
 	}
 
 	/**
+	 * Get the vehicle at offset \a n of this vehicle chain.
+	 * @param n Offset from the current vehicle.
+	 * @return The new vehicle or NULL if the offset is out-of-bounds.
+	 */
+	inline const Vehicle *Move(int n) const
+	{
+		const Vehicle *v = this;
+		if (n < 0) {
+			for (int i = 0; i != n && v != NULL; i--) v = v->Previous();
+		} else {
+			for (int i = 0; i != n && v != NULL; i++) v = v->Next();
+		}
+		return v;
+	}
+
+	/**
 	 * Get the first order of the vehicles order list.
 	 * @return first order of order list.
 	 */
@@ -579,25 +602,15 @@ public:
 	 */
 	inline void CopyVehicleConfigAndStatistics(const Vehicle *src)
 	{
+		this->CopyConsistPropertiesFrom(src);
+
 		this->unitnumber = src->unitnumber;
 
-		this->cur_real_order_index = src->cur_real_order_index;
-		this->cur_implicit_order_index = src->cur_implicit_order_index;
 		this->current_order = src->current_order;
 		this->dest_tile  = src->dest_tile;
 
 		this->profit_this_year = src->profit_this_year;
 		this->profit_last_year = src->profit_last_year;
-
-		this->current_order_time = src->current_order_time;
-		this->lateness_counter = src->lateness_counter;
-		this->timetable_start = src->timetable_start;
-
-		if (HasBit(src->vehicle_flags, VF_TIMETABLE_STARTED)) SetBit(this->vehicle_flags, VF_TIMETABLE_STARTED);
-		if (HasBit(src->vehicle_flags, VF_AUTOFILL_TIMETABLE)) SetBit(this->vehicle_flags, VF_AUTOFILL_TIMETABLE);
-		if (HasBit(src->vehicle_flags, VF_AUTOFILL_PRES_WAIT_TIME)) SetBit(this->vehicle_flags, VF_AUTOFILL_PRES_WAIT_TIME);
-
-		this->service_interval = src->service_interval;
 	}
 
 

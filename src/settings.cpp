@@ -77,6 +77,10 @@ GameSettings _settings_newgame;  ///< Game settings for new games (updated from 
 VehicleDefaultSettings _old_vds; ///< Used for loading default vehicles settings from old savegames
 char *_config_file; ///< Configuration file of OpenTTD
 
+typedef std::list<ErrorMessageData> ErrorList;
+static ErrorList _settings_error_list; ///< Errors while loading minimal settings.
+
+
 typedef void SettingDescProc(IniFile *ini, const SettingDesc *desc, const char *grpname, void *object);
 typedef void SettingDescProcList(IniFile *ini, const char *grpname, StringList *list);
 
@@ -347,9 +351,17 @@ static const void *StringToVal(const SettingDescBase *desc, const char *orig_str
 		case SDT_NUMX: {
 			char *end;
 			size_t val = strtoul(str, &end, 0);
+			if (end == str) {
+				ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_VALUE);
+				msg.SetDParamStr(0, str);
+				msg.SetDParamStr(1, desc->name);
+				_settings_error_list.push_back(msg);
+				return desc->def;
+			}
 			if (*end != '\0') {
-				SetDParamStr(0, desc->name);
-				ShowErrorMessage(STR_CONFIG_ERROR, STR_CONFIG_ERROR_TRAILING_CHARACTERS, WL_CRITICAL);
+				ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_TRAILING_CHARACTERS);
+				msg.SetDParamStr(0, desc->name);
+				_settings_error_list.push_back(msg);
 			}
 			return (void*)val;
 		}
@@ -361,29 +373,33 @@ static const void *StringToVal(const SettingDescBase *desc, const char *orig_str
 			if (r == (size_t)-1 && desc->proc_cnvt != NULL) r = desc->proc_cnvt(str);
 			if (r != (size_t)-1) return (void*)r; // and here goes converted value
 
-			SetDParamStr(0, str);
-			SetDParamStr(1, desc->name);
-			ShowErrorMessage(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_VALUE, WL_CRITICAL);
+			ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_VALUE);
+			msg.SetDParamStr(0, str);
+			msg.SetDParamStr(1, desc->name);
+			_settings_error_list.push_back(msg);
 			return desc->def;
 		}
 
 		case SDT_MANYOFMANY: {
 			size_t r = LookupManyOfMany(desc->many, str);
 			if (r != (size_t)-1) return (void*)r;
-			SetDParamStr(0, str);
-			SetDParamStr(1, desc->name);
-			ShowErrorMessage(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_VALUE, WL_CRITICAL);
+			ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_VALUE);
+			msg.SetDParamStr(0, str);
+			msg.SetDParamStr(1, desc->name);
+			_settings_error_list.push_back(msg);
 			return desc->def;
 		}
 
-		case SDT_BOOLX:
+		case SDT_BOOLX: {
 			if (strcmp(str, "true")  == 0 || strcmp(str, "on")  == 0 || strcmp(str, "1") == 0) return (void*)true;
 			if (strcmp(str, "false") == 0 || strcmp(str, "off") == 0 || strcmp(str, "0") == 0) return (void*)false;
 
-			SetDParamStr(0, str);
-			SetDParamStr(1, desc->name);
-			ShowErrorMessage(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_VALUE, WL_CRITICAL);
+			ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_INVALID_VALUE);
+			msg.SetDParamStr(0, str);
+			msg.SetDParamStr(1, desc->name);
+			_settings_error_list.push_back(msg);
 			return desc->def;
+		}
 
 		case SDT_STRING: return orig_str;
 		case SDT_INTLIST: return str;
@@ -501,7 +517,8 @@ static void IniLoadSettings(IniFile *ini, const SettingDesc *sd, const char *grp
 			case SDT_NUMX:
 			case SDT_ONEOFMANY:
 			case SDT_MANYOFMANY:
-				Write_ValidateSetting(ptr, sd, (int32)(size_t)p); break;
+				Write_ValidateSetting(ptr, sd, (int32)(size_t)p);
+				break;
 
 			case SDT_STRING:
 				switch (GetVarMemType(sld->conv)) {
@@ -524,8 +541,12 @@ static void IniLoadSettings(IniFile *ini, const SettingDesc *sd, const char *grp
 
 			case SDT_INTLIST: {
 				if (!LoadIntList((const char*)p, ptr, sld->length, GetVarMemType(sld->conv))) {
-					SetDParamStr(0, sdb->name);
-					ShowErrorMessage(STR_CONFIG_ERROR, STR_CONFIG_ERROR_ARRAY, WL_CRITICAL);
+					ErrorMessageData msg(STR_CONFIG_ERROR, STR_CONFIG_ERROR_ARRAY);
+					msg.SetDParamStr(0, sdb->name);
+					_settings_error_list.push_back(msg);
+
+					/* Use default */
+					LoadIntList((const char*)sdb->def, ptr, sld->length, GetVarMemType(sld->conv));
 				} else if (sd->desc.proc_cnvt != NULL) {
 					sd->desc.proc_cnvt((const char*)p);
 				}
@@ -709,6 +730,32 @@ static void IniSaveSettingList(IniFile *ini, const char *grpname, StringList *li
 	for (char **iter = list->Begin(); iter != list->End(); iter++) {
 		group->GetItem(*iter, true)->SetValue("");
 	}
+}
+
+/**
+ * Check whether the setting is editable in the current gamemode.
+ * @param do_command true if this is about checking a command from the server.
+ * @return true if editable.
+ */
+bool SettingDesc::IsEditable(bool do_command) const
+{
+	if (!do_command && !(this->save.conv & SLF_NO_NETWORK_SYNC) && _networking && !_network_server && !(this->desc.flags & SGF_PER_COMPANY)) return false;
+	if ((this->desc.flags & SGF_NETWORK_ONLY) && !_networking && _game_mode != GM_MENU) return false;
+	if ((this->desc.flags & SGF_NO_NETWORK) && _networking) return false;
+	if ((this->desc.flags & SGF_NEWGAME_ONLY) &&
+			(_game_mode == GM_NORMAL ||
+			(_game_mode == GM_EDITOR && !(this->desc.flags & SGF_SCENEDIT_TOO)))) return false;
+	return true;
+}
+
+/**
+ * Return the type of the setting.
+ * @return type of setting
+ */
+SettingType SettingDesc::GetType() const
+{
+	if (this->desc.flags & SGF_PER_COMPANY) return ST_COMPANY;
+	return (this->save.conv & SLF_NOT_IN_SAVE) ? ST_CLIENT : ST_GAME;
 }
 
 /* Begin - Callback Functions for the various settings. */
@@ -923,7 +970,7 @@ static bool TownFoundingChanged(int32 p1)
 
 static bool InvalidateVehTimetableWindow(int32 p1)
 {
-	InvalidateWindowClassesData(WC_VEHICLE_TIMETABLE, -2);
+	InvalidateWindowClassesData(WC_VEHICLE_TIMETABLE, VIWD_MODIFY_ORDERS);
 	return true;
 }
 
@@ -990,87 +1037,14 @@ static bool InvalidateCompanyInfrastructureWindow(int32 p1)
 	return true;
 }
 
-/*
- * A: competitors
- * B: competitor start time. Deprecated since savegame version 110.
- * C: town count (3 = high, 0 = very low)
- * D: industry count (4 = high, 0 = none)
- * E: inital loan (in GBP)
- * F: interest rate
- * G: running costs (0 = low, 2 = high)
- * H: construction speed of competitors (0 = very slow, 4 = very fast)
- * I: competitor intelligence. Deprecated since savegame version 110.
- * J: breakdowns (0 = off, 2 = normal)
- * K: subsidy multiplier (0 = 1.5, 3 = 4.0)
- * L: construction cost (0-2)
- * M: terrain type (0 = very flat, 3 = mountainous)
- * N: amount of water (0 = very low, 3 = high)
- * O: economy (0 = steady, 1 = fluctuating)
- * P: Train reversing (0 = end of line + stations, 1 = end of line)
- * Q: disasters
- * R: area restructuring (0 = permissive, 2 = hostile)
- * S: the difficulty level
- */
-static const DifficultySettings _default_game_diff[3] = { /*
-	 A, C, D,      E, F, G, H, J, K, L, M, N, O, P, Q, R, S*/
-	{2, 2, 4, 300000, 2, 0, 2, 1, 2, 0, 1, 0, 0, 0, 0, 0, 0}, ///< easy
-	{4, 2, 3, 150000, 3, 1, 3, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1}, ///< medium
-	{7, 3, 3, 100000, 4, 1, 3, 2, 0, 2, 3, 2, 1, 1, 1, 2, 2}, ///< hard
-};
-
-void SetDifficultyLevel(int mode, DifficultySettings *gm_opt)
-{
-	assert(mode <= 3);
-
-	if (mode != 3) {
-		*gm_opt = _default_game_diff[mode];
-	} else {
-		gm_opt->diff_level = 3;
-	}
-}
-
 /** Checks if any settings are set to incorrect values, and sets them to correct values in that case. */
 static void ValidateSettings()
 {
-	/* Force the difficulty levels to correct values if they are invalid. */
-	if (_settings_newgame.difficulty.diff_level != 3) {
-		SetDifficultyLevel(_settings_newgame.difficulty.diff_level, &_settings_newgame.difficulty);
-	}
-
 	/* Do not allow a custom sea level with the original land generator. */
 	if (_settings_newgame.game_creation.land_generator == 0 &&
 			_settings_newgame.difficulty.quantity_sea_lakes == CUSTOM_SEA_LEVEL_NUMBER_DIFFICULTY) {
 		_settings_newgame.difficulty.quantity_sea_lakes = CUSTOM_SEA_LEVEL_MIN_PERCENTAGE;
 	}
-}
-
-static bool DifficultyReset(int32 level)
-{
-	/* In game / in the scenario editor you can set the difficulty level only to custom. This is
-	 * needed by the AI Gui code that sets the difficulty level when you change any AI settings. */
-	if (_game_mode != GM_MENU && level != 3) return false;
-	SetDifficultyLevel(level, &GetGameSettings().difficulty);
-	return true;
-}
-
-static bool DifficultyChange(int32)
-{
-	if (_game_mode == GM_MENU) {
-		if (_settings_newgame.difficulty.diff_level != 3) {
-			ShowErrorMessage(STR_WARNING_DIFFICULTY_TO_CUSTOM, INVALID_STRING_ID, WL_WARNING);
-			_settings_newgame.difficulty.diff_level = 3;
-		}
-		SetWindowClassesDirty(WC_SELECT_GAME);
-	} else {
-		_settings_game.difficulty.diff_level = 3;
-	}
-
-	/* If we are a network-client, update the difficult setting (if it is open).
-	 * Use this instead of just dirtying the window because we need to load in
-	 * the new difficulty settings */
-	if (_networking) InvalidateWindowClassesData(WC_GAME_OPTIONS, GOID_DIFFICULTY_CHANGED);
-
-	return true;
 }
 
 static bool DifficultyNoiseChange(int32 i)
@@ -1082,7 +1056,7 @@ static bool DifficultyNoiseChange(int32 i)
 		}
 	}
 
-	return DifficultyChange(i);
+	return true;
 }
 
 static bool MaxNoAIsChange(int32 i)
@@ -1093,7 +1067,7 @@ static bool MaxNoAIsChange(int32 i)
 		ShowErrorMessage(STR_WARNING_NO_SUITABLE_AI, INVALID_STRING_ID, WL_CRITICAL);
 	}
 
-	return DifficultyChange(i);
+	return true;
 }
 
 /**
@@ -1279,81 +1253,6 @@ static void HandleOldDiffCustom(bool savegame)
 	}
 }
 
-/**
- * tries to convert newly introduced news settings based on old ones
- * @param name pointer to the string defining name of the old news config
- * @param value pointer to the string defining value of the old news config
- * @returns true if conversion could have been made
- */
-static bool ConvertOldNewsSetting(const char *name, const char *value)
-{
-	if (strcasecmp(name, "openclose") == 0) {
-		/* openclose has been split in "open" and "close".
-		 * So the job is now to decrypt the value of the old news config
-		 * and give it to the two newly introduced ones*/
-
-		NewsDisplay display = ND_OFF; // default
-		if (strcasecmp(value, "full") == 0) {
-			display = ND_FULL;
-		} else if (strcasecmp(value, "summarized") == 0) {
-			display = ND_SUMMARY;
-		}
-		/* tranfert of values */
-		_news_type_data[NT_INDUSTRY_OPEN].display = display;
-		_news_type_data[NT_INDUSTRY_CLOSE].display = display;
-		return true;
-	}
-	return false;
-}
-
-/**
- * Load newstype settings from a configuration file.
- * @param ini the configuration to read from.
- * @param grpname Name of the group containing the news type settings.
- */
-static void NewsDisplayLoadConfig(IniFile *ini, const char *grpname)
-{
-	IniGroup *group = ini->GetGroup(grpname);
-	IniItem *item;
-
-	/* If no group exists, return */
-	if (group == NULL) return;
-
-	for (item = group->item; item != NULL; item = item->next) {
-		int news_item = -1;
-		for (int i = 0; i < NT_END; i++) {
-			if (strcasecmp(item->name, _news_type_data[i].name) == 0) {
-				news_item = i;
-				break;
-			}
-		}
-
-		/* the config been read is not within current aceptable config */
-		if (news_item == -1) {
-			/* if the conversion function cannot process it, advice by a debug warning*/
-			if (!ConvertOldNewsSetting(item->name, item->value)) {
-				DEBUG(misc, 0, "Invalid display option: %s", item->name);
-			}
-			/* in all cases, there is nothing left to do */
-			continue;
-		}
-
-		if (StrEmpty(item->value)) {
-			DEBUG(misc, 0, "Empty display value for newstype %s", item->name);
-			continue;
-		} else if (strcasecmp(item->value, "full") == 0) {
-			_news_type_data[news_item].display = ND_FULL;
-		} else if (strcasecmp(item->value, "off") == 0) {
-			_news_type_data[news_item].display = ND_OFF;
-		} else if (strcasecmp(item->value, "summarized") == 0) {
-			_news_type_data[news_item].display = ND_SUMMARY;
-		} else {
-			DEBUG(misc, 0, "Invalid display value for newstype %s: %s", item->name, item->value);
-			continue;
-		}
-	}
-}
-
 static void AILoadConfig(IniFile *ini, const char *grpname)
 {
 	IniGroup *group = ini->GetGroup(grpname);
@@ -1483,25 +1382,6 @@ static GRFConfig *GRFLoadConfig(IniFile *ini, const char *grpname, bool is_stati
 	return first;
 }
 
-/**
- * Write newstype settings to a configuration file.
- * @param ini     The configuration to write to.
- * @param grpname Name of the group containing the news type settings.
- */
-static void NewsDisplaySaveConfig(IniFile *ini, const char *grpname)
-{
-	IniGroup *group = ini->GetGroup(grpname);
-
-	for (int i = 0; i < NT_END; i++) {
-		const char *value;
-		int v = _news_type_data[i].display;
-
-		value = (v == ND_OFF ? "off" : (v == ND_SUMMARY ? "summarized" : "full"));
-
-		group->GetItem(_news_type_data[i].name, true)->SetValue(value);
-	}
-}
-
 static void AISaveConfig(IniFile *ini, const char *grpname)
 {
 	IniGroup *group = ini->GetGroup(grpname);
@@ -1629,7 +1509,6 @@ void LoadFromConfig(bool minimal)
 	if (!minimal) {
 		_grfconfig_newgame = GRFLoadConfig(ini, "newgrf", false);
 		_grfconfig_static  = GRFLoadConfig(ini, "newgrf-static", true);
-		NewsDisplayLoadConfig(ini, "news_display");
 		AILoadConfig(ini, "ai_players");
 		GameLoadConfig(ini, "game_scripts");
 
@@ -1638,6 +1517,11 @@ void LoadFromConfig(bool minimal)
 		HandleOldDiffCustom(false);
 
 		ValidateSettings();
+
+		/* Display sheduled errors */
+		extern void ScheduleErrorMessage(ErrorList &datas);
+		ScheduleErrorMessage(_settings_error_list);
+		if (FindWindowById(WC_ERRMSG, 0) == NULL) ShowFirstError();
 	}
 
 	delete ini;
@@ -1656,7 +1540,6 @@ void SaveToConfig()
 	HandleSettingDescs(ini, IniSaveSettings, IniSaveSettingList);
 	GRFSaveConfig(ini, "newgrf", _grfconfig_newgame);
 	GRFSaveConfig(ini, "newgrf-static", _grfconfig_static);
-	NewsDisplaySaveConfig(ini, "news_display");
 	AISaveConfig(ini, "ai_players");
 	GameSaveConfig(ini, "game_scripts");
 	SaveVersionInConfig(ini);
@@ -1757,13 +1640,7 @@ CommandCost CmdChangeSetting(TileIndex tile, DoCommandFlag flags, uint32 p1, uin
 	if (sd == NULL) return CMD_ERROR;
 	if (!SlIsObjectCurrentlyValid(sd->save.version_from, sd->save.version_to)) return CMD_ERROR;
 
-	if ((sd->desc.flags & SGF_NETWORK_ONLY) && !_networking && _game_mode != GM_MENU) return CMD_ERROR;
-	if ((sd->desc.flags & SGF_NO_NETWORK) && _networking) return CMD_ERROR;
-	if ((sd->desc.flags & SGF_NEWGAME_ONLY) &&
-			(_game_mode == GM_NORMAL ||
-			(_game_mode == GM_EDITOR && (sd->desc.flags & SGF_SCENEDIT_TOO) == 0))) {
-		return CMD_ERROR;
-	}
+	if (!sd->IsEditable(true)) return CMD_ERROR;
 
 	if (flags & DC_EXEC) {
 		void *var = GetVariableAddress(&GetGameSettings(), &sd->save);
@@ -2155,7 +2032,7 @@ static void Load_PATS()
 {
 	/* Copy over default setting since some might not get loaded in
 	 * a networking environment. This ensures for example that the local
-	 * signal_side stays when joining a network-server */
+	 * currency setting stays when joining a network-server */
 	LoadSettings(_settings, &_settings_game);
 }
 

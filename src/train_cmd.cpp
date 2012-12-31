@@ -208,12 +208,13 @@ void Train::ConsistChanged(bool same_length)
 		if (e_u->GetGRF() != NULL && e_u->GetGRF()->grf_version >= 8) {
 			/* Use callback 36 */
 			veh_len = GetVehicleProperty(u, PROP_TRAIN_SHORTEN_FACTOR, CALLBACK_FAILED);
+
+			if (veh_len != CALLBACK_FAILED && veh_len >= VEHICLE_LENGTH) {
+				ErrorUnknownCallbackResult(e_u->GetGRFID(), CBID_VEHICLE_LENGTH, veh_len);
+			}
 		} else if (HasBit(e_u->info.callback_mask, CBM_VEHICLE_LENGTH)) {
 			/* Use callback 11 */
 			veh_len = GetVehicleCallback(CBID_VEHICLE_LENGTH, 0, 0, u->engine_type, u);
-		}
-		if (veh_len != CALLBACK_FAILED && veh_len >= VEHICLE_LENGTH) {
-			ErrorUnknownCallbackResult(e_u->GetGRFID(), CBID_VEHICLE_LENGTH, veh_len);
 		}
 		if (veh_len == CALLBACK_FAILED) veh_len = rvi_u->shorten_factor;
 		veh_len = VEHICLE_LENGTH - Clamp(veh_len, 0, VEHICLE_LENGTH - 1);
@@ -240,7 +241,8 @@ void Train::ConsistChanged(bool same_length)
 	if (this->IsFrontEngine()) {
 		this->UpdateAcceleration();
 		SetWindowDirty(WC_VEHICLE_DETAILS, this->index);
-		InvalidateWindowData(WC_VEHICLE_REFIT, this->index);
+		InvalidateWindowData(WC_VEHICLE_REFIT, this->index, VIWD_CONSIST_CHANGED);
+		InvalidateWindowData(WC_VEHICLE_ORDERS, this->index, VIWD_CONSIST_CHANGED);
 	}
 }
 
@@ -369,9 +371,9 @@ int Train::GetCurveSpeedLimit() const
  */
 int Train::GetCurrentMaxSpeed() const
 {
-	int max_speed = this->tcache.cached_max_curve_speed;
-	assert(max_speed == this->GetCurveSpeedLimit());
+	if (_settings_game.vehicle.train_acceleration_model == AM_ORIGINAL) return min(this->gcache.cached_max_track_speed, this->current_order.max_speed);
 
+	int max_speed = this->tcache.cached_max_curve_speed;
 	if (IsRailStationTile(this->tile)) {
 		StationID sid = GetStationIndex(this->tile);
 		if (this->current_order.ShouldStopAtStation(this, sid)) {
@@ -401,6 +403,11 @@ int Train::GetCurrentMaxSpeed() const
 		if (u->track == TRACK_BIT_DEPOT) {
 			max_speed = min(max_speed, 61);
 			break;
+		}
+
+		/* Vehicle is on the middle part of a bridge. */
+		if (u->track == TRACK_BIT_WORMHOLE && !(u->vehstatus & VS_HIDDEN)) {
+			max_speed = min(max_speed, GetBridgeSpec(GetBridgeType(u->tile))->speed);
 		}
 	}
 
@@ -517,6 +524,39 @@ void DrawTrainEngine(int left, int right, int preferred_x, int y, EngineID engin
 		const Sprite *real_sprite = GetSprite(sprite, ST_NORMAL);
 		preferred_x = Clamp(preferred_x, left - UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI), right - UnScaleByZoom(real_sprite->width, ZOOM_LVL_GUI) - UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI));
 		DrawSprite(sprite, pal, preferred_x, y);
+	}
+}
+
+/**
+ * Get the size of the sprite of a train sprite heading west, or both heads (used for lists).
+ * @param engine The engine to get the sprite from.
+ * @param[out] width The width of the sprite.
+ * @param[out] height The height of the sprite.
+ * @param[out] xoffs Number of pixels to shift the sprite to the right.
+ * @param[out] yoffs Number of pixels to shift the sprite downwards.
+ * @param image_type Context the sprite is used in.
+ */
+void GetTrainSpriteSize(EngineID engine, uint &width, uint &height, int &xoffs, int &yoffs, EngineImageType image_type)
+{
+	int y = 0;
+
+	SpriteID sprite = GetRailIcon(engine, false, y, image_type);
+	const Sprite *real_sprite = GetSprite(sprite, ST_NORMAL);
+
+	width  = UnScaleByZoom(real_sprite->width, ZOOM_LVL_GUI);
+	height = UnScaleByZoom(real_sprite->height, ZOOM_LVL_GUI);
+	xoffs  = UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI);
+	yoffs  = UnScaleByZoom(real_sprite->y_offs, ZOOM_LVL_GUI);
+
+	if (RailVehInfo(engine)->railveh_type == RAILVEH_MULTIHEAD) {
+		sprite = GetRailIcon(engine, true, y, image_type);
+		real_sprite = GetSprite(sprite, ST_NORMAL);
+
+		/* Calculate values relative to an imaginary center between the two sprites. */
+		width = TRAININFO_DEFAULT_VEHICLE_WIDTH + UnScaleByZoom(real_sprite->width, ZOOM_LVL_GUI) + UnScaleByZoom(real_sprite->x_offs, ZOOM_LVL_GUI) - xoffs;
+		height = max<uint>(height, UnScaleByZoom(real_sprite->height, ZOOM_LVL_GUI));
+		xoffs  = xoffs - TRAININFO_DEFAULT_VEHICLE_WIDTH / 2;
+		yoffs  = min(yoffs, UnScaleByZoom(real_sprite->y_offs, ZOOM_LVL_GUI));
 	}
 }
 
@@ -728,34 +768,6 @@ CommandCost CmdBuildRailVehicle(TileIndex tile, DoCommandFlag flags, const Engin
 	}
 
 	return CommandCost();
-}
-
-/**
- * Is the whole consist the in a depot?
- * @return \c true iff all vehicles of the train are in a depot.
- */
-bool Train::IsInDepot() const
-{
-	/* Is the front engine stationary in the depot? */
-	if (!IsRailDepotTile(this->tile) || this->cur_speed != 0) return false;
-
-	/* Check whether the rest is also already trying to enter the depot. */
-	for (const Train *v = this; v != NULL; v = v->Next()) {
-		if (v->track != TRACK_BIT_DEPOT || v->tile != this->tile) return false;
-	}
-
-	return true;
-}
-
-/**
- * Is the train stopped in a depot?
- * @return True if the train is stopped in a depot, else false.
- */
-bool Train::IsStoppedInDepot() const
-{
-	/* Are we stopped? Of course wagons don't really care... */
-	if (this->IsFrontEngine() && !(this->vehstatus & VS_STOPPED)) return false;
-	return this->IsInDepot();
 }
 
 static Train *FindGoodVehiclePos(const Train *src)
@@ -1098,7 +1110,7 @@ static void NormaliseTrainHead(Train *head)
 	if (!head->IsFrontEngine()) return;
 
 	/* Update the refit button and window */
-	InvalidateWindowData(WC_VEHICLE_REFIT, head->index);
+	InvalidateWindowData(WC_VEHICLE_REFIT, head->index, VIWD_CONSIST_CHANGED);
 	SetWindowWidgetDirty(WC_VEHICLE_VIEW, head->index, WID_VV_REFIT);
 
 	/* If we don't have a unit number yet, set one. */
@@ -1648,7 +1660,7 @@ void UpdateLevelCrossing(TileIndex tile, bool sound)
 
 	if (new_state != IsCrossingBarred(tile)) {
 		if (new_state && sound) {
-			SndPlayTileFx(SND_0E_LEVEL_CROSSING, tile);
+			if (_settings_client.sound.ambient) SndPlayTileFx(SND_0E_LEVEL_CROSSING, tile);
 		}
 		SetCrossingBarred(tile, new_state);
 		MarkTileDirtyByTile(tile);
@@ -1665,7 +1677,7 @@ static inline void MaybeBarCrossingWithSound(TileIndex tile)
 {
 	if (!IsCrossingBarred(tile)) {
 		BarCrossing(tile);
-		SndPlayTileFx(SND_0E_LEVEL_CROSSING, tile);
+		if (_settings_client.sound.ambient) SndPlayTileFx(SND_0E_LEVEL_CROSSING, tile);
 		MarkTileDirtyByTile(tile);
 	}
 }
@@ -1932,6 +1944,8 @@ CommandCost CmdForceTrainProceed(TileIndex tile, DoCommandFlag flags, uint32 p1,
 	Train *t = Train::GetIfValid(p1);
 	if (t == NULL) return CMD_ERROR;
 
+	if (!t->IsPrimaryVehicle()) return CMD_ERROR;
+
 	CommandCost ret = CheckOwnership(t->owner);
 	if (ret.Failed()) return ret;
 
@@ -1942,7 +1956,7 @@ CommandCost CmdForceTrainProceed(TileIndex tile, DoCommandFlag flags, uint32 p1,
 		 * to proceed to the next signal. In the other cases we
 		 * would like to pass the signal at danger and run till the
 		 * next signal we encounter. */
-		t->force_proceed = t->force_proceed == TFP_SIGNAL ? TFP_NONE : HasBit(t->flags, VRF_TRAIN_STUCK) || t->IsInDepot() ? TFP_STUCK : TFP_SIGNAL;
+		t->force_proceed = t->force_proceed == TFP_SIGNAL ? TFP_NONE : HasBit(t->flags, VRF_TRAIN_STUCK) || t->IsChainInDepot() ? TFP_STUCK : TFP_SIGNAL;
 		SetWindowDirty(WC_VEHICLE_VIEW, t->index);
 	}
 
@@ -2783,7 +2797,7 @@ static void TrainEnterStation(Train *v, StationID station)
 		SetDParam(0, st->index);
 		AddVehicleNewsItem(
 			STR_NEWS_FIRST_TRAIN_ARRIVAL,
-			v->owner == _local_company ? NS_ARRIVAL_COMPANY : NS_ARRIVAL_OTHER,
+			v->owner == _local_company ? NT_ARRIVAL_COMPANY : NT_ARRIVAL_OTHER,
 			v->index,
 			st->index
 		);
@@ -3017,13 +3031,10 @@ static bool CheckTrainCollision(Train *v)
 	if (tcc.num == 0) return false;
 
 	SetDParam(0, tcc.num);
-	AddVehicleNewsItem(STR_NEWS_TRAIN_CRASH,
-		NS_ACCIDENT,
-		v->index
-	);
+	AddVehicleNewsItem(STR_NEWS_TRAIN_CRASH, NT_ACCIDENT, v->index);
 
 	ModifyStationRatingAround(v->tile, v->owner, -160, 30);
-	SndPlayVehicleFx(SND_13_BIG_CRASH, v);
+	if (_settings_client.sound.disaster) SndPlayVehicleFx(SND_13_BIG_CRASH, v);
 	return true;
 }
 
@@ -3266,7 +3277,7 @@ bool TrainController(Train *v, Vehicle *nomove, bool reverse)
 
 					/* If we are approaching a crossing that is reserved, play the sound now. */
 					TileIndex crossing = TrainApproachingCrossingTile(v);
-					if (crossing != INVALID_TILE && HasCrossingReservation(crossing)) SndPlayTileFx(SND_0E_LEVEL_CROSSING, crossing);
+					if (crossing != INVALID_TILE && HasCrossingReservation(crossing) && _settings_client.sound.new_year) SndPlayTileFx(SND_0E_LEVEL_CROSSING, crossing);
 
 					/* Always try to extend the reservation when entering a tile. */
 					CheckNextTrainTile(v);
@@ -3278,14 +3289,6 @@ bool TrainController(Train *v, Vehicle *nomove, bool reverse)
 				}
 			}
 		} else {
-			/* In a tunnel or on a bridge
-			 * - for tunnels, only the part when the vehicle is not visible (part of enter/exit tile too)
-			 * - for bridges, only the middle part - without the bridge heads */
-			if (!(v->vehstatus & VS_HIDDEN)) {
-				Train *first = v->First();
-				first->cur_speed = min(first->cur_speed, GetBridgeSpec(GetBridgeType(v->tile))->speed);
-			}
-
 			if (IsTileType(gp.new_tile, MP_TUNNELBRIDGE) && HasBit(VehicleEnterTile(v, gp.new_tile, gp.x, gp.y), VETS_ENTERED_WORMHOLE)) {
 				/* Perform look-ahead on tunnel exit. */
 				if (v->IsFrontEngine()) {
@@ -3769,11 +3772,7 @@ static bool TrainLocoHandler(Train *v, bool mode)
 				/* Show message to player. */
 				if (_settings_client.gui.lost_vehicle_warn && v->owner == _local_company) {
 					SetDParam(0, v->index);
-					AddVehicleNewsItem(
-						STR_NEWS_TRAIN_IS_STUCK,
-						NS_ADVICE,
-						v->index
-					);
+					AddVehicleAdviceNewsItem(STR_NEWS_TRAIN_IS_STUCK, v->index);
 				}
 				v->wait_counter = 0;
 			}
@@ -3900,7 +3899,7 @@ bool Train::Tick()
 static void CheckIfTrainNeedsService(Train *v)
 {
 	if (Company::Get(v->owner)->settings.vehicle.servint_trains == 0 || !v->NeedsAutomaticServicing()) return;
-	if (v->IsInDepot()) {
+	if (v->IsChainInDepot()) {
 		VehicleServiceInDepot(v);
 		return;
 	}

@@ -34,6 +34,13 @@
 #include "error.h"
 #include "game/game.hpp"
 
+/** Values for _settings_client.gui.auto_scrolling */
+enum ViewportAutoscrolling {
+	VA_DISABLED,                  //!< Do not autoscroll when mouse is at edge of viewport.
+	VA_MAIN_VIEWPORT_FULLSCREEN,  //!< Scroll main viewport at edge when using fullscreen.
+	VA_MAIN_VIEWPORT,             //!< Scroll main viewport at edge.
+	VA_EVERY_VIEWPORT,            //!< Scroll all viewports at their edges.
+};
 
 static Point _drag_delta; ///< delta between mouse cursor and upper left corner of dragged window
 static Window *_mouseover_last_w = NULL; ///< Window of the last #MOUSEOVER event.
@@ -168,6 +175,39 @@ bool Window::IsWidgetHighlighted(byte widget_index) const
 }
 
 /**
+ * A dropdown window associated to this window has been closed.
+ * @param pt the point inside the window the mouse resides on after closure.
+ * @param widget the widget (button) that the dropdown is associated with.
+ * @param index the element in the dropdown that is selected.
+ * @param instant_close whether the dropdown was configured to close on mouse up.
+ */
+void Window::OnDropdownClose(Point pt, int widget, int index, bool instant_close)
+{
+	if (widget < 0) return;
+
+	if (instant_close) {
+		/* Send event for selected option if we're still
+		 * on the parent button of the dropdown (behaviour of the dropdowns in the main toolbar). */
+		if (GetWidgetFromPos(this, pt.x, pt.y) == widget) {
+			this->OnDropdownSelect(widget, index);
+		}
+	}
+
+	/* Raise the dropdown button */
+	if (this->nested_array != NULL) {
+		NWidgetCore *nwi2 = this->GetWidget<NWidgetCore>(widget);
+		if ((nwi2->type & WWT_MASK) == NWID_BUTTON_DROPDOWN) {
+			nwi2->disp_flags &= ~ND_DROPDOWN_ACTIVE;
+		} else {
+			this->RaiseWidget(widget);
+		}
+	} else {
+		this->RaiseWidget(widget);
+	}
+	this->SetWidgetDirty(widget);
+}
+
+/**
  * Return the Scrollbar to a widget index.
  * @param widnum Scrollbar widget index
  * @return Scrollbar to the widget
@@ -185,6 +225,28 @@ const Scrollbar *Window::GetScrollbar(uint widnum) const
 Scrollbar *Window::GetScrollbar(uint widnum)
 {
 	return this->GetWidget<NWidgetScrollbar>(widnum);
+}
+
+/**
+ * Return the querystring associated to a editbox.
+ * @param widnum Editbox widget index
+ * @return QueryString or NULL.
+ */
+const QueryString *Window::GetQueryString(uint widnum) const
+{
+	const SmallMap<int, QueryString*>::Pair *query = this->querystrings.Find(widnum);
+	return query != this->querystrings.End() ? query->second : NULL;
+}
+
+/**
+ * Return the querystring associated to a editbox.
+ * @param widnum Editbox widget index
+ * @return QueryString or NULL.
+ */
+QueryString *Window::GetQueryString(uint widnum)
+{
+	SmallMap<int, QueryString*>::Pair *query = this->querystrings.Find(widnum);
+	return query != this->querystrings.End() ? query->second : NULL;
 }
 
 
@@ -242,10 +304,10 @@ void Window::UnfocusFocusedWidget()
  * @param widget_index Index of the widget in the window to set the focus to.
  * @return Focus has changed.
  */
-bool Window::SetFocusedWidget(byte widget_index)
+bool Window::SetFocusedWidget(int widget_index)
 {
 	/* Do nothing if widget_index is already focused, or if it wasn't a valid widget. */
-	if (widget_index >= this->nested_array_size) return false;
+	if ((uint)widget_index >= this->nested_array_size) return false;
 
 	assert(this->nested_array[widget_index] != NULL); // Setting focus to a non-existing widget is a bad idea.
 	if (this->nested_focus != NULL) {
@@ -305,8 +367,10 @@ void CDECL Window::SetWidgetsLoweredState(bool lowered_stat, int widgets, ...)
 void Window::RaiseButtons(bool autoraise)
 {
 	for (uint i = 0; i < this->nested_array_size; i++) {
-		if (this->nested_array[i] != NULL && ((this->nested_array[i]->type & ~WWB_PUSHBUTTON) < WWT_LAST || this->nested_array[i]->type == NWID_PUSHBUTTON_DROPDOWN) &&
-				(!autoraise || (this->nested_array[i]->type & WWB_PUSHBUTTON)) && this->IsWidgetLowered(i)) {
+		if (this->nested_array[i] == NULL) continue;
+		WidgetType type = this->nested_array[i]->type;
+		if (((type & ~WWB_PUSHBUTTON) < WWT_LAST || type == NWID_PUSHBUTTON_DROPDOWN) &&
+				(!autoraise || (type & WWB_PUSHBUTTON) || type == WWT_EDITBOX) && this->IsWidgetLowered(i)) {
 			this->RaiseWidget(i);
 			this->SetWidgetDirty(i);
 		}
@@ -358,12 +422,6 @@ static void DispatchLeftClickEvent(Window *w, int x, int y, int click_count)
 			(w->desc_flags & WDF_NO_FOCUS) == 0 &&  // Don't lose focus to toolbars
 			widget_type != WWT_CLOSEBOX) {          // Don't change focused window if 'X' (close button) was clicked
 		focused_widget_changed = true;
-		if (_focused_window != NULL) {
-			_focused_window->OnFocusLost();
-
-			/* The window that lost focus may have had opened a OSK, window so close it, unless the user has clicked on the OSK window. */
-			if (w->window_class != WC_OSK) DeleteWindowById(WC_OSK, 0);
-		}
 		SetFocusedWindow(w);
 		w->OnFocus();
 	}
@@ -376,13 +434,9 @@ static void DispatchLeftClickEvent(Window *w, int x, int y, int click_count)
 	int widget_index = nw->index; ///< Index of the widget
 
 	/* Clicked on a widget that is not disabled.
-	 * So unless the clicked widget is the caption bar, change focus to this widget */
-	if (widget_type != WWT_CAPTION) {
-		/* Close the OSK window if a edit box loses focus */
-		if (w->nested_focus != NULL &&  w->nested_focus->type == WWT_EDITBOX && w->nested_focus != nw && w->window_class != WC_OSK) {
-			DeleteWindowById(WC_OSK, 0);
-		}
-
+	 * So unless the clicked widget is the caption bar, change focus to this widget.
+	 * Exception: In the OSK we always want the editbox to stay focussed. */
+	if (widget_type != WWT_CAPTION && w->window_class != WC_OSK) {
 		/* focused_widget_changed is 'now' only true if the window this widget
 		 * is in gained focus. In that case it must remain true, also if the
 		 * local widget focus did not change. As such it's the logical-or of
@@ -401,21 +455,19 @@ static void DispatchLeftClickEvent(Window *w, int x, int y, int click_count)
 
 	if ((widget_type & ~WWB_PUSHBUTTON) < WWT_LAST && (widget_type & WWB_PUSHBUTTON)) w->HandleButtonClick(widget_index);
 
+	Point pt = { x, y };
+
 	switch (widget_type) {
 		case NWID_VSCROLLBAR:
 		case NWID_HSCROLLBAR:
 			ScrollbarClickHandler(w, nw, x, y);
 			break;
 
-		case WWT_EDITBOX:
-			if (!focused_widget_changed) { // Only open the OSK window if clicking on an already focused edit box
-				/* Open the OSK window if clicked on an edit box */
-				QueryStringBaseWindow *qs = dynamic_cast<QueryStringBaseWindow *>(w);
-				if (qs != NULL) {
-					qs->OnOpenOSKWindow(widget_index);
-				}
-			}
+		case WWT_EDITBOX: {
+			QueryString *query = w->GetQueryString(widget_index);
+			if (query != NULL) query->ClickEditBox(w, pt, widget_index, click_count, focused_widget_changed);
 			break;
+		}
 
 		case WWT_CLOSEBOX: // 'X'
 			delete w;
@@ -459,7 +511,6 @@ static void DispatchLeftClickEvent(Window *w, int x, int y, int click_count)
 		Game::NewEvent(new ScriptEventWindowWidgetClick((ScriptWindow::WindowClass)w->window_class, w->window_number, widget_index));
 	}
 
-	Point pt = { x, y };
 	w->OnClick(pt, widget_index, click_count);
 }
 
@@ -557,7 +608,7 @@ static bool MayBeShown(const Window *w)
 	switch (w->window_class) {
 		case WC_MAIN_WINDOW:    ///< The background, i.e. the game.
 		case WC_MODAL_PROGRESS: ///< The actual progress window.
-		case WC_QUERY_STRING:   ///< The abort window.
+		case WC_CONFIRM_POPUP_QUERY: ///< The abort window.
 			return true;
 
 		default:
@@ -1138,10 +1189,10 @@ void Window::InitializeData(const WindowDesc *desc, WindowNumber window_number)
 	this->resize.step_width  = this->nested_root->resize_x;
 	this->resize.step_height = this->nested_root->resize_y;
 
-	/* Give focus to the opened window unless it is the OSK window or a text box
+	/* Give focus to the opened window unless a text box
 	 * of focused window has focus (so we don't interrupt typing). But if the new
 	 * window has a text box, then take focus anyway. */
-	if (this->window_class != WC_OSK && (!EditBoxInGlobalFocus() || this->nested_root->GetWidgetOfType(WWT_EDITBOX) != NULL)) SetFocusedWindow(this);
+	if (!EditBoxInGlobalFocus() || this->nested_root->GetWidgetOfType(WWT_EDITBOX) != NULL) SetFocusedWindow(this);
 
 	/* Insert the window into the correct location in the z-ordering. */
 	AddWindowToZOrdering(this);
@@ -1580,6 +1631,12 @@ static void DecreaseWindowCounters()
 				}
 			}
 		}
+
+		/* Handle editboxes */
+		for (SmallMap<int, QueryString*>::Pair *it = w->querystrings.Begin(); it != w->querystrings.End(); ++it) {
+			it->second->HandleEditBox(w, it->first);
+		}
+
 		w->OnMouseLoop();
 	}
 
@@ -1588,7 +1645,7 @@ static void DecreaseWindowCounters()
 			CLRBITS(w->flags, WF_TIMEOUT);
 
 			w->OnTimeout();
-			if (w->desc_flags & WDF_UNCLICK_BUTTONS) w->RaiseButtons(true);
+			w->RaiseButtons(true);
 		}
 	}
 }
@@ -2184,6 +2241,76 @@ static bool MaybeBringWindowToFront(Window *w)
 }
 
 /**
+ * Process keypress for editbox widget.
+ * @param wid Editbox widget.
+ * @param key     the Unicode value of the key.
+ * @param keycode the untranslated key code including shift state.
+ * @return #ES_HANDLED if the key press has been handled and no other
+ *         window should receive the event.
+ */
+EventState Window::HandleEditBoxKey(int wid, uint16 key, uint16 keycode)
+{
+	EventState state = ES_NOT_HANDLED;
+
+	QueryString *query = this->GetQueryString(wid);
+	if (query == NULL) return state;
+
+	int action = QueryString::ACTION_NOTHING;
+
+	switch (query->HandleEditBoxKey(this, wid, key, keycode, state)) {
+		case HEBR_EDITING:
+			this->SetWidgetDirty(wid);
+			this->OnEditboxChanged(wid);
+			break;
+
+		case HEBR_CURSOR:
+			this->SetWidgetDirty(wid);
+			/* For the OSK also invalidate the parent window */
+			if (this->window_class == WC_OSK) this->InvalidateData();
+			break;
+
+		case HEBR_CONFIRM:
+			if (this->window_class == WC_OSK) {
+				this->OnClick(Point(), WID_OSK_OK, 1);
+			} else if (query->ok_button >= 0) {
+				this->OnClick(Point(), query->ok_button, 1);
+			} else {
+				action = query->ok_button;
+			}
+			break;
+
+		case HEBR_CANCEL:
+			if (this->window_class == WC_OSK) {
+				this->OnClick(Point(), WID_OSK_CANCEL, 1);
+			} else if (query->cancel_button >= 0) {
+				this->OnClick(Point(), query->cancel_button, 1);
+			} else {
+				action = query->cancel_button;
+			}
+			break;
+
+		default: break;
+	}
+
+	switch (action) {
+		case QueryString::ACTION_DESELECT:
+			this->UnfocusFocusedWidget();
+			break;
+
+		case QueryString::ACTION_CLEAR:
+			query->text.DeleteAll();
+			this->SetWidgetDirty(wid);
+			this->OnEditboxChanged(wid);
+			break;
+
+		default:
+			break;
+	}
+
+	return state;
+}
+
+/**
  * Handle keyboard input.
  * @param raw_key Lower 8 bits contain the ASCII character, the higher 16 bits the keycode
  */
@@ -2213,8 +2340,12 @@ void HandleKeypress(uint32 raw_key)
 
 	/* Check if the focused window has a focused editbox */
 	if (EditBoxInGlobalFocus()) {
-		/* All input will in this case go to the focused window */
-		if (_focused_window->OnKeyPress(key, keycode) == ES_HANDLED) return;
+		/* All input will in this case go to the focused editbox */
+		if (_focused_window->window_class == WC_CONSOLE) {
+			if (_focused_window->OnKeyPress(key, keycode) == ES_HANDLED) return;
+		} else {
+			if (_focused_window->HandleEditBoxKey(_focused_window->nested_focus->index, key, keycode) == ES_HANDLED) return;
+		}
 	}
 
 	/* Call the event, start with the uppermost window, but ignore the toolbar. */
@@ -2257,31 +2388,35 @@ static int _input_events_this_tick = 0;
  */
 static void HandleAutoscroll()
 {
-	if (_settings_client.gui.autoscroll && _game_mode != GM_MENU && !HasModalProgress()) {
-		int x = _cursor.pos.x;
-		int y = _cursor.pos.y;
-		Window *w = FindWindowFromPt(x, y);
-		if (w == NULL || w->flags & WF_DISABLE_VP_SCROLL) return;
-		ViewPort *vp = IsPtInWindowViewport(w, x, y);
-		if (vp != NULL) {
-			x -= vp->left;
-			y -= vp->top;
+	if (_game_mode == GM_MENU || HasModalProgress()) return;
+	if (_settings_client.gui.auto_scrolling == VA_DISABLED) return;
+	if (_settings_client.gui.auto_scrolling == VA_MAIN_VIEWPORT_FULLSCREEN && !_fullscreen) return;
 
-			/* here allows scrolling in both x and y axis */
+	int x = _cursor.pos.x;
+	int y = _cursor.pos.y;
+	Window *w = FindWindowFromPt(x, y);
+	if (w == NULL || w->flags & WF_DISABLE_VP_SCROLL) return;
+	if (_settings_client.gui.auto_scrolling != VA_EVERY_VIEWPORT && w->window_class != WC_MAIN_WINDOW) return;
+
+	ViewPort *vp = IsPtInWindowViewport(w, x, y);
+	if (vp == NULL) return;
+
+	x -= vp->left;
+	y -= vp->top;
+
+	/* here allows scrolling in both x and y axis */
 #define scrollspeed 3
-			if (x - 15 < 0) {
-				w->viewport->dest_scrollpos_x += ScaleByZoom((x - 15) * scrollspeed, vp->zoom);
-			} else if (15 - (vp->width - x) > 0) {
-				w->viewport->dest_scrollpos_x += ScaleByZoom((15 - (vp->width - x)) * scrollspeed, vp->zoom);
-			}
-			if (y - 15 < 0) {
-				w->viewport->dest_scrollpos_y += ScaleByZoom((y - 15) * scrollspeed, vp->zoom);
-			} else if (15 - (vp->height - y) > 0) {
-				w->viewport->dest_scrollpos_y += ScaleByZoom((15 - (vp->height - y)) * scrollspeed, vp->zoom);
-			}
-#undef scrollspeed
-		}
+	if (x - 15 < 0) {
+		w->viewport->dest_scrollpos_x += ScaleByZoom((x - 15) * scrollspeed, vp->zoom);
+	} else if (15 - (vp->width - x) > 0) {
+		w->viewport->dest_scrollpos_x += ScaleByZoom((15 - (vp->width - x)) * scrollspeed, vp->zoom);
 	}
+	if (y - 15 < 0) {
+		w->viewport->dest_scrollpos_y += ScaleByZoom((y - 15) * scrollspeed, vp->zoom);
+	} else if (15 - (vp->height - y) > 0) {
+		w->viewport->dest_scrollpos_y += ScaleByZoom((15 - (vp->height - y)) * scrollspeed, vp->zoom);
+	}
+#undef scrollspeed
 }
 
 enum MouseClick {

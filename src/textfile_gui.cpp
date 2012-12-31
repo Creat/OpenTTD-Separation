@@ -45,7 +45,7 @@ static const NWidgetPart _nested_textfile_widgets[] = {
 static const WindowDesc _textfile_desc(
 	WDP_CENTER, 630, 460,
 	WC_TEXTFILE, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_textfile_widgets, lengthof(_nested_textfile_widgets)
 );
 
@@ -55,6 +55,7 @@ TextfileWindow::TextfileWindow(TextfileType file_type) : Window(), file_type(fil
 	this->vscroll = this->GetScrollbar(WID_TF_VSCROLLBAR);
 	this->hscroll = this->GetScrollbar(WID_TF_HSCROLLBAR);
 	this->FinishInitNested(&_textfile_desc);
+	this->GetWidget<NWidgetCore>(WID_TF_CAPTION)->SetDataTip(STR_TEXTFILE_README_CAPTION + file_type, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS);
 }
 
 /* virtual */ TextfileWindow::~TextfileWindow()

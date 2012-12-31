@@ -117,10 +117,8 @@ struct SetDateWindow : Window {
 				break;
 
 			case WID_SD_YEAR:
-				for (Year i = this->min_year; i <= this->max_year; i++) {
-					SetDParam(0, i);
-					d = maxdim(d, GetStringBoundingBox(STR_JUST_INT));
-				}
+				SetDParamMaxValue(0, this->max_year);
+				d = maxdim(d, GetStringBoundingBox(STR_JUST_INT));
 				break;
 		}
 
@@ -199,7 +197,7 @@ static const NWidgetPart _nested_set_date_widgets[] = {
 static const WindowDesc _set_date_desc(
 	WDP_CENTER, 0, 0,
 	WC_SET_DATE, WC_NONE,
-	WDF_UNCLICK_BUTTONS,
+	0,
 	_nested_set_date_widgets, lengthof(_nested_set_date_widgets)
 );
 

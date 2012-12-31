@@ -86,17 +86,22 @@ void DrawShipEngine(int left, int right, int preferred_x, int y, EngineID engine
 }
 
 /**
- * Get the size of the sprite of a ship sprite heading west (used for lists)
- * @param engine The engine to get the sprite from
- * @param width The width of the sprite
- * @param height The height of the sprite
+ * Get the size of the sprite of a ship sprite heading west (used for lists).
+ * @param engine The engine to get the sprite from.
+ * @param[out] width The width of the sprite.
+ * @param[out] height The height of the sprite.
+ * @param[out] xoffs Number of pixels to shift the sprite to the right.
+ * @param[out] yoffs Number of pixels to shift the sprite downwards.
+ * @param image_type Context the sprite is used in.
  */
-void GetShipSpriteSize(EngineID engine, uint &width, uint &height, EngineImageType image_type)
+void GetShipSpriteSize(EngineID engine, uint &width, uint &height, int &xoffs, int &yoffs, EngineImageType image_type)
 {
 	const Sprite *spr = GetSprite(GetShipIcon(engine, image_type), ST_NORMAL);
 
 	width  = UnScaleByZoom(spr->width, ZOOM_LVL_GUI);
 	height = UnScaleByZoom(spr->height, ZOOM_LVL_GUI);
+	xoffs  = UnScaleByZoom(spr->x_offs, ZOOM_LVL_GUI);
+	yoffs  = UnScaleByZoom(spr->y_offs, ZOOM_LVL_GUI);
 }
 
 SpriteID Ship::GetImage(Direction direction, EngineImageType image_type) const
@@ -142,7 +147,7 @@ static const Depot *FindClosestShipDepot(const Vehicle *v, uint max_distance)
 static void CheckIfShipNeedsService(Vehicle *v)
 {
 	if (Company::Get(v->owner)->settings.vehicle.servint_ships == 0 || !v->NeedsAutomaticServicing()) return;
-	if (v->IsInDepot()) {
+	if (v->IsChainInDepot()) {
 		VehicleServiceInDepot(v);
 		return;
 	}
@@ -271,24 +276,23 @@ TileIndex Ship::GetOrderStationLocation(StationID station)
 
 void Ship::UpdateDeltaXY(Direction direction)
 {
-#define MKIT(a, b, c, d) ((a & 0xFF) << 24) | ((b & 0xFF) << 16) | ((c & 0xFF) << 8) | ((d & 0xFF) << 0)
-	static const uint32 _delta_xy_table[8] = {
-		MKIT( 6,  6,  -3,  -3),
-		MKIT( 6, 32,  -3, -16),
-		MKIT( 6,  6,  -3,  -3),
-		MKIT(32,  6, -16,  -3),
-		MKIT( 6,  6,  -3,  -3),
-		MKIT( 6, 32,  -3, -16),
-		MKIT( 6,  6,  -3,  -3),
-		MKIT(32,  6, -16,  -3),
+	static const int8 _delta_xy_table[8][4] = {
+		/* y_extent, x_extent, y_offs, x_offs */
+		{ 6,  6,  -3,  -3}, // N
+		{ 6, 32,  -3, -16}, // NE
+		{ 6,  6,  -3,  -3}, // E
+		{32,  6, -16,  -3}, // SE
+		{ 6,  6,  -3,  -3}, // S
+		{ 6, 32,  -3, -16}, // SW
+		{ 6,  6,  -3,  -3}, // W
+		{32,  6, -16,  -3}, // NW
 	};
-#undef MKIT
 
-	uint32 x = _delta_xy_table[direction];
-	this->x_offs        = GB(x,  0, 8);
-	this->y_offs        = GB(x,  8, 8);
-	this->x_extent      = GB(x, 16, 8);
-	this->y_extent      = GB(x, 24, 8);
+	const int8 *bb = _delta_xy_table[direction];
+	this->x_offs        = bb[3];
+	this->y_offs        = bb[2];
+	this->x_extent      = bb[1];
+	this->y_extent      = bb[0];
 	this->z_extent      = 6;
 }
 
@@ -299,7 +303,7 @@ static const TileIndexDiffC _ship_leave_depot_offs[] = {
 
 static bool CheckShipLeaveDepot(Ship *v)
 {
-	if (!v->IsInDepot()) return false;
+	if (!v->IsChainInDepot()) return false;
 
 	/* We are leaving a depot, but have to go to the exact same one; re-enter */
 	if (v->current_order.IsType(OT_GOTO_DEPOT) &&
@@ -311,13 +315,34 @@ static bool CheckShipLeaveDepot(Ship *v)
 	TileIndex tile = v->tile;
 	Axis axis = GetShipDepotAxis(tile);
 
-	/* Check first (north) side */
-	if (DiagdirReachesTracks((DiagDirection)axis) & GetTileShipTrackStatus(TILE_ADD(tile, ToTileIndexDiff(_ship_leave_depot_offs[axis])))) {
-		v->direction = ReverseDir(AxisToDirection(axis));
-	/* Check second (south) side */
-	} else if (DiagdirReachesTracks((DiagDirection)(axis + 2)) & GetTileShipTrackStatus(TILE_ADD(tile, -2 * ToTileIndexDiff(_ship_leave_depot_offs[axis])))) {
-		v->direction = AxisToDirection(axis);
+	DiagDirection north_dir = ReverseDiagDir(AxisToDiagDir(axis));
+	TileIndex north_neighbour = TILE_ADD(tile, ToTileIndexDiff(_ship_leave_depot_offs[axis]));
+	DiagDirection south_dir = AxisToDiagDir(axis);
+	TileIndex south_neighbour = TILE_ADD(tile, -2 * ToTileIndexDiff(_ship_leave_depot_offs[axis]));
+
+	TrackBits north_tracks = DiagdirReachesTracks(north_dir) & GetTileShipTrackStatus(north_neighbour);
+	TrackBits south_tracks = DiagdirReachesTracks(south_dir) & GetTileShipTrackStatus(south_neighbour);
+	if (north_tracks && south_tracks) {
+		/* Ask pathfinder for best direction */
+		bool reverse = false;
+		bool path_found;
+		switch (_settings_game.pf.pathfinder_for_ships) {
+			case VPF_OPF: reverse = OPFShipChooseTrack(v, north_neighbour, north_dir, north_tracks, path_found) == INVALID_TRACK; break; // OPF always allows reversing
+			case VPF_NPF: reverse = NPFShipCheckReverse(v); break;
+			case VPF_YAPF: reverse = YapfShipCheckReverse(v); break;
+			default: NOT_REACHED();
+		}
+		if (reverse) north_tracks = TRACK_BIT_NONE;
+	}
+
+	if (north_tracks) {
+		/* Leave towards north */
+		v->direction = DiagDirToDir(north_dir);
+	} else if (south_tracks) {
+		/* Leave towards south */
+		v->direction = DiagDirToDir(south_dir);
 	} else {
+		/* Both ways blocked */
 		return false;
 	}
 
@@ -375,7 +400,7 @@ static void ShipArrivesAt(const Vehicle *v, Station *st)
 		SetDParam(0, st->index);
 		AddVehicleNewsItem(
 			STR_NEWS_FIRST_SHIP_ARRIVAL,
-			(v->owner == _local_company) ? NS_ARRIVAL_COMPANY : NS_ARRIVAL_OTHER,
+			(v->owner == _local_company) ? NT_ARRIVAL_COMPANY : NT_ARRIVAL_OTHER,
 			v->index,
 			st->index
 		);
@@ -385,9 +410,13 @@ static void ShipArrivesAt(const Vehicle *v, Station *st)
 
 
 /**
- * returns the track to choose on the next tile, or -1 when it's better to
- * reverse. The tile given is the tile we are about to enter, enterdir is the
- * direction in which we are entering the tile
+ * Runs the pathfinder to choose a track to continue along.
+ *
+ * @param v Ship to navigate
+ * @param tile Tile, the ship is about to enter
+ * @param enterdir Direction of entering
+ * @param tracks Available track choices on \a tile
+ * @return Track to choose, or INVALID_TRACK when to reverse.
  */
 static Track ChooseShipTrack(Ship *v, TileIndex tile, DiagDirection enterdir, TrackBits tracks)
 {
@@ -546,15 +575,12 @@ static void ShipController(Ship *v)
 				}
 			}
 		} else {
-			DiagDirection diagdir;
 			/* New tile */
-			if (TileX(gp.new_tile) >= MapMaxX() || TileY(gp.new_tile) >= MapMaxY()) {
-				goto reverse_direction;
-			}
+			if (!IsValidTile(gp.new_tile)) goto reverse_direction;
 
 			dir = ShipGetNewDirectionFromTiles(gp.new_tile, gp.old_tile);
 			assert(dir == DIR_NE || dir == DIR_SE || dir == DIR_SW || dir == DIR_NW);
-			diagdir = DirToDiagDir(dir);
+			DiagDirection diagdir = DirToDiagDir(dir);
 			tracks = GetAvailShipTracks(gp.new_tile, diagdir);
 			if (tracks == TRACK_BIT_NONE) goto reverse_direction;
 

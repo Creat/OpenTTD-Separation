@@ -156,6 +156,25 @@ void DrawRoadVehEngine(int left, int right, int preferred_x, int y, EngineID eng
 }
 
 /**
+ * Get the size of the sprite of a road vehicle sprite heading west (used for lists).
+ * @param engine The engine to get the sprite from.
+ * @param[out] width The width of the sprite.
+ * @param[out] height The height of the sprite.
+ * @param[out] xoffs Number of pixels to shift the sprite to the right.
+ * @param[out] yoffs Number of pixels to shift the sprite downwards.
+ * @param image_type Context the sprite is used in.
+ */
+void GetRoadVehSpriteSize(EngineID engine, uint &width, uint &height, int &xoffs, int &yoffs, EngineImageType image_type)
+{
+	const Sprite *spr = GetSprite(GetRoadVehIcon(engine, image_type), ST_NORMAL);
+
+	width  = UnScaleByZoom(spr->width, ZOOM_LVL_GUI);
+	height = UnScaleByZoom(spr->height, ZOOM_LVL_GUI);
+	xoffs  = UnScaleByZoom(spr->x_offs, ZOOM_LVL_GUI);
+	yoffs  = UnScaleByZoom(spr->y_offs, ZOOM_LVL_GUI);
+}
+
+/**
  * Get length of a road vehicle.
  * @param v Road vehicle to query length.
  * @return Length of the given road vehicle.
@@ -169,13 +188,13 @@ static uint GetRoadVehLength(const RoadVehicle *v)
 	if (e->GetGRF() != NULL && e->GetGRF()->grf_version >= 8) {
 		/* Use callback 36 */
 		veh_len = GetVehicleProperty(v, PROP_ROADVEH_SHORTEN_FACTOR, CALLBACK_FAILED);
+		if (veh_len != CALLBACK_FAILED && veh_len >= VEHICLE_LENGTH) ErrorUnknownCallbackResult(e->GetGRFID(), CBID_VEHICLE_LENGTH, veh_len);
 	} else {
 		/* Use callback 11 */
 		veh_len = GetVehicleCallback(CBID_VEHICLE_LENGTH, 0, 0, v->engine_type, v);
 	}
 	if (veh_len == CALLBACK_FAILED) veh_len = e->u.road.shorten_factor;
 	if (veh_len != 0) {
-		if (veh_len >= VEHICLE_LENGTH) ErrorUnknownCallbackResult(e->GetGRFID(), CBID_VEHICLE_LENGTH, veh_len);
 		length -= Clamp(veh_len, 0, VEHICLE_LENGTH - 1);
 	}
 
@@ -306,19 +325,6 @@ CommandCost CmdBuildRoadVehicle(TileIndex tile, DoCommandFlag flags, const Engin
 	return CommandCost();
 }
 
-bool RoadVehicle::IsStoppedInDepot() const
-{
-	TileIndex tile = this->tile;
-
-	if (!IsRoadDepotTile(tile)) return false;
-	if (this->IsFrontEngine() && !(this->vehstatus & VS_STOPPED)) return false;
-
-	for (const RoadVehicle *v = this; v != NULL; v = v->Next()) {
-		if (v->state != RVSB_IN_DEPOT || v->tile != tile) return false;
-	}
-	return true;
-}
-
 static FindDepotData FindClosestRoadDepot(const RoadVehicle *v, int max_distance)
 {
 	if (IsRoadDepotTile(v->tile)) return FindDepotData(v->tile, 0);
@@ -356,6 +362,8 @@ CommandCost CmdTurnRoadVeh(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 	RoadVehicle *v = RoadVehicle::GetIfValid(p1);
 	if (v == NULL) return CMD_ERROR;
 
+	if (!v->IsPrimaryVehicle()) return CMD_ERROR;
+
 	CommandCost ret = CheckOwnership(v->owner);
 	if (ret.Failed()) return ret;
 
@@ -389,24 +397,28 @@ void RoadVehicle::MarkDirty()
 
 void RoadVehicle::UpdateDeltaXY(Direction direction)
 {
-#define MKIT(a, b, c, d) ((a & 0xFF) << 24) | ((b & 0xFF) << 16) | ((c & 0xFF) << 8) | ((d & 0xFF) << 0)
-	static const uint32 _delta_xy_table[8] = {
-		MKIT(3, 3, -1, -1),
-		MKIT(3, 7, -1, -3),
-		MKIT(3, 3, -1, -1),
-		MKIT(7, 3, -3, -1),
-		MKIT(3, 3, -1, -1),
-		MKIT(3, 7, -1, -3),
-		MKIT(3, 3, -1, -1),
-		MKIT(7, 3, -3, -1),
+	static const int8 _delta_xy_table[8][10] = {
+		/* y_extent, x_extent, y_offs, x_offs, y_bb_offs, x_bb_offs, y_extent_shorten, x_extent_shorten, y_bb_offs_shorten, x_bb_offs_shorten */
+		{3, 3, -1, -1,  0,  0, -1, -1, -1, -1}, // N
+		{3, 7, -1, -3,  0, -1,  0, -1,  0,  0}, // NE
+		{3, 3, -1, -1,  0,  0,  1, -1,  1, -1}, // E
+		{7, 3, -3, -1, -1,  0,  0,  0,  1,  0}, // SE
+		{3, 3, -1, -1,  0,  0,  1,  1,  1,  1}, // S
+		{3, 7, -1, -3,  0, -1,  0,  0,  0,  1}, // SW
+		{3, 3, -1, -1,  0,  0, -1,  1, -1,  1}, // W
+		{7, 3, -3, -1, -1,  0, -1,  0,  0,  0}, // NW
 	};
-#undef MKIT
 
-	uint32 x = _delta_xy_table[direction];
-	this->x_offs        = GB(x,  0, 8);
-	this->y_offs        = GB(x,  8, 8);
-	this->x_extent      = GB(x, 16, 8);
-	this->y_extent      = GB(x, 24, 8);
+	int shorten = VEHICLE_LENGTH - this->gcache.cached_veh_length;
+	if (!IsDiagonalDirection(direction)) shorten >>= 1;
+
+	const int8 *bb = _delta_xy_table[direction];
+	this->x_bb_offs     = bb[5] + bb[9] * shorten;
+	this->y_bb_offs     = bb[4] + bb[8] * shorten;;
+	this->x_offs        = bb[3];
+	this->y_offs        = bb[2];
+	this->x_extent      = bb[1] + bb[7] * shorten;
+	this->y_extent      = bb[0] + bb[6] * shorten;
 	this->z_extent      = 6;
 }
 
@@ -427,6 +439,11 @@ inline int RoadVehicle::GetCurrentMaxSpeed() const
 			break;
 		} else if ((u->direction & 1) == 0) {
 			max_speed = this->vcache.cached_max_speed * 3 / 4;
+		}
+
+		/* Vehicle is on the middle part of a bridge. */
+		if (u->state == RVSB_WORMHOLE && !(u->vehstatus & VS_HIDDEN)) {
+			max_speed = min(max_speed, GetBridgeSpec(GetBridgeType(u->tile))->speed * 2);
 		}
 	}
 
@@ -526,12 +543,12 @@ static void RoadVehCrash(RoadVehicle *v)
 	AddVehicleNewsItem(
 		(pass == 1) ?
 			STR_NEWS_ROAD_VEHICLE_CRASH_DRIVER : STR_NEWS_ROAD_VEHICLE_CRASH,
-		NS_ACCIDENT,
+		NT_ACCIDENT,
 		v->index
 	);
 
 	ModifyStationRatingAround(v->tile, v->owner, -160, 22);
-	SndPlayVehicleFx(SND_12_EXPLOSION, v);
+	if (_settings_client.sound.disaster) SndPlayVehicleFx(SND_12_EXPLOSION, v);
 }
 
 static bool RoadVehCheckTrainCrash(RoadVehicle *v)
@@ -664,7 +681,7 @@ static void RoadVehArrivesAt(const RoadVehicle *v, Station *st)
 			SetDParam(0, st->index);
 			AddVehicleNewsItem(
 				v->roadtype == ROADTYPE_ROAD ? STR_NEWS_FIRST_BUS_ARRIVAL : STR_NEWS_FIRST_PASSENGER_TRAM_ARRIVAL,
-				(v->owner == _local_company) ? NS_ARRIVAL_COMPANY : NS_ARRIVAL_OTHER,
+				(v->owner == _local_company) ? NT_ARRIVAL_COMPANY : NT_ARRIVAL_OTHER,
 				v->index,
 				st->index
 			);
@@ -678,7 +695,7 @@ static void RoadVehArrivesAt(const RoadVehicle *v, Station *st)
 			SetDParam(0, st->index);
 			AddVehicleNewsItem(
 				v->roadtype == ROADTYPE_ROAD ? STR_NEWS_FIRST_TRUCK_ARRIVAL : STR_NEWS_FIRST_CARGO_TRAM_ARRIVAL,
-				(v->owner == _local_company) ? NS_ARRIVAL_COMPANY : NS_ARRIVAL_OTHER,
+				(v->owner == _local_company) ? NT_ARRIVAL_COMPANY : NT_ARRIVAL_OTHER,
 				v->index,
 				st->index
 			);
@@ -948,7 +965,7 @@ struct RoadDriveEntry {
 
 static bool RoadVehLeaveDepot(RoadVehicle *v, bool first)
 {
-	/* Don't leave if not all the wagons are in the depot. */
+	/* Don't leave unless v and following wagons are in the depot. */
 	for (const RoadVehicle *u = v; u != NULL; u = u->Next()) {
 		if (u->state != RVSB_IN_DEPOT || u->tile != v->tile) return false;
 	}
@@ -1101,12 +1118,6 @@ static bool IndividualRoadVehicleController(RoadVehicle *v, const RoadVehicle *p
 	if (v->state == RVSB_WORMHOLE) {
 		/* Vehicle is entering a depot or is on a bridge or in a tunnel */
 		GetNewVehiclePosResult gp = GetNewVehiclePos(v);
-
-		/* Apply bridge speed limit */
-		if (!(v->vehstatus & VS_HIDDEN)) {
-			RoadVehicle *first = v->First();
-			first->cur_speed = min(first->cur_speed, GetBridgeSpec(GetBridgeType(v->tile))->speed * 2);
-		}
 
 		if (v->IsFrontEngine()) {
 			const Vehicle *u = RoadVehFindCloseTo(v, gp.x, gp.y, v->direction);
@@ -1576,7 +1587,7 @@ static void CheckIfRoadVehNeedsService(RoadVehicle *v)
 {
 	/* If we already got a slot at a stop, use that FIRST, and go to a depot later */
 	if (Company::Get(v->owner)->settings.vehicle.servint_roadveh == 0 || !v->NeedsAutomaticServicing()) return;
-	if (v->IsInDepot()) {
+	if (v->IsChainInDepot()) {
 		VehicleServiceInDepot(v);
 		return;
 	}

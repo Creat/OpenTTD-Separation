@@ -34,7 +34,7 @@ void DrawEngineList(VehicleType type, int x, int r, int y, const GUIEngineList *
 
 static int CDECL EngineNumberSorter(const EngineID *a, const EngineID *b)
 {
-	int r = ListPositionOfEngine(*a) - ListPositionOfEngine(*b);
+	int r = Engine::Get(*a)->list_position - Engine::Get(*b)->list_position;
 
 	return r;
 }
@@ -546,8 +546,8 @@ static const NWidgetPart _nested_replace_rail_vehicle_widgets[] = {
 		NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_RV_RIGHT_SCROLLBAR),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
-		NWidget(WWT_PANEL, COLOUR_GREY, WID_RV_LEFT_DETAILS), SetMinimalSize(228, 102), SetResize(1, 0), EndContainer(),
-		NWidget(WWT_PANEL, COLOUR_GREY, WID_RV_RIGHT_DETAILS), SetMinimalSize(228, 102), SetResize(1, 0), EndContainer(),
+		NWidget(WWT_PANEL, COLOUR_GREY, WID_RV_LEFT_DETAILS), SetMinimalSize(240, 122), SetResize(1, 0), EndContainer(),
+		NWidget(WWT_PANEL, COLOUR_GREY, WID_RV_RIGHT_DETAILS), SetMinimalSize(240, 122), SetResize(1, 0), EndContainer(),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL),
 		NWidget(NWID_PUSHBUTTON_DROPDOWN, COLOUR_GREY, WID_RV_START_REPLACE), SetMinimalSize(139, 12), SetDataTip(STR_REPLACE_VEHICLES_START, STR_REPLACE_HELP_START_BUTTON),
@@ -566,9 +566,9 @@ static const NWidgetPart _nested_replace_rail_vehicle_widgets[] = {
 };
 
 static const WindowDesc _replace_rail_vehicle_desc(
-	WDP_AUTO, 456, 140,
+	WDP_AUTO, 500, 140,
 	WC_REPLACE_VEHICLE, WC_NONE,
-	WDF_UNCLICK_BUTTONS | WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION,
 	_nested_replace_rail_vehicle_widgets, lengthof(_nested_replace_rail_vehicle_widgets)
 );
 
@@ -600,7 +600,7 @@ static const NWidgetPart _nested_replace_vehicle_widgets[] = {
 static const WindowDesc _replace_vehicle_desc(
 	WDP_AUTO, 456, 118,
 	WC_REPLACE_VEHICLE, WC_NONE,
-	WDF_UNCLICK_BUTTONS | WDF_CONSTRUCTION,
+	WDF_CONSTRUCTION,
 	_nested_replace_vehicle_widgets, lengthof(_nested_replace_vehicle_widgets)
 );
 

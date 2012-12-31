@@ -1055,7 +1055,7 @@ static CommandCost DecloneOrder(Vehicle *dst, DoCommandFlag flags)
 {
 	if (flags & DC_EXEC) {
 		DeleteVehicleOrders(dst);
-		InvalidateVehicleOrder(dst, -1);
+		InvalidateVehicleOrder(dst, VIWD_REMOVE_ALL_ORDERS);
 		InvalidateWindowClassesData(GetWindowClassForVehicleType(dst->type), 0);
 	}
 	return CommandCost();
@@ -1194,7 +1194,7 @@ CommandCost CmdSkipToOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 
 		if (v->current_order.IsType(OT_LOADING)) v->LeaveStation();
 
-		InvalidateVehicleOrder(v, -2);
+		InvalidateVehicleOrder(v, VIWD_MODIFY_ORDERS);
 	}
 
 	/* We have an aircraft/ship, they have a mini-schedule, so update them all */
@@ -1533,7 +1533,7 @@ CommandCost CmdModifyOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint3
 					u->current_order.GetLoadType() != order->GetLoadType()) {
 				u->current_order.SetLoadType(order->GetLoadType());
 			}
-			InvalidateVehicleOrder(u, -2);
+			InvalidateVehicleOrder(u, VIWD_MODIFY_ORDERS);
 		}
 	}
 
@@ -1612,8 +1612,13 @@ CommandCost CmdCloneOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 			const Order *order;
 
 			FOR_VEHICLE_ORDERS(src, order) {
-				if (OrderGoesToStation(dst, order) &&
-						!CanVehicleUseStation(dst, Station::Get(order->GetDestination()))) {
+				if (!OrderGoesToStation(dst, order)) continue;
+
+				/* Allow copying unreachable destinations if they were already unreachable for the source.
+				 * This is basically to allow cloning / autorenewing / autoreplacing vehicles, while the stations
+				 * are temporarily invalid due to reconstruction. */
+				const Station *st = Station::Get(order->GetDestination());
+				if (CanVehicleUseStation(src, st) && !CanVehicleUseStation(dst, st)) {
 					return_cmd_error(STR_ERROR_CAN_T_COPY_SHARE_ORDER);
 				}
 			}
@@ -1638,8 +1643,8 @@ CommandCost CmdCloneOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 				/* Link this vehicle in the shared-list */
 				dst->AddToShared(src);
 
-				InvalidateVehicleOrder(dst, -1);
-				InvalidateVehicleOrder(src, -2);
+				InvalidateVehicleOrder(dst, VIWD_REMOVE_ALL_ORDERS);
+				InvalidateVehicleOrder(src, VIWD_MODIFY_ORDERS);
 
 				InvalidateWindowClassesData(GetWindowClassForVehicleType(dst->type), 0);
 			}
@@ -1701,7 +1706,7 @@ CommandCost CmdCloneOrder(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 					dst->orders.list = new OrderList(first, dst);
 				}
 
-				InvalidateVehicleOrder(dst, -1);
+				InvalidateVehicleOrder(dst, VIWD_REMOVE_ALL_ORDERS);
 
 				InvalidateWindowClassesData(GetWindowClassForVehicleType(dst->type), 0);
 			}
@@ -1752,14 +1757,14 @@ CommandCost CmdOrderRefit(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32
 		order->SetRefit(cargo, subtype);
 
 		/* Make the depot order an 'always go' order. */
-		if (cargo != CT_NO_REFIT) {
+		if (cargo != CT_NO_REFIT && order->IsType(OT_GOTO_DEPOT)) {
 			order->SetDepotOrderType((OrderDepotTypeFlags)(order->GetDepotOrderType() & ~ODTFB_SERVICE));
 			order->SetDepotActionType((OrderDepotActionFlags)(order->GetDepotActionType() & ~ODATFB_HALT));
 		}
 
 		for (Vehicle *u = v->FirstShared(); u != NULL; u = u->NextShared()) {
 			/* Update any possible open window of the vehicle */
-			InvalidateVehicleOrder(u, -2);
+			InvalidateVehicleOrder(u, VIWD_MODIFY_ORDERS);
 
 			/* If the vehicle already got the current depot set as current order, then update current order as well */
 			if (u->cur_real_order_index == order_number && (u->current_order.GetDepotOrderType() & ODTFB_PART_OF_ORDERS)) {
@@ -1838,11 +1843,7 @@ void CheckOrders(const Vehicle *v)
 		//DEBUG(misc, 3, "Triggered News Item for vehicle %d", v->index);
 
 		SetDParam(0, v->index);
-		AddVehicleNewsItem(
-			message,
-			NS_ADVICE,
-			v->index
-		);
+		AddVehicleAdviceNewsItem(message, v->index);
 	}
 }
 
@@ -2232,7 +2233,7 @@ bool ProcessOrders(Vehicle *v)
 	/* Otherwise set it, and determine the destination tile. */
 	v->current_order = *order;
 
-	InvalidateVehicleOrder(v, -2);
+	InvalidateVehicleOrder(v, VIWD_MODIFY_ORDERS);
 	switch (v->type) {
 		default:
 			NOT_REACHED();

@@ -4,6 +4,7 @@ animated_tile.cpp
 articulated_vehicles.cpp
 autoreplace.cpp
 bmp.cpp
+cargomonitor.cpp
 cargopacket.cpp
 cargotype.cpp
 cheat.cpp
@@ -24,6 +25,7 @@ engine.cpp
 fileio.cpp
 fios.cpp
 fontcache.cpp
+base_consist.cpp
 gamelog.cpp
 genworld.cpp
 gfx.cpp
@@ -70,8 +72,10 @@ spritecache.cpp
 station.cpp
 strgen/strgen_base.cpp
 string.cpp
+stringfilter.cpp
 strings.cpp
 subsidy.cpp
+textbuf.cpp
 texteff.cpp
 tgp.cpp
 tile_map.cpp
@@ -121,6 +125,7 @@ base_station_base.h
 bmp.h
 bridge.h
 cargo_type.h
+cargomonitor.h
 cargopacket.h
 cargotype.h
 cheat_func.h
@@ -168,6 +173,7 @@ fileio_func.h
 fileio_type.h
 fios.h
 fontcache.h
+base_consist.h
 gamelog.h
 gamelog_internal.h
 genworld.h
@@ -272,6 +278,7 @@ sdl.h
 sound/sdl_s.h
 video/sdl_v.h
 settings_func.h
+settings_gui.h
 settings_internal.h
 settings_type.h
 ship.h
@@ -297,6 +304,7 @@ stdafx.h
 strgen/strgen.h
 string_func.h
 string_type.h
+stringfilter_type.h
 strings_func.h
 strings_type.h
 subsidy_base.h
@@ -305,6 +313,7 @@ subsidy_type.h
 tar_type.h
 terraform_gui.h
 textbuf_gui.h
+textbuf_type.h
 texteff.hpp
 textfile_gui.h
 textfile_type.h
@@ -541,6 +550,7 @@ saveload/ai_sl.cpp
 saveload/airport_sl.cpp
 saveload/animated_tile_sl.cpp
 saveload/autoreplace_sl.cpp
+saveload/cargomonitor_sl.cpp
 saveload/cargopacket_sl.cpp
 saveload/cheat_sl.cpp
 saveload/company_sl.cpp
@@ -725,6 +735,7 @@ script/api/script_bridge.hpp
 script/api/script_bridgelist.hpp
 script/api/script_cargo.hpp
 script/api/script_cargolist.hpp
+script/api/script_cargomonitor.hpp
 script/api/script_company.hpp
 script/api/script_companymode.hpp
 script/api/script_controller.hpp
@@ -788,6 +799,7 @@ script/api/script_bridge.cpp
 script/api/script_bridgelist.cpp
 script/api/script_cargo.cpp
 script/api/script_cargolist.cpp
+script/api/script_cargomonitor.cpp
 script/api/script_company.cpp
 script/api/script_companymode.cpp
 script/api/script_controller.cpp

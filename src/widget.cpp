@@ -18,6 +18,7 @@
 #include "transparency.h"
 #include "core/geometry_func.hpp"
 #include "settings_type.h"
+#include "querystring_gui.h"
 
 #include "table/sprites.h"
 #include "table/strings.h"
@@ -480,9 +481,11 @@ static inline void DrawResizeBox(const Rect &r, Colours colour, bool at_left, bo
 {
 	DrawFrameRect(r.left, r.top, r.right, r.bottom, colour, (clicked) ? FR_LOWERED : FR_NONE);
 	if (at_left) {
-		DrawSprite(SPR_WINDOW_RESIZE_LEFT, PAL_NONE, r.left + WD_RESIZEBOX_RIGHT + clicked, r.top + WD_RESIZEBOX_TOP + clicked);
+		DrawSprite(SPR_WINDOW_RESIZE_LEFT, PAL_NONE, r.left + WD_RESIZEBOX_RIGHT + clicked,
+				 r.bottom - WD_RESIZEBOX_BOTTOM - GetSpriteSize(SPR_WINDOW_RESIZE_LEFT).height + clicked);
 	} else {
-		DrawSprite(SPR_WINDOW_RESIZE_RIGHT, PAL_NONE, r.left + WD_RESIZEBOX_LEFT + clicked, r.top + WD_RESIZEBOX_TOP + clicked);
+		DrawSprite(SPR_WINDOW_RESIZE_RIGHT, PAL_NONE, r.left + WD_RESIZEBOX_LEFT + clicked,
+				 r.bottom - WD_RESIZEBOX_BOTTOM - GetSpriteSize(SPR_WINDOW_RESIZE_RIGHT).height + clicked);
 	}
 }
 
@@ -819,7 +822,7 @@ void NWidgetResizeBase::AssignSizePosition(SizingType sizing, uint x, uint y, ui
  * @param widget_data Data component of the widget. @see Widget::data
  * @param tool_tip    Tool tip of the widget. @see Widget::tootips
  */
-NWidgetCore::NWidgetCore(WidgetType tp, Colours colour, uint fill_x, uint fill_y, uint16 widget_data, StringID tool_tip) : NWidgetResizeBase(tp, fill_x, fill_y)
+NWidgetCore::NWidgetCore(WidgetType tp, Colours colour, uint fill_x, uint fill_y, uint32 widget_data, StringID tool_tip) : NWidgetResizeBase(tp, fill_x, fill_y)
 {
 	this->colour = colour;
 	this->index = -1;
@@ -843,7 +846,7 @@ void NWidgetCore::SetIndex(int index)
  * @param widget_data Data to use.
  * @param tool_tip    Tool tip string to use.
  */
-void NWidgetCore::SetDataTip(uint16 widget_data, StringID tool_tip)
+void NWidgetCore::SetDataTip(uint32 widget_data, StringID tool_tip)
 {
 	this->widget_data = widget_data;
 	this->tool_tip = tool_tip;
@@ -1153,7 +1156,17 @@ void NWidgetHorizontal::AssignSizePosition(SizingType sizing, uint x, uint y, ui
 {
 	assert(given_width >= this->smallest_x && given_height >= this->smallest_y);
 
-	uint additional_length = given_width - this->smallest_x; // Additional width given to us.
+	/* Compute additional width given to us. */
+	uint additional_length = given_width;
+	if (sizing == ST_SMALLEST && (this->flags & NC_EQUALSIZE)) {
+		/* For EQUALSIZE containers this does not sum to smallest_x during initialisation */
+		for (NWidgetBase *child_wid = this->head; child_wid != NULL; child_wid = child_wid->next) {
+			additional_length -= child_wid->smallest_x + child_wid->padding_right + child_wid->padding_left;
+		}
+	} else {
+		additional_length -= this->smallest_x;
+	}
+
 	this->StoreSizePosition(sizing, x, y, given_width, given_height);
 
 	/* In principle, the additional horizontal space is distributed evenly over the available resizable childs. Due to step sizes, this may not always be feasible.
@@ -1305,7 +1318,17 @@ void NWidgetVertical::AssignSizePosition(SizingType sizing, uint x, uint y, uint
 {
 	assert(given_width >= this->smallest_x && given_height >= this->smallest_y);
 
-	int additional_length = given_height - this->smallest_y; // Additional height given to us.
+	/* Compute additional height given to us. */
+	uint additional_length = given_height;
+	if (sizing == ST_SMALLEST && (this->flags & NC_EQUALSIZE)) {
+		/* For EQUALSIZE containers this does not sum to smallest_y during initialisation */
+		for (NWidgetBase *child_wid = this->head; child_wid != NULL; child_wid = child_wid->next) {
+			additional_length -= child_wid->smallest_y + child_wid->padding_top + child_wid->padding_bottom;
+		}
+	} else {
+		additional_length -= this->smallest_y;
+	}
+
 	this->StoreSizePosition(sizing, x, y, given_width, given_height);
 
 	/* Like the horizontal container, the vertical container also distributes additional height evenly, starting with the childs with the biggest resize steps.
@@ -1508,9 +1531,7 @@ void NWidgetMatrix::AssignSizePosition(SizingType sizing, uint x, uint y, uint g
 	/* When resizing, update the scrollbar's count. E.g. with a vertical
 	 * scrollbar becoming wider or narrower means the amount of rows in
 	 * the scrollbar becomes respectively smaller or higher. */
-	if (sizing == ST_RESIZE) {
-		this->SetCount(this->count);
-	}
+	this->SetCount(this->count);
 }
 
 void NWidgetMatrix::FillNestedArray(NWidgetBase **array, uint length)
@@ -2344,9 +2365,11 @@ void NWidgetLeaf::Draw(const Window *w)
 			DrawMatrix(r, this->colour, clicked, this->widget_data);
 			break;
 
-		case WWT_EDITBOX:
-			DrawFrameRect(r.left, r.top, r.right, r.bottom, this->colour, FR_LOWERED | FR_DARKENED);
+		case WWT_EDITBOX: {
+			const QueryString *query = w->GetQueryString(this->index);
+			if (query != NULL) query->DrawEditBox(w, this->index);
 			break;
+		}
 
 		case WWT_CAPTION:
 			if (this->index >= 0) w->SetStringParameters(this->index);

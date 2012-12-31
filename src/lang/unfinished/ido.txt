@@ -429,10 +429,7 @@ STR_STATUSBAR_COMPANY_NAME                                      :{SILVER}- -  {C
 
 # News message history
 
-# Message settings window
 STR_NEWS_MESSAGE_CAPTION                                        :{WHITE}Sendajo
-
-
 
 
 
@@ -489,16 +486,6 @@ STR_GAME_OPTIONS_RESOLUTION_OTHER                               :altra
 
 
 
-# Difficulty level window
-
-############ range for difficulty levels starts
-############ range for difficulty levels ends
-
-
-############ range for difficulty settings starts
-STR_DIFFICULTY_LEVEL_SETTING_ECONOMY                            :{LTBLUE}Ekonomio: {ORANGE}{STRING}
-STR_DIFFICULTY_LEVEL_SETTING_DISASTERS                          :{LTBLUE}Dizastri: {ORANGE}{STRING}
-############ range for difficulty settings ends
 
 STR_NUM_LOW                                                     :Basa
 STR_NUM_NORMAL                                                  :Normala
@@ -528,16 +515,16 @@ STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Kustumigita ({N
 
 
 
-
-
 # Advanced settings window
+
+
 
 
 
 STR_CONFIG_SETTING_NONE                                         :Nulo
 
 
-STR_CONFIG_SETTING_INDUSTRY_PLATFORM                            :{LTBLUE}Plata areo cirkum industrii: {ORANGE}{STRING} karel{P 0:1 o i}
+
 STR_CONFIG_SETTING_PLANE_CRASHES_NONE                           :nulo
 STR_CONFIG_SETTING_PLANE_CRASHES_NORMAL                         :normala
 
@@ -547,6 +534,10 @@ STR_CONFIG_SETTING_PLANE_CRASHES_NORMAL                         :normala
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_GREEN                   :Verda
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_DARK_GREEN              :Obskur-verda
 STR_CONFIG_SETTING_SMALLMAP_LAND_COLOUR_VIOLET                  :Violkolora
+
+
+
+
 
 
 
@@ -871,10 +862,12 @@ STR_STATION_VIEW_WAITING_CARGO                                  :{WHITE}{CARGO_L
 
 STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Aceptas: {WHITE}{CARGO_LIST}
 
+
 STR_STATION_VIEW_CARGO_RATING                                   :{WHITE}{STRING}: {YELLOW}{STRING} ({COMMA}%)
 
 ############ range for rating starts
 ############ range for rating ends
+
 
 
 
@@ -1140,6 +1133,7 @@ STR_AI_SETTINGS_SETTING                                         :{STRING}: {ORAN
 
 # Screenshot related messages
 
+
 # Error message titles
 STR_ERROR_MESSAGE_CAPTION                                       :{YELLOW}Sendajo
 STR_ERROR_MESSAGE_CAPTION_OTHER_COMPANY                         :{YELLOW}Sendajo de {STRING}
@@ -1345,6 +1339,8 @@ STR_ORANGE_STRING                                               :{ORANGE}{STRING
 STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
+STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}
+STR_ORANGE_STRING1_LTBLUE                                       :{ORANGE}{STRING}{LTBLUE}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}
 STR_TINY_RIGHT_ARROW                                            :{TINY_FONT}{RIGHT_ARROW}

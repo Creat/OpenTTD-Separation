@@ -347,7 +347,6 @@ STR_SCENEDIT_FILE_MENU_QUIT                                     :Напушти
 
 ############ range for settings menu starts
 STR_SETTINGS_MENU_GAME_OPTIONS                                  :игра опции
-STR_SETTINGS_MENU_DIFFICULTY_SETTINGS                           :Ниво на тешкотија подесувања
 STR_SETTINGS_MENU_CONFIG_SETTINGS                               :напредни поставувања
 STR_SETTINGS_MENU_SCRIPT_SETTINGS                               :АИ / игри поставувања
 STR_SETTINGS_MENU_NEWGRF_SETTINGS                               :НовGRF подесувања
@@ -437,7 +436,6 @@ STR_TOOLBAR_SOUND_MUSIC                                         :Звук/муз
 
 ############ range for message menu starts
 STR_NEWS_MENU_LAST_MESSAGE_NEWS_REPORT                          :Последната порака/вест
-STR_NEWS_MENU_MESSAGE_SETTINGS                                  :Поставки за пораки
 STR_NEWS_MENU_MESSAGE_HISTORY_MENU                              :порака историјата
 ############ range ends here
 
@@ -637,7 +635,7 @@ STR_PLAYLIST_TOOLTIP_CLICK_TO_ADD_TRACK                         :{BLACK}Клик
 STR_PLAYLIST_TOOLTIP_CLICK_TO_REMOVE_TRACK                      :{BLACK}Кликнете на песна за да го отстраните од тековната програма (Прилагодено 1 или 2 Прилагодено само)
 
 # Highscore window
-STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED                         :{BIG_FONT}{BLACK}Топ компании што постигнаа {NUM}{}({STRING} Ниво)
+STR_HIGHSCORE_TOP_COMPANIES_WHO_REACHED                         :{BIG_FONT}{BLACK}Топ компании што постигнаа {NUM}
 STR_HIGHSCORE_TOP_COMPANIES_NETWORK_GAME                        :{BIG_FONT}{BLACK}Компанијата табелата во {NUM}
 STR_HIGHSCORE_POSITION                                          :{BIG_FONT}{BLACK}{COMMA}.
 STR_HIGHSCORE_PERFORMANCE_TITLE_BUSINESSMAN                     :Бизнисмен
@@ -725,32 +723,7 @@ STR_MESSAGE_HISTORY                                             :{WHITE}пора
 STR_MESSAGE_HISTORY_TOOLTIP                                     :{BLACK}Листа на последните вести пораки
 STR_MESSAGE_NEWS_FORMAT                                         :{STRING}  -  {STRING}
 
-# Message settings window
 STR_NEWS_MESSAGE_CAPTION                                        :{WHITE}Порака
-STR_NEWS_MESSAGE_OPTIONS_CAPTION                                :{WHITE}Опции за пораки
-STR_NEWS_MESSAGES_ALL                                           :{YELLOW}Намести сите типови на пораки на: Исклучување / Краток преглед / Целосна
-STR_NEWS_MESSAGES_SOUND                                         :{YELLOW}Пушти звук за сумирани вести пораки
-STR_NEWS_MESSAGES_OFF                                           :исклучен
-STR_NEWS_MESSAGES_SUMMARY                                       :резиме
-STR_NEWS_MESSAGES_FULL                                          :целосна
-
-STR_NEWS_MESSAGE_TYPES                                          :{BLACK}Типови на пораки:
-STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OWN              :{YELLOW}Пристигнување на првото возило на станицата на играчот
-STR_NEWS_MESSAGE_TYPE_ARRIVAL_OF_FIRST_VEHICLE_OTHER            :{YELLOW}Пристигнување на прво возило на конкурентска станица
-STR_NEWS_MESSAGE_TYPE_ACCIDENTS_DISASTERS                       :{YELLOW}Несреќи / хаварии
-STR_NEWS_MESSAGE_TYPE_COMPANY_INFORMATION                       :{YELLOW}Информации за компанијата
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_OPEN                             :{YELLOW}Отворање на индустрии
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CLOSE                            :{YELLOW}Затворање на индустрии
-STR_NEWS_MESSAGE_TYPE_ECONOMY_CHANGES                           :{YELLOW}Промени во економијата
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_COMPANY        :{YELLOW}Производство промени на индустрии сервира од страна на компанијата
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_SERVED_BY_OTHER          :{YELLOW}Производство промени на индустрии сервира од страна конкурент(и)
-STR_NEWS_MESSAGE_TYPE_INDUSTRY_CHANGES_UNSERVED                 :{YELLOW}Други индустрија производство промени
-STR_NEWS_MESSAGE_TYPE_ADVICE_INFORMATION_ON_COMPANY             :{YELLOW}Совет / информации за возилата на компанијата
-STR_NEWS_MESSAGE_TYPE_NEW_VEHICLES                              :{YELLOW}Нови возила
-STR_NEWS_MESSAGE_TYPE_CHANGES_OF_CARGO_ACCEPTANCE               :{YELLOW}Промени во прием на товар
-STR_NEWS_MESSAGE_TYPE_SUBSIDIES                                 :{YELLOW}Субвенции
-STR_NEWS_MESSAGE_TYPE_GENERAL_INFORMATION                       :{YELLOW}Општи информации
-
 STR_NEWS_CUSTOM_ITEM                                            :{BIG_FONT}{BLACK}{STRING}
 
 STR_NEWS_FIRST_TRAIN_ARRIVAL                                    :{BIG_FONT}{BLACK}Граѓаните го слават. . .{}Првиот воз пристигнува во {STATION}!
@@ -829,14 +802,6 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH                :Секој ме
 
 
 
-# Difficulty level window
-
-############ range for difficulty levels starts
-############ range for difficulty levels ends
-
-
-############ range for difficulty settings starts
-############ range for difficulty settings ends
 
 STR_NUM_CUSTOM_NUMBER                                           :Прилагодено ({NUM})
 
@@ -851,9 +816,9 @@ STR_SEA_LEVEL_CUSTOM_PERCENTAGE                                 :Прилаго�
 
 
 
-
-
 # Advanced settings window
+
+
 
 
 
@@ -862,15 +827,12 @@ STR_CONFIG_SETTING_ORIGINAL                                     :Авторск�
 STR_CONFIG_SETTING_REALISTIC                                    :Реален
 
 
-STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :{LTBLUE}Износ на локомотива чад / искри: {ORANGE}{STRING}
-STR_CONFIG_SETTING_INDUSTRY_PLATFORM                            :{LTBLUE}Рамна површина околу индустрии: {ORANGE}{STRING} плочка{P 0:1 "" s}
-STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :{LTBLUE}Инфраструктура за одржување: {ORANGE}{STRING}
+
+STR_CONFIG_SETTING_SMOKE_AMOUNT                                 :Износ на локомотива чад / искри: {STRING}
+STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :Инфраструктура за одржување: {STRING}
 
 
-STR_CONFIG_SETTING_HOVER_DELAY                                  :{LTBLUE}Одложување на поставете настани: {ORANGE}{STRING} втора{P 0:1 "" s}
-STR_CONFIG_SETTING_HOVER_DELAY_DISABLED                         :{LTBLUE}Одложување на поставете настани: {ORANGE}забрането
-STR_CONFIG_SETTING_GRAPH_LINE_THICKNESS                         :{LTBLUE}Дебелина на линии во графици: {ORANGE}{STRING}
-
+STR_CONFIG_SETTING_GRAPH_LINE_THICKNESS                         :Дебелина на линии во графици: {STRING}
 
 
 
@@ -880,16 +842,39 @@ STR_CONFIG_SETTING_GRAPH_LINE_THICKNESS                         :{LTBLUE}Деб�
 
 
 
-STR_CONFIG_SETTING_SCRIPT_MAX_OPCODES                           :{LTBLUE}#ОПкодови пред скрипти се суспендирани: {ORANGE}{STRING}
 
 
 
-STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :{LTBLUE}Градови смеете да изгради ниво премини: {ORANGE}{STRING}
+STR_CONFIG_SETTING_SCRIPT_MAX_OPCODES                           :#ОПкодови пред скрипти се суспендирани: {STRING}
 
 
-STR_CONFIG_SETTING_STATUSBAR_POS                                :{LTBLUE}Позиција на статусната лента: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ZOOM_MIN                                     :{LTBLUE}Максимална зумирате ниво: {ORANGE}{STRING}
-STR_CONFIG_SETTING_ZOOM_MAX                                     :{LTBLUE}Максимална одзумирате ниво: {ORANGE}{STRING}
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OWN               :Пристигнување на првото возило на станицата на играчот: {STRING}
+STR_CONFIG_SETTING_NEWS_ARRIVAL_FIRST_VEHICLE_OTHER             :Пристигнување на прво возило на конкурентска станица: {STRING}
+STR_CONFIG_SETTING_NEWS_ACCIDENTS_DISASTERS                     :Несреќи / хаварии: {STRING}
+STR_CONFIG_SETTING_NEWS_COMPANY_INFORMATION                     :Информации за компанијата: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_OPEN                           :Отворање на индустрии: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CLOSE                          :Затворање на индустрии: {STRING}
+STR_CONFIG_SETTING_NEWS_ECONOMY_CHANGES                         :Промени во економијата: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_COMPANY                :Производство промени на индустрии сервира од страна на компанијата: {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_OTHER                  :Производство промени на индустрии сервира од страна конкурент(и): {STRING}
+STR_CONFIG_SETTING_NEWS_INDUSTRY_CHANGES_UNSERVED               :Други индустрија производство промени: {STRING}
+STR_CONFIG_SETTING_NEWS_ADVICE                                  :Совет / информации за возилата на компанијата: {STRING}
+STR_CONFIG_SETTING_NEWS_NEW_VEHICLES                            :Нови возила: {STRING}
+STR_CONFIG_SETTING_NEWS_CHANGES_ACCEPTANCE                      :Промени во прием на товар: {STRING}
+STR_CONFIG_SETTING_NEWS_SUBSIDIES                               :Субвенции: {STRING}
+STR_CONFIG_SETTING_NEWS_GENERAL_INFORMATION                     :Општи информации: {STRING}
+
+STR_CONFIG_SETTING_NEWS_MESSAGES_OFF                            :исклучен
+STR_CONFIG_SETTING_NEWS_MESSAGES_SUMMARY                        :резиме
+STR_CONFIG_SETTING_NEWS_MESSAGES_FULL                           :целосна
+
+
+STR_CONFIG_SETTING_ALLOW_TOWN_LEVEL_CROSSINGS                   :Градови смеете да изгради ниво премини: {STRING}
+
+
+STR_CONFIG_SETTING_STATUSBAR_POS                                :Позиција на статусната лента: {STRING}
+STR_CONFIG_SETTING_ZOOM_MIN                                     :Максимална зумирате ниво: {STRING}
+STR_CONFIG_SETTING_ZOOM_MAX                                     :Максимална одзумирате ниво: {STRING}
 STR_CONFIG_SETTING_ZOOM_LVL_MIN                                 :4x
 STR_CONFIG_SETTING_ZOOM_LVL_IN_2X                               :2x
 STR_CONFIG_SETTING_ZOOM_LVL_NORMAL                              :Нормално
@@ -897,7 +882,6 @@ STR_CONFIG_SETTING_ZOOM_LVL_OUT_2X                              :2x
 STR_CONFIG_SETTING_ZOOM_LVL_OUT_4X                              :4x
 STR_CONFIG_SETTING_ZOOM_LVL_OUT_8X                              :8x
 
-STR_CONFIG_SETTING_ECONOMY_SCRIPTS                              :{ORANGE}скрипти
 
 
 
@@ -926,7 +910,6 @@ STR_INTRO_SCENARIO_EDITOR                                       :{BLACK}Сцен
 STR_INTRO_MULTIPLAYER                                           :{BLACK}Повеќе играчи
 
 STR_INTRO_GAME_OPTIONS                                          :{BLACK}Опции на Играта
-STR_INTRO_DIFFICULTY                                            :{BLACK}Тежина ({STRING})
 STR_INTRO_SCRIPT_SETTINGS                                       :{BLACK}АИ / Играта Подесувања
 
 
@@ -1278,9 +1261,7 @@ STR_NEWGRF_INVALID_INDUSTRYTYPE                                 :<валиден
 
 # Sign list window
 STR_SIGN_LIST_MATCH_CASE                                        :{BLACK}Совпаѓање на
-STR_SIGN_LIST_CLEAR                                             :{BLACK}Исчисти филтер
 STR_SIGN_LIST_MATCH_CASE_TOOLTIP                                :{BLACK}Вклучи појавување случај кога се споредуваат знак имиња против низа филтер
-STR_SIGN_LIST_CLEAR_TOOLTIP                                     :{BLACK}Исчисти филтер низа
 
 # Sign window
 
@@ -1330,10 +1311,12 @@ STR_STATION_VIEW_EN_ROUTE_FROM                                  :{YELLOW}({CARGO
 
 STR_STATION_VIEW_ACCEPTS_CARGO                                  :{BLACK}Прифаќа: {WHITE}{CARGO_LIST}
 
+
 STR_STATION_VIEW_CARGO_RATING                                   :{WHITE}{STRING}: {YELLOW}{STRING} ({COMMA}%)
 
 ############ range for rating starts
 ############ range for rating ends
+
 
 
 
@@ -1544,8 +1527,8 @@ STR_VEHICLE_DETAILS_TRAIN_ARTICULATED_RV_CAPACITY               :{BLACK}Капа
 
 # Vehicle refit
 STR_REFIT_TITLE                                                 :{GOLD}Одбери тип на товар за носење:
-STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}Нов капацитет: {GOLD}{CARGO_LONG}{}{BLACK}Пренамената чини: {GOLD}{CURRENCY_LONG}
-STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT                   :{BLACK}Нов капацитет: {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK} Цена на ремонтирам: {GOLD}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_COST_OF_REFIT                            :{BLACK}Нов капацитет: {GOLD}{CARGO_LONG}{}{BLACK}Пренамената чини: {RED}{CURRENCY_LONG}
+STR_REFIT_NEW_CAPACITY_COST_OF_AIRCRAFT_REFIT                   :{BLACK}Нов капацитет: {GOLD}{CARGO_LONG}, {GOLD}{CARGO_LONG}{}{BLACK} Цена на ремонтирам: {RED}{CURRENCY_LONG}
 
 STR_REFIT_SHIP_LIST_TOOLTIP                                     :{BLACK}Одбери тип на товар што ќе го носи бродот
 STR_REFIT_AIRCRAFT_LIST_TOOLTIP                                 :{BLACK}Одбери тип на товар за авионот
@@ -1668,6 +1651,7 @@ STR_ERROR_BMPMAP_IMAGE_TYPE                                     :{WHITE}... мо
 # Soundset messages
 
 # Screenshot related messages
+
 
 # Error message titles
 STR_ERROR_MESSAGE_CAPTION                                       :{YELLOW}Порака
@@ -1906,6 +1890,8 @@ STR_ORANGE_STRING                                               :{ORANGE}{STRING
 STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
+STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}
+STR_ORANGE_STRING1_LTBLUE                                       :{ORANGE}{STRING}{LTBLUE}
 STR_TINY_BLACK_HEIGHT                                           :{TINY_FONT}{BLACK}{HEIGHT}
 STR_TINY_BLACK_VEHICLE                                          :{TINY_FONT}{BLACK}{VEHICLE}
 STR_TINY_RIGHT_ARROW                                            :{TINY_FONT}{RIGHT_ARROW}

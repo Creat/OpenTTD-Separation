@@ -200,6 +200,9 @@ uint Vehicle::Crash(bool flooded)
 	SetWindowDirty(WC_VEHICLE_DETAILS, this->index);
 	SetWindowDirty(WC_VEHICLE_DEPOT, this->tile);
 
+	delete this->cargo_payment;
+	this->cargo_payment = NULL;
+
 	return RandomRange(pass + 1); // Randomise deceased passengers.
 }
 
@@ -718,7 +721,7 @@ void Vehicle::HandlePathfindingResult(bool path_found)
 	AI::NewEvent(this->owner, new ScriptEventVehicleLost(this->index));
 	if (_settings_client.gui.lost_vehicle_warn && this->owner == _local_company) {
 		SetDParam(0, this->index);
-		AddVehicleNewsItem(STR_NEWS_VEHICLE_IS_LOST, NS_ADVICE, this->index);
+		AddVehicleAdviceNewsItem(STR_NEWS_VEHICLE_IS_LOST, this->index);
 	}
 }
 
@@ -789,8 +792,6 @@ void Vehicle::PreDestructor()
 
 Vehicle::~Vehicle()
 {
-	free(this->name);
-
 	if (CleaningPool()) {
 		this->cargo.OnCleanPool();
 		return;
@@ -947,7 +948,7 @@ void CallVehicleTicks()
 
 		SetDParam(0, v->index);
 		SetDParam(1, error_message);
-		AddVehicleNewsItem(message, NS_ADVICE, v->index);
+		AddVehicleAdviceNewsItem(message, v->index);
 	}
 
 	cur_company.Restore();
@@ -1233,16 +1234,16 @@ void AgeVehicle(Vehicle *v)
 	}
 
 	SetDParam(0, v->index);
-	AddVehicleNewsItem(str, NS_ADVICE, v->index);
+	AddVehicleAdviceNewsItem(str, v->index);
 }
 
 /**
  * Calculates how full a vehicle is.
- * @param v The Vehicle to check. For trains, use the first engine.
+ * @param front The front vehicle of the consist to check.
  * @param colour The string to show depending on if we are unloading or loading
  * @return A percentage of how full the Vehicle is.
  */
-uint8 CalcPercentVehicleFilled(const Vehicle *v, StringID *colour)
+uint8 CalcPercentVehicleFilled(const Vehicle *front, StringID *colour)
 {
 	int count = 0;
 	int max = 0;
@@ -1250,18 +1251,24 @@ uint8 CalcPercentVehicleFilled(const Vehicle *v, StringID *colour)
 	int unloading = 0;
 	bool loading = false;
 
-	const Vehicle *u = v;
+	bool is_loading = front->current_order.IsType(OT_LOADING);
+
 	/* The station may be NULL when the (colour) string does not need to be set. */
-	const Station *st = Station::GetIfValid(v->last_station_visited);
-	assert(colour == NULL || st != NULL);
+	const Station *st = Station::GetIfValid(front->last_station_visited);
+	assert(colour == NULL || (st != NULL && is_loading));
+
+	bool order_no_load = is_loading && (front->current_order.GetLoadType() & OLFB_NO_LOAD);
+	bool order_full_load = is_loading && (front->current_order.GetLoadType() & OLFB_FULL_LOAD);
 
 	/* Count up max and used */
-	for (; v != NULL; v = v->Next()) {
+	for (const Vehicle *v = front; v != NULL; v = v->Next()) {
 		count += v->cargo.Count();
 		max += v->cargo_cap;
 		if (v->cargo_cap != 0 && colour != NULL) {
 			unloading += HasBit(v->vehicle_flags, VF_CARGO_UNLOADING) ? 1 : 0;
-			loading |= !(u->current_order.GetLoadType() & OLFB_NO_LOAD) && st->goods[v->cargo_type].days_since_pickup != 255;
+			loading |= !order_no_load &&
+					(order_full_load || HasBit(st->goods[v->cargo_type].acceptance_pickup, GoodsEntry::GES_PICKUP)) &&
+					!HasBit(v->vehicle_flags, VF_LOADING_FINISHED) && !HasBit(v->vehicle_flags, VF_STOP_LOADING);
 			cars++;
 		}
 	}
@@ -1269,6 +1276,8 @@ uint8 CalcPercentVehicleFilled(const Vehicle *v, StringID *colour)
 	if (colour != NULL) {
 		if (unloading == 0 && loading) {
 			*colour = STR_PERCENT_UP;
+		} else if (unloading == 0 && !loading) {
+			*colour = STR_PERCENT_NONE;
 		} else if (cars == unloading || !loading) {
 			*colour = STR_PERCENT_DOWN;
 		} else {
@@ -1370,7 +1379,7 @@ void VehicleEnterDepot(Vehicle *v)
 				if (v->owner == _local_company) {
 					/* Notify the user that we stopped the vehicle */
 					SetDParam(0, v->index);
-					AddVehicleNewsItem(STR_NEWS_ORDER_REFIT_FAILED, NS_ADVICE, v->index);
+					AddVehicleAdviceNewsItem(STR_NEWS_ORDER_REFIT_FAILED, v->index);
 				}
 			} else if (cost.GetCost() != 0) {
 				v->profit_this_year -= cost.GetCost() << 8;
@@ -1391,7 +1400,7 @@ void VehicleEnterDepot(Vehicle *v)
 			_vehicles_to_autoreplace[v] = false;
 			if (v->owner == _local_company) {
 				SetDParam(0, v->index);
-				AddVehicleNewsItem(STR_NEWS_TRAIN_IS_WAITING + v->type, NS_ADVICE, v->index);
+				AddVehicleAdviceNewsItem(STR_NEWS_TRAIN_IS_WAITING + v->type, v->index);
 			}
 			AI::NewEvent(v->owner, new ScriptEventVehicleWaitingInDepot(v->index));
 			v->MarkSeparationInvalid();
@@ -1644,10 +1653,10 @@ bool CanBuildVehicleInfrastructure(VehicleType type)
 
 /**
  * Determines the #LiveryScheme for a vehicle.
- * @param engine_type EngineID of the vehicle
- * @param parent_engine_type EngineID of the front vehicle. INVALID_VEHICLE if vehicle is at front itself.
- * @param v the vehicle. NULL if in purchase list etc.
- * @return livery scheme to use
+ * @param engine_type Engine of the vehicle.
+ * @param parent_engine_type Engine of the front vehicle, #INVALID_ENGINE if vehicle is at front itself.
+ * @param v the vehicle, \c NULL if in purchase list etc.
+ * @return livery scheme to use.
  */
 LiveryScheme GetEngineLiveryScheme(EngineID engine_type, EngineID parent_engine_type, const Vehicle *v)
 {
@@ -2434,11 +2443,7 @@ void VehiclesYearlyLoop()
 				if (_settings_client.gui.vehicle_income_warn && v->owner == _local_company) {
 					SetDParam(0, v->index);
 					SetDParam(1, profit);
-					AddVehicleNewsItem(
-						STR_NEWS_VEHICLE_IS_UNPROFITABLE,
-						NS_ADVICE,
-						v->index
-					);
+					AddVehicleAdviceNewsItem(STR_NEWS_VEHICLE_IS_UNPROFITABLE, v->index);
 				}
 				AI::NewEvent(v->owner, new ScriptEventVehicleUnprofitable(v->index));
 			}

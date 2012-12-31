@@ -251,15 +251,20 @@ static void Ptrs_ORDL()
 const SaveLoad *GetOrderBackupDescription()
 {
 	static const SaveLoad _order_backup_desc[] = {
-		SLE_VAR(OrderBackup, user,                  SLE_UINT32),
-		SLE_VAR(OrderBackup, tile,                  SLE_UINT32),
-		SLE_VAR(OrderBackup, group,                 SLE_UINT16),
-		SLE_VAR(OrderBackup, service_interval,      SLE_INT32),
-		SLE_STR(OrderBackup, name,                  SLE_STR, 0),
-		SLE_VAR(OrderBackup, clone,                 SLE_UINT16),
-		SLE_VAR(OrderBackup, orderindex,            SLE_UINT8),
-		SLE_REF(OrderBackup, orders,                REF_ORDER),
-		SLE_END()
+		     SLE_VAR(OrderBackup, user,                     SLE_UINT32),
+		     SLE_VAR(OrderBackup, tile,                     SLE_UINT32),
+		     SLE_VAR(OrderBackup, group,                    SLE_UINT16),
+		     SLE_VAR(OrderBackup, service_interval,         SLE_INT32),
+		     SLE_STR(OrderBackup, name,                     SLE_STR, 0),
+		     SLE_VAR(OrderBackup, clone,                    SLE_UINT16),
+		     SLE_VAR(OrderBackup, cur_real_order_index,     SLE_UINT8),
+		 SLE_CONDVAR(OrderBackup, cur_implicit_order_index, SLE_UINT8,     176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, current_order_time,       SLE_UINT32,    176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, lateness_counter,         SLE_INT32,     176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, timetable_start,          SLE_INT32,     176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, vehicle_flags,            SLE_UINT8,     176, SL_MAX_VERSION),
+		     SLE_REF(OrderBackup, orders,                   REF_ORDER),
+		     SLE_END()
 	};
 
 	return _order_backup_desc;
@@ -289,10 +294,11 @@ void Load_BKOR()
 		SlObject(ob, GetOrderBackupDescription());
 	}
 
-	/* If we are a network server, then we just loaded
+	/* Only load order-backups for network clients.
+	 * If we are a network server or not networking, then we just loaded
 	 * a previously saved-by-server savegame. There are
 	 * no clients with a backup anymore, so clear it. */
-	if (_networking && _network_server) {
+	if (!_networking || _network_server) {
 		_order_backup_pool.CleanPool();
 	}
 }

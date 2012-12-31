@@ -58,7 +58,7 @@
  *
  * Contains portions of documentation by TTDPatch team.
  * Thanks especially to Josef Drexler for the documentation as well as a lot
- * of help at #tycoon. Also thanks to Michael Blunck for is GRF files which
+ * of help at #tycoon. Also thanks to Michael Blunck for his GRF files which
  * served as subject to the initial testing of this codec. */
 
 /** List of all loaded GRF files */
@@ -284,7 +284,7 @@ static const uint MAX_STATIONS = 256;
 
 /** Temporary engine data used when loading only */
 struct GRFTempEngineData {
-	/** Summary state of refitability properties */
+	/** Summary state of refittability properties */
 	enum Refittability {
 		UNSET    =  0,  ///< No properties assigned. Default refit masks shall be activated.
 		EMPTY,          ///< GRF defined vehicle as not-refittable. The vehicle shall only carry the default cargo.
@@ -856,7 +856,7 @@ static uint32 TranslateRefitMask(uint32 refit_mask)
  * See http://wiki.ttdpatch.net/tiki-index.php?page=BaseCosts
  * @param base_pointer TTD(P) Base Price Pointer
  * @param error_location Function name for grf error messages
- * @param index If #base_pointer is valid, #index is assigned to the matching price; else it is left unchanged
+ * @param[out] index If \a base_pointer is valid, \a index is assigned to the matching price; else it is left unchanged
  */
 static void ConvertTTDBasePrice(uint32 base_pointer, const char *error_location, Price *index)
 {
@@ -953,7 +953,7 @@ static ChangeInfoResult RailVehicleChangeInfo(uint engine, int numinfo, int prop
 			case 0x05: { // Track type
 				uint8 tracktype = buf->ReadByte();
 
-				if (tracktype < _cur.grffile->railtype_max) {
+				if (tracktype < _cur.grffile->railtype_list.Length()) {
 					_gted[e->index].railtypelabel = _cur.grffile->railtype_list[tracktype];
 					break;
 				}
@@ -1041,7 +1041,7 @@ static ChangeInfoResult RailVehicleChangeInfo(uint engine, int numinfo, int prop
 				} else if (_cur.grffile->grf_version >= 8) {
 					/* Use translated cargo. Might result in CT_INVALID (first refittable), if cargo is not defined. */
 					ei->cargo_type = GetCargoTranslation(ctype, _cur.grffile);
-				} else if (ctype < NUM_CARGO && HasBit(_cargo_mask, ctype)) {
+				} else if (ctype < NUM_CARGO) {
 					/* Use untranslated cargo. */
 					ei->cargo_type = ctype;
 				} else {
@@ -1089,7 +1089,7 @@ static ChangeInfoResult RailVehicleChangeInfo(uint engine, int numinfo, int prop
 					break;
 				}
 
-				if (_cur.grffile->railtype_max == 0) {
+				if (_cur.grffile->railtype_list.Length() == 0) {
 					/* Use traction type to select between normal and electrified
 					 * rail only when no translation list is in place. */
 					if (_gted[e->index].railtypelabel == RAILTYPE_RAIL_LABEL     && engclass >= EC_ELECTRIC) _gted[e->index].railtypelabel = RAILTYPE_ELECTRIC_LABEL;
@@ -1276,7 +1276,7 @@ static ChangeInfoResult RoadVehicleChangeInfo(uint engine, int numinfo, int prop
 				} else if (_cur.grffile->grf_version >= 8) {
 					/* Use translated cargo. Might result in CT_INVALID (first refittable), if cargo is not defined. */
 					ei->cargo_type = GetCargoTranslation(ctype, _cur.grffile);
-				} else if (ctype < NUM_CARGO && HasBit(_cargo_mask, ctype)) {
+				} else if (ctype < NUM_CARGO) {
 					/* Use untranslated cargo. */
 					ei->cargo_type = ctype;
 				} else {
@@ -1454,7 +1454,7 @@ static ChangeInfoResult ShipVehicleChangeInfo(uint engine, int numinfo, int prop
 				} else if (_cur.grffile->grf_version >= 8) {
 					/* Use translated cargo. Might result in CT_INVALID (first refittable), if cargo is not defined. */
 					ei->cargo_type = GetCargoTranslation(ctype, _cur.grffile);
-				} else if (ctype < NUM_CARGO && HasBit(_cargo_mask, ctype)) {
+				} else if (ctype < NUM_CARGO) {
 					/* Use untranslated cargo. */
 					ei->cargo_type = ctype;
 				} else {
@@ -1970,7 +1970,7 @@ static ChangeInfoResult CanalChangeInfo(uint id, int numinfo, int prop, ByteRead
 	ChangeInfoResult ret = CIR_SUCCESS;
 
 	if (id + numinfo > CF_END) {
-		grfmsg(1, "CanalChangeInfo: Canal feature %u is invalid, max %u, ignoreing", id + numinfo, CF_END);
+		grfmsg(1, "CanalChangeInfo: Canal feature %u is invalid, max %u, ignoring", id + numinfo, CF_END);
 		return CIR_INVALID_ID;
 	}
 
@@ -2417,6 +2417,32 @@ static ChangeInfoResult TownHouseChangeInfo(uint hid, int numinfo, int prop, Byt
 }
 
 /**
+ * Load a cargo- or railtype-translation table.
+ * @param gvid ID of the global variable. This is basically only checked for zerones.
+ * @param numinfo Number of subsequent IDs to change the property for.
+ * @param buf The property value.
+ * @param [in,out] translation_table Storage location for the translation table.
+ * @param name Name of the table for debug output.
+ * @return ChangeInfoResult.
+ */
+template <typename T>
+static ChangeInfoResult LoadTranslationTable(uint gvid, int numinfo, ByteReader *buf, T &translation_table, const char *name)
+{
+	if (gvid != 0) {
+		grfmsg(1, "LoadTranslationTable: %s translation table must start at zero", name);
+		return CIR_INVALID_ID;
+	}
+
+	translation_table.Clear();
+	for (int i = 0; i < numinfo; i++) {
+		uint32 item = buf->ReadDWord();
+		*translation_table.Append() = BSWAP32(item);
+	}
+
+	return CIR_SUCCESS;
+}
+
+/**
  * Define properties for global variables
  * @param gvid ID of the global variable.
  * @param numinfo Number of subsequent IDs to change the property for.
@@ -2426,8 +2452,20 @@ static ChangeInfoResult TownHouseChangeInfo(uint hid, int numinfo, int prop, Byt
  */
 static ChangeInfoResult GlobalVarChangeInfo(uint gvid, int numinfo, int prop, ByteReader *buf)
 {
-	ChangeInfoResult ret = CIR_SUCCESS;
+	/* Properties which are handled as a whole */
+	switch (prop) {
+		case 0x09: // Cargo Translation Table; loading during both reservation and activation stage (in case it is selected depending on defined cargos)
+			return LoadTranslationTable(gvid, numinfo, buf, _cur.grffile->cargo_list, "Cargo");
 
+		case 0x12: // Rail type translation table; loading during both reservation and activation stage (in case it is selected depending on defined railtypes)
+			return LoadTranslationTable(gvid, numinfo, buf, _cur.grffile->railtype_list, "Rail type");
+
+		default:
+			break;
+	}
+
+	/* Properties which are handled per item */
+	ChangeInfoResult ret = CIR_SUCCESS;
 	for (int i = 0; i < numinfo; i++) {
 		switch (prop) {
 			case 0x08: { // Cost base factor
@@ -2441,12 +2479,6 @@ static ChangeInfoResult GlobalVarChangeInfo(uint gvid, int numinfo, int prop, By
 				}
 				break;
 			}
-
-			case 0x09: // Cargo translation table
-				/* This is loaded during the reservation stage, so just skip it here. */
-				/* Each entry is 4 bytes. */
-				buf->Skip(4);
-				break;
 
 			case 0x0A: { // Currency display names
 				uint curidx = GetNewgrfCurrencyIdConverted(gvid + i);
@@ -2560,12 +2592,6 @@ static ChangeInfoResult GlobalVarChangeInfo(uint gvid, int numinfo, int prop, By
 				buf->Skip(8);
 				break;
 
-			case 0x12: // Rail type translation table
-				/* This is loaded during the reservation stage, so just skip it here. */
-				/* Each entry is 4 bytes. */
-				buf->Skip(4);
-				break;
-
 			case 0x13:   // Gender translation table
 			case 0x14:   // Case translation table
 			case 0x15: { // Plural form translation
@@ -2641,31 +2667,26 @@ static ChangeInfoResult GlobalVarChangeInfo(uint gvid, int numinfo, int prop, By
 
 static ChangeInfoResult GlobalVarReserveInfo(uint gvid, int numinfo, int prop, ByteReader *buf)
 {
-	ChangeInfoResult ret = CIR_SUCCESS;
+	/* Properties which are handled as a whole */
+	switch (prop) {
+		case 0x09: // Cargo Translation Table; loading during both reservation and activation stage (in case it is selected depending on defined cargos)
+			return LoadTranslationTable(gvid, numinfo, buf, _cur.grffile->cargo_list, "Cargo");
 
+		case 0x12: // Rail type translation table; loading during both reservation and activation stage (in case it is selected depending on defined railtypes)
+			return LoadTranslationTable(gvid, numinfo, buf, _cur.grffile->railtype_list, "Rail type");
+
+		default:
+			break;
+	}
+
+	/* Properties which are handled per item */
+	ChangeInfoResult ret = CIR_SUCCESS;
 	for (int i = 0; i < numinfo; i++) {
 		switch (prop) {
 			case 0x08: // Cost base factor
 			case 0x15: // Plural form translation
 				buf->ReadByte();
 				break;
-
-			case 0x09: { // Cargo Translation Table
-				if (i == 0) {
-					if (gvid != 0) {
-						grfmsg(1, "ReserveChangeInfo: Cargo translation table must start at zero");
-						return CIR_INVALID_ID;
-					}
-
-					free(_cur.grffile->cargo_list);
-					_cur.grffile->cargo_max = numinfo;
-					_cur.grffile->cargo_list = MallocT<CargoLabel>(numinfo);
-				}
-
-				CargoLabel cl = buf->ReadDWord();
-				_cur.grffile->cargo_list[i] = BSWAP32(cl);
-				break;
-			}
 
 			case 0x0A: // Currency display names
 			case 0x0C: // Currency options
@@ -2687,23 +2708,6 @@ static ChangeInfoResult GlobalVarReserveInfo(uint gvid, int numinfo, int prop, B
 				uint32 s = buf->ReadDWord();
 				uint32 t = buf->ReadDWord();
 				SetNewGRFOverride(s, t);
-				break;
-			}
-
-			case 0x12: { // Rail type translation table
-				if (i == 0) {
-					if (gvid != 0) {
-						grfmsg(1, "ReserveChangeInfo: Rail type translation table must start at zero");
-						return CIR_INVALID_ID;
-					}
-
-					free(_cur.grffile->railtype_list);
-					_cur.grffile->railtype_max = numinfo;
-					_cur.grffile->railtype_list = MallocT<RailTypeLabel>(numinfo);
-				}
-
-				RailTypeLabel rtl = buf->ReadDWord();
-				_cur.grffile->railtype_list[i] = BSWAP32(rtl);
 				break;
 			}
 
@@ -4363,11 +4367,13 @@ static void ReserveChangeInfo(ByteReader *buf)
 /* Action 0x01 */
 static void NewSpriteSet(ByteReader *buf)
 {
-	/* <01> <feature> <num-sets> <num-ent>
+	/* Basic format:    <01> <feature> <num-sets> <num-ent>
+	 * Extended format: <01> <feature> 00 <first-set> <num-sets> <num-ent>
 	 *
 	 * B feature       feature to define sprites for
 	 *                 0, 1, 2, 3: veh-type, 4: train stations
-	 * B num-sets      number of sprite sets
+	 * E first-set     first sprite set to define
+	 * B num-sets      number of sprite sets (extended byte in extended format)
 	 * E num-ent       how many entries per sprite set
 	 *                 For vehicles, this is the number of different
 	 *                         vehicle directions in each sprite set
@@ -4375,11 +4381,11 @@ static void NewSpriteSet(ByteReader *buf)
 	 *                         In that case, use num-dirs=4.
 	 */
 
-	uint8 feature   = buf->ReadByte();
-	uint8 num_sets  = buf->ReadByte();
+	uint8  feature   = buf->ReadByte();
+	uint16 num_sets  = buf->ReadByte();
 	uint16 first_set = 0;
 
-	if (num_sets == 0 && buf->HasData(2)) {
+	if (num_sets == 0 && buf->HasData(3)) {
 		/* Extended Action1 format.
 		 * Some GRFs define zero sets of zero sprites, though there is actually no use in that. Ignore them. */
 		first_set = buf->ReadExtendedByte();
@@ -4403,7 +4409,14 @@ static void NewSpriteSet(ByteReader *buf)
 static void SkipAct1(ByteReader *buf)
 {
 	buf->ReadByte();
-	uint8 num_sets  = buf->ReadByte();
+	uint16 num_sets  = buf->ReadByte();
+
+	if (num_sets == 0 && buf->HasData(3)) {
+		/* Extended Action1 format.
+		 * Some GRFs define zero sets of zero sprites, though there is actually no use in that. Ignore them. */
+		buf->ReadExtendedByte(); // first_set
+		num_sets = buf->ReadExtendedByte();
+	}
 	uint16 num_ents = buf->ReadExtendedByte();
 
 	_cur.skip_sprites = num_sets * num_ents;
@@ -4703,7 +4716,7 @@ static CargoID TranslateCargo(uint8 feature, uint8 ctype)
 	if (feature == GSF_STATIONS && ctype == 0xFE) return CT_DEFAULT_NA;
 	if (ctype == 0xFF) return CT_PURCHASE;
 
-	if (_cur.grffile->cargo_max == 0) {
+	if (_cur.grffile->cargo_list.Length() == 0) {
 		/* No cargo table, so use bitnum values */
 		if (ctype >= 32) {
 			grfmsg(1, "TranslateCargo: Cargo bitnum %d out of range (max 31), skipping.", ctype);
@@ -4723,8 +4736,8 @@ static CargoID TranslateCargo(uint8 feature, uint8 ctype)
 	}
 
 	/* Check if the cargo type is out of bounds of the cargo translation table */
-	if (ctype >= _cur.grffile->cargo_max) {
-		grfmsg(1, "TranslateCargo: Cargo type %d out of range (max %d), skipping.", ctype, _cur.grffile->cargo_max - 1);
+	if (ctype >= _cur.grffile->cargo_list.Length()) {
+		grfmsg(1, "TranslateCargo: Cargo type %d out of range (max %d), skipping.", ctype, _cur.grffile->cargo_list.Length() - 1);
 		return CT_INVALID;
 	}
 
@@ -5582,7 +5595,7 @@ void CheckForMissingSprites()
 	}
 
 	if (missing) {
-		ShowErrorMessage(STR_NEWGRF_ERROR_MISSING_SPRITES, INVALID_STRING_ID, WL_CRITICAL);
+		ShowErrorMessage(IsReleasedVersion() ? STR_NEWGRF_ERROR_MISSING_SPRITES : STR_NEWGRF_ERROR_MISSING_SPRITES_UNSTABLE, INVALID_STRING_ID, WL_CRITICAL);
 	}
 }
 
@@ -5714,7 +5727,7 @@ bool GetGlobalVariable(byte param, uint32 *value, const GRFFile *grffile)
 			return true;
 
 		case 0x22: // difficulty level
-			*value = _settings_game.difficulty.diff_level;
+			*value = SP_CUSTOM;
 			return true;
 
 		case 0x23: // long format date
@@ -7670,7 +7683,7 @@ static void InitializeGRFSpecial()
 	                   |                                                      (1 << 0x18)  // newrvs
 	                   |                                                      (1 << 0x19)  // newships
 	                   |                                                      (1 << 0x1A)  // newplanes
-	                   |      ((_settings_game.construction.signal_side ? 1 : 0) << 0x1B)  // signalsontrafficside
+	                   | ((_settings_game.construction.train_signal_side == 1 ? 1 : 0) << 0x1B)  // signalsontrafficside
 	                   |       ((_settings_game.vehicle.disable_elrails ? 0 : 1) << 0x1C); // electrifiedrailway
 
 	_ttdpatch_flags[2] =                                                      (1 << 0x01)  // loadallgraphics - obsolote
@@ -7876,12 +7889,7 @@ static void ResetNewGRF()
 {
 	const GRFFile * const *end = _grf_files.End();
 	for (GRFFile **file = _grf_files.Begin(); file != end; file++) {
-		GRFFile *f = *file;
-		free(f->filename);
-		free(f->cargo_list);
-		free(f->railtype_list);
-		delete [] f->language_map;
-		free(f);
+		delete *file;
 	}
 
 	_grf_files.Clear();
@@ -8019,17 +8027,13 @@ static void BuildCargoTranslationMap()
 		const CargoSpec *cs = CargoSpec::Get(c);
 		if (!cs->IsValid()) continue;
 
-		if (_cur.grffile->cargo_max == 0) {
+		if (_cur.grffile->cargo_list.Length() == 0) {
 			/* Default translation table, so just a straight mapping to bitnum */
 			_cur.grffile->cargo_map[c] = cs->bitnum;
 		} else {
 			/* Check the translation table for this cargo's label */
-			for (uint i = 0; i < _cur.grffile->cargo_max; i++) {
-				if (cs->label == _cur.grffile->cargo_list[i]) {
-					_cur.grffile->cargo_map[c] = i;
-					break;
-				}
-			}
+			int index = _cur.grffile->cargo_list.FindIndex(cs->label);
+			if (index >= 0) _cur.grffile->cargo_map[c] = index;
 		}
 	}
 }
@@ -8047,39 +8051,50 @@ static void InitNewGRFFile(const GRFConfig *config)
 		return;
 	}
 
-	newfile = CallocT<GRFFile>(1);
+	newfile = new GRFFile(config);
+	*_grf_files.Append() = _cur.grffile = newfile;
+}
 
-	newfile->filename = strdup(config->filename);
-	newfile->grfid = config->ident.grfid;
+/**
+ * Constructor for GRFFile
+ * @param config GRFConfig to copy name, grfid and parameters from.
+ */
+GRFFile::GRFFile(const GRFConfig *config)
+{
+	this->filename = strdup(config->filename);
+	this->grfid = config->ident.grfid;
 
 	/* Initialise local settings to defaults */
-	newfile->traininfo_vehicle_pitch = 0;
-	newfile->traininfo_vehicle_width = TRAININFO_DEFAULT_VEHICLE_WIDTH;
+	this->traininfo_vehicle_pitch = 0;
+	this->traininfo_vehicle_width = TRAININFO_DEFAULT_VEHICLE_WIDTH;
 
 	/* Mark price_base_multipliers as 'not set' */
 	for (Price i = PR_BEGIN; i < PR_END; i++) {
-		newfile->price_base_multipliers[i] = INVALID_PRICE_MODIFIER;
+		this->price_base_multipliers[i] = INVALID_PRICE_MODIFIER;
 	}
 
 	/* Initialise rail type map with default rail types */
-	memset(newfile->railtype_map, INVALID_RAILTYPE, sizeof newfile->railtype_map);
-	newfile->railtype_map[0] = RAILTYPE_RAIL;
-	newfile->railtype_map[1] = RAILTYPE_ELECTRIC;
-	newfile->railtype_map[2] = RAILTYPE_MONO;
-	newfile->railtype_map[3] = RAILTYPE_MAGLEV;
+	memset(this->railtype_map, INVALID_RAILTYPE, sizeof(this->railtype_map));
+	this->railtype_map[0] = RAILTYPE_RAIL;
+	this->railtype_map[1] = RAILTYPE_ELECTRIC;
+	this->railtype_map[2] = RAILTYPE_MONO;
+	this->railtype_map[3] = RAILTYPE_MAGLEV;
 
 	/* Copy the initial parameter list
 	 * 'Uninitialised' parameters are zeroed as that is their default value when dynamically creating them. */
-	assert_compile(lengthof(newfile->param) == lengthof(config->param) && lengthof(config->param) == 0x80);
-	memset(newfile->param, 0, sizeof(newfile->param));
+	assert_compile(lengthof(this->param) == lengthof(config->param) && lengthof(this->param) == 0x80);
 
 	assert(config->num_params <= lengthof(config->param));
-	newfile->param_end = config->num_params;
-	if (newfile->param_end > 0) {
-		MemCpyT(newfile->param, config->param, newfile->param_end);
+	this->param_end = config->num_params;
+	if (this->param_end > 0) {
+		MemCpyT(this->param, config->param, this->param_end);
 	}
+}
 
-	*_grf_files.Append() = _cur.grffile = newfile;
+GRFFile::~GRFFile()
+{
+	free(this->filename);
+	delete[] this->language_map;
 }
 
 
@@ -8175,6 +8190,9 @@ static void CalculateRefitMasks()
 			only_defaultcargo = (ei->refit_mask == 0);
 		}
 
+		/* Clear invalid cargoslots (from default vehicles or pre-NewCargo GRFs) */
+		if (!HasBit(_cargo_mask, ei->cargo_type)) ei->cargo_type = CT_INVALID;
+
 		/* Ensure that the vehicle is either not refittable, or that the default cargo is one of the refittable cargoes.
 		 * Note: Vehicles refittable to no cargo are handle differently to vehicle refittable to a single cargo. The latter might have subtypes. */
 		if (!only_defaultcargo && (e->type != VEH_SHIP || e->u.ship.old_refittable) && ei->cargo_type != CT_INVALID && !HasBit(ei->refit_mask, ei->cargo_type)) {
@@ -8189,7 +8207,7 @@ static void CalculateRefitMasks()
 			{
 				const GRFFile *file = _gted[engine].defaultcargo_grf;
 				if (file == NULL) file = e->GetGRF();
-				if (file != NULL && file->grf_version >= 8 && file->cargo_max != 0) {
+				if (file != NULL && file->grf_version >= 8 && file->cargo_list.Length() != 0) {
 					cargo_map_for_first_refittable = file->cargo_map;
 				}
 			}
