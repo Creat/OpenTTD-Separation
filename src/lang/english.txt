@@ -1336,7 +1336,7 @@ STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_NON_LANDSCAPING      :All but landsca
 STR_CONFIG_SETTING_COMMAND_PAUSE_LEVEL_ALL_ACTIONS              :All actions
 STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS                       :Use the advanced vehicle list: {STRING2}
 STR_CONFIG_SETTING_ADVANCED_VEHICLE_LISTS_HELPTEXT              :Enable usage of the advanced vehicle lists for grouping vehicles
-STR_CONFIG_SETTING_TIMETABLE_ENABLE_SEPARATION                  :{LTBLUE}Enable automatic timetable separation: {ORANGE}{STRING1}
+STR_CONFIG_SETTING_TIMETABLE_ENABLE_SEPARATION                  :Enable automatic timetable separation: {STRING2}
 STR_CONFIG_SETTING_LOADING_INDICATORS                           :Use loading indicators: {STRING2}
 STR_CONFIG_SETTING_LOADING_INDICATORS_HELPTEXT                  :Select whether loading indicators are displayed above loading or unloading vehicles
 STR_CONFIG_SETTING_TIMETABLE_IN_TICKS                           :Show timetable in ticks rather than days: {STRING2}
