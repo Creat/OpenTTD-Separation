@@ -40,23 +40,23 @@ static const CmdStruct _cmd_structs[] = {
 	{"BIG_FONT",          EmitSingleChar, SCC_BIGFONT,            0, C_NONE},
 
 	/* Colours */
-	{"BLUE",              EmitSingleChar, SCC_BLUE,               0, C_NONE},
-	{"SILVER",            EmitSingleChar, SCC_SILVER,             0, C_NONE},
-	{"GOLD",              EmitSingleChar, SCC_GOLD,               0, C_NONE},
-	{"RED",               EmitSingleChar, SCC_RED,                0, C_NONE},
-	{"PURPLE",            EmitSingleChar, SCC_PURPLE,             0, C_NONE},
-	{"LTBROWN",           EmitSingleChar, SCC_LTBROWN,            0, C_NONE},
-	{"ORANGE",            EmitSingleChar, SCC_ORANGE,             0, C_NONE},
-	{"GREEN",             EmitSingleChar, SCC_GREEN,              0, C_NONE},
-	{"YELLOW",            EmitSingleChar, SCC_YELLOW,             0, C_NONE},
-	{"DKGREEN",           EmitSingleChar, SCC_DKGREEN,            0, C_NONE},
-	{"CREAM",             EmitSingleChar, SCC_CREAM,              0, C_NONE},
-	{"BROWN",             EmitSingleChar, SCC_BROWN,              0, C_NONE},
-	{"WHITE",             EmitSingleChar, SCC_WHITE,              0, C_NONE},
-	{"LTBLUE",            EmitSingleChar, SCC_LTBLUE,             0, C_NONE},
-	{"GRAY",              EmitSingleChar, SCC_GRAY,               0, C_NONE},
-	{"DKBLUE",            EmitSingleChar, SCC_DKBLUE,             0, C_NONE},
-	{"BLACK",             EmitSingleChar, SCC_BLACK,              0, C_NONE},
+	{"BLUE",              EmitSingleChar, SCC_BLUE,               0, C_DONTCOUNT},
+	{"SILVER",            EmitSingleChar, SCC_SILVER,             0, C_DONTCOUNT},
+	{"GOLD",              EmitSingleChar, SCC_GOLD,               0, C_DONTCOUNT},
+	{"RED",               EmitSingleChar, SCC_RED,                0, C_DONTCOUNT},
+	{"PURPLE",            EmitSingleChar, SCC_PURPLE,             0, C_DONTCOUNT},
+	{"LTBROWN",           EmitSingleChar, SCC_LTBROWN,            0, C_DONTCOUNT},
+	{"ORANGE",            EmitSingleChar, SCC_ORANGE,             0, C_DONTCOUNT},
+	{"GREEN",             EmitSingleChar, SCC_GREEN,              0, C_DONTCOUNT},
+	{"YELLOW",            EmitSingleChar, SCC_YELLOW,             0, C_DONTCOUNT},
+	{"DKGREEN",           EmitSingleChar, SCC_DKGREEN,            0, C_DONTCOUNT},
+	{"CREAM",             EmitSingleChar, SCC_CREAM,              0, C_DONTCOUNT},
+	{"BROWN",             EmitSingleChar, SCC_BROWN,              0, C_DONTCOUNT},
+	{"WHITE",             EmitSingleChar, SCC_WHITE,              0, C_DONTCOUNT},
+	{"LTBLUE",            EmitSingleChar, SCC_LTBLUE,             0, C_DONTCOUNT},
+	{"GRAY",              EmitSingleChar, SCC_GRAY,               0, C_DONTCOUNT},
+	{"DKBLUE",            EmitSingleChar, SCC_DKBLUE,             0, C_DONTCOUNT},
+	{"BLACK",             EmitSingleChar, SCC_BLACK,              0, C_DONTCOUNT},
 
 	{"REV",               EmitSingleChar, SCC_REVISION,           0, C_NONE}, // openttd revision string
 
@@ -128,15 +128,10 @@ static const CmdStruct _cmd_structs[] = {
 	{"PLANE",             EmitSingleChar, SCC_PLANE,              0, C_DONTCOUNT},
 	{"SHIP",              EmitSingleChar, SCC_SHIP,               0, C_DONTCOUNT},
 	{"NBSP",              EmitSingleChar, 0xA0,                   0, C_DONTCOUNT},
-	{"CENT",              EmitSingleChar, 0xA2,                   0, C_DONTCOUNT},
-	{"POUND_SIGN",        EmitSingleChar, 0xA3,                   0, C_DONTCOUNT},
-	{"EURO",              EmitSingleChar, 0x20AC,                 0, C_DONTCOUNT},
-	{"YEN_SIGN",          EmitSingleChar, 0xA5,                   0, C_DONTCOUNT},
 	{"COPYRIGHT",         EmitSingleChar, 0xA9,                   0, C_DONTCOUNT},
 	{"DOWN_ARROW",        EmitSingleChar, SCC_DOWN_ARROW,         0, C_DONTCOUNT},
 	{"CHECKMARK",         EmitSingleChar, SCC_CHECKMARK,          0, C_DONTCOUNT},
 	{"CROSS",             EmitSingleChar, SCC_CROSS,              0, C_DONTCOUNT},
-	{"REGISTERED",        EmitSingleChar, 0xAE,                   0, C_DONTCOUNT},
 	{"RIGHT_ARROW",       EmitSingleChar, SCC_RIGHT_ARROW,        0, C_DONTCOUNT},
 	{"SMALL_LEFT_ARROW",  EmitSingleChar, SCC_LESS_THAN,          0, C_DONTCOUNT},
 	{"SMALL_RIGHT_ARROW", EmitSingleChar, SCC_GREATER_THAN,       0, C_DONTCOUNT},
@@ -159,12 +154,15 @@ struct PluralForm {
 	const char *names;       ///< Plural names
 };
 
+/** The maximum number of plurals. */
+static const int MAX_PLURALS = 5;
+
 /** All plural forms used */
 static const PluralForm _plural_forms[] = {
 	{ 2, "Two forms: special case for 1.", "\"1\" \"other\"" },
 	{ 1, "Only one form.", "\"other\"" },
 	{ 2, "Two forms: special case for 0 to 1.", "\"0..1\" \"other\"" },
-	{ 3, "Three forms: special cases for 0, and numbers ending in 1 except when ending in 11.", "\"0\" \"1,21,31,...\" \"other\"" },
+	{ 3, "Three forms: special cases for 0, and numbers ending in 1 except when ending in 11.", "\"1,21,31,...\" \"other\" \"0\"" },
 	{ 5, "Five forms: special cases for 1, 2, 3 to 6, and 7 to 10.", "\"1\" \"2\" \"3..6\" \"7..10\" \"other\"" },
 	{ 3, "Three forms: special cases for numbers ending in 1 except when ending in 11, and 2 to 9 except when ending in 12 to 19.", "\"1,21,31,...\" \"2..9,22..29,32..39,...\" \"other\"" },
 	{ 3, "Three forms: special cases for numbers ending in 1 except when ending in 11, and 2 to 4 except when ending in 12 to 14.", "\"1,21,31,...\" \"2..4,22..24,32..34,...\" \"other\"" },
@@ -174,6 +172,7 @@ static const PluralForm _plural_forms[] = {
 	{ 3, "Three forms: special cases for 1, and 2 to 4.", "\"1\" \"2..4\" \"other\"" },
 	{ 2, "Two forms: cases for numbers ending with a consonant, and with a vowel.", "\"yeong,il,sam,yuk,chil,pal\" \"i,sa,o,gu\"" },
 	{ 4, "Four forms: special cases for 1, 0 and numbers ending in 02 to 10, and numbers ending in 11 to 19.", "\"1\" \"0,2..10,102..110,202..210,...\" \"11..19,111..119,211..219,...\" \"other\"" },
+	{ 4, "Four forms: special cases for 1 and 11, 2 and 12, 3..10 and 13..19.", "\"1,11\" \"2,12\" \"3..10,13..19\" \"other\"" },
 };
 
 /* Flags:
@@ -197,7 +196,7 @@ static const char * const _pragmas[][4] = {
 	{ "plural",      "tp",  "0",      "Plural form to use" },
 	{ "textdir",     "tl",  "ltr",    "Text direction. Either ltr (left-to-right) or rtl (right-to-left)" },
 	{ "digitsep",    "td",  ",",      "Digit grouping separator for non-currency numbers" },
-	{ "digitsepcur", "td",  ",",      "Digit grouping seprarator for currency numbers" },
+	{ "digitsepcur", "td",  ",",      "Digit grouping separator for currency numbers" },
 	{ "decimalsep",  "td",  ".",      "Decimal separator" },
 	{ "winlangid",   "x2",  "0x0000", "Language ID for Windows" },
 	{ "grflangid",   "x1",  "0x00",   "Language ID for NewGRFs" },

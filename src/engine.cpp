@@ -30,9 +30,12 @@
 #include "company_base.h"
 #include "vehicle_func.h"
 #include "articulated_vehicles.h"
+#include "error.h"
 
 #include "table/strings.h"
 #include "table/engines.h"
+
+#include "safeguards.h"
 
 EnginePool _engine_pool("Engine");
 INSTANTIATE_POOL_METHODS(Engine)
@@ -854,7 +857,7 @@ void EnginesDailyLoop()
  * Accept an engine prototype. XXX - it is possible that the top-company
  * changes while you are waiting to accept the offer? Then it becomes invalid
  * @param tile unused
- * @param flags operation to perfom
+ * @param flags operation to perform
  * @param p1 engine-prototype offered
  * @param p2 unused
  * @param text unused
@@ -1000,7 +1003,7 @@ static bool IsUniqueEngineName(const char *name)
 /**
  * Rename an engine.
  * @param tile unused
- * @param flags operation to perfom
+ * @param flags operation to perform
  * @param p1 engine ID to rename
  * @param p2 unused
  * @param text the new name or an empty string when resetting to the default
@@ -1024,7 +1027,7 @@ CommandCost CmdRenameEngine(TileIndex tile, DoCommandFlag flags, uint32 p1, uint
 		if (reset) {
 			e->name = NULL;
 		} else {
-			e->name = strdup(text);
+			e->name = stredup(text);
 		}
 
 		MarkWholeScreenDirty();
@@ -1097,4 +1100,30 @@ bool IsEngineRefittable(EngineID engine)
 	/* Is there any cargo except the default cargo? */
 	CargoID default_cargo = e->GetDefaultCargoType();
 	return default_cargo != CT_INVALID && ei->refit_mask != 1U << default_cargo;
+}
+
+/**
+ * Check for engines that have an appropriate availability.
+ */
+void CheckEngines()
+{
+	const Engine *e;
+	Date min_date = INT32_MAX;
+
+	FOR_ALL_ENGINES(e) {
+		if (!e->IsEnabled()) continue;
+
+		/* We have an available engine... yay! */
+		if ((e->flags & ENGINE_AVAILABLE) != 0 && e->company_avail != 0) return;
+
+		/* Okay, try to find the earliest date. */
+		min_date = min(min_date, e->info.base_intro);
+	}
+
+	if (min_date < INT32_MAX) {
+		SetDParam(0, min_date);
+		ShowErrorMessage(STR_ERROR_NO_VEHICLES_AVAILABLE_YET, STR_ERROR_NO_VEHICLES_AVAILABLE_YET_EXPLANATION, WL_WARNING);
+	} else {
+		ShowErrorMessage(STR_ERROR_NO_VEHICLES_AVAILABLE_AT_ALL, STR_ERROR_NO_VEHICLES_AVAILABLE_AT_ALL_EXPLANATION, WL_WARNING);
+	}
 }

@@ -31,10 +31,13 @@
 #include "townname_func.h"
 #include "core/geometry_func.hpp"
 #include "genworld.h"
+#include "widgets/dropdown_func.h"
 
 #include "widgets/town_widget.h"
 
 #include "table/strings.h"
+
+#include "safeguards.h"
 
 typedef GUIList<const Town*> GUITownList;
 
@@ -43,6 +46,7 @@ static const NWidgetPart _nested_town_authority_widgets[] = {
 		NWidget(WWT_CLOSEBOX, COLOUR_BROWN),
 		NWidget(WWT_CAPTION, COLOUR_BROWN, WID_TA_CAPTION), SetDataTip(STR_LOCAL_AUTHORITY_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_SHADEBOX, COLOUR_BROWN),
+		NWidget(WWT_DEFSIZEBOX, COLOUR_BROWN),
 		NWidget(WWT_STICKYBOX, COLOUR_BROWN),
 	EndContainer(),
 	NWidget(WWT_PANEL, COLOUR_BROWN, WID_TA_RATING_INFO), SetMinimalSize(317, 92), SetResize(1, 1), EndContainer(),
@@ -87,10 +91,10 @@ private:
 	}
 
 public:
-	TownAuthorityWindow(const WindowDesc *desc, WindowNumber window_number) : Window(), sel_index(-1), displayed_actions_on_previous_painting(0)
+	TownAuthorityWindow(WindowDesc *desc, WindowNumber window_number) : Window(desc), sel_index(-1), displayed_actions_on_previous_painting(0)
 	{
 		this->town = Town::Get(window_number);
-		this->InitNested(desc, window_number);
+		this->InitNested(window_number);
 		this->vscroll = this->GetScrollbar(WID_TA_SCROLLBAR);
 		this->vscroll->SetCapacity((this->GetWidget<NWidgetBase>(WID_TA_COMMAND_LIST)->current_y - WD_FRAMERECT_TOP - WD_FRAMERECT_BOTTOM) / FONT_HEIGHT_NORMAL);
 	}
@@ -279,8 +283,8 @@ public:
 	}
 };
 
-static const WindowDesc _town_authority_desc(
-	WDP_AUTO, 317, 222,
+static WindowDesc _town_authority_desc(
+	WDP_AUTO, "view_town_authority", 317, 222,
 	WC_TOWN_AUTHORITY, WC_NONE,
 	0,
 	_nested_town_authority_widgets, lengthof(_nested_town_authority_widgets)
@@ -300,14 +304,14 @@ private:
 public:
 	static const int WID_TV_HEIGHT_NORMAL = 150;
 
-	TownViewWindow(const WindowDesc *desc, WindowNumber window_number) : Window()
+	TownViewWindow(WindowDesc *desc, WindowNumber window_number) : Window(desc)
 	{
-		this->CreateNestedTree(desc);
+		this->CreateNestedTree();
 
 		this->town = Town::Get(window_number);
 		if (this->town->larger_town) this->GetWidget<NWidgetCore>(WID_TV_CAPTION)->widget_data = STR_TOWN_VIEW_CITY_CAPTION;
 
-		this->FinishInitNested(desc, window_number);
+		this->FinishInitNested(window_number);
 
 		this->flags |= WF_DISABLE_VP_SCROLL;
 		NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(WID_TV_VIEWPORT);
@@ -386,7 +390,7 @@ public:
 			DrawString(cargo_text_left, cargo_text_right, y += FONT_HEIGHT_NORMAL, string);
 		}
 
-		if (HasBit(this->town->flags, TOWN_IS_FUNDED)) {
+		if (HasBit(this->town->flags, TOWN_IS_GROWING)) {
 			SetDParam(0, ((this->town->growth_rate & (~TOWN_GROW_RATE_CUSTOM)) * TOWN_GROWTH_TICKS + DAY_TICKS) / DAY_TICKS);
 			DrawString(r.left + WD_FRAMERECT_LEFT, r.right - WD_FRAMERECT_LEFT, y += FONT_HEIGHT_NORMAL, this->town->fund_buildings_months == 0 ? STR_TOWN_VIEW_TOWN_GROWS_EVERY : STR_TOWN_VIEW_TOWN_GROWS_EVERY_FUNDED);
 		} else {
@@ -531,6 +535,7 @@ static const NWidgetPart _nested_town_game_view_widgets[] = {
 		NWidget(WWT_CLOSEBOX, COLOUR_BROWN),
 		NWidget(WWT_CAPTION, COLOUR_BROWN, WID_TV_CAPTION), SetDataTip(STR_TOWN_VIEW_TOWN_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_SHADEBOX, COLOUR_BROWN),
+		NWidget(WWT_DEFSIZEBOX, COLOUR_BROWN),
 		NWidget(WWT_STICKYBOX, COLOUR_BROWN),
 	EndContainer(),
 	NWidget(WWT_PANEL, COLOUR_BROWN),
@@ -549,8 +554,8 @@ static const NWidgetPart _nested_town_game_view_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _town_game_view_desc(
-	WDP_AUTO, 260, TownViewWindow::WID_TV_HEIGHT_NORMAL,
+static WindowDesc _town_game_view_desc(
+	WDP_AUTO, "view_town", 260, TownViewWindow::WID_TV_HEIGHT_NORMAL,
 	WC_TOWN_VIEW, WC_NONE,
 	0,
 	_nested_town_game_view_widgets, lengthof(_nested_town_game_view_widgets)
@@ -562,6 +567,7 @@ static const NWidgetPart _nested_town_editor_view_widgets[] = {
 		NWidget(WWT_CAPTION, COLOUR_BROWN, WID_TV_CAPTION), SetDataTip(STR_TOWN_VIEW_TOWN_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_PUSHTXTBTN, COLOUR_BROWN, WID_TV_CHANGE_NAME), SetMinimalSize(76, 14), SetDataTip(STR_BUTTON_RENAME, STR_TOWN_VIEW_RENAME_TOOLTIP),
 		NWidget(WWT_SHADEBOX, COLOUR_BROWN),
+		NWidget(WWT_DEFSIZEBOX, COLOUR_BROWN),
 		NWidget(WWT_STICKYBOX, COLOUR_BROWN),
 	EndContainer(),
 	NWidget(WWT_PANEL, COLOUR_BROWN),
@@ -580,8 +586,8 @@ static const NWidgetPart _nested_town_editor_view_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _town_editor_view_desc(
-	WDP_AUTO, 260, TownViewWindow::WID_TV_HEIGHT_NORMAL,
+static WindowDesc _town_editor_view_desc(
+	WDP_AUTO, "view_town_scen", 260, TownViewWindow::WID_TV_HEIGHT_NORMAL,
 	WC_TOWN_VIEW, WC_NONE,
 	0,
 	_nested_town_editor_view_widgets, lengthof(_nested_town_editor_view_widgets)
@@ -601,13 +607,15 @@ static const NWidgetPart _nested_town_directory_widgets[] = {
 		NWidget(WWT_CLOSEBOX, COLOUR_BROWN),
 		NWidget(WWT_CAPTION, COLOUR_BROWN), SetDataTip(STR_TOWN_DIRECTORY_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_SHADEBOX, COLOUR_BROWN),
+		NWidget(WWT_DEFSIZEBOX, COLOUR_BROWN),
 		NWidget(WWT_STICKYBOX, COLOUR_BROWN),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL),
 		NWidget(NWID_VERTICAL),
 			NWidget(NWID_HORIZONTAL),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_BROWN, WID_TD_SORT_NAME), SetMinimalSize(99, 12), SetDataTip(STR_SORT_BY_CAPTION_NAME, STR_TOOLTIP_SORT_ORDER), SetFill(1, 0),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_BROWN, WID_TD_SORT_POPULATION), SetMinimalSize(97, 12), SetDataTip(STR_SORT_BY_CAPTION_POPULATION, STR_TOOLTIP_SORT_ORDER), SetFill(1, 0),
+				NWidget(WWT_TEXTBTN, COLOUR_BROWN, WID_TD_SORT_ORDER), SetDataTip(STR_BUTTON_SORT_BY, STR_TOOLTIP_SORT_ORDER),
+				NWidget(WWT_DROPDOWN, COLOUR_BROWN, WID_TD_SORT_CRITERIA), SetDataTip(STR_JUST_STRING, STR_TOOLTIP_SORT_CRITERIA),
+				NWidget(WWT_PANEL, COLOUR_BROWN), SetResize(1, 0), EndContainer(),
 			EndContainer(),
 			NWidget(WWT_PANEL, COLOUR_BROWN, WID_TD_LIST), SetMinimalSize(196, 0), SetDataTip(0x0, STR_TOWN_DIRECTORY_LIST_TOOLTIP),
 							SetFill(1, 0), SetResize(0, 10), SetScrollbar(WID_TD_SCROLLBAR), EndContainer(),
@@ -630,6 +638,7 @@ private:
 	static const Town *last_town;
 
 	/* Constants for sorting towns */
+	static const StringID sorter_names[];
 	static GUITownList::SortFunction * const sorter_funcs[];
 
 	GUITownList towns;
@@ -653,6 +662,7 @@ private:
 		/* Always sort the towns. */
 		this->last_town = NULL;
 		this->towns.Sort();
+		this->SetWidgetDirty(WID_TD_LIST); // Force repaint of the displayed towns.
 	}
 
 	/** Sort by town name */
@@ -668,7 +678,7 @@ private:
 
 		/* If 'b' is the same town as in the last round, use the cached value
 		 * We do this to speed stuff up ('b' is called with the same value a lot of
-		 * times after eachother) */
+		 * times after each other) */
 		if (tb != last_town) {
 			last_town = tb;
 			SetDParam(0, tb->index);
@@ -678,16 +688,38 @@ private:
 		return strnatcmp(buf, buf_cache); // Sort by name (natural sorting).
 	}
 
-	/** Sort by population */
+	/** Sort by population (default descending, as big towns are of the most interest). */
 	static int CDECL TownPopulationSorter(const Town * const *a, const Town * const *b)
 	{
-		return (*a)->cache.population - (*b)->cache.population;
+		uint32 a_population = (*a)->cache.population;
+		uint32 b_population = (*b)->cache.population;
+		if (a_population == b_population) return TownDirectoryWindow::TownNameSorter(a, b);
+		return (a_population < b_population) ? -1 : 1;
+	}
+
+	/** Sort by town rating */
+	static int CDECL TownRatingSorter(const Town * const *a, const Town * const *b)
+	{
+		int before = TownDirectoryWindow::last_sorting.order ? 1 : -1; // Value to get 'a' before 'b'.
+
+		/* Towns without rating are always after towns with rating. */
+		if (HasBit((*a)->have_ratings, _local_company)) {
+			if (HasBit((*b)->have_ratings, _local_company)) {
+				int16 a_rating = (*a)->ratings[_local_company];
+				int16 b_rating = (*b)->ratings[_local_company];
+				if (a_rating == b_rating) return TownDirectoryWindow::TownNameSorter(a, b);
+				return (a_rating < b_rating) ? -1 : 1;
+			}
+			return before;
+		}
+		if (HasBit((*b)->have_ratings, _local_company)) return -before;
+		return -before * TownDirectoryWindow::TownNameSorter(a, b); // Sort unrated towns always on ascending town name.
 	}
 
 public:
-	TownDirectoryWindow(const WindowDesc *desc) : Window()
+	TownDirectoryWindow(WindowDesc *desc) : Window(desc)
 	{
-		this->CreateNestedTree(desc);
+		this->CreateNestedTree();
 
 		this->vscroll = this->GetScrollbar(WID_TD_SCROLLBAR);
 
@@ -696,28 +728,27 @@ public:
 		this->towns.ForceRebuild();
 		this->BuildSortTownList();
 
-		this->FinishInitNested(desc, 0);
-	}
-
-	~TownDirectoryWindow()
-	{
-		this->last_sorting = this->towns.GetListing();
+		this->FinishInitNested(0);
 	}
 
 	virtual void SetStringParameters(int widget) const
 	{
-		if (widget == WID_TD_WORLD_POPULATION) SetDParam(0, GetWorldPopulation());
+		switch (widget) {
+			case WID_TD_WORLD_POPULATION:
+				SetDParam(0, GetWorldPopulation());
+				break;
+
+			case WID_TD_SORT_CRITERIA:
+				SetDParam(0, TownDirectoryWindow::sorter_names[this->towns.SortType()]);
+				break;
+		}
 	}
 
 	virtual void DrawWidget(const Rect &r, int widget) const
 	{
 		switch (widget) {
-			case WID_TD_SORT_NAME:
-				if (this->towns.SortType() == 0) this->DrawSortButtonState(widget, this->towns.IsDescSortOrder() ? SBS_DOWN : SBS_UP);
-				break;
-
-			case WID_TD_SORT_POPULATION:
-				if (this->towns.SortType() != 0) this->DrawSortButtonState(widget, this->towns.IsDescSortOrder() ? SBS_DOWN : SBS_UP);
+			case WID_TD_SORT_ORDER:
+				this->DrawSortButtonState(widget, this->towns.IsDescSortOrder() ? SBS_DOWN : SBS_UP);
 				break;
 
 			case WID_TD_LIST: {
@@ -764,10 +795,19 @@ public:
 	virtual void UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 	{
 		switch (widget) {
-			case WID_TD_SORT_NAME:
-			case WID_TD_SORT_POPULATION: {
+			case WID_TD_SORT_ORDER: {
 				Dimension d = GetStringBoundingBox(this->GetWidget<NWidgetCore>(widget)->widget_data);
 				d.width += padding.width + WD_SORTBUTTON_ARROW_WIDTH * 2; // Doubled since the string is centred and it also looks better.
+				d.height += padding.height;
+				*size = maxdim(*size, d);
+				break;
+			}
+			case WID_TD_SORT_CRITERIA: {
+				Dimension d = {0, 0};
+				for (uint i = 0; TownDirectoryWindow::sorter_names[i] != INVALID_STRING_ID; i++) {
+					d = maxdim(d, GetStringBoundingBox(TownDirectoryWindow::sorter_names[i]));
+				}
+				d.width += padding.width;
 				d.height += padding.height;
 				*size = maxdim(*size, d);
 				break;
@@ -807,24 +847,22 @@ public:
 	virtual void OnClick(Point pt, int widget, int click_count)
 	{
 		switch (widget) {
-			case WID_TD_SORT_NAME: // Sort by Name ascending/descending
-				if (this->towns.SortType() == 0) {
+			case WID_TD_SORT_ORDER: // Click on sort order button
+				if (this->towns.SortType() != 2) { // A different sort than by rating.
 					this->towns.ToggleSortOrder();
+					this->last_sorting = this->towns.GetListing(); // Store new sorting order.
 				} else {
-					this->towns.SetSortType(0);
+					/* Some parts are always sorted ascending on name. */
+					this->last_sorting.order = !this->last_sorting.order;
+					this->towns.SetListing(this->last_sorting);
+					this->towns.ForceResort();
+					this->towns.Sort();
 				}
-				this->BuildSortTownList();
 				this->SetDirty();
 				break;
 
-			case WID_TD_SORT_POPULATION: // Sort by Population ascending/descending
-				if (this->towns.SortType() == 1) {
-					this->towns.ToggleSortOrder();
-				} else {
-					this->towns.SetSortType(1);
-				}
-				this->BuildSortTownList();
-				this->SetDirty();
+			case WID_TD_SORT_CRITERIA: // Click on sort criteria dropdown
+				ShowDropDownMenu(this, TownDirectoryWindow::sorter_names, this->towns.SortType(), WID_TD_SORT_CRITERIA, 0, 0);
 				break;
 
 			case WID_TD_LIST: { // Click on Town Matrix
@@ -840,6 +878,17 @@ public:
 				}
 				break;
 			}
+		}
+	}
+
+	virtual void OnDropdownSelect(int widget, int index)
+	{
+		if (widget != WID_TD_SORT_CRITERIA) return;
+
+		if (this->towns.SortType() != index) {
+			this->towns.SetSortType(index);
+			this->last_sorting = this->towns.GetListing(); // Store new sorting order.
+			this->BuildSortTownList();
 		}
 	}
 
@@ -879,14 +928,23 @@ public:
 Listing TownDirectoryWindow::last_sorting = {false, 0};
 const Town *TownDirectoryWindow::last_town = NULL;
 
-/* Available town directory sorting functions */
+/** Names of the sorting functions. */
+const StringID TownDirectoryWindow::sorter_names[] = {
+	STR_SORT_BY_NAME,
+	STR_SORT_BY_POPULATION,
+	STR_SORT_BY_RATING,
+	INVALID_STRING_ID
+};
+
+/** Available town directory sorting functions. */
 GUITownList::SortFunction * const TownDirectoryWindow::sorter_funcs[] = {
 	&TownNameSorter,
 	&TownPopulationSorter,
+	&TownRatingSorter,
 };
 
-static const WindowDesc _town_directory_desc(
-	WDP_AUTO, 208, 202,
+static WindowDesc _town_directory_desc(
+	WDP_AUTO, "list_towns", 208, 202,
 	WC_TOWN_DIRECTORY, WC_NONE,
 	0,
 	_nested_town_directory_widgets, lengthof(_nested_town_directory_widgets)
@@ -902,7 +960,7 @@ void CcFoundTown(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2
 {
 	if (result.Failed()) return;
 
-	if (_settings_client.sound.confirm) SndPlayTileFx(SND_1F_SPLAT, tile);
+	if (_settings_client.sound.confirm) SndPlayTileFx(SND_1F_SPLAT_OTHER, tile);
 	if (!_settings_client.gui.persistent_buildingtools) ResetObjectToPlace();
 }
 
@@ -989,13 +1047,14 @@ private:
 	TownNameParams params;  ///< Town name parameters
 
 public:
-	FoundTownWindow(const WindowDesc *desc, WindowNumber window_number) :
+	FoundTownWindow(WindowDesc *desc, WindowNumber window_number) :
+			Window(desc),
 			town_size(TSZ_MEDIUM),
 			town_layout(_settings_game.economy.town_layout),
 			townname_editbox(MAX_LENGTH_TOWN_NAME_CHARS * MAX_CHAR_LENGTH, MAX_LENGTH_TOWN_NAME_CHARS),
 			params(_settings_game.game_creation.town_name)
 	{
-		this->InitNested(desc, window_number);
+		this->InitNested(window_number);
 		this->querystrings[WID_TF_TOWN_NAME_EDITBOX] = &this->townname_editbox;
 		this->RandomTownName();
 		this->UpdateButtons(true);
@@ -1125,8 +1184,8 @@ public:
 	}
 };
 
-static const WindowDesc _found_town_desc(
-	WDP_AUTO, 160, 162,
+static WindowDesc _found_town_desc(
+	WDP_AUTO, "build_town", 160, 162,
 	WC_FOUND_TOWN, WC_NONE,
 	WDF_CONSTRUCTION,
 	_nested_found_town_widgets, lengthof(_nested_found_town_widgets)

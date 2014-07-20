@@ -38,9 +38,11 @@
 
 #include "table/strings.h"
 
+#include "safeguards.h"
+
 const NewsItem *_statusbar_news_item = NULL;
 
-static uint MIN_NEWS_AMOUNT = 30;           ///< prefered minimum amount of news messages
+static uint MIN_NEWS_AMOUNT = 30;           ///< preferred minimum amount of news messages
 static uint _total_news = 0;                ///< current number of news items
 static NewsItem *_oldest_news = NULL;       ///< head of news items queue
 static NewsItem *_latest_news = NULL;       ///< tail of news items queue
@@ -89,8 +91,8 @@ static const NWidgetPart _nested_normal_news_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _normal_news_desc(
-	WDP_MANUAL, 0, 0,
+static WindowDesc _normal_news_desc(
+	WDP_MANUAL, NULL, 0, 0,
 	WC_NEWS_WINDOW, WC_NONE,
 	0,
 	_nested_normal_news_widgets, lengthof(_nested_normal_news_widgets)
@@ -116,8 +118,8 @@ static const NWidgetPart _nested_vehicle_news_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _vehicle_news_desc(
-	WDP_MANUAL, 0, 0,
+static WindowDesc _vehicle_news_desc(
+	WDP_MANUAL, NULL, 0, 0,
 	WC_NEWS_WINDOW, WC_NONE,
 	0,
 	_nested_vehicle_news_widgets, lengthof(_nested_vehicle_news_widgets)
@@ -147,8 +149,8 @@ static const NWidgetPart _nested_company_news_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _company_news_desc(
-	WDP_MANUAL, 0, 0,
+static WindowDesc _company_news_desc(
+	WDP_MANUAL, NULL, 0, 0,
 	WC_NEWS_WINDOW, WC_NONE,
 	0,
 	_nested_company_news_widgets, lengthof(_nested_company_news_widgets)
@@ -170,8 +172,8 @@ static const NWidgetPart _nested_thin_news_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _thin_news_desc(
-	WDP_MANUAL, 0, 0,
+static WindowDesc _thin_news_desc(
+	WDP_MANUAL, NULL, 0, 0,
 	WC_NEWS_WINDOW, WC_NONE,
 	0,
 	_nested_thin_news_widgets, lengthof(_nested_thin_news_widgets)
@@ -194,8 +196,8 @@ static const NWidgetPart _nested_small_news_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _small_news_desc(
-	WDP_MANUAL, 0, 0,
+static WindowDesc _small_news_desc(
+	WDP_MANUAL, NULL, 0, 0,
 	WC_NEWS_WINDOW, WC_NONE,
 	0,
 	_nested_small_news_widgets, lengthof(_nested_small_news_widgets)
@@ -204,7 +206,7 @@ static const WindowDesc _small_news_desc(
 /**
  * Window layouts for news items.
  */
-static const WindowDesc* _news_window_layout[] = {
+static WindowDesc* _news_window_layout[] = {
 	&_thin_news_desc,    ///< NF_THIN
 	&_small_news_desc,   ///< NF_SMALL
 	&_normal_news_desc,  ///< NF_NORMAL
@@ -212,7 +214,7 @@ static const WindowDesc* _news_window_layout[] = {
 	&_company_news_desc, ///< NF_COMPANY
 };
 
-const WindowDesc* GetNewsWindowLayout(NewsFlag flags)
+WindowDesc* GetNewsWindowLayout(NewsFlag flags)
 {
 	uint layout = GB(flags, NFB_WINDOW_LAYOUT, NFB_WINDOW_LAYOUT_COUNT);
 	assert(layout < lengthof(_news_window_layout));
@@ -263,7 +265,7 @@ struct NewsWindow : Window {
 	const NewsItem *ni;   ///< News item to display.
 	static uint duration; ///< Remaining time for showing current news message (may only be accessed while a news item is displayed).
 
-	NewsWindow(const WindowDesc *desc, const NewsItem *ni) : Window(), ni(ni)
+	NewsWindow(WindowDesc *desc, const NewsItem *ni) : Window(desc), ni(ni)
 	{
 		NewsWindow::duration = 555;
 		const Window *w = FindWindowByClass(WC_SEND_NETWORK_MSG);
@@ -272,12 +274,12 @@ struct NewsWindow : Window {
 
 		this->flags |= WF_DISABLE_VP_SCROLL;
 
-		this->CreateNestedTree(desc);
+		this->CreateNestedTree();
 
 		/* For company news with a face we have a separate headline in param[0] */
 		if (desc == &_company_news_desc) this->GetWidget<NWidgetCore>(WID_N_TITLE)->widget_data = this->ni->params[0];
 
-		this->FinishInitNested(desc, 0);
+		this->FinishInitNested(0);
 
 		/* Initialize viewport if it exists. */
 		NWidgetViewport *nvp = this->GetWidget<NWidgetViewport>(WID_N_VIEWPORT);
@@ -304,7 +306,7 @@ struct NewsWindow : Window {
 		GfxFillRect(r.left,  r.bottom, r.right, r.bottom, PC_BLACK);
 	}
 
-	virtual Point OnInitialPosition(const WindowDesc *desc, int16 sm_width, int16 sm_height, int window_number)
+	virtual Point OnInitialPosition(int16 sm_width, int16 sm_height, int window_number)
 	{
 		Point pt = { 0, _screen.height };
 		return pt;
@@ -449,7 +451,7 @@ struct NewsWindow : Window {
 		}
 	}
 
-	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
+	virtual EventState OnKeyPress(WChar key, uint16 keycode)
 	{
 		if (keycode == WKC_SPACE) {
 			/* Don't continue. */
@@ -724,7 +726,7 @@ CommandCost CmdCustomNewsItem(TileIndex tile, DoCommandFlag flags, uint32 p1, ui
 	if (company != INVALID_OWNER && company != _local_company) return CommandCost();
 
 	if (flags & DC_EXEC) {
-		char *news = strdup(text);
+		char *news = stredup(text);
 		SetDParamStr(0, news);
 		AddNewsItem(STR_NEWS_CUSTOM_ITEM, type, NF_NORMAL, reftype1, p2, NR_NONE, UINT32_MAX, news);
 	}
@@ -909,8 +911,14 @@ void ShowLastNewsMessage()
 	} else if (_forced_news == NULL) {
 		/* Not forced any news yet, show the current one, unless a news window is
 		 * open (which can only be the current one), then show the previous item */
-		const Window *w = FindWindowById(WC_NEWS_WINDOW, 0);
-		ni = (w == NULL || (_current_news == _oldest_news)) ? _current_news : _current_news->prev;
+		if (_current_news == NULL) {
+			/* No news were shown yet resp. the last shown one was already deleted.
+			 * Threat this as if _forced_news reached _oldest_news; so, wrap around and start anew with the latest. */
+			ni = _latest_news;
+		} else {
+			const Window *w = FindWindowById(WC_NEWS_WINDOW, 0);
+			ni = (w == NULL || (_current_news == _oldest_news)) ? _current_news : _current_news->prev;
+		}
 	} else if (_forced_news == _oldest_news) {
 		/* We have reached the oldest news, start anew with the latest */
 		ni = _latest_news;
@@ -977,7 +985,7 @@ static void DrawNewsString(uint left, uint right, int y, TextColour colour, cons
 	}
 
 	*dest = '\0';
-	/* Truncate and show string; postfixed by '...' if neccessary */
+	/* Truncate and show string; postfixed by '...' if necessary */
 	DrawString(left, right, y, buffer2, colour);
 }
 
@@ -985,16 +993,16 @@ struct MessageHistoryWindow : Window {
 	static const int top_spacing;    ///< Additional spacing at the top of the #WID_MH_BACKGROUND widget.
 	static const int bottom_spacing; ///< Additional spacing at the bottom of the #WID_MH_BACKGROUND widget.
 
-	int line_height; /// < Height of a single line in the news histoy window including spacing.
+	int line_height; /// < Height of a single line in the news history window including spacing.
 	int date_width;  /// < Width needed for the date part.
 
 	Scrollbar *vscroll;
 
-	MessageHistoryWindow(const WindowDesc *desc) : Window()
+	MessageHistoryWindow(WindowDesc *desc) : Window(desc)
 	{
-		this->CreateNestedTree(desc);
+		this->CreateNestedTree();
 		this->vscroll = this->GetScrollbar(WID_MH_SCROLLBAR);
-		this->FinishInitNested(desc); // Initializes 'this->line_height' and 'this->date_width'.
+		this->FinishInitNested(); // Initializes 'this->line_height' and 'this->date_width'.
 		this->OnInvalidateData(0);
 	}
 
@@ -1078,7 +1086,7 @@ struct MessageHistoryWindow : Window {
 
 	virtual void OnResize()
 	{
-		this->vscroll->SetCapacity(this->GetWidget<NWidgetBase>(WID_MH_BACKGROUND)->current_y / this->line_height);
+		this->vscroll->SetCapacityFromWidget(this, WID_MH_BACKGROUND);
 	}
 };
 
@@ -1090,6 +1098,7 @@ static const NWidgetPart _nested_message_history[] = {
 		NWidget(WWT_CLOSEBOX, COLOUR_BROWN),
 		NWidget(WWT_CAPTION, COLOUR_BROWN), SetDataTip(STR_MESSAGE_HISTORY, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_SHADEBOX, COLOUR_BROWN),
+		NWidget(WWT_DEFSIZEBOX, COLOUR_BROWN),
 		NWidget(WWT_STICKYBOX, COLOUR_BROWN),
 	EndContainer(),
 
@@ -1103,8 +1112,8 @@ static const NWidgetPart _nested_message_history[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _message_history_desc(
-	WDP_AUTO, 400, 140,
+static WindowDesc _message_history_desc(
+	WDP_AUTO, "list_news", 400, 140,
 	WC_MESSAGE_HISTORY, WC_NONE,
 	0,
 	_nested_message_history, lengthof(_nested_message_history)

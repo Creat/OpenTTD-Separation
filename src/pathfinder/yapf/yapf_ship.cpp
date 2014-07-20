@@ -15,6 +15,8 @@
 #include "yapf.hpp"
 #include "yapf_node_ship.hpp"
 
+#include "../../safeguards.h"
+
 /** Node Follower module of YAPF for ships */
 template <class Types>
 class CYapfFollowShipT
@@ -58,9 +60,12 @@ public:
 		if (tile == v->dest_tile) {
 			/* convert tracks to trackdirs */
 			TrackdirBits trackdirs = (TrackdirBits)(tracks | ((int)tracks << 8));
-			/* choose any trackdir reachable from enterdir */
+			/* limit to trackdirs reachable from enterdir */
 			trackdirs &= DiagdirReachesTrackdirs(enterdir);
-			return (Trackdir)FindFirstBit2x64(trackdirs);
+
+			/* use vehicle's current direction if that's possible, otherwise use first usable one. */
+			Trackdir veh_dir = v->GetVehicleTrackdir();
+			return ((trackdirs & TrackdirToTrackdirBits(veh_dir)) != 0) ? veh_dir : (Trackdir)FindFirstBit2x64(trackdirs);
 		}
 
 		/* move back to the old tile/trackdir (where ship is coming from) */
@@ -164,7 +169,7 @@ public:
 		/* base tile cost depending on distance */
 		int c = IsDiagonalTrackdir(n.GetTrackdir()) ? YAPF_TILE_LENGTH : YAPF_TILE_CORNER_LENGTH;
 		/* additional penalty for curves */
-		if (n.m_parent != NULL && n.GetTrackdir() != NextTrackdir(n.m_parent->GetTrackdir())) {
+		if (n.GetTrackdir() != NextTrackdir(n.m_parent->GetTrackdir())) {
 			/* new trackdir does not match the next one when going straight */
 			c += YAPF_TILE_LENGTH;
 		}

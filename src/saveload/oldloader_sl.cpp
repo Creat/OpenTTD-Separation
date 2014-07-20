@@ -34,6 +34,8 @@
 #include "../table/engines.h"
 #include "../table/townname.h"
 
+#include "../safeguards.h"
+
 static bool _read_ttdpatch_flags;    ///< Have we (tried to) read TTDPatch extra flags?
 static uint16 _old_extra_chunk_nums; ///< Number of extra TTDPatch chunks
 static byte _old_vehicle_multiplier; ///< TTDPatch vehicle multiplier
@@ -626,7 +628,7 @@ static bool LoadOldOrder(LoadgameState *ls, int num)
 	if (o->IsType(OT_NOTHING)) {
 		delete o;
 	} else {
-		/* Relink the orders to eachother (in the orders for one vehicle are behind eachother,
+		/* Relink the orders to each other (in the orders for one vehicle are behind each other,
 		 * with an invalid order (OT_NOTHING) as indication that it is the last order */
 		Order *prev = Order::GetIfValid(num - 1);
 		if (prev != NULL) prev->next = o;
@@ -637,7 +639,7 @@ static bool LoadOldOrder(LoadgameState *ls, int num)
 
 static bool LoadOldAnimTileList(LoadgameState *ls, int num)
 {
-	/* This is sligthly hackish - we must load a chunk into an array whose
+	/* This is slightly hackish - we must load a chunk into an array whose
 	 * address isn't static, but instead pointed to by _animated_tile_list.
 	 * To achieve that, create an OldChunks list on the stack on the fly.
 	 * The list cannot be static because the value of _animated_tile_list
@@ -708,10 +710,11 @@ static bool LoadOldGood(LoadgameState *ls, int num)
 
 	if (!LoadChunk(ls, ge, goods_chunk)) return false;
 
-	SB(ge->acceptance_pickup, GoodsEntry::GES_ACCEPTANCE, 1, HasBit(_waiting_acceptance, 15));
-	SB(ge->acceptance_pickup, GoodsEntry::GES_PICKUP, 1, _cargo_source != 0xFF);
+	SB(ge->status, GoodsEntry::GES_ACCEPTANCE, 1, HasBit(_waiting_acceptance, 15));
+	SB(ge->status, GoodsEntry::GES_RATING, 1, _cargo_source != 0xFF);
 	if (GB(_waiting_acceptance, 0, 12) != 0 && CargoPacket::CanAllocateItem()) {
-		ge->cargo.Append(new CargoPacket(GB(_waiting_acceptance, 0, 12), _cargo_days, (_cargo_source == 0xFF) ? INVALID_STATION : _cargo_source, 0, 0));
+		ge->cargo.Append(new CargoPacket(GB(_waiting_acceptance, 0, 12), _cargo_days, (_cargo_source == 0xFF) ? INVALID_STATION : _cargo_source, 0, 0),
+				INVALID_STATION);
 	}
 
 	return true;
@@ -1252,6 +1255,7 @@ bool LoadOldVehicle(LoadgameState *ls, int num)
 
 			if (!LoadChunk(ls, v, vehicle_chunk)) return false;
 			if (v == NULL) continue;
+			v->refit_cap = v->cargo_cap;
 
 			SpriteID sprite = v->cur_image;
 			/* no need to override other sprites */
@@ -1575,6 +1579,7 @@ extern uint16 _disaster_delay;
 extern byte _trees_tick_ctr;
 extern byte _age_cargo_skip_counter; // From misc_sl.cpp
 extern uint8 _old_diff_level;
+extern uint8 _old_units;
 static const OldChunks main_chunk[] = {
 	OCL_ASSERT( OC_TTD, 0 ),
 	OCL_ASSERT( OC_TTO, 0 ),
@@ -1703,7 +1708,7 @@ static const OldChunks main_chunk[] = {
 	OCL_NULL( 1 ),               ///< Station tick counter, no longer in use
 
 	OCL_VAR (  OC_UINT8,    1, &_settings_game.locale.currency ),
-	OCL_VAR (  OC_UINT8,    1, &_settings_game.locale.units ),
+	OCL_VAR (  OC_UINT8,    1, &_old_units ),
 	OCL_VAR ( OC_FILE_U8 | OC_VAR_U32,    1, &_cur_company_tick_index ),
 
 	OCL_NULL( 2 ),               ///< Date stuff, calculated automatically

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -16,6 +16,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Utility</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -137,6 +138,12 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\src\lang\english.txt;..\objs\strgen\strgen.exe;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\lang\estonian.lng;%(Outputs)</Outputs>
     </CustomBuild>
+    <CustomBuild Include="..\src\lang\faroese.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating faroese language file</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\objs\strgen\strgen.exe -s ..\src\lang -d ..\bin\lang "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\src\lang\english.txt;..\objs\strgen\strgen.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\lang\faroese.lng;%(Outputs)</Outputs>
+    </CustomBuild>
     <CustomBuild Include="..\src\lang\finnish.txt">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating finnish language file</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\objs\strgen\strgen.exe -s ..\src\lang -d ..\bin\lang "%(FullPath)"</Command>
@@ -148,6 +155,12 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\objs\strgen\strgen.exe -s ..\src\lang -d ..\bin\lang "%(FullPath)"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\src\lang\english.txt;..\objs\strgen\strgen.exe;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\lang\french.lng;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\src\lang\gaelic.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating gaelic language file</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\objs\strgen\strgen.exe -s ..\src\lang -d ..\bin\lang "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\src\lang\english.txt;..\objs\strgen\strgen.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\lang\gaelic.lng;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\src\lang\galician.txt">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating galician language file</Message>
@@ -310,6 +323,18 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\objs\strgen\strgen.exe -s ..\src\lang -d ..\bin\lang "%(FullPath)"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\src\lang\english.txt;..\objs\strgen\strgen.exe;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\lang\swedish.lng;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\src\lang\tamil.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating tamil language file</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\objs\strgen\strgen.exe -s ..\src\lang -d ..\bin\lang "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\src\lang\english.txt;..\objs\strgen\strgen.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\lang\tamil.lng;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="..\src\lang\thai.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating thai language file</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\objs\strgen\strgen.exe -s ..\src\lang -d ..\bin\lang "%(FullPath)"</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\src\lang\english.txt;..\objs\strgen\strgen.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\lang\thai.lng;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="..\src\lang\traditional_chinese.txt">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Generating traditional_chinese language file</Message>

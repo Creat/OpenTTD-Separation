@@ -82,6 +82,8 @@
 #include "../company_base.h"
 #include "../company_func.h"
 
+#include "../safeguards.h"
+
 AIInstance::AIInstance() :
 	ScriptInstance("AI")
 {}
@@ -238,8 +240,17 @@ ScriptInfo *AIInstance::FindLibrary(const char *library, int version)
  */
 void CcAI(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 {
-	Company::Get(_current_company)->ai_instance->DoCommandCallback(result, tile, p1, p2);
-	Company::Get(_current_company)->ai_instance->Continue();
+	/*
+	 * The company might not exist anymore. Check for this.
+	 * The command checks are not useful since this callback
+	 * is also called when the command fails, which is does
+	 * when the company does not exist anymore.
+	 */
+	const Company *c = Company::GetIfValid(_current_company);
+	if (c == NULL || c->ai_instance == NULL) return;
+
+	c->ai_instance->DoCommandCallback(result, tile, p1, p2);
+	c->ai_instance->Continue();
 }
 
 CommandCallback *AIInstance::GetDoCommandCallback()

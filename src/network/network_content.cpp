@@ -27,6 +27,8 @@
 #include <zlib.h>
 #endif
 
+#include "../safeguards.h"
+
 extern bool HasScenario(const ContentInfo *ci, bool md5sum);
 
 /** The client we use to connect to the server. */
@@ -388,7 +390,7 @@ static char *GetFullFilename(const ContentInfo *ci, bool compressed)
 	if (dir == NO_DIRECTORY) return NULL;
 
 	static char buf[MAX_PATH];
-	FioGetFullPath(buf, lengthof(buf), SP_AUTODOWNLOAD_DIR, dir, ci->filename);
+	FioGetFullPath(buf, lastof(buf), SP_AUTODOWNLOAD_DIR, dir, ci->filename);
 	strecat(buf, compressed ? ".tar.gz" : ".tar", lastof(buf));
 
 	return buf;
@@ -404,6 +406,8 @@ static bool GunzipFile(const ContentInfo *ci)
 #if defined(WITH_ZLIB)
 	bool ret = true;
 	FILE *ftmp = fopen(GetFullFilename(ci, true), "rb");
+	if (ftmp == NULL) return false;
+
 	gzFile fin = gzdopen(fileno(ftmp), "rb");
 	FILE *fout = fopen(GetFullFilename(ci, false), "wb");
 
@@ -509,7 +513,7 @@ bool ClientNetworkContentSocketHandler::BeforeDownload()
 		/* The filesize is > 0, so we are going to download it */
 		const char *filename = GetFullFilename(this->curInfo, true);
 		if (filename == NULL || (this->curFile = fopen(filename, "wb")) == NULL) {
-			/* Unless that fails ofcourse... */
+			/* Unless that fails of course... */
 			DeleteWindowById(WC_NETWORK_STATUS_WINDOW, WN_NETWORK_STATUS_WINDOW_CONTENT_DOWNLOAD);
 			ShowErrorMessage(STR_CONTENT_ERROR_COULD_NOT_DOWNLOAD, STR_CONTENT_ERROR_COULD_NOT_DOWNLOAD_FILE_NOT_WRITABLE, WL_ERROR);
 			return false;
@@ -703,7 +707,8 @@ ClientNetworkContentSocketHandler::ClientNetworkContentSocketHandler() :
 	http_response_index(-2),
 	curFile(NULL),
 	curInfo(NULL),
-	isConnecting(false)
+	isConnecting(false),
+	lastActivity(_realtime_tick)
 {
 }
 
@@ -778,8 +783,10 @@ void ClientNetworkContentSocketHandler::SendReceive()
 	}
 
 	if (this->CanSendReceive()) {
-		this->ReceivePackets();
-		this->lastActivity = _realtime_tick;
+		if (this->ReceivePackets()) {
+			/* Only update activity once a packet is received, instead of everytime we try it. */
+			this->lastActivity = _realtime_tick;
+		}
 	}
 
 	this->SendPackets();

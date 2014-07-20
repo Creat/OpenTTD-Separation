@@ -15,6 +15,8 @@
 #include "zoom_type.h"
 #include "strings_type.h"
 
+class LinkGraphOverlay;
+
 /**
  * Data structure for viewport, display of a part of the world
  */
@@ -30,9 +32,10 @@ struct ViewPort {
 	int virtual_height;  ///< height << zoom
 
 	ZoomLevel zoom; ///< The zoom level of the viewport.
+	LinkGraphOverlay *overlay;
 };
 
-/** Margings for the viewport sign */
+/** Margins for the viewport sign */
 enum ViewportSignMargin {
 	VPSM_LEFT   = 1, ///< Left margin
 	VPSM_RIGHT  = 1, ///< Right margin
@@ -82,7 +85,7 @@ enum ViewportPlaceMethod {
 	VPM_X_LIMITED       =    7, ///< Drag only in X axis with limited size
 	VPM_Y_LIMITED       =    8, ///< Drag only in Y axis with limited size
 	VPM_RAILDIRS        = 0x40, ///< all rail directions
-	VPM_SIGNALDIRS      = 0x80, ///< similiar to VMP_RAILDIRS, but with different cursor
+	VPM_SIGNALDIRS      = 0x80, ///< similar to VMP_RAILDIRS, but with different cursor
 };
 DECLARE_ENUM_AS_BIT_SET(ViewportPlaceMethod)
 

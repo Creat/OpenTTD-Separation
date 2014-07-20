@@ -14,19 +14,24 @@
 #include "../debug.h"
 #include "squirrel_std.hpp"
 #include "../fileio_func.h"
+#include "../string_func.h"
 #include <sqstdaux.h>
 #include <../squirrel/sqpcheader.h>
 #include <../squirrel/sqvm.h>
+
+/* Due to the different characters for Squirrel, the scsnprintf might be a simple
+ * snprint which triggers the safeguard. But it isn't always a simple snprintf.
+ * Likewise for scvsnprintf and scstrcat. */
+#include "../safeguards.h"
+#undef snprintf
+#undef vsnprintf
+#undef strcat
 
 void Squirrel::CompileError(HSQUIRRELVM vm, const SQChar *desc, const SQChar *source, SQInteger line, SQInteger column)
 {
 	SQChar buf[1024];
 
-#ifdef _SQ64
-	scsnprintf(buf, lengthof(buf), _SC("Error %s:%ld/%ld: %s"), source, line, column, desc);
-#else
-	scsnprintf(buf, lengthof(buf), _SC("Error %s:%d/%d: %s"), source, line, column, desc);
-#endif
+	scsnprintf(buf, lengthof(buf), _SC("Error %s:") SQ_PRINTF64 _SC("/") SQ_PRINTF64 _SC(": %s"), source, line, column, desc);
 
 	/* Check if we have a custom print function */
 	Squirrel *engine = (Squirrel *)sq_getforeignptr(vm);
@@ -251,7 +256,8 @@ bool Squirrel::CallStringMethodStrdup(HSQOBJECT instance, const char *method_nam
 	HSQOBJECT ret;
 	if (!this->CallMethod(instance, method_name, &ret, suspend)) return false;
 	if (ret._type != OT_STRING) return false;
-	*res = strdup(ObjectToString(&ret));
+	*res = stredup(ObjectToString(&ret));
+	ValidateString(*res);
 	return true;
 }
 
@@ -283,8 +289,9 @@ bool Squirrel::CallBoolMethod(HSQOBJECT instance, const char *method_name, bool 
 	sq_pushroottable(vm);
 
 	if (prepend_API_name) {
-		char *class_name2 = (char *)alloca(strlen(class_name) + strlen(engine->GetAPIName()) + 1);
-		sprintf(class_name2, "%s%s", engine->GetAPIName(), class_name);
+		size_t len = strlen(class_name) + strlen(engine->GetAPIName()) + 1;
+		char *class_name2 = (char *)alloca(len);
+		seprintf(class_name2, class_name2 + len - 1, "%s%s", engine->GetAPIName(), class_name);
 
 		sq_pushstring(vm, OTTD2SQ(class_name2), -1);
 	} else {
@@ -328,12 +335,17 @@ bool Squirrel::CreateClassInstance(const char *class_name, void *real_instance, 
 }
 
 Squirrel::Squirrel(const char *APIName) :
-	global_pointer(NULL),
-	print_func(NULL),
-	crashed(false),
-	overdrawn_ops(0),
 	APIName(APIName)
 {
+	this->Initialize();
+}
+
+void Squirrel::Initialize()
+{
+	this->global_pointer = NULL;
+	this->print_func = NULL;
+	this->crashed = false;
+	this->overdrawn_ops = 0;
 	this->vm = sq_open(1024);
 
 	/* Handle compile-errors ourself, so we can display it nicely */
@@ -345,7 +357,7 @@ Squirrel::Squirrel(const char *APIName) :
 	sq_newclosure(this->vm, &Squirrel::_RunError, 0);
 	sq_seterrorhandler(this->vm);
 
-	/* Set the foreigh pointer, so we can always find this instance from within the VM */
+	/* Set the foreign pointer, so we can always find this instance from within the VM */
 	sq_setforeignptr(this->vm, this);
 
 	sq_pushroottable(this->vm);
@@ -464,7 +476,10 @@ SQRESULT Squirrel::LoadFile(HSQUIRRELVM vm, const char *filename, SQBool printer
 
 		switch (us) {
 			case SQ_BYTECODE_STREAM_TAG: { // BYTECODE
-				fseek(file, -2, SEEK_CUR);
+				if (fseek(file, -2, SEEK_CUR) < 0) {
+					FioFCloseFile(file);
+					return sq_throwerror(vm, _SC("cannot seek the file"));
+				}
 				if (SQ_SUCCEEDED(sq_readclosure(vm, _io_file_read, &f))) {
 					FioFCloseFile(file);
 					return SQ_OK;
@@ -491,7 +506,13 @@ SQRESULT Squirrel::LoadFile(HSQUIRRELVM vm, const char *filename, SQBool printer
 				}
 				func = _io_file_lexfeed_UTF8;
 				break;
-			default: func = _io_file_lexfeed_ASCII; fseek(file, -2, SEEK_CUR); break; // ASCII
+			default: // ASCII
+				func = _io_file_lexfeed_ASCII;
+				if (fseek(file, -2, SEEK_CUR) < 0) {
+					FioFCloseFile(file);
+					return sq_throwerror(vm, _SC("cannot seek the file"));
+				}
+				break;
 		}
 
 		if (SQ_SUCCEEDED(sq_compile(vm, func, &f, OTTD2SQ(filename), printerror))) {
@@ -533,23 +554,38 @@ bool Squirrel::LoadScript(const char *script)
 
 Squirrel::~Squirrel()
 {
+	this->Uninitialize();
+}
+
+void Squirrel::Uninitialize()
+{
 	/* Clean up the stuff */
 	sq_pop(this->vm, 1);
 	sq_close(this->vm);
 }
 
+void Squirrel::Reset()
+{
+	this->Uninitialize();
+	this->Initialize();
+}
+
 void Squirrel::InsertResult(bool result)
 {
 	sq_pushbool(this->vm, result);
-	vm->GetAt(vm->_stackbase + vm->_suspended_target) = vm->GetUp(-1);
-	vm->Pop();
+	if (this->IsSuspended()) { // Called before resuming a suspended script?
+		vm->GetAt(vm->_stackbase + vm->_suspended_target) = vm->GetUp(-1);
+		vm->Pop();
+	}
 }
 
 void Squirrel::InsertResult(int result)
 {
 	sq_pushinteger(this->vm, result);
-	vm->GetAt(vm->_stackbase + vm->_suspended_target) = vm->GetUp(-1);
-	vm->Pop();
+	if (this->IsSuspended()) { // Called before resuming a suspended script?
+		vm->GetAt(vm->_stackbase + vm->_suspended_target) = vm->GetUp(-1);
+		vm->Pop();
+	}
 }
 
 /* static */ void Squirrel::DecreaseOps(HSQUIRRELVM vm, int ops)
@@ -565,11 +601,6 @@ bool Squirrel::IsSuspended()
 bool Squirrel::HasScriptCrashed()
 {
 	return this->crashed;
-}
-
-void Squirrel::ResetCrashed()
-{
-	this->crashed = false;
 }
 
 void Squirrel::CrashOccurred()

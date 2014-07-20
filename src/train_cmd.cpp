@@ -34,9 +34,12 @@
 #include "newgrf.h"
 #include "order_backup.h"
 #include "zoom_func.h"
+#include "newgrf_debug.h"
 
 #include "table/strings.h"
 #include "table/train_cmd.h"
+
+#include "safeguards.h"
 
 static Track ChooseTrainTrack(Train *v, TileIndex tile, DiagDirection enterdir, TrackBits tracks, bool force_res, bool *got_reservation, bool mark_stuck);
 static bool TrainCheckIfLineEnds(Train *v, bool reverse = true);
@@ -48,6 +51,11 @@ static void CheckNextTrainTile(Train *v);
 static const byte _vehicle_initial_x_fract[4] = {10, 8, 4,  8};
 static const byte _vehicle_initial_y_fract[4] = { 8, 4, 8, 10};
 
+template <>
+bool IsValidImageIndex<VEH_TRAIN>(uint8 image_index)
+{
+	return image_index < lengthof(_engine_sprite_base);
+}
 
 /**
  * Determine the side in which the train will leave the tile
@@ -116,9 +124,9 @@ void CheckTrainsLengths()
  * Recalculates the cached stuff of a train. Should be called each time a vehicle is added
  * to/removed from the chain, and when the game is loaded.
  * Note: this needs to be called too for 'wagon chains' (in the depot, without an engine)
- * @param same_length should length of vehicles stay the same?
+ * @param allowed_changes Stuff that is allowed to change.
  */
-void Train::ConsistChanged(bool same_length)
+void Train::ConsistChanged(ConsistChangeFlags allowed_changes)
 {
 	uint16 max_speed = UINT16_MAX;
 
@@ -200,7 +208,16 @@ void Train::ConsistChanged(bool same_length)
 			}
 		}
 
-		u->cargo_cap = e_u->DetermineCapacity(u);
+		uint16 new_cap = e_u->DetermineCapacity(u);
+		if (allowed_changes & CCF_CAPACITY) {
+			/* Update vehicle capacity. */
+			if (u->cargo_cap > new_cap) u->cargo.Truncate(new_cap);
+			u->refit_cap = min(new_cap, u->refit_cap);
+			u->cargo_cap = new_cap;
+		} else {
+			/* Verify capacity hasn't changed. */
+			if (new_cap != u->cargo_cap) ShowNewGrfVehicleError(u->engine_type, STR_NEWGRF_BROKEN, STR_NEWGRF_BROKEN_CAPACITY, GBUG_VEH_CAPACITY, true);
+		}
 		u->vcache.cached_cargo_age_period = GetVehicleProperty(u, PROP_TRAIN_CARGO_AGE_PERIOD, e_u->info.cargo_age_period);
 
 		/* check the vehicle length (callback) */
@@ -219,11 +236,13 @@ void Train::ConsistChanged(bool same_length)
 		if (veh_len == CALLBACK_FAILED) veh_len = rvi_u->shorten_factor;
 		veh_len = VEHICLE_LENGTH - Clamp(veh_len, 0, VEHICLE_LENGTH - 1);
 
-		/* verify length hasn't changed */
-		if (same_length && veh_len != u->gcache.cached_veh_length) VehicleLengthChanged(u);
-
-		/* update vehicle length? */
-		if (!same_length) u->gcache.cached_veh_length = veh_len;
+		if (allowed_changes & CCF_LENGTH) {
+			/* Update vehicle length. */
+			u->gcache.cached_veh_length = veh_len;
+		} else {
+			/* Verify length hasn't changed. */
+			if (veh_len != u->gcache.cached_veh_length) VehicleLengthChanged(u);
+		}
 
 		this->gcache.cached_total_length += u->gcache.cached_veh_length;
 		this->InvalidateNewGRFCache();
@@ -243,6 +262,7 @@ void Train::ConsistChanged(bool same_length)
 		SetWindowDirty(WC_VEHICLE_DETAILS, this->index);
 		InvalidateWindowData(WC_VEHICLE_REFIT, this->index, VIWD_CONSIST_CHANGED);
 		InvalidateWindowData(WC_VEHICLE_ORDERS, this->index, VIWD_CONSIST_CHANGED);
+		InvalidateNewGRFInspectWindow(GSF_TRAINS, this->index);
 	}
 }
 
@@ -371,10 +391,11 @@ int Train::GetCurveSpeedLimit() const
  */
 int Train::GetCurrentMaxSpeed() const
 {
-	if (_settings_game.vehicle.train_acceleration_model == AM_ORIGINAL) return min(this->gcache.cached_max_track_speed, this->current_order.max_speed);
+	int max_speed = _settings_game.vehicle.train_acceleration_model == AM_ORIGINAL ?
+			this->gcache.cached_max_track_speed :
+			this->tcache.cached_max_curve_speed;
 
-	int max_speed = this->tcache.cached_max_curve_speed;
-	if (IsRailStationTile(this->tile)) {
+	if (_settings_game.vehicle.train_acceleration_model == AM_REALISTIC && IsRailStationTile(this->tile)) {
 		StationID sid = GetStationIndex(this->tile);
 		if (this->current_order.ShouldStopAtStation(this, sid)) {
 			int station_ahead;
@@ -400,7 +421,7 @@ int Train::GetCurrentMaxSpeed() const
 	}
 
 	for (const Train *u = this; u != NULL; u = u->Next()) {
-		if (u->track == TRACK_BIT_DEPOT) {
+		if (_settings_game.vehicle.train_acceleration_model == AM_REALISTIC && u->track == TRACK_BIT_DEPOT) {
 			max_speed = min(max_speed, 61);
 			break;
 		}
@@ -411,14 +432,14 @@ int Train::GetCurrentMaxSpeed() const
 		}
 	}
 
-	max_speed = min(max_speed, this->current_order.max_speed);
+	max_speed = min(max_speed, this->current_order.GetMaxSpeed());
 	return min(max_speed, this->gcache.cached_max_track_speed);
 }
 
 /** Update acceleration of the train from the cached power and weight. */
 void Train::UpdateAcceleration()
 {
-	assert(this->IsFrontEngine());
+	assert(this->IsFrontEngine() || this->IsFreeWagon());
 
 	uint power = this->gcache.cached_power;
 	uint weight = this->gcache.cached_weight;
@@ -451,6 +472,7 @@ int Train::GetDisplayImageWidth(Point *offset) const
 
 static SpriteID GetDefaultTrainSprite(uint8 spritenum, Direction direction)
 {
+	assert(IsValidImageIndex<VEH_TRAIN>(spritenum));
 	return ((direction + _engine_sprite_add[spritenum]) & _engine_sprite_and[spritenum]) + _engine_sprite_base[spritenum];
 }
 
@@ -474,9 +496,10 @@ SpriteID Train::GetImage(Direction direction, EngineImageType image_type) const
 		spritenum = this->GetEngine()->original_image_index;
 	}
 
+	assert(IsValidImageIndex<VEH_TRAIN>(spritenum));
 	sprite = GetDefaultTrainSprite(spritenum, direction);
 
-	if (this->cargo.Count() >= this->cargo_cap / 2U) sprite += _wagon_full_adder[spritenum];
+	if (this->cargo.StoredCount() >= this->cargo_cap / 2U) sprite += _wagon_full_adder[spritenum];
 
 	return sprite;
 }
@@ -605,6 +628,7 @@ static CommandCost CmdBuildRailWagon(TileIndex tile, DoCommandFlag flags, const 
 
 		v->cargo_type = e->GetDefaultCargoType();
 		v->cargo_cap = rvi->capacity;
+		v->refit_cap = 0;
 
 		v->railtype = rvi->railtype;
 
@@ -619,7 +643,7 @@ static CommandCost CmdBuildRailWagon(TileIndex tile, DoCommandFlag flags, const 
 		_new_vehicle_id = v->index;
 
 		VehicleUpdatePosition(v);
-		v->First()->ConsistChanged(false);
+		v->First()->ConsistChanged(CCF_ARRANGE);
 		UpdateTrainGroupID(v->First());
 
 		CheckConsistencyOfArticulatedVehicle(v);
@@ -672,6 +696,7 @@ static void AddRearEngineToMultiheadedTrain(Train *v)
 	u->cargo_type = v->cargo_type;
 	u->cargo_subtype = v->cargo_subtype;
 	u->cargo_cap = v->cargo_cap;
+	u->refit_cap = v->refit_cap;
 	u->railtype = v->railtype;
 	u->engine_type = v->engine_type;
 	u->build_year = v->build_year;
@@ -724,7 +749,9 @@ CommandCost CmdBuildRailVehicle(TileIndex tile, DoCommandFlag flags, const Engin
 		v->spritenum = rvi->image_index;
 		v->cargo_type = e->GetDefaultCargoType();
 		v->cargo_cap = rvi->capacity;
+		v->refit_cap = 0;
 		v->last_station_visited = INVALID_STATION;
+		v->last_loading_station = INVALID_STATION;
 
 		v->engine_type = e->index;
 		v->gcache.first_engine = INVALID_ENGINE; // needs to be set before first callback
@@ -736,13 +763,14 @@ CommandCost CmdBuildRailVehicle(TileIndex tile, DoCommandFlag flags, const Engin
 		v->railtype = rvi->railtype;
 		_new_vehicle_id = v->index;
 
-		v->service_interval = Company::Get(_current_company)->settings.vehicle.servint_trains;
+		v->SetServiceInterval(Company::Get(_current_company)->settings.vehicle.servint_trains);
 		v->date_of_last_service = _date;
 		v->build_year = _cur_year;
 		v->cur_image = SPR_IMG_QUERY;
 		v->random_bits = VehicleRandomBits();
 
 		if (e->flags & ENGINE_EXCLUSIVE_PREVIEW) SetBit(v->vehicle_flags, VF_BUILT_AS_PROTOTYPE);
+		v->SetServiceIntervalIsPercent(Company::Get(_current_company)->settings.vehicle.servint_ispercent);
 
 		v->group_id = DEFAULT_GROUP;
 
@@ -757,7 +785,7 @@ CommandCost CmdBuildRailVehicle(TileIndex tile, DoCommandFlag flags, const Engin
 			AddArticulatedParts(v);
 		}
 
-		v->ConsistChanged(false);
+		v->ConsistChanged(CCF_ARRANGE);
 		UpdateTrainGroupID(v);
 
 		if (!HasBit(data, 0) && !(flags & DC_AUTOREPLACE)) { // check if the cars should be added to the new vehicle
@@ -1103,7 +1131,7 @@ static void NormaliseTrainHead(Train *head)
 	if (head == NULL) return;
 
 	/* Tell the 'world' the train changed. */
-	head->ConsistChanged(false);
+	head->ConsistChanged(CCF_ARRANGE);
 	UpdateTrainGroupID(head);
 
 	/* Not a front engine, i.e. a free wagon chain. No need to do more. */
@@ -1209,8 +1237,10 @@ CommandCost CmdMoveRailVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, u
 	Train *original_src_head = src_head;
 	Train *original_dst_head = (dst_head == src_head ? NULL : dst_head);
 
-	/* We want this information from before the rearrangement, but execute this after the validation. */
-	bool original_src_head_front_engine = original_src_head != NULL && original_src_head->IsFrontEngine();
+	/* We want this information from before the rearrangement, but execute this after the validation.
+	 * original_src_head can't be NULL; src is by definition != NULL, so src_head can't be NULL as
+	 * src->GetFirst() always yields non-NULL, so eventually original_src_head != NULL as well. */
+	bool original_src_head_front_engine = original_src_head->IsFrontEngine();
 	bool original_dst_head_front_engine = original_dst_head != NULL && original_dst_head->IsFrontEngine();
 
 	/* (Re)arrange the trains in the wanted arrangement. */
@@ -1266,6 +1296,7 @@ CommandCost CmdMoveRailVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, u
 			DeleteWindowById(WC_VEHICLE_REFIT, src->index);
 			DeleteWindowById(WC_VEHICLE_DETAILS, src->index);
 			DeleteWindowById(WC_VEHICLE_TIMETABLE, src->index);
+			DeleteNewGRFInspectWindow(GSF_TRAINS, src->index);
 			SetWindowDirty(WC_COMPANY, _current_company);
 
 			/* Delete orders, group stuff and the unit number as we're not the
@@ -1295,6 +1326,9 @@ CommandCost CmdMoveRailVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, u
 			CheckCargoCapacity(dst_head);
 		}
 
+		if (src_head != NULL) src_head->First()->MarkDirty();
+		if (dst_head != NULL) dst_head->First()->MarkDirty();
+
 		/* We are undoubtedly changing something in the depot and train list. */
 		InvalidateWindowData(WC_VEHICLE_DEPOT, src->tile);
 		InvalidateWindowClassesData(WC_TRAINS_LIST, 0);
@@ -1320,9 +1354,6 @@ CommandCost CmdMoveRailVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, u
  */
 CommandCost CmdSellRailWagon(DoCommandFlag flags, Vehicle *t, uint16 data, uint32 user)
 {
-	/* Check if we deleted a vehicle window */
-	Window *w = NULL;
-
 	/* Sell a chain of vehicles or not? */
 	bool sell_chain = HasBit(data, 0);
 
@@ -1373,9 +1404,6 @@ CommandCost CmdSellRailWagon(DoCommandFlag flags, Vehicle *t, uint16 data, uint3
 			/* Copy other important data from the front engine */
 			new_head->CopyVehicleConfigAndStatistics(first);
 			GroupStatistics::CountVehicle(new_head, 1); // after copying over the profit
-
-			/* If we deleted a window then open a new one for the 'new' train */
-			if (IsLocalCompany() && w != NULL) ShowVehicleViewWindow(new_head);
 		} else if (v->IsPrimaryVehicle() && data & (MAKE_ORDER_BACKUP_FLAG >> 20)) {
 			OrderBackup::Backup(v, user);
 		}
@@ -1807,7 +1835,7 @@ void ReverseTrainDirection(Train *v)
 	ClrBit(v->flags, VRF_REVERSING);
 
 	/* recalculate cached data */
-	v->ConsistChanged(true);
+	v->ConsistChanged(CCF_TRACK);
 
 	/* update all images */
 	for (Train *u = v; u != NULL; u = u->Next()) u->UpdateViewport(false, false);
@@ -1891,7 +1919,7 @@ CommandCost CmdReverseTrainDirection(TileIndex tile, DoCommandFlag flags, uint32
 		if (flags & DC_EXEC) {
 			ToggleBit(v->flags, VRF_REVERSE_DIRECTION);
 
-			front->ConsistChanged(false);
+			front->ConsistChanged(CCF_ARRANGE);
 			SetWindowDirty(WC_VEHICLE_DEPOT, front->tile);
 			SetWindowDirty(WC_VEHICLE_DETAILS, front->index);
 			SetWindowDirty(WC_VEHICLE_VIEW, front->index);
@@ -2754,7 +2782,8 @@ void Train::MarkDirty()
 {
 	Train *v = this;
 	do {
-		v->UpdateViewport(false, false);
+		v->colourmap = PAL_NONE;
+		v->UpdateViewport(true, false);
 	} while ((v = v->Next()) != NULL);
 
 	/* need to update acceleration and cached values since the goods on the train changed. */
@@ -2774,7 +2803,7 @@ int Train::UpdateSpeed()
 	switch (_settings_game.vehicle.train_acceleration_model) {
 		default: NOT_REACHED();
 		case AM_ORIGINAL:
-			return this->DoUpdateSpeed(this->acceleration * (this->GetAccelerationStatus() == AS_BRAKE ? -4 : 2), 0, min(this->gcache.cached_max_track_speed, this->current_order.max_speed));
+			return this->DoUpdateSpeed(this->acceleration * (this->GetAccelerationStatus() == AS_BRAKE ? -4 : 2), 0, this->GetCurrentMaxSpeed());
 
 		case AM_REALISTIC:
 			return this->DoUpdateSpeed(this->GetAcceleration(), this->GetAccelerationStatus() == AS_BRAKE ? 0 : 2, this->GetCurrentMaxSpeed());
@@ -2810,6 +2839,7 @@ static void TrainEnterStation(Train *v, StationID station)
 
 	v->BeginLoading();
 
+	TriggerStationRandomisation(st, v->tile, SRT_TRAIN_ARRIVES);
 	TriggerStationAnimation(st, v->tile, SAT_TRAIN_ARRIVES);
 }
 
@@ -3136,8 +3166,9 @@ bool TrainController(Train *v, Vehicle *nomove, bool reverse)
 						 * this to one, then if we reach the next signal it is
 						 * decreased to zero and we won't pass that new signal. */
 						Trackdir dir = FindFirstTrackdir(trackdirbits);
-						if (GetSignalType(gp.new_tile, TrackdirToTrack(dir)) != SIGTYPE_PBS ||
-								!HasSignalOnTrackdir(gp.new_tile, ReverseTrackdir(dir))) {
+						if (HasSignalOnTrackdir(gp.new_tile, dir) ||
+								(HasSignalOnTrackdir(gp.new_tile, ReverseTrackdir(dir)) &&
+								GetSignalType(gp.new_tile, TrackdirToTrack(dir)) != SIGTYPE_PBS)) {
 							/* However, we do not want to be stopped by PBS signals
 							 * entered via the back. */
 							v->force_proceed = (v->force_proceed == TFP_SIGNAL) ? TFP_STUCK : TFP_NONE;
@@ -3184,7 +3215,7 @@ bool TrainController(Train *v, Vehicle *nomove, bool reverse)
 						}
 						goto reverse_train_direction;
 					} else {
-						TryReserveRailTrack(gp.new_tile, TrackBitsToTrack(chosen_track));
+						TryReserveRailTrack(gp.new_tile, TrackBitsToTrack(chosen_track), false);
 					}
 				} else {
 					/* The wagon is active, simply follow the prev vehicle. */
@@ -3251,7 +3282,7 @@ bool TrainController(Train *v, Vehicle *nomove, bool reverse)
 					v->tile = gp.new_tile;
 
 					if (GetTileRailType(gp.new_tile) != GetTileRailType(gp.old_tile)) {
-						v->First()->ConsistChanged(true);
+						v->First()->ConsistChanged(CCF_TRACK);
 					}
 
 					v->track = chosen_track;
@@ -3277,7 +3308,7 @@ bool TrainController(Train *v, Vehicle *nomove, bool reverse)
 
 					/* If we are approaching a crossing that is reserved, play the sound now. */
 					TileIndex crossing = TrainApproachingCrossingTile(v);
-					if (crossing != INVALID_TILE && HasCrossingReservation(crossing) && _settings_client.sound.new_year) SndPlayTileFx(SND_0E_LEVEL_CROSSING, crossing);
+					if (crossing != INVALID_TILE && HasCrossingReservation(crossing) && _settings_client.sound.ambient) SndPlayTileFx(SND_0E_LEVEL_CROSSING, crossing);
 
 					/* Always try to extend the reservation when entering a tile. */
 					CheckNextTrainTile(v);
@@ -3417,12 +3448,13 @@ static void DeleteLastWagon(Train *v)
 
 	if (first != v) {
 		/* Recalculate cached train properties */
-		first->ConsistChanged(false);
+		first->ConsistChanged(CCF_ARRANGE);
 		/* Update the depot window if the first vehicle is in depot -
 		 * if v == first, then it is updated in PreDestructor() */
 		if (first->track == TRACK_BIT_DEPOT) {
 			SetWindowDirty(WC_VEHICLE_DEPOT, first->tile);
 		}
+		v->last_station_visited = first->last_station_visited; // for PreDestructor
 	}
 
 	/* 'v' shouldn't be accessed after it has been deleted */
@@ -3893,7 +3925,7 @@ bool Train::Tick()
 }
 
 /**
- * Check whether a train needs serivce, and if so, find a depot or service it.
+ * Check whether a train needs service, and if so, find a depot or service it.
  * @return v %Train to check.
  */
 static void CheckIfTrainNeedsService(Train *v)

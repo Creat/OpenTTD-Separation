@@ -13,29 +13,63 @@
 #include "cargomonitor.h"
 #include "station_base.h"
 
+#include "safeguards.h"
+
 CargoMonitorMap _cargo_pickups;    ///< Map of monitored pick-ups   to the amount since last query/activation.
 CargoMonitorMap _cargo_deliveries; ///< Map of monitored deliveries to the amount since last query/activation.
 
-/** Clear all pick-up cargo monitors. */
-void ClearCargoPickupMonitoring()
+/**
+ * Helper method for #ClearCargoPickupMonitoring and #ClearCargoDeliveryMonitoring.
+ * Clears all monitors that belong to the specified company or all if #INVALID_OWNER
+ * is specified as company.
+ * @param cargo_monitor_map reference to the cargo monitor map to operate on.
+ * @param company company to clear cargo monitors for or #INVALID_OWNER if all cargo monitors should be cleared.
+ */
+static void ClearCargoMonitoring(CargoMonitorMap &cargo_monitor_map, CompanyID company = INVALID_OWNER)
 {
-	_cargo_pickups.clear();
+	if (company == INVALID_OWNER) {
+		cargo_monitor_map.clear();
+		return;
+	}
+
+	CargoMonitorMap::iterator next;
+	for (CargoMonitorMap::iterator it = cargo_monitor_map.begin(); it != cargo_monitor_map.end(); it = next) {
+		next = it;
+		next++;
+		if (DecodeMonitorCompany(it->first) == company) {
+			cargo_monitor_map.erase(it);
+		}
+	}
 }
 
-/** Clear all delivery cargo monitors. */
-void ClearCargoDeliveryMonitoring()
+/**
+ * Clear all pick-up cargo monitors.
+ * @param company clear all pick-up monitors for this company or if #INVALID_OWNER
+ * is passed, all pick-up monitors are cleared regardless of company.
+ */
+void ClearCargoPickupMonitoring(CompanyID company)
 {
-	_cargo_deliveries.clear();
+	ClearCargoMonitoring(_cargo_pickups, company);
+}
+
+/**
+ * Clear all delivery cargo monitors.
+ * @param company clear all delivery monitors for this company or if #INVALID_OWNER
+ * is passed, all delivery monitors are cleared regardless of company.
+ */
+void ClearCargoDeliveryMonitoring(CompanyID company)
+{
+	ClearCargoMonitoring(_cargo_deliveries, company);
 }
 
 /**
  * Get and reset the amount associated with a cargo monitor.
  * @param[in,out] monitor_map Monitoring map to search (and reset for the queried entry).
- * @oaram monitor Cargo monitor to query/reset.
+ * @param monitor Cargo monitor to query/reset.
  * @param keep_monitoring After returning from this call, continue monitoring.
  * @return Amount collected since last query/activation for the monitored combination.
  */
-static uint32 GetAmount(CargoMonitorMap &monitor_map, CargoMonitorID monitor, bool keep_monitoring)
+static int32 GetAmount(CargoMonitorMap &monitor_map, CargoMonitorID monitor, bool keep_monitoring)
 {
 	CargoMonitorMap::iterator iter = monitor_map.find(monitor);
 	if (iter == monitor_map.end()) {
@@ -45,7 +79,7 @@ static uint32 GetAmount(CargoMonitorMap &monitor_map, CargoMonitorID monitor, bo
 		}
 		return 0;
 	} else {
-		uint32 result = iter->second;
+		int32 result = iter->second;
 		iter->second = 0;
 		if (!keep_monitoring) monitor_map.erase(iter);
 		return result;
@@ -58,7 +92,7 @@ static uint32 GetAmount(CargoMonitorMap &monitor_map, CargoMonitorID monitor, bo
  * @param keep_monitoring After returning from this call, continue monitoring.
  * @return Amount of delivered cargo for the monitored combination.
  */
-uint32 GetDeliveryAmount(CargoMonitorID monitor, bool keep_monitoring)
+int32 GetDeliveryAmount(CargoMonitorID monitor, bool keep_monitoring)
 {
 	return GetAmount(_cargo_deliveries, monitor, keep_monitoring);
 }
@@ -70,7 +104,7 @@ uint32 GetDeliveryAmount(CargoMonitorID monitor, bool keep_monitoring)
  * @return Amount of picked up cargo for the monitored combination.
  * @note Cargo pick up is counted on final delivery, to prevent users getting credit for picking up cargo without delivering it.
  */
-uint32 GetPickupAmount(CargoMonitorID monitor, bool keep_monitoring)
+int32 GetPickupAmount(CargoMonitorID monitor, bool keep_monitoring)
 {
 	return GetAmount(_cargo_pickups, monitor, keep_monitoring);
 }

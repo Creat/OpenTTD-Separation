@@ -41,7 +41,7 @@ static inline bool IsBridgeTile(TileIndex t)
  * checks for the possibility that a bridge may be on this tile
  * These are in fact all the tile types on which a bridge can be found
  * @param t The tile to analyze
- * @return true if a bridge migh be present
+ * @return true if a bridge might be present
  */
 static inline bool MayHaveBridgeAbove(TileIndex t)
 {
@@ -161,15 +161,17 @@ static inline void MakeBridgeRamp(TileIndex t, Owner o, BridgeType bridgetype, D
  * Make a bridge ramp for roads.
  * @param t          the tile to make a bridge ramp
  * @param o          the new owner of the bridge ramp
+ * @param owner_road the new owner of the road on the bridge
+ * @param owner_tram the new owner of the tram on the bridge
  * @param bridgetype the type of bridge this bridge ramp belongs to
  * @param d          the direction this ramp must be facing
  * @param r          the road type of the bridge
  */
-static inline void MakeRoadBridgeRamp(TileIndex t, Owner o, BridgeType bridgetype, DiagDirection d, RoadTypes r)
+static inline void MakeRoadBridgeRamp(TileIndex t, Owner o, Owner owner_road, Owner owner_tram, BridgeType bridgetype, DiagDirection d, RoadTypes r)
 {
 	MakeBridgeRamp(t, o, bridgetype, d, TRANSPORT_ROAD, 0);
-	SetRoadOwner(t, ROADTYPE_ROAD, o);
-	if (o != OWNER_TOWN) SetRoadOwner(t, ROADTYPE_TRAM, o);
+	SetRoadOwner(t, ROADTYPE_ROAD, owner_road);
+	if (owner_tram != OWNER_TOWN) SetRoadOwner(t, ROADTYPE_TRAM, owner_tram);
 	SetRoadTypes(t, r);
 }
 

@@ -16,13 +16,16 @@
 #include "game_scanner.hpp"
 #include "../debug.h"
 
+#include "../safeguards.h"
+
 /**
  * Check if the API version provided by the Game is supported.
  * @param api_version The API version as provided by the Game.
  */
 static bool CheckAPIVersion(const char *api_version)
 {
-	return strcmp(api_version, "1.2") == 0 || strcmp(api_version, "1.3") == 0;
+	return strcmp(api_version, "1.2") == 0 || strcmp(api_version, "1.3") == 0 || strcmp(api_version, "1.4") == 0 ||
+			strcmp(api_version, "1.5") == 0;
 }
 
 #if defined(WIN32)

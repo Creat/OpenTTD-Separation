@@ -16,6 +16,8 @@
 #include "address.h"
 #include "../../debug.h"
 
+#include "../../safeguards.h"
+
 /**
  * Get the hostname; in case it wasn't given the
  * IPv4 dotted representation is given.
@@ -259,7 +261,7 @@ SOCKET NetworkAddress::Resolve(int family, int socktype, int flags, SocketList *
 	for (struct addrinfo *runp = ai; runp != NULL; runp = runp->ai_next) {
 		/* When we are binding to multiple sockets, make sure we do not
 		 * connect to one with exactly the same address twice. That's
-		 * ofcourse totally unneeded ;) */
+		 * of course totally unneeded ;) */
 		if (sockets != NULL) {
 			NetworkAddress address(runp->ai_addr, (int)runp->ai_addrlen);
 			if (sockets->Contains(address)) continue;

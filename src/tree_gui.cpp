@@ -25,6 +25,8 @@
 #include "table/strings.h"
 #include "table/tree_land.h"
 
+#include "safeguards.h"
+
 void PlaceTreesRandomly();
 
 /** Tree Sprites with their palettes */
@@ -52,9 +54,9 @@ class BuildTreesWindow : public Window
 	TreeType tree_to_plant; ///< Tree number to plant, \c TREE_INVALID for a random tree.
 
 public:
-	BuildTreesWindow(const WindowDesc *desc, WindowNumber window_number) : Window()
+	BuildTreesWindow(WindowDesc *desc, WindowNumber window_number) : Window(desc)
 	{
-		this->InitNested(desc, window_number);
+		this->InitNested(window_number);
 		ResetObjectToPlace();
 	}
 
@@ -98,11 +100,6 @@ public:
 			size->width = 0;
 			size->height = 0;
 		}
-	}
-
-	virtual void OnPaint()
-	{
-		this->DrawWidgets();
 	}
 
 	virtual void DrawWidget(const Rect &r, int widget) const
@@ -238,8 +235,8 @@ static const NWidgetPart _nested_build_trees_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _build_trees_desc(
-	WDP_AUTO, 0, 0,
+static WindowDesc _build_trees_desc(
+	WDP_AUTO, "build_tree", 0, 0,
 	WC_BUILD_TREES, WC_NONE,
 	WDF_CONSTRUCTION,
 	_nested_build_trees_widgets, lengthof(_nested_build_trees_widgets)

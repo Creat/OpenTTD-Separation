@@ -15,6 +15,7 @@
 #include "script_vehicle.hpp"
 #include "script_rail.hpp"
 #include "script_airport.hpp"
+#include "script_date.hpp"
 
 /**
  * Class that handles all engine related functions.
@@ -174,7 +175,7 @@ public:
 	 * @pre IsValidEngine(engine_id).
 	 * @return The date this engine was designed.
 	 */
-	static int32 GetDesignDate(EngineID engine_id);
+	static ScriptDate::Date GetDesignDate(EngineID engine_id);
 
 	/**
 	 * Get the type of an engine.
@@ -255,7 +256,7 @@ public:
 
 	/**
 	 * Get the maximum allowed distance between two orders for an engine.
-	 * The distance returned is a vehicle-type specific distance indepenent from other
+	 * The distance returned is a vehicle-type specific distance independent from other
 	 * map distances, you may use the result of this function to compare it
 	 * with the result of ScriptOrder::GetOrderDistance.
 	 * @param engine_id The engine to get the max distance for.

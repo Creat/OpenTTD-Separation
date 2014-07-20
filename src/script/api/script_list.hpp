@@ -33,11 +33,11 @@ public:
 
 	/** Sort ascending */
 	static const bool SORT_ASCENDING = true;
-	/** Sort descnding */
+	/** Sort descending */
 	static const bool SORT_DESCENDING = false;
 
 private:
-	ScriptListSorter *sorter;         ///< Sorting algorithm
+	ScriptListSorter *sorter;     ///< Sorting algorithm
 	SorterType sorter_type;       ///< Sorting type
 	bool sort_ascending;          ///< Whether to sort ascending or descending
 	bool initialized;             ///< Whether an iteration has been started
@@ -54,13 +54,16 @@ public:
 	ScriptList();
 	~ScriptList();
 
+#ifdef DOXYGEN_API
 	/**
 	 * Add a single item to the list.
 	 * @param item the item to add. Should be unique, otherwise it is ignored.
 	 * @param value the value to assign.
-	 * @note the value is set to 0 by default.
 	 */
+	void AddItem(int32 item, int32 value);
+#else
 	void AddItem(int32 item, int32 value = 0);
+#endif /* DOXYGEN_API */
 
 	/**
 	 * Remove a single item from the list.
@@ -164,7 +167,7 @@ public:
 	/**
 	 * Removes all items with a value above start and below end.
 	 * @param start the lower bound of the to be removed values (exclusive).
-	 * @param end   the upper bound of the to be removed valuens (exclusive).
+	 * @param end   the upper bound of the to be removed values (exclusive).
 	 */
 	void RemoveBetweenValue(int32 start, int32 end);
 

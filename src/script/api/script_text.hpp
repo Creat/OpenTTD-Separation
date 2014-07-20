@@ -27,6 +27,13 @@ public:
 	 * @api -all
 	 */
 	virtual const char *GetEncodedText() = 0;
+
+	/**
+	 * Convert a #ScriptText into a decoded normal string.
+	 * @return A string (in a static buffer), or NULL.
+	 * @api -all
+	 */
+	const char *GetDecodedText();
 };
 
 /**
@@ -35,9 +42,8 @@ public:
  */
 class RawText : public Text {
 public:
-	RawText(const char *text) :
-	  text(strdup(text)) {}
-	~RawText() { free(this->text); }
+	RawText(const char *text);
+	~RawText();
 
 	/* virtual */ const char *GetEncodedText() { return this->text; }
 private:
@@ -132,9 +138,10 @@ private:
 	 *  instances, while writing in the same buffer.
 	 * @param p The current position in the buffer.
 	 * @param lastofp The last position valid in the buffer.
+	 * @param param_count The number of parameters that are in the string.
 	 * @return The new current position in the buffer.
 	 */
-	char *_GetEncodedText(char *p, char *lastofp);
+	char *_GetEncodedText(char *p, char *lastofp, int &param_count);
 
 	/**
 	 * Set a parameter, where the value is the first item on the stack.

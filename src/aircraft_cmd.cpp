@@ -39,6 +39,8 @@
 
 #include "table/strings.h"
 
+#include "safeguards.h"
+
 static const int ROTOR_Z_OFFSET         = 5;    ///< Z Offset between helicopter- and rotorsprite.
 
 static const int PLANE_HOLDING_ALTITUDE = 150;  ///< Altitude of planes in holding pattern (= lowest flight altitude).
@@ -98,6 +100,12 @@ static const SpriteID _aircraft_sprite[] = {
 	0x0E9D, 0x0EA5, 0x0EAD, 0x0EB5,
 	0x0EBD, 0x0EC5
 };
+
+template <>
+bool IsValidImageIndex<VEH_AIRCRAFT>(uint8 image_index)
+{
+	return image_index < lengthof(_aircraft_sprite);
+}
 
 /** Helicopter rotor animation states */
 enum HelicopterRotorStates {
@@ -160,6 +168,7 @@ SpriteID Aircraft::GetImage(Direction direction, EngineImageType image_type) con
 		spritenum = this->GetEngine()->original_image_index;
 	}
 
+	assert(IsValidImageIndex<VEH_AIRCRAFT>(spritenum));
 	return direction + _aircraft_sprite[spritenum];
 }
 
@@ -189,6 +198,7 @@ static SpriteID GetAircraftIcon(EngineID engine, EngineImageType image_type)
 		spritenum = e->original_image_index;
 	}
 
+	assert(IsValidImageIndex<VEH_AIRCRAFT>(spritenum));
 	return DIR_W + _aircraft_sprite[spritenum];
 }
 
@@ -242,7 +252,7 @@ CommandCost CmdBuildAircraft(TileIndex tile, DoCommandFlag flags, const Engine *
 	/* Prevent building aircraft types at places which can't handle them */
 	if (!CanVehicleUseStation(e->index, st)) return CMD_ERROR;
 
-	/* Make sure all aircraft end up in the first tile of the hanger. */
+	/* Make sure all aircraft end up in the first tile of the hangar. */
 	tile = st->airport.GetHangarTile(st->airport.GetHangarNum(tile));
 
 	if (flags & DC_EXEC) {
@@ -271,13 +281,16 @@ CommandCost CmdBuildAircraft(TileIndex tile, DoCommandFlag flags, const Engine *
 		v->spritenum = avi->image_index;
 
 		v->cargo_cap = avi->passenger_capacity;
+		v->refit_cap = 0;
 		u->cargo_cap = avi->mail_capacity;
+		u->refit_cap = 0;
 
 		v->cargo_type = e->GetDefaultCargoType();
 		u->cargo_type = CT_MAIL;
 
 		v->name = NULL;
 		v->last_station_visited = INVALID_STATION;
+		v->last_loading_station = INVALID_STATION;
 
 		v->acceleration = avi->acceleration;
 		v->engine_type = e->index;
@@ -302,7 +315,7 @@ CommandCost CmdBuildAircraft(TileIndex tile, DoCommandFlag flags, const Engine *
 		v->targetairport = GetStationIndex(tile);
 		v->SetNext(u);
 
-		v->service_interval = Company::Get(_current_company)->settings.vehicle.servint_aircraft;
+		v->SetServiceInterval(Company::Get(_current_company)->settings.vehicle.servint_aircraft);
 
 		v->date_of_last_service = _date;
 		v->build_year = u->build_year = _cur_year;
@@ -314,6 +327,7 @@ CommandCost CmdBuildAircraft(TileIndex tile, DoCommandFlag flags, const Engine *
 
 		v->vehicle_flags = 0;
 		if (e->flags & ENGINE_EXCLUSIVE_PREVIEW) SetBit(v->vehicle_flags, VF_BUILT_AS_PROTOTYPE);
+		v->SetServiceIntervalIsPercent(Company::Get(_current_company)->settings.vehicle.servint_ispercent);
 
 		v->InvalidateNewGRFCacheOfChain();
 
@@ -597,7 +611,14 @@ enum AircraftSpeedLimits {
  */
 static int UpdateAircraftSpeed(Aircraft *v, uint speed_limit = SPEED_LIMIT_NONE, bool hard_limit = true)
 {
-	uint spd = v->acceleration * 16;
+	/**
+	 * 'acceleration' has the unit 3/8 mph/tick. This function is called twice per tick.
+	 * So the speed amount we need to accelerate is:
+	 *     acceleration * 3 / 16 mph = acceleration * 3 / 16 * 16 / 10 km-ish/h
+	 *                               = acceleration * 3 / 10 * 256 * (km-ish/h / 256)
+	 *                               ~ acceleration * 77 (km-ish/h / 256)
+	 */
+	uint spd = v->acceleration * 77;
 	byte t;
 
 	/* Adjust speed limits by plane speed factor to prevent taxiing
@@ -635,7 +656,7 @@ static int UpdateAircraftSpeed(Aircraft *v, uint speed_limit = SPEED_LIMIT_NONE,
 	/* Adjust distance moved by plane speed setting */
 	if (_settings_game.vehicle.plane_speed > 1) spd /= _settings_game.vehicle.plane_speed;
 
-	/* Convert direction-indepenent speed into direction-dependent speed. (old movement method) */
+	/* Convert direction-independent speed into direction-dependent speed. (old movement method) */
 	spd = v->GetOldAdvanceSpeed(spd);
 
 	spd += v->progress;
@@ -660,7 +681,7 @@ int GetAircraftFlyingAltitude(const Aircraft *v)
 	int base_altitude = PLANE_HOLDING_ALTITUDE;
 
 	/* Make sure eastbound and westbound planes do not "crash" into each
-	 * other by providing them with vertical seperation
+	 * other by providing them with vertical separation
 	 */
 	switch (v->direction) {
 		case DIR_N:
@@ -1013,7 +1034,7 @@ static bool HandleCrashedAircraft(Aircraft *v)
 
 	/* make aircraft crash down to the ground */
 	if (v->crashed_counter < 500 && st == NULL && ((v->crashed_counter % 3) == 0) ) {
-		int z = GetSlopePixelZ(v->x_pos, v->y_pos);
+		int z = GetSlopePixelZ(Clamp(v->x_pos, 0, MapMaxX() * TILE_SIZE), Clamp(v->y_pos, 0, MapMaxY() * TILE_SIZE));
 		v->z_pos -= 1;
 		if (v->z_pos == z) {
 			v->crashed_counter = 500;
@@ -1058,7 +1079,12 @@ static bool HandleCrashedAircraft(Aircraft *v)
 }
 
 
-static void HandleAircraftSmoke(Aircraft *v)
+/**
+ * Handle smoke of broken aircraft.
+ * @param v Aircraft
+ * @param mode Is this the non-first call for this vehicle in this tick?
+ */
+static void HandleAircraftSmoke(Aircraft *v, bool mode)
 {
 	static const struct {
 		int8 x;
@@ -1076,13 +1102,15 @@ static void HandleAircraftSmoke(Aircraft *v)
 
 	if (!(v->vehstatus & VS_AIRCRAFT_BROKEN)) return;
 
+	/* Stop smoking when landed */
 	if (v->cur_speed < 10) {
 		v->vehstatus &= ~VS_AIRCRAFT_BROKEN;
 		v->breakdown_ctr = 0;
 		return;
 	}
 
-	if ((v->tick_counter & 0x1F) == 0) {
+	/* Spawn effect et most once per Tick, i.e. !mode */
+	if (!mode && (v->tick_counter & 0x0F) == 0) {
 		CreateEffectVehicleRel(v,
 			smoke_pos[v->direction].x,
 			smoke_pos[v->direction].y,
@@ -1135,7 +1163,8 @@ TileIndex Aircraft::GetOrderStationLocation(StationID station)
 
 void Aircraft::MarkDirty()
 {
-	this->UpdateViewport(false, false);
+	this->colourmap = PAL_NONE;
+	this->UpdateViewport(true, false);
 	if (this->subtype == AIR_HELICOPTER) this->Next()->Next()->cur_image = GetRotorImage(this, EIT_ON_MAP);
 }
 
@@ -1159,8 +1188,8 @@ static void CrashAirplane(Aircraft *v)
 	uint pass = v->Crash();
 	SetDParam(0, pass);
 
-	v->cargo.Truncate(0);
-	v->Next()->cargo.Truncate(0);
+	v->cargo.Truncate();
+	v->Next()->cargo.Truncate();
 	const Station *st = GetTargetAirportIfValid(v);
 	StringID newsitem;
 	if (st == NULL) {
@@ -1204,7 +1233,7 @@ static void MaybeCrashAirplane(Aircraft *v)
 	/* Crash the airplane. Remove all goods stored at the station. */
 	for (CargoID i = 0; i < NUM_CARGO; i++) {
 		st->goods[i].rating = 1;
-		st->goods[i].cargo.Truncate(0);
+		st->goods[i].cargo.Truncate();
 	}
 
 	CrashAirplane(v);
@@ -1380,7 +1409,7 @@ static void AircraftEventHandler_AtTerminal(Aircraft *v, const AirportFTAClass *
 		 * and get serviced at the same time - setting */
 		if (_settings_game.order.serviceathelipad) {
 			if (v->subtype == AIR_HELICOPTER && apc->num_helipads > 0) {
-				/* an exerpt of ServiceAircraft, without the invisibility stuff */
+				/* an excerpt of ServiceAircraft, without the invisibility stuff */
 				v->date_of_last_service = _date;
 				v->breakdowns_since_last_service = 0;
 				v->reliability = v->GetEngine()->reliability;
@@ -1402,7 +1431,7 @@ static void AircraftEventHandler_AtTerminal(Aircraft *v, const AirportFTAClass *
 	switch (v->current_order.GetType()) {
 		case OT_GOTO_STATION: // ready to fly to another airport
 			break;
-		case OT_GOTO_DEPOT:   // visit hangar for serivicing, sale, etc.
+		case OT_GOTO_DEPOT:   // visit hangar for servicing, sale, etc.
 			go_to_hangar = v->current_order.GetDestination() == v->targetairport;
 			break;
 		case OT_CONDITIONAL:
@@ -1885,8 +1914,6 @@ static void AircraftHandleDestTooFar(Aircraft *v, bool too_far)
 
 static bool AircraftEventHandler(Aircraft *v, int loop)
 {
-	v->tick_counter++;
-
 	if (v->vehstatus & VS_CRASHED) {
 		return HandleCrashedAircraft(v);
 	}
@@ -1895,7 +1922,7 @@ static bool AircraftEventHandler(Aircraft *v, int loop)
 
 	v->HandleBreakdown();
 
-	HandleAircraftSmoke(v);
+	HandleAircraftSmoke(v, loop != 0);
 	ProcessOrders(v);
 	v->HandleLoading(loop != 0);
 
@@ -1924,6 +1951,8 @@ static bool AircraftEventHandler(Aircraft *v, int loop)
 bool Aircraft::Tick()
 {
 	if (!this->IsNormalAircraft()) return true;
+
+	this->tick_counter++;
 
 	if (!(this->vehstatus & VS_STOPPED)) this->running_ticks++;
 

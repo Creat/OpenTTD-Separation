@@ -24,7 +24,7 @@ struct AirportTileScopeResolver : public ScopeResolver {
 	byte airport_id;     ///< Type of airport for which the callback is run.
 	TileIndex tile;      ///< Tile for the callback, only valid for airporttile callbacks.
 
-	AirportTileScopeResolver(ResolverObject *ro, const AirportTileSpec *ats, TileIndex tile, Station *st);
+	AirportTileScopeResolver(ResolverObject &ro, const AirportTileSpec *ats, TileIndex tile, Station *st);
 
 	/* virtual */ uint32 GetRandomBits() const;
 	/* virtual */ uint32 GetVariable(byte variable, uint32 parameter, bool *available) const;
@@ -47,7 +47,7 @@ struct AirportTileResolverObject : public ResolverObject {
 };
 
 /**
- * Defines the data structure of each indivudual tile of an airport.
+ * Defines the data structure of each individual tile of an airport.
  */
 struct AirportTileSpec {
 	AnimationInfo animation;              ///< Information about the animation.

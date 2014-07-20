@@ -30,7 +30,7 @@ struct StationScopeResolver : public ScopeResolver {
 	CargoID cargo_type;                 ///< Type of cargo of the station.
 	Axis axis;                          ///< Station axis, used only for the slope check callback.
 
-	StationScopeResolver(ResolverObject *ro, const StationSpec *statspec, BaseStation *st, TileIndex tile);
+	StationScopeResolver(ResolverObject &ro, const StationSpec *statspec, BaseStation *st, TileIndex tile);
 
 	/* virtual */ uint32 GetRandomBits() const;
 	/* virtual */ uint32 GetTriggers() const;
@@ -90,6 +90,16 @@ enum StationSpecFlags {
 	SSF_EXTENDED_FOUNDATIONS, ///< Extended foundation block instead of simple.
 };
 
+/** Randomisation triggers for stations */
+enum StationRandomTrigger {
+	SRT_NEW_CARGO,        ///< Trigger station on new cargo arrival.
+	SRT_CARGO_TAKEN,      ///< Trigger station when cargo is completely taken.
+	SRT_TRAIN_ARRIVES,    ///< Trigger platform when train arrives.
+	SRT_TRAIN_DEPARTS,    ///< Trigger platform when train leaves.
+	SRT_TRAIN_LOADS,      ///< Trigger platform when train loads/unloads.
+	SRT_PATH_RESERVATION, ///< Trigger platform when train reserves path.
+};
+
 /* Station layout for given dimensions - it is a two-dimensional array
  * where index is computed as (x * platforms) + platform. */
 typedef byte *StationLayout;
@@ -108,12 +118,12 @@ struct StationSpec {
 
 	/**
 	 * Bitmask of number of platforms available for the station.
-	 * 0..6 correpsond to 1..7, while bit 7 corresponds to >7 platforms.
+	 * 0..6 correspond to 1..7, while bit 7 corresponds to >7 platforms.
 	 */
 	byte disallowed_platforms;
 	/**
 	 * Bitmask of platform lengths available for the station.
-	 * 0..6 correpsond to 1..7, while bit 7 corresponds to >7 tiles long.
+	 * 0..6 correspond to 1..7, while bit 7 corresponds to >7 tiles long.
 	 */
 	byte disallowed_lengths;
 
@@ -176,6 +186,7 @@ bool DrawStationTile(int x, int y, RailType railtype, Axis axis, StationClassID 
 
 void AnimateStationTile(TileIndex tile);
 void TriggerStationAnimation(BaseStation *st, TileIndex tile, StationAnimationTrigger trigger, CargoID cargo_type = CT_INVALID);
-void StationUpdateAnimTriggers(BaseStation *st);
+void TriggerStationRandomisation(Station *st, TileIndex tile, StationRandomTrigger trigger, CargoID cargo_type = CT_INVALID);
+void StationUpdateCachedTriggers(BaseStation *st);
 
 #endif /* NEWGRF_STATION_H */

@@ -18,6 +18,8 @@
 
 #include "table/strings.h"
 
+#include "safeguards.h"
+
 /**
  * Callback for building wagons.
  * @param result The result of the command.
@@ -33,8 +35,7 @@ void CcBuildWagon(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p
 	const Vehicle *found = NULL;
 	const Train *t;
 	FOR_ALL_TRAINS(t) {
-		if (t->IsFrontEngine() && t->tile == tile &&
-				t->track == TRACK_BIT_DEPOT) {
+		if (t->IsFrontEngine() && t->tile == tile && t->IsStoppedInDepot()) {
 			if (found != NULL) return; // must be exactly one.
 			found = t;
 		}
@@ -163,7 +164,7 @@ struct CargoSummaryItem {
 	uint amount;      ///< Amount that is carried
 	StationID source; ///< One of the source stations
 
-	/** Used by CargoSummary::Find() and similiar functions */
+	/** Used by CargoSummary::Find() and similar functions */
 	inline bool operator != (const CargoSummaryItem &other) const
 	{
 		return this->cargo != other.cargo || this->subtype != other.subtype;
@@ -216,12 +217,12 @@ static void TrainDetailsInfoTab(const Vehicle *v, int left, int right, int y)
 	if (RailVehInfo(v->engine_type)->railveh_type == RAILVEH_WAGON) {
 		SetDParam(0, v->engine_type);
 		SetDParam(1, v->value);
-		DrawString(left, right, y, STR_VEHICLE_DETAILS_TRAIN_WAGON_VALUE, TC_FROMSTRING, SA_LEFT | SA_STRIP);
+		DrawString(left, right, y, STR_VEHICLE_DETAILS_TRAIN_WAGON_VALUE);
 	} else {
 		SetDParam(0, v->engine_type);
 		SetDParam(1, v->build_year);
 		SetDParam(2, v->value);
-		DrawString(left, right, y, STR_VEHICLE_DETAILS_TRAIN_ENGINE_BUILT_AND_VALUE, TC_FROMSTRING, SA_LEFT | SA_STRIP);
+		DrawString(left, right, y, STR_VEHICLE_DETAILS_TRAIN_ENGINE_BUILT_AND_VALUE);
 	}
 }
 
@@ -251,7 +252,7 @@ static void TrainDetailsCapacityTab(const CargoSummaryItem *item, int left, int 
 }
 
 /**
- * Collects the cargo transportet
+ * Collects the cargo transported
  * @param v Vehicle to process
  * @param summary Space for the result
  */
@@ -277,7 +278,7 @@ static void GetCargoSummaryOfArticulatedVehicle(const Train *v, CargoSummary *su
 		}
 
 		item->capacity += v->cargo_cap;
-		item->amount += v->cargo.Count();
+		item->amount += v->cargo.StoredCount();
 		if (item->source == INVALID_STATION) item->source = v->cargo.Source();
 	} while ((v = v->Next()) != NULL && v->IsArticulatedPart());
 }
@@ -312,11 +313,11 @@ int GetTrainDetailsWndVScroll(VehicleID veh_id, TrainDetailsWindowTabs det_tab)
 		CargoArray act_cargo;
 		CargoArray max_cargo;
 		for (const Vehicle *v = Vehicle::Get(veh_id); v != NULL; v = v->Next()) {
-			act_cargo[v->cargo_type] += v->cargo.Count();
+			act_cargo[v->cargo_type] += v->cargo.StoredCount();
 			max_cargo[v->cargo_type] += v->cargo_cap;
 		}
 
-		/* Set scroll-amount seperately from counting, as to not compute num double
+		/* Set scroll-amount separately from counting, as to not compute num double
 		 * for more carriages of the same type
 		 */
 		for (CargoID i = 0; i < NUM_CARGO; i++) {
@@ -425,7 +426,7 @@ void DrawTrainDetails(const Train *v, int left, int right, int y, int vscroll_po
 		Money feeder_share = 0;
 
 		for (const Vehicle *u = v; u != NULL; u = u->Next()) {
-			act_cargo[u->cargo_type] += u->cargo.Count();
+			act_cargo[u->cargo_type] += u->cargo.StoredCount();
 			max_cargo[u->cargo_type] += u->cargo_cap;
 			feeder_share             += u->cargo.FeederShare();
 		}

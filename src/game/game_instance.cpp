@@ -66,6 +66,9 @@
 #include "../script/api/game/game_signlist.hpp.sq"
 #include "../script/api/game/game_station.hpp.sq"
 #include "../script/api/game/game_stationlist.hpp.sq"
+#include "../script/api/game/game_story_page.hpp.sq"
+#include "../script/api/game/game_storypageelementlist.hpp.sq"
+#include "../script/api/game/game_storypagelist.hpp.sq"
 #include "../script/api/game/game_subsidy.hpp.sq"
 #include "../script/api/game/game_subsidylist.hpp.sq"
 #include "../script/api/game/game_testmode.hpp.sq"
@@ -81,6 +84,8 @@
 #include "../script/api/game/game_waypoint.hpp.sq"
 #include "../script/api/game/game_waypointlist.hpp.sq"
 #include "../script/api/game/game_window.hpp.sq"
+
+#include "../safeguards.h"
 
 
 GameInstance::GameInstance() :
@@ -169,6 +174,9 @@ void GameInstance::RegisterAPI()
 	SQGSStation_Register(this->engine);
 	SQGSStationList_Register(this->engine);
 	SQGSStationList_Vehicle_Register(this->engine);
+	SQGSStoryPage_Register(this->engine);
+	SQGSStoryPageElementList_Register(this->engine);
+	SQGSStoryPageList_Register(this->engine);
 	SQGSSubsidy_Register(this->engine);
 	SQGSSubsidyList_Register(this->engine);
 	SQGSTestMode_Register(this->engine);

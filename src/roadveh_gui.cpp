@@ -18,6 +18,8 @@
 
 #include "table/strings.h"
 
+#include "safeguards.h"
+
 /**
  * Draw the details for the given vehicle at the given position
  *
@@ -35,7 +37,7 @@ void DrawRoadVehDetails(const Vehicle *v, int left, int right, int y)
 	SetDParam(0, v->engine_type);
 	SetDParam(1, v->build_year);
 	SetDParam(2, v->value);
-	DrawString(left, right, y + y_offset, STR_VEHICLE_INFO_BUILT_VALUE, TC_FROMSTRING, SA_LEFT | SA_STRIP);
+	DrawString(left, right, y + y_offset, STR_VEHICLE_INFO_BUILT_VALUE);
 
 	if (v->HasArticulatedPart()) {
 		CargoArray max_cargo;
@@ -81,9 +83,9 @@ void DrawRoadVehDetails(const Vehicle *v, int left, int right, int y)
 			if (u->cargo_cap == 0) continue;
 
 			str = STR_VEHICLE_DETAILS_CARGO_EMPTY;
-			if (!u->cargo.Empty()) {
+			if (u->cargo.StoredCount() > 0) {
 				SetDParam(0, u->cargo_type);
-				SetDParam(1, u->cargo.Count());
+				SetDParam(1, u->cargo.StoredCount());
 				SetDParam(2, u->cargo.Source());
 				str = STR_VEHICLE_DETAILS_CARGO_FROM;
 				feeder_share += u->cargo.FeederShare();
@@ -101,9 +103,9 @@ void DrawRoadVehDetails(const Vehicle *v, int left, int right, int y)
 		DrawString(left, right, y + FONT_HEIGHT_NORMAL + y_offset, STR_VEHICLE_INFO_CAPACITY);
 
 		str = STR_VEHICLE_DETAILS_CARGO_EMPTY;
-		if (!v->cargo.Empty()) {
+		if (v->cargo.StoredCount() > 0) {
 			SetDParam(0, v->cargo_type);
-			SetDParam(1, v->cargo.Count());
+			SetDParam(1, v->cargo.StoredCount());
 			SetDParam(2, v->cargo.Source());
 			str = STR_VEHICLE_DETAILS_CARGO_FROM;
 			feeder_share += v->cargo.FeederShare();

@@ -17,7 +17,10 @@
 #include "../../settings_type.h"
 #include "../../engine_base.h"
 #include "../../articulated_vehicles.h"
+#include "../../string_func.h"
 #include "table/strings.h"
+
+#include "../../safeguards.h"
 
 bool ScriptEventEnginePreview::IsEngineValid() const
 {
@@ -115,6 +118,17 @@ bool ScriptEventEnginePreview::AcceptPreview()
 bool ScriptEventCompanyAskMerger::AcceptMerger()
 {
 	return ScriptObject::DoCommand(0, this->owner, 0, CMD_BUY_COMPANY);
+}
+
+ScriptEventAdminPort::ScriptEventAdminPort(const char *json) :
+		ScriptEvent(ET_ADMIN_PORT),
+		json(stredup(json))
+{
+}
+
+ScriptEventAdminPort::~ScriptEventAdminPort()
+{
+	free(this->json);
 }
 
 #define SKIP_EMPTY(p) while (*(p) == ' ' || *(p) == '\n' || *(p) == '\r') (p)++;
@@ -243,6 +257,14 @@ char *ScriptEventAdminPort::ReadValue(HSQUIRRELVM vm, char *p)
 		case '[': {
 			/* Array */
 			sq_newarray(vm, 0);
+
+			/* Empty array? */
+			char *p2 = p+1;
+			SKIP_EMPTY(p2);
+			if (*p2 == ']') {
+				p = p2+1;
+				break;
+			}
 
 			while (*p++ != ']') {
 				p = this->ReadValue(vm, p);

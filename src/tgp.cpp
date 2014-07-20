@@ -17,6 +17,8 @@
 #include "core/random_func.hpp"
 #include "landscape_type.h"
 
+#include "safeguards.h"
+
 /*
  *
  * Quickie guide to Perlin Noise
@@ -560,11 +562,12 @@ static const control_point_list_t _curve_maps[] = {
 static void HeightMapCurves(uint level)
 {
 	height_t ht[lengthof(_curve_maps)];
+	MemSetT(ht, 0, lengthof(ht));
 
 	/* Set up a grid to choose curve maps based on location */
 	uint sx = Clamp(1 << level, 2, 32);
 	uint sy = Clamp(1 << level, 2, 32);
-	byte *c = (byte *)alloca(sx * sy);
+	byte *c = AllocaM(byte, sx * sy);
 
 	for (uint i = 0; i < sx * sy; i++) {
 		c[i] = Random() % lengthof(_curve_maps);
@@ -950,8 +953,7 @@ static void TgenSetTileHeight(TileIndex tile, int height)
 	SetTileHeight(tile, height);
 
 	/* Only clear the tiles within the map area. */
-	if (TileX(tile) != MapMaxX() && TileY(tile) != MapMaxY() &&
-			(!_settings_game.construction.freeform_edges || (TileX(tile) != 0 && TileY(tile) != 0))) {
+	if (IsInnerTile(tile)) {
 		MakeClear(tile, CLEAR_GRASS, 3);
 	}
 }

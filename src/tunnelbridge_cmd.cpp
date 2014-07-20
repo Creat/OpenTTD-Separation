@@ -10,7 +10,7 @@
 /**
  * @file tunnelbridge_cmd.cpp
  * This file deals with tunnels and bridges (non-gui stuff)
- * @todo seperate this file into two
+ * @todo separate this file into two
  */
 
 #include "stdafx.h"
@@ -44,6 +44,8 @@
 #include "table/strings.h"
 #include "table/bridge_land.h"
 
+#include "safeguards.h"
+
 BridgeSpec _bridge[MAX_BRIDGES]; ///< The specification of all bridges.
 TileIndex _build_tunnel_endtile; ///< The end of a tunnel; as hidden return from the tunnel build command for GUI purposes.
 
@@ -61,7 +63,7 @@ void ResetBridges()
 		}
 	}
 
-	/* Then, wipe out current bidges */
+	/* Then, wipe out current bridges */
 	memset(&_bridge, 0, sizeof(_bridge));
 	/* And finally, reinstall default data */
 	memcpy(&_bridge, &_orig_bridge, sizeof(_orig_bridge));
@@ -91,8 +93,8 @@ int CalcBridgeLenCostFactor(int length)
 /**
  * Get the foundation for a bridge.
  * @param tileh The slope to build the bridge on.
- * @param axis The axis of the bridge entrace.
- * @return The foundatiton required.
+ * @param axis The axis of the bridge entrance.
+ * @return The foundation required.
  */
 Foundation GetBridgeFoundation(Slope tileh, Axis axis)
 {
@@ -295,6 +297,7 @@ CommandCost CmdBuildBridge(TileIndex end_tile, DoCommandFlag flags, uint32 p1, u
 
 	CommandCost cost(EXPENSES_CONSTRUCTION);
 	Owner owner;
+	bool is_new_owner;
 	if (IsBridgeTile(tile_start) && IsBridgeTile(tile_end) &&
 			GetOtherBridgeEnd(tile_start) == tile_end &&
 			GetTunnelBridgeTransportType(tile_start) == transport_type) {
@@ -305,9 +308,10 @@ CommandCost CmdBuildBridge(TileIndex end_tile, DoCommandFlag flags, uint32 p1, u
 			return_cmd_error(STR_ERROR_MUST_DEMOLISH_BRIDGE_FIRST);
 		}
 
-		/* Do not replace town bridges with lower speed bridges. */
+		/* Do not replace town bridges with lower speed bridges, unless in scenario editor. */
 		if (!(flags & DC_QUERY_COST) && IsTileOwner(tile_start, OWNER_TOWN) &&
-				GetBridgeSpec(bridge_type)->speed < GetBridgeSpec(GetBridgeType(tile_start))->speed) {
+				GetBridgeSpec(bridge_type)->speed < GetBridgeSpec(GetBridgeType(tile_start))->speed &&
+				_game_mode != GM_EDITOR) {
 			Town *t = ClosestTownFromTile(tile_start, UINT_MAX);
 
 			if (t == NULL) {
@@ -324,12 +328,16 @@ CommandCost CmdBuildBridge(TileIndex end_tile, DoCommandFlag flags, uint32 p1, u
 		}
 
 		/* Do not allow replacing another company's bridges. */
-		if (!IsTileOwner(tile_start, company) && !IsTileOwner(tile_start, OWNER_TOWN)) {
+		if (!IsTileOwner(tile_start, company) && !IsTileOwner(tile_start, OWNER_TOWN) && !IsTileOwner(tile_start, OWNER_NONE)) {
 			return_cmd_error(STR_ERROR_AREA_IS_OWNED_BY_ANOTHER);
 		}
 
 		cost.AddCost((bridge_len + 1) * _price[PR_CLEAR_BRIDGE]); // The cost of clearing the current bridge.
 		owner = GetTileOwner(tile_start);
+
+		/* If bridge belonged to bankrupt company, it has a new owner now */
+		is_new_owner = (owner == OWNER_NONE);
+		if (is_new_owner) owner = company;
 
 		switch (transport_type) {
 			case TRANSPORT_RAIL:
@@ -431,12 +439,13 @@ CommandCost CmdBuildBridge(TileIndex end_tile, DoCommandFlag flags, uint32 p1, u
 			if (flags & DC_EXEC) {
 				/* We do this here because when replacing a bridge with another
 				 * type calling SetBridgeMiddle isn't needed. After all, the
-				 * tile alread has the has_bridge_above bits set. */
+				 * tile already has the has_bridge_above bits set. */
 				SetBridgeMiddle(tile, direction);
 			}
 		}
 
 		owner = company;
+		is_new_owner = true;
 	}
 
 	/* do the drill? */
@@ -446,29 +455,40 @@ CommandCost CmdBuildBridge(TileIndex end_tile, DoCommandFlag flags, uint32 p1, u
 		Company *c = Company::GetIfValid(owner);
 		switch (transport_type) {
 			case TRANSPORT_RAIL:
-				/* Add to company infrastructure count if building a new bridge. */
-				if (!IsBridgeTile(tile_start) && c != NULL) c->infrastructure.rail[railtype] += (bridge_len + 2) * TUNNELBRIDGE_TRACKBIT_FACTOR;
+				/* Add to company infrastructure count if required. */
+				if (is_new_owner && c != NULL) c->infrastructure.rail[railtype] += (bridge_len + 2) * TUNNELBRIDGE_TRACKBIT_FACTOR;
 				MakeRailBridgeRamp(tile_start, owner, bridge_type, dir,                 railtype);
 				MakeRailBridgeRamp(tile_end,   owner, bridge_type, ReverseDiagDir(dir), railtype);
 				SetTunnelBridgeReservation(tile_start, pbs_reservation);
 				SetTunnelBridgeReservation(tile_end,   pbs_reservation);
 				break;
 
-			case TRANSPORT_ROAD:
+			case TRANSPORT_ROAD: {
+				RoadTypes prev_roadtypes = IsBridgeTile(tile_start) ? GetRoadTypes(tile_start) : ROADTYPES_NONE;
+				if (is_new_owner) {
+					/* Also give unowned present roadtypes to new owner */
+					if (HasBit(prev_roadtypes, ROADTYPE_ROAD) && GetRoadOwner(tile_start, ROADTYPE_ROAD) == OWNER_NONE) ClrBit(prev_roadtypes, ROADTYPE_ROAD);
+					if (HasBit(prev_roadtypes, ROADTYPE_TRAM) && GetRoadOwner(tile_start, ROADTYPE_TRAM) == OWNER_NONE) ClrBit(prev_roadtypes, ROADTYPE_TRAM);
+				}
 				if (c != NULL) {
 					/* Add all new road types to the company infrastructure counter. */
 					RoadType new_rt;
-					FOR_EACH_SET_ROADTYPE(new_rt, roadtypes ^ (IsBridgeTile(tile_start) ? GetRoadTypes(tile_start) : ROADTYPES_NONE)) {
+					FOR_EACH_SET_ROADTYPE(new_rt, roadtypes ^ prev_roadtypes) {
 						/* A full diagonal road tile has two road bits. */
 						Company::Get(owner)->infrastructure.road[new_rt] += (bridge_len + 2) * 2 * TUNNELBRIDGE_TRACKBIT_FACTOR;
 					}
 				}
-				MakeRoadBridgeRamp(tile_start, owner, bridge_type, dir,                 roadtypes);
-				MakeRoadBridgeRamp(tile_end,   owner, bridge_type, ReverseDiagDir(dir), roadtypes);
+				Owner owner_road = owner;
+				Owner owner_tram = owner;
+				if (HasBit(prev_roadtypes, ROADTYPE_ROAD)) owner_road = GetRoadOwner(tile_start, ROADTYPE_ROAD);
+				if (HasBit(prev_roadtypes, ROADTYPE_TRAM)) owner_tram = GetRoadOwner(tile_start, ROADTYPE_TRAM);
+				MakeRoadBridgeRamp(tile_start, owner, owner_road, owner_tram, bridge_type, dir,                 roadtypes);
+				MakeRoadBridgeRamp(tile_end,   owner, owner_road, owner_tram, bridge_type, ReverseDiagDir(dir), roadtypes);
 				break;
+			}
 
 			case TRANSPORT_WATER:
-				if (!IsBridgeTile(tile_start) && c != NULL) c->infrastructure.water += (bridge_len + 2) * TUNNELBRIDGE_TRACKBIT_FACTOR;
+				if (is_new_owner && c != NULL) c->infrastructure.water += (bridge_len + 2) * TUNNELBRIDGE_TRACKBIT_FACTOR;
 				MakeAqueductBridgeRamp(tile_start, owner, dir);
 				MakeAqueductBridgeRamp(tile_end,   owner, ReverseDiagDir(dir));
 				break;
@@ -591,7 +611,7 @@ CommandCost CmdBuildTunnel(TileIndex start_tile, DoCommandFlag flags, uint32 p1,
 
 	TileIndex end_tile = start_tile;
 
-	/* Tile shift coeficient. Will decrease for very long tunnels to avoid exponential growth of price*/
+	/* Tile shift coefficient. Will decrease for very long tunnels to avoid exponential growth of price*/
 	int tiles_coef = 3;
 	/* Number of tiles from start of tunnel */
 	int tiles = 0;
@@ -662,7 +682,7 @@ CommandCost CmdBuildTunnel(TileIndex start_tile, DoCommandFlag flags, uint32 p1,
 	switch (transport_type) {
 		case TRANSPORT_ROAD: cost.AddCost((tiles + 2) * _price[PR_BUILD_ROAD] * 2); break;
 		case TRANSPORT_RAIL: cost.AddCost((tiles + 2) * RailBuildCost(railtype)); break;
-		default: break;
+		default: NOT_REACHED();
 	}
 
 	if (flags & DC_EXEC) {
@@ -711,7 +731,8 @@ static inline CommandCost CheckAllowRemoveTunnelBridge(TileIndex tile)
 			if (HasBit(rts, ROADTYPE_TRAM)) tram_owner = GetRoadOwner(tile, ROADTYPE_TRAM);
 
 			/* We can remove unowned road and if the town allows it */
-			if (road_owner == OWNER_TOWN && !(_settings_game.construction.extra_dynamite || _cheats.magic_bulldozer.value)) {
+			if (road_owner == OWNER_TOWN && _current_company != OWNER_TOWN && !(_settings_game.construction.extra_dynamite || _cheats.magic_bulldozer.value)) {
+				/* Town does not allow */
 				return CheckTileOwnership(tile);
 			}
 			if (road_owner == OWNER_NONE || road_owner == OWNER_TOWN) road_owner = _current_company;
@@ -1076,7 +1097,7 @@ static void DrawBridgeTramBits(int x, int y, int z, int offset, bool overlay, bo
 
 /**
  * Draws a tunnel of bridge tile.
- * For tunnels, this is rather simple, as you only needa draw the entrance.
+ * For tunnels, this is rather simple, as you only need to draw the entrance.
  * Bridges are a bit more complex. base_offset is where the sprite selection comes into play
  * and it works a bit like a bitmask.<p> For bridge heads:
  * @param ti TileInfo of the structure to draw
@@ -1204,10 +1225,9 @@ static void DrawTile_TunnelBridge(TileInfo *ti)
 		/* HACK Wizardry to convert the bridge ramp direction into a sprite offset */
 		base_offset += (6 - tunnelbridge_direction) % 4;
 
-		if (ti->tileh == SLOPE_FLAT) base_offset += 4; // sloped bridge head
-
 		/* Table number BRIDGE_PIECE_HEAD always refers to the bridge heads for any bridge type */
 		if (transport_type != TRANSPORT_WATER) {
+			if (ti->tileh == SLOPE_FLAT) base_offset += 4; // sloped bridge head
 			psid = &GetBridgeSpriteTable(GetBridgeType(ti->tile), BRIDGE_PIECE_HEAD)[base_offset];
 		} else {
 			psid = _aqueduct_sprites + base_offset;
@@ -1545,6 +1565,8 @@ static void GetTileDesc_TunnelBridge(TileIndex tile, TileDesc *td)
 				td->rail_speed = spd;
 			}
 		}
+	} else if (tt == TRANSPORT_ROAD && !IsTunnel(tile)) {
+		td->road_speed = GetBridgeSpec(GetBridgeType(tile))->speed;
 	}
 }
 
@@ -1555,7 +1577,7 @@ static void TileLoop_TunnelBridge(TileIndex tile)
 	switch (_settings_game.game_creation.landscape) {
 		case LT_ARCTIC: {
 			/* As long as we do not have a snow density, we want to use the density
-			 * from the entry endge. For tunnels this is the lowest point for bridges the highest point.
+			 * from the entry edge. For tunnels this is the lowest point for bridges the highest point.
 			 * (Independent of foundations) */
 			int z = IsBridge(tile) ? GetTileMaxZ(tile) : GetTileZ(tile);
 			if (snow_or_desert != (z > GetSnowLine())) {

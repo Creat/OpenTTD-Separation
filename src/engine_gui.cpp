@@ -25,6 +25,8 @@
 
 #include "table/strings.h"
 
+#include "safeguards.h"
+
 /**
  * Return the category of an engine.
  * @param engine Engine to examine.
@@ -61,9 +63,9 @@ static const NWidgetPart _nested_engine_preview_widgets[] = {
 struct EnginePreviewWindow : Window {
 	static const int VEHICLE_SPACE = 40; // The space to show the vehicle image
 
-	EnginePreviewWindow(const WindowDesc *desc, WindowNumber window_number) : Window()
+	EnginePreviewWindow(WindowDesc *desc, WindowNumber window_number) : Window(desc)
 	{
-		this->InitNested(desc, window_number);
+		this->InitNested(window_number);
 
 		/* There is no way to recover the window; so disallow closure via DEL; unless SHIFT+DEL */
 		this->flags |= WF_STICKY;
@@ -120,8 +122,8 @@ struct EnginePreviewWindow : Window {
 	}
 };
 
-static const WindowDesc _engine_preview_desc(
-	WDP_CENTER, 0, 0,
+static WindowDesc _engine_preview_desc(
+	WDP_CENTER, "engine_preview", 0, 0,
 	WC_ENGINE_PREVIEW, WC_NONE,
 	WDF_CONSTRUCTION,
 	_nested_engine_preview_widgets, lengthof(_nested_engine_preview_widgets)

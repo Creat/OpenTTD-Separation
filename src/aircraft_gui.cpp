@@ -21,6 +21,8 @@
 
 #include "table/strings.h"
 
+#include "safeguards.h"
+
 /**
  * Draw the details for the given vehicle at the given position
  *
@@ -39,7 +41,7 @@ void DrawAircraftDetails(const Aircraft *v, int left, int right, int y)
 			SetDParam(0, u->engine_type);
 			SetDParam(1, u->build_year);
 			SetDParam(2, u->value);
-			DrawString(left, right, y, STR_VEHICLE_INFO_BUILT_VALUE, TC_FROMSTRING, SA_LEFT | SA_STRIP);
+			DrawString(left, right, y, STR_VEHICLE_INFO_BUILT_VALUE);
 
 			SetDParam(0, u->cargo_type);
 			SetDParam(1, u->cargo_cap);
@@ -50,7 +52,7 @@ void DrawAircraftDetails(const Aircraft *v, int left, int right, int y)
 		}
 
 		if (u->cargo_cap != 0) {
-			uint cargo_count = u->cargo.Count();
+			uint cargo_count = u->cargo.StoredCount();
 
 			y_offset += FONT_HEIGHT_NORMAL + 1;
 			if (cargo_count != 0) {

@@ -33,6 +33,8 @@
 
 #include "table/strings.h"
 
+#include "safeguards.h"
+
 /*
  * Since all depot window sizes aren't the same, we need to modify sizes a little.
  * It's done with the following arrays of widget indexes. Each of them tells if a widget side should be moved and in what direction.
@@ -45,11 +47,12 @@ static const NWidgetPart _nested_train_depot_widgets[] = {
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
 		NWidget(WWT_CAPTION, COLOUR_GREY, WID_D_CAPTION), SetDataTip(STR_DEPOT_CAPTION, STR_NULL),
 		NWidget(WWT_SHADEBOX, COLOUR_GREY),
+		NWidget(WWT_DEFSIZEBOX, COLOUR_GREY),
 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL),
 		NWidget(NWID_VERTICAL),
-			NWidget(WWT_MATRIX, COLOUR_GREY, WID_D_MATRIX), SetDataTip(0x0, STR_NULL), SetResize(1, 1), SetScrollbar(WID_D_V_SCROLL),
+			NWidget(WWT_MATRIX, COLOUR_GREY, WID_D_MATRIX), SetResize(1, 1), SetScrollbar(WID_D_V_SCROLL),
 			NWidget(NWID_SELECTION, INVALID_COLOUR, WID_D_SHOW_H_SCROLL),
 				NWidget(NWID_HSCROLLBAR, COLOUR_GREY, WID_D_H_SCROLL),
 			EndContainer(),
@@ -78,29 +81,29 @@ static const NWidgetPart _nested_train_depot_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _train_depot_desc(
-	WDP_AUTO, 362, 123,
+static WindowDesc _train_depot_desc(
+	WDP_AUTO, "depot_train", 362, 123,
 	WC_VEHICLE_DEPOT, WC_NONE,
 	0,
 	_nested_train_depot_widgets, lengthof(_nested_train_depot_widgets)
 );
 
-static const WindowDesc _road_depot_desc(
-	WDP_AUTO, 316, 97,
+static WindowDesc _road_depot_desc(
+	WDP_AUTO, "depot_roadveh", 316, 97,
 	WC_VEHICLE_DEPOT, WC_NONE,
 	0,
 	_nested_train_depot_widgets, lengthof(_nested_train_depot_widgets)
 );
 
-static const WindowDesc _ship_depot_desc(
-	WDP_AUTO, 306, 99,
+static WindowDesc _ship_depot_desc(
+	WDP_AUTO, "depot_ship", 306, 99,
 	WC_VEHICLE_DEPOT, WC_NONE,
 	0,
 	_nested_train_depot_widgets, lengthof(_nested_train_depot_widgets)
 );
 
-static const WindowDesc _aircraft_depot_desc(
-	WDP_AUTO, 332, 99,
+static WindowDesc _aircraft_depot_desc(
+	WDP_AUTO, "depot_aircraft", 332, 99,
 	WC_VEHICLE_DEPOT, WC_NONE,
 	0,
 	_nested_train_depot_widgets, lengthof(_nested_train_depot_widgets)
@@ -229,7 +232,7 @@ struct DepotWindow : Window {
 	Scrollbar *hscroll;     ///< Only for trains.
 	Scrollbar *vscroll;
 
-	DepotWindow(const WindowDesc *desc, TileIndex tile, VehicleType type) : Window()
+	DepotWindow(WindowDesc *desc, TileIndex tile, VehicleType type) : Window(desc)
 	{
 		assert(IsCompanyBuildableVehicleType(type)); // ensure that we make the call with a valid type
 
@@ -239,16 +242,17 @@ struct DepotWindow : Window {
 		this->type = type;
 		this->num_columns = 1; // for non-trains this gets set in FinishInitNested()
 
-		this->CreateNestedTree(desc);
+		this->CreateNestedTree();
 		this->hscroll = (this->type == VEH_TRAIN ? this->GetScrollbar(WID_D_H_SCROLL) : NULL);
 		this->vscroll = this->GetScrollbar(WID_D_V_SCROLL);
 		/* Don't show 'rename button' of aircraft hangar */
 		this->GetWidget<NWidgetStacked>(WID_D_SHOW_RENAME)->SetDisplayedPlane(type == VEH_AIRCRAFT ? SZSP_NONE : 0);
 		/* Only train depots have a horizontal scrollbar and a 'sell chain' button */
+		if (type == VEH_TRAIN) this->GetWidget<NWidgetCore>(WID_D_MATRIX)->widget_data = 1 << MAT_COL_START;
 		this->GetWidget<NWidgetStacked>(WID_D_SHOW_H_SCROLL)->SetDisplayedPlane(type == VEH_TRAIN ? 0 : SZSP_HORIZONTAL);
 		this->GetWidget<NWidgetStacked>(WID_D_SHOW_SELL_CHAIN)->SetDisplayedPlane(type == VEH_TRAIN ? 0 : SZSP_NONE);
 		this->SetupWidgetData(type);
-		this->FinishInitNested(desc, tile);
+		this->FinishInitNested(tile);
 
 		this->owner = GetTileOwner(tile);
 		OrderBackup::Reset();
@@ -334,27 +338,26 @@ struct DepotWindow : Window {
 		bool rtl = _current_text_dir == TD_RTL;
 
 		/* Set the row and number of boxes in each row based on the number of boxes drawn in the matrix */
-		uint16 mat_data = this->GetWidget<NWidgetCore>(WID_D_MATRIX)->widget_data;
-		uint16 rows_in_display   = GB(mat_data, MAT_ROW_START, MAT_ROW_BITS);
-		uint16 boxes_in_each_row = GB(mat_data, MAT_COL_START, MAT_COL_BITS);
+		const NWidgetCore *wid = this->GetWidget<NWidgetCore>(WID_D_MATRIX);
+		uint16 rows_in_display = wid->current_y / wid->resize_y;
 
-		uint16 num = this->vscroll->GetPosition() * boxes_in_each_row;
-		int maxval = min(this->vehicle_list.Length(), num + (rows_in_display * boxes_in_each_row));
+		uint16 num = this->vscroll->GetPosition() * this->num_columns;
+		int maxval = min(this->vehicle_list.Length(), num + (rows_in_display * this->num_columns));
 		int y;
 		for (y = r.top + 1; num < maxval; y += this->resize.step_height) { // Draw the rows
-			for (byte i = 0; i < boxes_in_each_row && num < maxval; i++, num++) {
+			for (byte i = 0; i < this->num_columns && num < maxval; i++, num++) {
 				/* Draw all vehicles in the current row */
 				const Vehicle *v = this->vehicle_list[num];
-				if (boxes_in_each_row == 1) {
+				if (this->num_columns == 1) {
 					this->DrawVehicleInDepot(v, r.left, r.right, y);
 				} else {
-					int x = r.left + (rtl ? (boxes_in_each_row - i - 1) : i) * this->resize.step_width;
+					int x = r.left + (rtl ? (this->num_columns - i - 1) : i) * this->resize.step_width;
 					this->DrawVehicleInDepot(v, x, x + this->resize.step_width - 1, y);
 				}
 			}
 		}
 
-		maxval = min(this->vehicle_list.Length() + this->wagon_list.Length(), (this->vscroll->GetPosition() * boxes_in_each_row) + (rows_in_display * boxes_in_each_row));
+		maxval = min(this->vehicle_list.Length() + this->wagon_list.Length(), (this->vscroll->GetPosition() * this->num_columns) + (rows_in_display * this->num_columns));
 
 		/* Draw the train wagons without an engine in front. */
 		for (; num < maxval; num++, y += this->resize.step_height) {
@@ -404,8 +407,7 @@ struct DepotWindow : Window {
 		uint row = y / this->resize.step_height;
 		if (row >= this->vscroll->GetCapacity()) return MODE_ERROR;
 
-		uint boxes_in_each_row = GB(matrix_widget->widget_data, MAT_COL_START, MAT_COL_BITS);
-		uint pos = ((row + this->vscroll->GetPosition()) * boxes_in_each_row) + xt;
+		uint pos = ((row + this->vscroll->GetPosition()) * this->num_columns) + xt;
 
 		if (this->vehicle_list.Length() + this->wagon_list.Length() <= pos) {
 			/* Clicking on 'line' / 'block' without a vehicle */
@@ -442,6 +444,7 @@ struct DepotWindow : Window {
 			switch (this->type) {
 				case VEH_TRAIN:
 					if (wagon) return MODE_ERROR;
+					/* FALL THROUGH */
 				case VEH_ROAD:
 					if (xm <= this->flag_width) return MODE_START_STOP;
 					break;
@@ -600,7 +603,7 @@ struct DepotWindow : Window {
 				uint min_height = 0;
 
 				if (this->type == VEH_TRAIN) {
-					SetDParamMaxValue(0, 1000);
+					SetDParamMaxValue(0, 1000, 0, FS_SMALL);
 					SetDParam(1, 1);
 					this->count_width = GetStringBoundingBox(STR_TINY_BLACK_DECIMAL).width + WD_FRAMERECT_LEFT + WD_FRAMERECT_RIGHT;
 				} else {
@@ -744,7 +747,7 @@ struct DepotWindow : Window {
 			}
 
 			case WID_D_SELL_ALL:
-				/* Only open the confimation window if there are anything to sell */
+				/* Only open the confirmation window if there are anything to sell */
 				if (this->vehicle_list.Length() != 0 || this->wagon_list.Length() != 0) {
 					TileIndex tile = this->window_number;
 					byte vehtype = this->type;
@@ -802,7 +805,7 @@ struct DepotWindow : Window {
 		for (const Vehicle *w = v; w != NULL; w = w->Next()) {
 			if (w->cargo_cap > 0 && w->cargo_type < NUM_CARGO) {
 				capacity[w->cargo_type] += w->cargo_cap;
-				loaded  [w->cargo_type] += w->cargo.Count();
+				loaded  [w->cargo_type] += w->cargo.StoredCount();
 			}
 
 			if (w->type == VEH_TRAIN && !w->HasArticulatedPart()) {
@@ -842,8 +845,7 @@ struct DepotWindow : Window {
 	 */
 	virtual bool OnVehicleSelect(const Vehicle *v)
 	{
-		/* Suppress the vehicle GUI when share-cloning. There is no point to it, starting vehicles can also be done via the depot GUI. */
-		if (DoCommandP(this->window_number, v->index, _ctrl_pressed ? 1 : 0, CMD_CLONE_VEHICLE | CMD_MSG(STR_ERROR_CAN_T_BUY_TRAIN + v->type), _ctrl_pressed ? NULL : CcCloneVehicle)) {
+		if (DoCommandP(this->window_number, v->index, _ctrl_pressed ? 1 : 0, CMD_CLONE_VEHICLE | CMD_MSG(STR_ERROR_CAN_T_BUY_TRAIN + v->type), CcCloneVehicle)) {
 			ResetObjectToPlace();
 		}
 		return true;
@@ -968,14 +970,12 @@ struct DepotWindow : Window {
 
 	virtual void OnResize()
 	{
-		NWidgetCore *nwi = this->GetWidget<NWidgetCore>(WID_D_MATRIX);
 		this->vscroll->SetCapacityFromWidget(this, WID_D_MATRIX);
+		NWidgetCore *nwi = this->GetWidget<NWidgetCore>(WID_D_MATRIX);
 		if (this->type == VEH_TRAIN) {
 			this->hscroll->SetCapacity(nwi->current_x - this->header_width - this->count_width);
-			nwi->widget_data = (this->vscroll->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 		} else {
 			this->num_columns = nwi->current_x / nwi->resize_x;
-			nwi->widget_data = (this->vscroll->GetCapacity() << MAT_ROW_START) + (this->num_columns << MAT_COL_START);
 		}
 	}
 
@@ -1010,7 +1010,7 @@ void ShowDepotWindow(TileIndex tile, VehicleType type)
 {
 	if (BringWindowToFrontById(WC_VEHICLE_DEPOT, tile) != NULL) return;
 
-	const WindowDesc *desc;
+	WindowDesc *desc;
 	switch (type) {
 		default: NOT_REACHED();
 		case VEH_TRAIN:    desc = &_train_depot_desc;    break;

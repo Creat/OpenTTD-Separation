@@ -78,6 +78,23 @@ static inline TileType GetTileType(TileIndex tile)
 }
 
 /**
+ * Check if a tile is within the map (not a border)
+ *
+ * @param tile The tile to check
+ * @return Whether the tile is in the interior of the map
+ * @pre tile < MapSize()
+ */
+static inline bool IsInnerTile(TileIndex tile)
+{
+	assert(tile < MapSize());
+
+	uint x = TileX(tile);
+	uint y = TileY(tile);
+
+	return x < MapMaxX() && y < MapMaxY() && ((x > 0 && y > 0) || !_settings_game.construction.freeform_edges);
+}
+
+/**
  * Set the type of a tile
  *
  * This functions sets the type of a tile. If the type
@@ -95,7 +112,7 @@ static inline void SetTileType(TileIndex tile, TileType type)
 	/* VOID tiles (and no others) are exactly allowed at the lower left and right
 	 * edges of the map. If _settings_game.construction.freeform_edges is true,
 	 * the upper edges of the map are also VOID tiles. */
-	assert((TileX(tile) == MapMaxX() || TileY(tile) == MapMaxY() || (_settings_game.construction.freeform_edges && (TileX(tile) == 0 || TileY(tile) == 0))) == (type == MP_VOID));
+	assert(IsInnerTile(tile) == (type != MP_VOID));
 	SB(_m[tile].type_height, 4, 4, type);
 }
 
@@ -105,8 +122,8 @@ static inline void SetTileType(TileIndex tile, TileType type)
  * This function checks if a tile got the given tiletype.
  *
  * @param tile The tile to check
- * @param type The type to check agains
- * @return true If the type matches agains the type of the tile
+ * @param type The type to check against
+ * @return true If the type matches against the type of the tile
  */
 static inline bool IsTileType(TileIndex tile, TileType type)
 {
@@ -169,7 +186,7 @@ static inline void SetTileOwner(TileIndex tile, Owner owner)
  * Checks if a tile belongs to the given owner
  *
  * @param tile The tile to check
- * @param owner The owner to check agains
+ * @param owner The owner to check against
  * @return True if a tile belongs the the given owner
  */
 static inline bool IsTileOwner(TileIndex tile, Owner owner)
@@ -229,6 +246,8 @@ static inline void SetAnimationFrame(TileIndex t, byte frame)
 Slope GetTileSlope(TileIndex tile, int *h = NULL);
 int GetTileZ(TileIndex tile);
 int GetTileMaxZ(TileIndex tile);
+
+bool IsTileFlat(TileIndex tile, int *h = NULL);
 
 /**
  * Return the slope of a given tile

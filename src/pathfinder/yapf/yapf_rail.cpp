@@ -17,6 +17,9 @@
 #include "yapf_costrail.hpp"
 #include "yapf_destrail.hpp"
 #include "../../viewport_func.h"
+#include "../../newgrf_station.h"
+
+#include "../../safeguards.h"
 
 #define DEBUG_YAPF_CACHE 0
 
@@ -82,6 +85,8 @@ private:
 			MarkTileDirtyByTile(tile);
 			tile = TILE_ADD(tile, diff);
 		} while (IsCompatibleTrainStationTile(tile, start) && tile != m_origin_tile);
+
+		TriggerStationRandomisation(NULL, start, SRT_PATH_RESERVATION);
 
 		return true;
 	}

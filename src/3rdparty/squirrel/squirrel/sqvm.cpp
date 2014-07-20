@@ -107,6 +107,7 @@ SQVM::SQVM(SQSharedState *ss)
 	_errorhandler = _null_;
 	_debughook = _null_;
 	_can_suspend = false;
+	_in_stackoverflow = false;
 	_ops_till_suspend = 0;
 	ci = NULL;
 	INIT_CHAIN();ADD_TO_CHAIN(&_ss(this)->_gc_chain,this);
@@ -258,11 +259,7 @@ void SQVM::ToString(const SQObjectPtr &o,SQObjectPtr &res)
 		scsprintf(_sp(rsl(NUMBER_MAX_CHAR+1)),_SC("%g"),_float(o));
 		break;
 	case OT_INTEGER:
-#if defined(_SQ64)
-		scsprintf(_sp(rsl(NUMBER_MAX_CHAR+1)),_SC("%ld"),_integer(o));
-#else
-		scsprintf(_sp(rsl(NUMBER_MAX_CHAR+1)),_SC("%d"),_integer(o));
-#endif
+		scsprintf(_sp(rsl(NUMBER_MAX_CHAR+1)),SQ_PRINTF64,_integer(o));
 		break;
 	case OT_BOOL:
 		scsprintf(_sp(rsl(6)),_integer(o)?_SC("true"):_SC("false"));
@@ -292,8 +289,8 @@ bool SQVM::StringCat(const SQObjectPtr &str,const SQObjectPtr &obj,SQObjectPtr &
 	ToString(obj, b);
 	SQInteger l = _string(a)->_len , ol = _string(b)->_len;
 	SQChar *s = _sp(rsl(l + ol + 1));
-	memcpy(s, _stringval(a), rsl(l));
-	memcpy(s + l, _stringval(b), rsl(ol));
+	memcpy(s, _stringval(a), (size_t)rsl(l));
+	memcpy(s + l, _stringval(b), (size_t)rsl(ol));
 	dest = SQString::Create(_ss(this), _spval, l + ol);
 	return true;
 }
@@ -1190,7 +1187,7 @@ bool SQVM::CallNative(SQNativeClosure *nclosure,SQInteger nargs,SQInteger stackb
 		throw;
 	}
 
-	assert(cstksize == _callsstacksize);
+	_callsstacksize = cstksize;
 
 	_nnativecalls--;
 	suspend = false;

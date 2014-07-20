@@ -11,8 +11,23 @@
 
 #include "../../stdafx.h"
 #include "../../string_func.h"
+#include "../../strings_func.h"
 #include "script_text.hpp"
 #include "../../table/control_codes.h"
+
+#include "table/strings.h"
+
+#include "../../safeguards.h"
+
+RawText::RawText(const char *text) : text(stredup(text))
+{
+}
+
+RawText::~RawText()
+{
+	free(this->text);
+}
+
 
 ScriptText::ScriptText(HSQUIRRELVM vm) :
 	ZeroedMemoryAllocator()
@@ -68,7 +83,8 @@ SQInteger ScriptText::_SetParam(int parameter, HSQUIRRELVM vm)
 			const SQChar *value;
 			sq_getstring(vm, -1, &value);
 
-			this->params[parameter] = strdup(SQ2OTTD(value));
+			this->params[parameter] = stredup(SQ2OTTD(value));
+			ValidateString(this->params[parameter]);
 			break;
 		}
 
@@ -144,6 +160,7 @@ SQInteger ScriptText::_set(HSQUIRRELVM vm)
 		const SQChar *key;
 		sq_getstring(vm, 2, &key);
 		const char *key_string = SQ2OTTD(key);
+		ValidateString(key_string);
 
 		if (strncmp(key_string, "param_", 6) != 0 || strlen(key_string) > 8) return SQ_ERROR;
 		k = atoi(key_string + 6);
@@ -165,26 +182,40 @@ SQInteger ScriptText::_set(HSQUIRRELVM vm)
 const char *ScriptText::GetEncodedText()
 {
 	static char buf[1024];
-	this->_GetEncodedText(buf, lastof(buf));
-	return buf;
+	int param_count = 0;
+	this->_GetEncodedText(buf, lastof(buf), param_count);
+	return (param_count > SCRIPT_TEXT_MAX_PARAMETERS) ? NULL : buf;
 }
 
-char *ScriptText::_GetEncodedText(char *p, char *lastofp)
+char *ScriptText::_GetEncodedText(char *p, char *lastofp, int &param_count)
 {
 	p += Utf8Encode(p, SCC_ENCODED);
 	p += seprintf(p, lastofp, "%X", this->string);
 	for (int i = 0; i < this->paramc; i++) {
 		if (this->params[i] != NULL) {
 			p += seprintf(p, lastofp, ":\"%s\"", this->params[i]);
+			param_count++;
 			continue;
 		}
 		if (this->paramt[i] != NULL) {
 			p += seprintf(p, lastofp, ":");
-			p = this->paramt[i]->_GetEncodedText(p, lastofp);
+			p = this->paramt[i]->_GetEncodedText(p, lastofp, param_count);
 			continue;
 		}
-		p += seprintf(p, lastofp,":%X", this->parami[i]);
+		p += seprintf(p, lastofp,":%X", (uint32)this->parami[i]);
+		param_count++;
 	}
 
 	return p;
+}
+
+const char *Text::GetDecodedText()
+{
+	const char *encoded_text = this->GetEncodedText();
+	if (encoded_text == NULL) return NULL;
+
+	static char buf[1024];
+	::SetDParamStr(0, encoded_text);
+	::GetString(buf, STR_JUST_RAW_STRING, lastof(buf));
+	return buf;
 }

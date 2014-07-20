@@ -21,16 +21,13 @@
 #include "game_instance.hpp"
 #include "game_info.hpp"
 
+#include "../safeguards.h"
+
 /* static */ uint Game::frame_counter = 0;
 /* static */ GameInfo *Game::info = NULL;
 /* static */ GameInstance *Game::instance = NULL;
 /* static */ GameScannerInfo *Game::scanner_info = NULL;
 /* static */ GameScannerLibrary *Game::scanner_library = NULL;
-
-/* static */ const char *Game::GetMainScript()
-{
-		return Game::info->GetMainScript();
-}
 
 /* static */ void Game::GameLoop()
 {
@@ -75,6 +72,8 @@
 	GameConfig *config = GameConfig::GetConfig(GameConfig::SSS_FORCE_GAME);
 	GameInfo *info = config->GetInfo();
 	if (info == NULL) return;
+
+	config->AnchorUnchangeableSettings();
 
 	Backup<CompanyByte> cur_company(_current_company, FILE_LINE);
 	cur_company.Change(OWNER_DEITY);
@@ -159,7 +158,7 @@
 
 /* static */ void Game::ResetConfig()
 {
-	/* Check for both newgame as current game if we can reload the GameInfo insde
+	/* Check for both newgame as current game if we can reload the GameInfo inside
 	 *  the GameConfig. If not, remove the Game from the list. */
 	if (_settings_game.game_config != NULL && _settings_game.game_config->HasScript()) {
 		if (!_settings_game.game_config->ResetInfo(true)) {

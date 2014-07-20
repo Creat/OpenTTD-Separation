@@ -186,7 +186,6 @@ STR_MEASURE_AREA                                                :{BLACK}Лапт
 
 
 # These are used in buttons
-STR_SORT_BY_CAPTION_POPULATION                                  :{BLACK}Ҫынисем
 STR_SORT_BY_CAPTION_NAME                                        :{BLACK}Ячӗ
 STR_SORT_BY_CAPTION_DATE                                        :{BLACK}Кун
 # These are used in dropdowns
@@ -201,6 +200,7 @@ STR_SORT_BY_VALUE                                               :Хак
 STR_SORT_BY_LENGTH                                              :Тӑршшӗ
 STR_SORT_BY_COST                                                :Хак
 STR_SORT_BY_POWER                                               :Хӑватлӑх
+STR_SORT_BY_POPULATION                                          :Ҫынисем
 
 # Tooltips for the main toolbar
 STR_TOOLBAR_TOOLTIP_PAUSE_GAME                                  :{BLACK}Вӑййи тӑхтав
@@ -227,10 +227,10 @@ STR_FILE_MENU_SEPARATOR                                         :
 STR_FILE_MENU_EXIT                                              :Тух
 ############ range ends here
 
-############ range for map menu starts
-############ range for town menu starts, yet the town directory is shown in the map menu in the scenario editor
-############ end of the 'Display map' dropdown
-############ end of the 'Town' dropdown
+# map menu
+
+############ range for town menu starts
+############ range ends here
 
 ############ range for subsidies menu starts
 STR_SUBSIDIES_MENU_SUBSIDIES                                    :Грантсем
@@ -275,7 +275,7 @@ STR_ABOUT_MENU_ZOOMIN_SCREENSHOT                                :Яланхил�
 STR_ABOUT_MENU_ABOUT_OPENTTD                                    :'OpenTTD' çинчен
 ############ range ends here
 
-############ range for days starts (also used for the place in the highscore window)
+############ range for ordinal numbers used for the place in the highscore window
 STR_ORDINAL_NUMBER_1ST                                          :1мӗш
 STR_ORDINAL_NUMBER_2ND                                          :2мӗш
 STR_ORDINAL_NUMBER_3RD                                          :3-мӗш
@@ -291,22 +291,40 @@ STR_ORDINAL_NUMBER_12TH                                         :12-мӗш
 STR_ORDINAL_NUMBER_13TH                                         :13-мӗш
 STR_ORDINAL_NUMBER_14TH                                         :14-мӗш
 STR_ORDINAL_NUMBER_15TH                                         :15-мӗш
-STR_ORDINAL_NUMBER_16TH                                         :16-мӗш
-STR_ORDINAL_NUMBER_17TH                                         :17-мӗш
-STR_ORDINAL_NUMBER_18TH                                         :18-мӗш
-STR_ORDINAL_NUMBER_19TH                                         :19-мӗш
-STR_ORDINAL_NUMBER_20TH                                         :20-мӗш
-STR_ORDINAL_NUMBER_21ST                                         :21-мӗш
-STR_ORDINAL_NUMBER_22ND                                         :22-мӗш
-STR_ORDINAL_NUMBER_23RD                                         :23-мӗш
-STR_ORDINAL_NUMBER_24TH                                         :24-мӗш
-STR_ORDINAL_NUMBER_25TH                                         :25-мӗш
-STR_ORDINAL_NUMBER_26TH                                         :26-мӗш
-STR_ORDINAL_NUMBER_27TH                                         :27-мӗш
-STR_ORDINAL_NUMBER_28TH                                         :28-мӗш
-STR_ORDINAL_NUMBER_29TH                                         :29-мӗш
-STR_ORDINAL_NUMBER_30TH                                         :30-мӗш
-STR_ORDINAL_NUMBER_31ST                                         :31-мӗш
+############ range for ordinal numbers ends
+
+############ range for days starts
+STR_DAY_NUMBER_1ST                                              :1мӗш
+STR_DAY_NUMBER_2ND                                              :2мӗш
+STR_DAY_NUMBER_3RD                                              :3-мӗш
+STR_DAY_NUMBER_4TH                                              :4-мӗш
+STR_DAY_NUMBER_5TH                                              :5-мӗш
+STR_DAY_NUMBER_6TH                                              :6-мӗш
+STR_DAY_NUMBER_7TH                                              :7-мӗш
+STR_DAY_NUMBER_8TH                                              :8-мӗш
+STR_DAY_NUMBER_9TH                                              :9-мӗш
+STR_DAY_NUMBER_10TH                                             :10-мӗш
+STR_DAY_NUMBER_11TH                                             :11-мӗш
+STR_DAY_NUMBER_12TH                                             :12-мӗш
+STR_DAY_NUMBER_13TH                                             :13-мӗш
+STR_DAY_NUMBER_14TH                                             :14-мӗш
+STR_DAY_NUMBER_15TH                                             :15-мӗш
+STR_DAY_NUMBER_16TH                                             :16-мӗш
+STR_DAY_NUMBER_17TH                                             :17-мӗш
+STR_DAY_NUMBER_18TH                                             :18-мӗш
+STR_DAY_NUMBER_19TH                                             :19-мӗш
+STR_DAY_NUMBER_20TH                                             :20-мӗш
+STR_DAY_NUMBER_21ST                                             :21-мӗш
+STR_DAY_NUMBER_22ND                                             :22-мӗш
+STR_DAY_NUMBER_23RD                                             :23-мӗш
+STR_DAY_NUMBER_24TH                                             :24-мӗш
+STR_DAY_NUMBER_25TH                                             :25-мӗш
+STR_DAY_NUMBER_26TH                                             :26-мӗш
+STR_DAY_NUMBER_27TH                                             :27-мӗш
+STR_DAY_NUMBER_28TH                                             :28-мӗш
+STR_DAY_NUMBER_29TH                                             :29-мӗш
+STR_DAY_NUMBER_30TH                                             :30-мӗш
+STR_DAY_NUMBER_31ST                                             :31-мӗш
 ############ range for days ends
 
 ############ range for months starts
@@ -389,7 +407,7 @@ STR_PLAYLIST_CLEAR                                              :{TINY_FONT}{BLA
 
 # Highscore window
 STR_HIGHSCORE_POSITION                                          :{BIG_FONT}{BLACK}{COMMA}.
-STR_HIGHSCORE_NAME                                              :{BIG_FONT}{PRESIDENT_NAME}, {COMPANY}
+STR_HIGHSCORE_NAME                                              :{PRESIDENT_NAME}, {COMPANY}
 STR_HIGHSCORE_STATS                                             :{BIG_FONT}'{STRING}'   ({COMMA})
 
 # Smallmap window
@@ -440,9 +458,7 @@ STR_NEWS_MESSAGE_CAPTION                                        :{WHITE}Пӗлт
 
 
 
-# Start of order review system
-# DON'T ADD OR REMOVE LINES HERE
-# end of order system
+# Order review system / warnings
 
 
 
@@ -488,7 +504,9 @@ STR_GAME_OPTIONS_TOWN_NAME_CATALAN                              :Катталу�
 
 STR_GAME_OPTIONS_AUTOSAVE_FRAME                                 :{BLACK}Хӑй управ
 
+############ start of autosave dropdown
 STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF                          :Сӳнтер
+############ end of autosave dropdown
 
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Чӗлхи
 
@@ -496,8 +514,6 @@ STR_GAME_OPTIONS_FULLSCREEN                                     :{BLACK}Тулл
 
 STR_GAME_OPTIONS_RESOLUTION                                     :{BLACK}Экрана сӑнарлама пултарни
 STR_GAME_OPTIONS_RESOLUTION_OTHER                               :расна
-
-STR_GAME_OPTIONS_SCREENSHOT_FORMAT                              :{BLACK}Формат экран сӑнӗ
 
 
 
@@ -572,10 +588,10 @@ STR_CONFIG_SETTING_SCROLLWHEEL_OFF                              :Сӳнтер
 STR_CONFIG_SETTING_RIGHT_MOUSE_BTN_EMU_OFF                      :Сӳнтер
 
 
+
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_LONG               :вӑрӑм (2008 раш 31меш)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_SHORT              :кӗске (2008-12-31)
 STR_CONFIG_SETTING_DATE_FORMAT_IN_SAVE_NAMES_ISO                :ISO (2008-12-31)
-
 
 
 
@@ -604,14 +620,18 @@ STR_CONFIG_SETTING_TOWN_GROWTH_NORMAL                           :Виҫеллӗ
 STR_CONFIG_SETTING_TOWN_GROWTH_FAST                             :Хӑвӑрт
 STR_CONFIG_SETTING_TOWN_GROWTH_VERY_FAST                        :Питӗ хӑвӑрт
 
-STR_CONFIG_SETTING_GUI                                          :{ORANGE}Интерфейс
-STR_CONFIG_SETTING_CONSTRUCTION                                 :{ORANGE}Лартӑм
+
+
+
+
+
+
+
+STR_CONFIG_SETTING_INTERFACE                                    :{ORANGE}Интерфейс
+STR_CONFIG_SETTING_INTERFACE_CONSTRUCTION                       :{ORANGE}Лартӑм
 STR_CONFIG_SETTING_VEHICLES                                     :{ORANGE}Ҫул-йӗр:
-STR_CONFIG_SETTING_STATIONS                                     :{ORANGE}Станцисем:
+STR_CONFIG_SETTING_ENVIRONMENT_TOWNS                            :{ORANGE}Хуласем
 STR_CONFIG_SETTING_AI                                           :{ORANGE}Ӑмӑртуҫӑсем
-STR_CONFIG_SETTING_VEHICLES_AUTORENEW                           :{ORANGE}Автоҫӗнет
-STR_CONFIG_SETTING_VEHICLES_TRAINS                              :{ORANGE}Пуйӑссем
-STR_CONFIG_SETTING_ECONOMY_TOWNS                                :{ORANGE}Хуласем
 
 STR_CONFIG_SETTING_PATHFINDER_NPF                               :NPF
 
@@ -716,9 +736,6 @@ STR_FACE_TIE                                                    :Галстук:
 STR_FACE_EARRING                                                :Алка:
 
 # Network server list
-STR_NETWORK_SERVER_LIST_CONNECTION                              :{BLACK}Ҫыхӑну:
-STR_NETWORK_SERVER_LIST_LAN                                     :LAN
-STR_NETWORK_SERVER_LIST_INTERNET                                :Тетел
 STR_NETWORK_SERVER_LIST_PLAYER_NAME                             :{BLACK}Вӑйӑҫӑ ят:
 
 STR_NETWORK_SERVER_LIST_GAME_NAME                               :{BLACK}Ят
@@ -760,7 +777,6 @@ STR_NETWORK_SERVER_LIST_START_SERVER                            :{BLACK}Серв
 STR_NETWORK_START_SERVER_NEW_GAME_NAME                          :{BLACK}Вӑййи ят:
 STR_NETWORK_START_SERVER_SET_PASSWORD                           :{BLACK}Вырнаҫтар вӑрттӑн сӑмахӗ
 
-STR_NETWORK_START_SERVER_LAN_INTERNET                           :Вырӑнти Тӗвӗлӗх/Тетел
 
 
 # Network game languages
@@ -816,6 +832,10 @@ STR_CONTENT_DETAIL_VERSION                                      :{SILVER}Вер�
 
 
 # Transparency settings window
+
+# Linkgraph legend window
+
+# Linkgraph legend window and linkgraph legend in smallmap
 
 # Base for station construction window(s)
 
@@ -974,6 +994,8 @@ STR_GENERATION_OBJECT_GENERATION                                :{BLACK}Объе
 STR_NEWGRF_SETTINGS_VERSION                                     :{BLACK}Верси: {SILVER}{NUM}
 
 
+# NewGRF save preset window
+
 # NewGRF parameters window
 STR_NEWGRF_PARAMETERS_CLOSE                                     :{BLACK}Хуп
 STR_NEWGRF_PARAMETERS_RESET                                     :{BLACK}Сикӗ
@@ -1003,6 +1025,8 @@ STR_NEWGRF_LIST_NONE                                            :Ҫук
 
 
 # 'User removed essential NewGRFs'-placeholders for stuff without specs
+
+# Placeholders for other invalid stuff, e.g. vehicles that have gone (Game Script).
 
 # NewGRF scanning window
 
@@ -1035,6 +1059,8 @@ STR_GOALS_TEXT                                                  :{ORANGE}{STRING
 # Subsidies window
 STR_SUBSIDIES_NONE                                              :{ORANGE}- Ҫук -
 
+# Story book window
+
 # Station list window
 STR_STATION_LIST_STATION                                        :{YELLOW}{STATION} {STATION_FEATURES}
 STR_STATION_LIST_WAYPOINT                                       :{YELLOW}{WAYPOINT}
@@ -1046,7 +1072,8 @@ STR_STATION_VIEW_WAITING_CARGO                                  :{WHITE}{CARGO_L
 
 
 
-STR_STATION_VIEW_CARGO_RATING                                   :{WHITE}{STRING}: {YELLOW}{STRING} ({COMMA}%)
+
+
 
 ############ range for rating starts
 ############ range for rating ends
@@ -1097,6 +1124,7 @@ STR_INDUSTRY_DIRECTORY_NONE                                     :{ORANGE}- Ҫу�
 
 
 # Group window
+
 
 
 
@@ -1169,6 +1197,7 @@ STR_VEHICLE_VIEW_CAPTION                                        :{WHITE}{VEHICLE
 
 
 STR_VEHICLE_INFO_NO_CAPACITY                                    :{BLACK}Савӑт: {LTBLUE}Ҫук пул{STRING}
+
 
 
 
@@ -1350,6 +1379,7 @@ STR_ERROR_OBJECT_IN_THE_WAY                                     :{WHITE}Ҫул �
 
 
 
+
 # Specific vehicle errors
 
 
@@ -1362,6 +1392,8 @@ STR_ERROR_OBJECT_IN_THE_WAY                                     :{WHITE}Ҫул �
 # Sign related errors
 
 # Translatable comment for OpenTTD's desktop shortcut
+
+# Translatable descriptions in media/baseset/*.ob* files
 
 ##id 0x2000
 # Town building names
@@ -1440,7 +1472,7 @@ STR_JUST_DATE_SHORT                                             :{DATE_SHORT}
 STR_JUST_DATE_LONG                                              :{DATE_LONG}
 STR_JUST_DATE_ISO                                               :{DATE_ISO}
 STR_JUST_STRING                                                 :{STRING}
-STR_JUST_STRING_SPACE_STRING                                    :{STRING} {STRING}
+STR_JUST_STRING_STRING                                          :{STRING}{STRING}
 STR_JUST_RAW_STRING                                             :{STRING}
 
 # Slightly 'raw' stringcodes with colour or size
@@ -1465,9 +1497,7 @@ STR_WHITE_SIGN                                                  :{WHITE}{SIGN}
 STR_TINY_BLACK_STATION                                          :{TINY_FONT}{BLACK}{STATION}
 STR_BLACK_STRING                                                :{BLACK}{STRING}
 STR_BLACK_RAW_STRING                                            :{BLACK}{STRING}
-STR_GREEN_STRING                                                :{GREEN}{STRING}
 STR_ORANGE_STRING                                               :{ORANGE}{STRING}
-STR_RED_STRING                                                  :{RED}{STRING}
 STR_LTBLUE_STRING                                               :{LTBLUE}{STRING}
 STR_WHITE_STRING                                                :{WHITE}{STRING}
 STR_ORANGE_STRING1_WHITE                                        :{ORANGE}{STRING}{WHITE}

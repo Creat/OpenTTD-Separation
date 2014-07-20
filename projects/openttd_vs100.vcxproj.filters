@@ -117,6 +117,9 @@
     <ClCompile Include="..\src\bmp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\cargoaction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\cargomonitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -136,6 +139,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\console_cmds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\crashlog.cpp">
@@ -180,6 +186,9 @@
     <ClCompile Include="..\src\fontcache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\fontdetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\base_consist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -193,6 +202,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gfxinit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gfx_layout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\goal.cpp">
@@ -217,6 +229,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\landscape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\linkgraph\demands.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\linkgraph\flowmapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\linkgraph\linkgraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\linkgraph\linkgraphjob.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\linkgraph\linkgraphschedule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\linkgraph\mcf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\linkgraph\refresh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\map.cpp">
@@ -259,9 +292,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\order_backup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\os_timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\pbs.cpp">
@@ -321,6 +351,9 @@
     <ClCompile Include="..\src\strings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\story.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\subsidy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -349,6 +382,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\viewport_sprite_sorter_sse4.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\waypoint.cpp">
@@ -405,6 +441,9 @@
     <ClInclude Include="..\src\cargo_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\cargoaction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\cargomonitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -457,6 +496,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\console_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\cpu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\crashlog.h">
@@ -549,6 +591,9 @@
     <ClInclude Include="..\src\fontcache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\fontdetection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\base_consist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -562,6 +607,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gfx_func.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\gfx_layout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\gfx_type.h">
@@ -628,6 +676,42 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\language.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\demands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\flowmapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\linkgraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\linkgraph_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\linkgraph_gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\linkgraph_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\linkgraphjob.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\linkgraphjob_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\linkgraphschedule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\mcf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\linkgraph\refresh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\livery.h">
@@ -849,6 +933,9 @@
     <ClInclude Include="..\src\roadveh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\safeguards.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\screenshot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -933,7 +1020,16 @@
     <ClInclude Include="..\src\stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\story_base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\story_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\strgen\strgen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\string_base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\string_func.h">
@@ -1062,6 +1158,9 @@
     <ClInclude Include="..\src\viewport_func.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\viewport_sprite_sorter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\viewport_type.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1149,6 +1248,9 @@
     <ClInclude Include="..\src\core\mem_func.hpp">
       <Filter>Core Source Code</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\core\multimap.hpp">
+      <Filter>Core Source Code</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\core\overflowsafe_type.hpp">
       <Filter>Core Source Code</Filter>
     </ClInclude>
@@ -1168,6 +1270,12 @@
       <Filter>Core Source Code</Filter>
     </ClInclude>
     <ClInclude Include="..\src\core\smallmap_type.hpp">
+      <Filter>Core Source Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\core\smallmatrix_type.hpp">
+      <Filter>Core Source Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\core\smallstack_type.hpp">
       <Filter>Core Source Code</Filter>
     </ClInclude>
     <ClInclude Include="..\src\core\smallvec_type.hpp">
@@ -1245,6 +1353,9 @@
     <ClCompile Include="..\src\intro_gui.cpp">
       <Filter>GUI Source Code</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\linkgraph\linkgraph_gui.cpp">
+      <Filter>GUI Source Code</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\main_gui.cpp">
       <Filter>GUI Source Code</Filter>
     </ClCompile>
@@ -1306,6 +1417,9 @@
       <Filter>GUI Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\src\statusbar_gui.cpp">
+      <Filter>GUI Source Code</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\story_gui.cpp">
       <Filter>GUI Source Code</Filter>
     </ClCompile>
     <ClCompile Include="..\src\subsidy_gui.cpp">
@@ -1422,6 +1536,9 @@
     <ClInclude Include="..\src\widgets\intro_widget.h">
       <Filter>Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\widgets\link_graph_legend_widget.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\widgets\main_widget.h">
       <Filter>Widgets</Filter>
     </ClInclude>
@@ -1477,6 +1594,9 @@
       <Filter>Widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\src\widgets\statusbar_widget.h">
+      <Filter>Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\widgets\story_widget.h">
       <Filter>Widgets</Filter>
     </ClInclude>
     <ClInclude Include="..\src\widgets\subsidy_widget.h">
@@ -1644,6 +1764,9 @@
     <ClCompile Include="..\src\saveload\labelmaps_sl.cpp">
       <Filter>Save/Load handlers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\saveload\linkgraph_sl.cpp">
+      <Filter>Save/Load handlers</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\saveload\map_sl.cpp">
       <Filter>Save/Load handlers</Filter>
     </ClCompile>
@@ -1693,6 +1816,9 @@
       <Filter>Save/Load handlers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\saveload\strings_sl.cpp">
+      <Filter>Save/Load handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\saveload\story_sl.cpp">
       <Filter>Save/Load handlers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\saveload\subsidy_sl.cpp">
@@ -2211,6 +2337,15 @@
     <ClInclude Include="..\src\script\api\script_stationlist.hpp">
       <Filter>Script API</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\script\api\script_story_page.hpp">
+      <Filter>Script API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\script\api\script_storypagelist.hpp">
+      <Filter>Script API</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\script\api\script_storypageelementlist.hpp">
+      <Filter>Script API</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\script\api\script_subsidy.hpp">
       <Filter>Script API</Filter>
     </ClInclude>
@@ -2394,6 +2529,15 @@
     <ClCompile Include="..\src\script\api\script_stationlist.cpp">
       <Filter>Script API Implementation</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\script\api\script_story_page.cpp">
+      <Filter>Script API Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\script\api\script_storypagelist.cpp">
+      <Filter>Script API Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\script\api\script_storypageelementlist.cpp">
+      <Filter>Script API Implementation</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\script\api\script_subsidy.cpp">
       <Filter>Script API Implementation</Filter>
     </ClCompile>
@@ -2445,6 +2589,12 @@
     <ClInclude Include="..\src\blitter\32bpp_anim.hpp">
       <Filter>Blitters</Filter>
     </ClInclude>
+    <ClCompile Include="..\src\blitter\32bpp_anim_sse4.cpp">
+      <Filter>Blitters</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\blitter\32bpp_anim_sse4.hpp">
+      <Filter>Blitters</Filter>
+    </ClInclude>
     <ClCompile Include="..\src\blitter\32bpp_base.cpp">
       <Filter>Blitters</Filter>
     </ClCompile>
@@ -2461,6 +2611,30 @@
       <Filter>Blitters</Filter>
     </ClCompile>
     <ClInclude Include="..\src\blitter\32bpp_simple.hpp">
+      <Filter>Blitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\blitter\32bpp_sse_func.hpp">
+      <Filter>Blitters</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\blitter\32bpp_sse_type.h">
+      <Filter>Blitters</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\blitter\32bpp_sse2.cpp">
+      <Filter>Blitters</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\blitter\32bpp_sse2.hpp">
+      <Filter>Blitters</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\blitter\32bpp_sse4.cpp">
+      <Filter>Blitters</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\blitter\32bpp_sse4.hpp">
+      <Filter>Blitters</Filter>
+    </ClInclude>
+    <ClCompile Include="..\src\blitter\32bpp_ssse3.cpp">
+      <Filter>Blitters</Filter>
+    </ClCompile>
+    <ClInclude Include="..\src\blitter\32bpp_ssse3.hpp">
       <Filter>Blitters</Filter>
     </ClInclude>
     <ClCompile Include="..\src\blitter\8bpp_base.cpp">
@@ -2826,6 +3000,9 @@
     <ClCompile Include="..\src\pathfinder\yapf\yapf_ship.cpp">
       <Filter>YAPF</Filter>
     </ClCompile>
+    <ClInclude Include="..\src\pathfinder\yapf\yapf_type.hpp">
+      <Filter>YAPF</Filter>
+    </ClInclude>
     <ClCompile Include="..\src\video\dedicated_v.cpp">
       <Filter>Video</Filter>
     </ClCompile>

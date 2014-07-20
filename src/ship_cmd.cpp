@@ -36,6 +36,8 @@
 
 #include "table/strings.h"
 
+#include "safeguards.h"
+
 /**
  * Determine the effective #WaterClass for a ship travelling on a tile.
  * @param tile Tile of interest
@@ -57,6 +59,12 @@ WaterClass GetEffectiveWaterClass(TileIndex tile)
 
 static const uint16 _ship_sprites[] = {0x0E5D, 0x0E55, 0x0E65, 0x0E6D};
 
+template <>
+bool IsValidImageIndex<VEH_SHIP>(uint8 image_index)
+{
+	return image_index < lengthof(_ship_sprites);
+}
+
 static inline TrackBits GetTileShipTrackStatus(TileIndex tile)
 {
 	return TrackStatusToTrackBits(GetTileTrackStatus(tile, TRANSPORT_WATER, 0));
@@ -74,6 +82,7 @@ static SpriteID GetShipIcon(EngineID engine, EngineImageType image_type)
 		spritenum = e->original_image_index;
 	}
 
+	assert(IsValidImageIndex<VEH_SHIP>(spritenum));
 	return DIR_W + _ship_sprites[spritenum];
 }
 
@@ -115,6 +124,7 @@ SpriteID Ship::GetImage(Direction direction, EngineImageType image_type) const
 		spritenum = this->GetEngine()->original_image_index;
 	}
 
+	assert(IsValidImageIndex<VEH_SHIP>(spritenum));
 	return _ship_sprites[spritenum] + direction;
 }
 
@@ -245,7 +255,8 @@ Trackdir Ship::GetVehicleTrackdir() const
 
 void Ship::MarkDirty()
 {
-	this->UpdateViewport(false, false);
+	this->colourmap = PAL_NONE;
+	this->UpdateViewport(true, false);
 	this->UpdateCache();
 }
 
@@ -367,7 +378,7 @@ static bool ShipAccelerate(Vehicle *v)
 	byte t;
 
 	spd = min(v->cur_speed + 1, v->vcache.cached_max_speed);
-	spd = min(spd, v->current_order.max_speed * 2);
+	spd = min(spd, v->current_order.GetMaxSpeed() * 2);
 
 	/* updates statusbar only if speed have changed to save CPU time */
 	if (spd != v->cur_speed) {
@@ -375,7 +386,7 @@ static bool ShipAccelerate(Vehicle *v)
 		SetWindowWidgetDirty(WC_VEHICLE_VIEW, v->index, WID_VV_START_STOP);
 	}
 
-	/* Convert direction-indepenent speed into direction-dependent speed. (old movement method) */
+	/* Convert direction-independent speed into direction-dependent speed. (old movement method) */
 	spd = v->GetOldAdvanceSpeed(spd);
 
 	if (spd == 0) return false;
@@ -681,8 +692,10 @@ CommandCost CmdBuildShip(TileIndex tile, DoCommandFlag flags, const Engine *e, u
 		v->spritenum = svi->image_index;
 		v->cargo_type = e->GetDefaultCargoType();
 		v->cargo_cap = svi->capacity;
+		v->refit_cap = 0;
 
 		v->last_station_visited = INVALID_STATION;
+		v->last_loading_station = INVALID_STATION;
 		v->engine_type = e->index;
 
 		v->reliability = e->reliability;
@@ -692,7 +705,7 @@ CommandCost CmdBuildShip(TileIndex tile, DoCommandFlag flags, const Engine *e, u
 
 		v->state = TRACK_BIT_DEPOT;
 
-		v->service_interval = Company::Get(_current_company)->settings.vehicle.servint_ships;
+		v->SetServiceInterval(Company::Get(_current_company)->settings.vehicle.servint_ships);
 		v->date_of_last_service = _date;
 		v->build_year = _cur_year;
 		v->cur_image = SPR_IMG_QUERY;
@@ -701,6 +714,7 @@ CommandCost CmdBuildShip(TileIndex tile, DoCommandFlag flags, const Engine *e, u
 		v->UpdateCache();
 
 		if (e->flags & ENGINE_EXCLUSIVE_PREVIEW) SetBit(v->vehicle_flags, VF_BUILT_AS_PROTOTYPE);
+		v->SetServiceIntervalIsPercent(Company::Get(_current_company)->settings.vehicle.servint_ispercent);
 
 		v->InvalidateNewGRFCacheOfChain();
 

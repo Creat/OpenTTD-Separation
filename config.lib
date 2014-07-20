@@ -72,6 +72,7 @@ set_default() {
 	with_zlib="1"
 	with_lzma="1"
 	with_lzo2="1"
+	with_xdg_basedir="1"
 	with_png="1"
 	enable_builtin_depend="1"
 	with_makedepend="0"
@@ -91,6 +92,7 @@ set_default() {
 	with_ccache="1"
 	with_nforenum="1"
 	with_grfcodec="1"
+	with_sse="1"
 
 	save_params_array="
 		build
@@ -145,6 +147,7 @@ set_default() {
 		with_zlib
 		with_lzma
 		with_lzo2
+		with_xdg_basedir
 		with_png
 		enable_builtin_depend
 		with_makedepend
@@ -164,6 +167,7 @@ set_default() {
 		with_ccache
 		with_grfcodec
 		with_nforenum
+		with_sse
 	CC CXX CFLAGS CXXFLAGS LDFLAGS CFLAGS_BUILD CXXFLAGS_BUILD LDFLAGS_BUILD"
 }
 
@@ -347,6 +351,13 @@ detect_params() {
 			--without-liblzo2)            with_lzo2="0";;
 			--with-liblzo2=*)             with_lzo2="$optarg";;
 
+			--with-xdg-basedir)           with_xdg_basedir="2";;
+			--without-xdg-basedir)        with_xdg_basedir="0";;
+			--with-xdg-basedir=*)         with_xdg_basedir="$optarg";;
+			--with-libxdg-basedir)        with_xdg_basedir="2";;
+			--without-libxdg-basedir)     with_xdg_basedir="0";;
+			--with-libxdg-basedir=*)      with_xdg_basedir="$optarg";;
+
 			--with-png)                   with_png="2";;
 			--without-png)                with_png="0";;
 			--with-png=*)                 with_png="$optarg";;
@@ -437,6 +448,10 @@ detect_params() {
 			--without-threads)            with_threads="0";;
 			--with-threads)               with_threads="1";;
 			--with-threads=*)             with_threads="$optarg";;
+
+			--without-sse)                with_sse="0";;
+			--with-sse)                   with_sse="1";;
+			--with-sse=*)                 with_sse="$optarg";;
 
 			CC=* | --CC=*)                CC="$optarg";;
 			CXX=* | --CXX=*)              CXX="$optarg";;
@@ -578,6 +593,7 @@ check_params() {
 
 	check_makedepend
 	detect_cputype
+	detect_sse_capable_architecture
 
 	if [ "$enable_static" = "1" ]; then
 		if [ "$os" = "MINGW" ] || [ "$os" = "CYGWIN" ] || [ "$os" = "MORPHOS" ] || [ "$os" = "DOS" ]; then
@@ -818,6 +834,7 @@ check_params() {
 		fi
 	fi
 
+	detect_xdg_basedir
 	detect_png
 	detect_freetype
 	detect_fontconfig
@@ -845,7 +862,7 @@ check_params() {
 		endian="PREPROCESSOR"
 	fi
 
-	log 1 "checking endianess... $endian"
+	log 1 "checking endianness... $endian"
 
 	# Suppress language errors when there is a version defined, indicating a release
 	#  It just isn't pretty if any release produces warnings in the languages.
@@ -1012,6 +1029,12 @@ check_params() {
 
 	if [ -d "$ROOT_DIR/.svn" ] && [ -n "`svn help 2>/dev/null`" ]; then
 		log 1 "checking revision... svn detection"
+	elif [ -d "$ROOT_DIR/../.svn" ] && [ -n "`svn help 2>/dev/null`" ] && [ -n "`LC_ALL=C svn info $ROOT_DIR/.. | grep '^URL:.*tags$'`" ]; then
+		# subversion changed its behaviour; now not all folders have a .svn folder,
+		# but only the root folder. Since making tags requires a (sparse) checkout
+		# of the tags folder, the folder of the tag does not have a .svn folder
+		# anymore and this fails to detect the subversion repository checkout.
+		log 1 "checking revision... svn detection (tag)"
 	elif [ -d "$ROOT_DIR/.git" ] && [ -n "`git help 2>/dev/null`" ]; then
 		log 1 "checking revision... git detection"
 	elif [ -d "$ROOT_DIR/.hg" ] && [ -n "`hg help 2>/dev/null`" ]; then
@@ -1449,12 +1472,16 @@ make_cflags_and_ldflags() {
 	fi
 
 	if [ $enable_debug -le 2 ]; then
-		if basename "$cc_host" | grep "gcc" &>/dev/null; then
+		cc_host_is_gcc=`basename "$cc_host" | grep "gcc" &>/dev/null`
+		if [ -n "$cc_host_is_gcc" ]; then
 			# Define only when compiling with GCC. Some GLIBC versions use GNU
 			# extensions in a way that breaks build with at least ICC.
 			# This requires -O1 or more, so debug level 3 (-O0) is excluded.
 			CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+		fi
 
+		cc_build_is_gcc=`basename "$cc_build" | grep "gcc" &>/dev/null`
+		if [ -n "$cc_build_is_gcc" ]; then
 			# Just add -O1 to the tools needed for building.
 			CFLAGS_BUILD="$CFLAGS_BUILD -D_FORTIFY_SOURCE=2 -O1"
 		fi
@@ -1474,6 +1501,9 @@ make_cflags_and_ldflags() {
 	if [ "$with_threads" = "0" ]; then
 		CFLAGS="$CFLAGS -DNO_THREADS"
 	fi
+	if [ "$with_sse" = "1" ]; then
+		CFLAGS="$CFLAGS -DWITH_SSE"
+	fi
 
 	if [ "`echo $1 | cut -c 1-3`" != "icc" ]; then
 		if [ "$os" = "CYGWIN" ]; then
@@ -1481,15 +1511,18 @@ make_cflags_and_ldflags() {
 			LDFLAGS="$LDFLAGS -mwin32"
 		fi
 		if [ "$os" = "MINGW" ] || [ "$os" = "CYGWIN" ]; then
-			flags="$flags -mno-cygwin"
-
-			if [ "$enable_console" != "0" ]; then
-				LDFLAGS="$LDFLAGS -mno-cygwin -Wl,--subsystem,console"
-			else
-				LDFLAGS="$LDFLAGS -mno-cygwin -Wl,--subsystem,windows"
+			if [ $cc_version -lt 46 ]; then
+				flags="$flags -mno-cygwin"
+				LDFLAGS="$LDFLAGS -mno-cygwin"
 			fi
 
-			LIBS="$LIBS -lws2_32 -lwinmm -lgdi32 -ldxguid -lole32"
+			if [ "$enable_console" != "0" ]; then
+				LDFLAGS="$LDFLAGS -Wl,--subsystem,console"
+			else
+				LDFLAGS="$LDFLAGS -Wl,--subsystem,windows"
+			fi
+
+			LIBS="$LIBS -lws2_32 -lwinmm -lgdi32 -ldxguid -lole32 -limm32"
 
 			if [ $cc_version -ge 44 ]; then
 				LDFLAGS_BUILD="$LDFLAGS_BUILD -static-libgcc -static-libstdc++"
@@ -1549,7 +1582,7 @@ make_cflags_and_ldflags() {
 			LDFLAGS="$OSX_LD_SYSROOT $LDFLAGS"
 		fi
 
-		if [ "$enable_universal" = "0" ] && [ $cc_version -ge 40 ]; then
+		if [ "$enable_universal" = "0" ] && [ $cc_version -gt 40 ]; then
 			# Only set the min version when not doing an universal build.
 			# Universal builds set the version elsewhere.
 			if [ "$cpu_type" = "64" ]; then
@@ -1648,6 +1681,17 @@ make_cflags_and_ldflags() {
 		CFLAGS="$CFLAGS -DWITH_LZO"
 	fi
 
+	if [ -n "$xdg_basedir_config" ]; then
+		CFLAGS="$CFLAGS -DWITH_XDG_BASEDIR"
+		CFLAGS="$CFLAGS `$xdg_basedir_config --cflags | tr '\n\r' '  '`"
+
+		if [ "$enable_static" != "0" ]; then
+			LIBS="$LIBS `$xdg_basedir_config --libs --static | tr '\n\r' '  '`"
+		else
+			LIBS="$LIBS `$xdg_basedir_config --libs | tr '\n\r' '  '`"
+		fi
+	fi
+
 	# 64bit machines need -D_SQ64
 	if [ "$cpu_type" = "64" ] && [ "$enable_universal" = "0" ]; then
 		CFLAGS="$CFLAGS -D_SQ64"
@@ -1656,17 +1700,18 @@ make_cflags_and_ldflags() {
 
 	if [ -n "$png_config" ]; then
 		CFLAGS="$CFLAGS -DWITH_PNG"
-		CFLAGS="$CFLAGS `$png_config --cppflags --I_opts | tr '\n\r' '  '`"
+		CFLAGS="$CFLAGS `$png_config --cflags | tr '\n\r' '  '`"
 
-		# The extra flags are unneeded for latest libpng-config, but some versions are so broken...
 		if [ "$enable_static" != "0" ]; then
 			if [ "$os" = "OSX" ]; then
-				LIBS="$LIBS `$png_config --prefix`/lib/libpng.a"
+				# fontconfig_config goes via pkg-config on all systems, which doesn't know --prefix
+				# Also, despite the reason we link to the .a file ourself (because we can't use -static), we do need to ask pkg-config about possible other deps
+				LIBS="$LIBS `$png_config --variable=prefix`/lib/libpng.a `$png_config --libs --static | sed s@-lpng[0-9]*@@`"
 			else
-				LIBS="$LIBS `$png_config --static --ldflags | tr '\n\r' '  '`"
+				LIBS="$LIBS `$png_config --libs --static | tr '\n\r' '  '`"
 			fi
 		else
-			LIBS="$LIBS `$png_config --ldflags | tr '\n\r' '  '`"
+			LIBS="$LIBS `$png_config --libs | tr '\n\r' '  '`"
 		fi
 	fi
 
@@ -1709,9 +1754,9 @@ make_cflags_and_ldflags() {
 
 		# Some icu-configs have the 'feature' of not adding a space where others do add the space
 		if [ "$static_icu" != "0" ]; then
-			LIBS="$LIBS `$icu_config --ldflags-searchpath` `$icu_config --ldflags-libsonly | tr '\n\r' '  ' | sed s/licu/lsicu/g`"
+			LIBS="$LIBS `$icu_config --ldflags-searchpath` `($icu_config --ldflags-libsonly; $icu_config --ldflags-layout) | tr '\n\r' '  ' | sed s/licu/lsicu/g`"
 		else
-			LIBS="$LIBS `$icu_config --ldflags-searchpath` `$icu_config --ldflags-libsonly | tr '\n\r' '  '`"
+			LIBS="$LIBS `$icu_config --ldflags-searchpath` `($icu_config --ldflags-libsonly; $icu_config --ldflags-layout) | tr '\n\r' '  '`"
 		fi
 	fi
 
@@ -1745,7 +1790,7 @@ make_cflags_and_ldflags() {
 			fi
 		fi
 
-		if [ "$have_non_const_iconv" != "no" ]; then
+		if [ "$os" != "OSX" ] && [ "$have_non_const_iconv" != "no" ]; then
 			CFLAGS="$CFLAGS -DHAVE_NON_CONST_ICONV"
 		fi
 	fi
@@ -2671,42 +2716,64 @@ detect_libtimidity() {
 	detect_library "$with_libtimidity" "libtimidity" "libtimidity.a" "" "timidity.h"
 }
 
-detect_lzma() {
-	# 0 means no, 1 is auto-detect, 2 is force
-	if [ "$with_lzma" = "0" ]; then
-		log 1 "checking liblzma... disabled"
+detect_pkg_config() {
+	# $1 - config-param ($with_lzma value)
+	# $2 - package name ('liblzma')
+	# $3 - config name ('lzma_config', sets $lzma_config)
+	# $4 - minimum module version ('2.3')
 
-		lzma_config=""
+	# 0 means no, 1 is auto-detect, 2 is force
+	if [ "$1" = "0" ]; then
+		log 1 "checking $2... disabled"
+
+		eval "$3=\"\""
 		return 0
 	fi
 
-	if [ "$with_lzma" = "1" ] || [ "$with_lzma" = "" ] || [ "$with_lzma" = "2" ]; then
-		lzma_config="pkg-config liblzma"
+	log 2 "detecting $2"
+
+	if [ "$1" = "1" ] || [ "$1" = "" ] || [ "$1" = "2" ]; then
+		pkg_config_call="pkg-config $2"
 	else
-		lzma_config="$with_lzma"
+		pkg_config_call="$1"
 	fi
 
-	version=`$lzma_config --modversion 2>/dev/null`
+	version=`$pkg_config_call --modversion 2>/dev/null`
 	ret=$?
-	log 2 "executing $lzma_config --modversion"
+	check_version "$4" "$version"
+	version_ok=$?
+	log 2 "executing $pkg_config_call --modversion"
 	log 2 "  returned $version"
 	log 2 "  exit code $ret"
 
-	if [ -z "$version" ] || [ "$ret" != "0" ]; then
-		log 1 "checking liblzma... not found"
+	if [ -z "$version" ] || [ "$ret" != "0" ] || [ "$version_ok" != "1" ]; then
+		if [ -n "$version" ] && [ "$version_ok" != "1" ]; then
+			log 1 "checking $2... needs at least version $4, $2 NOT enabled"
+		else
+			log 1 "checking $2... not found"
+		fi
 
 		# It was forced, so it should be found.
-		if [ "$with_lzma" != "1" ]; then
-			log 1 "configure: error: pkg-config liblzma couldn't be found"
-			log 1 "configure: error: you supplied '$with_lzma', but it seems invalid"
+		if [ "$1" != "1" ]; then
+			log 1 "configure: error: pkg-config $2 couldn't be found"
+			log 1 "configure: error: you supplied '$1', but it seems invalid"
 			exit 1
 		fi
 
-		lzma_config=""
+		eval "$3=\"\""
 		return 0
 	fi
 
-	log 1 "checking liblzma... found"
+	eval "$3=\"$pkg_config_call\""
+	log 1 "checking $2... found"
+}
+
+detect_lzma() {
+	detect_pkg_config "$with_lzma" "liblzma" "lzma_config" "5.0"
+}
+
+detect_xdg_basedir() {
+	detect_pkg_config "$with_xdg_basedir" "libxdg-basedir" "xdg_basedir_config" "1.2"
 }
 
 detect_png() {
@@ -2733,33 +2800,7 @@ detect_png() {
 		return 0
 	fi
 
-	if [ "$with_png" = "1" ] || [ "$with_png" = "" ] || [ "$with_png" = "2" ]; then
-		png_config="libpng-config"
-	else
-		png_config="$with_png"
-	fi
-
-	version=`$png_config --version 2>/dev/null`
-	ret=$?
-	log 2 "executing $png_config --version"
-	log 2 "  returned $version"
-	log 2 "  exit code $ret"
-
-	if [ -z "$version" ] || [ "$ret" != "0" ]; then
-		log 1 "checking libpng... not found"
-
-		# It was forced, so it should be found.
-		if [ "$with_png" != "1" ]; then
-			log 1 "configure: error: libpng-config couldn't be found"
-			log 1 "configure: error: you supplied '$with_png', but it seems invalid"
-			exit 1
-		fi
-
-		png_config=""
-		return 0
-	fi
-
-	log 1 "checking libpng... found"
+	detect_pkg_config "$with_png" "libpng" "png_config" "1.2"
 }
 
 detect_freetype() {
@@ -2854,39 +2895,7 @@ detect_fontconfig() {
 		return 0
 	fi
 
-	if [ "$with_fontconfig" = "1" ] || [ "$with_fontconfig" = "" ] || [ "$with_fontconfig" = "2" ]; then
-		fontconfig_config="pkg-config fontconfig"
-	else
-		fontconfig_config="$with_fontconfig"
-	fi
-
-	version=`$fontconfig_config --modversion 2>/dev/null`
-	ret=$?
-	check_version '2.3' "$version"
-	version_ok=$?
-	log 2 "executing $fontconfig_config --modversion"
-	log 2 "  returned $version"
-	log 2 "  exit code $ret"
-
-	if [ -z "$version" ] || [ "$ret" != "0" ] || [ "$version_ok" != "1" ]; then
-		if [ -n "$version" ] && [ "$version_ok" != "1" ]; then
-			log 1 "checking libfontconfig... needs at least version 2.3.0, fontconfig NOT enabled"
-		else
-			log 1 "checking libfontconfig... not found"
-		fi
-
-		# It was forced, so it should be found.
-		if [ "$with_fontconfig" != "1" ]; then
-			log 1 "configure: error: fontconfig-config couldn't be found"
-			log 1 "configure: error: you supplied '$with_fontconfig', but it seems invalid"
-			exit 1
-		fi
-
-		fontconfig_config=""
-		return 0
-	fi
-
-	log 1 "checking libfontconfig... found"
+	detect_pkg_config "$with_fontconfig" "fontconfig" "fontconfig_config" "2.3"
 }
 
 detect_icu() {
@@ -3169,9 +3178,9 @@ detect_grfcodec() {
 	log 2 "  returned $version"
 	log 2 "  exit code $ret"
 
-	if [ -z "$version" ] || [ "$ret" != "0" ] || [ "$version" -lt "913" ]; then
-		if [ -n "$version" ] && [ "$version" -lt "913" ]; then
-			log 1 "checking grfcodec... needs at least version 5.1.4 (r913), disabled"
+	if [ -z "$version" ] || [ "$ret" != "0" ] || [ "$version" -lt "949" ]; then
+		if [ -n "$version" ] && [ "$version" -lt "949" ]; then
+			log 1 "checking grfcodec... needs at least version 6.0.2 (r949), disabled"
 		else
 			log 1 "checking grfcodec... not found"
 		fi
@@ -3211,9 +3220,9 @@ detect_nforenum() {
 	log 2 "  returned $version"
 	log 2 "  exit code $ret"
 
-	if [ -z "$version" ] || [ "$ret" != "0" ] || [ "$version" -lt "913" ]; then
-		if [ -n "$version" ] && [ "$version" -lt "913" ]; then
-			log 1 "checking nforenum... needs at least version 5.1.4 (r913), disabled"
+	if [ -z "$version" ] || [ "$ret" != "0" ] || [ "$version" -lt "949" ]; then
+		if [ -n "$version" ] && [ "$version" -lt "949" ]; then
+			log 1 "checking nforenum... needs at least version 6.0.2 (r949), disabled"
 		else
 			log 1 "checking nforenum... not found"
 		fi
@@ -3250,6 +3259,40 @@ detect_cputype() {
 	if [ "$ret" = "0" ]; then cpu_type="64"; else cpu_type="32"; fi
 	log 1 "detecting cpu-type... $cpu_type bits"
 	rm -f tmp.64bit tmp.64bit.cpp
+}
+
+detect_sse_capable_architecture() {
+	# 0 means no, 1 is auto-detect, 2 is force
+	if [ "$with_sse" = "0" ]; then
+		log 1 "checking SSE... disabled"
+		return
+	fi
+
+	echo "#define _SQ64 1" > tmp.sse.cpp
+	echo "#include <xmmintrin.h>" >> tmp.sse.cpp
+	echo "#include <smmintrin.h>" >> tmp.sse.cpp
+	echo "#include <tmmintrin.h>" >> tmp.sse.cpp
+	echo "int main() { return 0; }" >> tmp.sse.cpp
+	execute="$cxx_host -msse4.1 $CFLAGS tmp.sse.cpp -o tmp.sse 2>&1"
+	sse="`eval $execute 2>/dev/null`"
+	ret=$?
+	log 2 "executing $execute"
+	log 2 "  returned $sse"
+	log 2 "  exit code $ret"
+	if [ "$ret" = "0" ]; then
+		log 1 "detecting SSE... found"
+	else
+		# It was forced, so it should be found.
+		if [ "$with_sse" != "1" ]; then
+			log 1 "configure: error: SSE couln't be found"
+			log 1 "configure: error: you force enabled SSE, but it seems unavailable"
+			exit 1
+		fi
+
+		log 1 "detecting SSE... not found"
+		with_sse="0"
+	fi
+	rm -f tmp.sse tmp.exe tmp.sse.cpp
 }
 
 make_sed() {
@@ -3429,7 +3472,7 @@ generate_settings() {
 }
 
 generate_grf() {
-	STAGE="[GRF]"
+	STAGE="[BASESET]"
 
 	make_sed
 
@@ -3479,7 +3522,7 @@ generate_src_osx() {
 				CFLAGS="-isysroot $osx_sdk_path $CFLAGS_orig"
 				LDFLAGS="-Wl,-syslibroot,$osx_sdk_path $LDFLAGS_orig"
 			fi
-			CFLAGS="$CFLAGS -D_SQ64 -DHAVE_NON_CONST_ICONV -DNO_QUICKTIME -UENABLE_COCOA_QUICKDRAW"
+			CFLAGS="$CFLAGS -D_SQ64 -DNO_QUICKTIME -UENABLE_COCOA_QUICKDRAW"
 			LIBS="`echo $LIBS | sed 's/-framework QuickTime//'`"
 		fi
 
@@ -3622,13 +3665,16 @@ showhelp() {
 	echo "  --with-cocoa                   enables COCOA video driver (OSX ONLY)"
 	echo "  --with-sdl[=sdl-config]        enables SDL video driver support"
 	echo "  --with-zlib[=zlib.a]           enables zlib support"
-	echo "  --with-liblzma[=liblzma.a]     enables liblzma support"
+	echo "  --with-liblzma[=\"pkg-config liblzma\"]"
+	echo "                                 enables liblzma support"
 	echo "  --with-liblzo2[=liblzo2.a]     enables liblzo2 support"
 	echo "  --with-png[=libpng-config]     enables libpng support"
 	echo "  --with-freetype[=freetype-config]"
 	echo "                                 enables libfreetype support"
-	echo "  --with-fontconfig[=pkg-config fontconfig]"
+	echo "  --with-fontconfig[=\"pkg-config fontconfig\"]"
 	echo "                                 enables fontconfig support"
+	echo "  --with-xdg-basedir[=\"pkg-config libxdg-basedir\"]"
+	echo "                                 enables XDG base directory support"
 	echo "  --with-icu[=icu-config]        enables icu (used for right-to-left support)"
 	echo "  --static-icu                   try to link statically (libsicu instead of"
 	echo "                                 libicu; can fail as the new name is guessed)"
@@ -3638,6 +3684,9 @@ showhelp() {
 	echo "  --with-makedepend[=makedepend] enables makedepend support"
 	echo "  --with-ccache                  enables ccache support"
 	echo "  --with-distcc                  enables distcc support"
+	echo "  --without-grfcodec             disable usage of grfcodec and re-generation of base sets"
+	echo "  --without-threads              disable threading support"
+	echo "  --without-sse                  disable SSE support (x86/x86_64 only)"
 	echo ""
 	echo "Some influential environment variables:"
 	echo "  CC                             C compiler command"
@@ -3648,6 +3697,9 @@ showhelp() {
 	echo "  LDFLAGS                        linker flags, e.g. -L<lib dir> if you"
 	echo "                                 have libraries in a nonstandard"
 	echo "                                 directory <lib dir>"
+	echo "  CFLAGS_BUILD                   C compiler flags for build time tool generation"
+	echo "  CXXFLAGS_BUILD                 C++ compiler flags for build time tool generation"
+	echo "  LDFLAGS_BUILD                  linker flags for build time tool generation"
 	echo ""
 	echo "Use these variables to override the choices made by 'configure' or to help"
 	echo "it to find libraries and programs with nonstandard names/locations."

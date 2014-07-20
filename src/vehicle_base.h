@@ -12,6 +12,7 @@
 #ifndef VEHICLE_BASE_H
 #define VEHICLE_BASE_H
 
+#include "core/smallmap_type.hpp"
 #include "track_type.h"
 #include "command_type.h"
 #include "order_base.h"
@@ -22,6 +23,8 @@
 #include "transport_type.h"
 #include "group_type.h"
 #include "base_consist.h"
+#include <list>
+#include <map>
 
 /** Vehicle status bits in #Vehicle::vehstatus. */
 enum VehStatus {
@@ -45,6 +48,8 @@ enum VehicleFlags {
 	VF_AUTOFILL_PRES_WAIT_TIME, ///< Whether non-destructive auto-fill should preserve waiting times
 	VF_STOP_LOADING,            ///< Don't load anymore during the next load cycle.
 	VF_PATHFINDER_LOST,         ///< Vehicle's pathfinder is lost.
+	VF_SERVINT_IS_CUSTOM,       ///< Service interval is custom.
+	VF_SERVINT_IS_PERCENT,      ///< Service interval is percent.
 };
 
 /** Bit numbers used to indicate which of the #NewGRFCache values are valid. */
@@ -53,6 +58,7 @@ enum NewGRFCacheValidValues {
 	NCVV_POSITION_SAME_ID_LENGTH   = 1, ///< This bit will be set if the NewGRF var 41 currently stored is valid.
 	NCVV_CONSIST_CARGO_INFORMATION = 2, ///< This bit will be set if the NewGRF var 42 currently stored is valid.
 	NCVV_COMPANY_INFORMATION       = 3, ///< This bit will be set if the NewGRF var 43 currently stored is valid.
+	NCVV_POSITION_IN_VEHICLE       = 4, ///< This bit will be set if the NewGRF var 4D currently stored is valid.
 	NCVV_END,                           ///< End of the bits.
 };
 
@@ -63,6 +69,7 @@ struct NewGRFCache {
 	uint32 position_same_id_length;   ///< Cache for NewGRF var 41.
 	uint32 consist_cargo_information; ///< Cache for NewGRF var 42. (Note: The cargotype is untranslated in the cache because the accessing GRF is yet unknown.)
 	uint32 company_information;       ///< Cache for NewGRF var 43.
+	uint32 position_in_vehicle;       ///< Cache for NewGRF var 4D.
 	uint8  cache_valid;               ///< Bitset that indicates which cache values are valid.
 };
 
@@ -121,15 +128,30 @@ extern void FixOldVehicles();
 
 struct GRFFile;
 
+/**
+ * Simulated cargo type and capacity for prediction of future links.
+ */
+struct RefitDesc {
+	CargoID cargo;    ///< Cargo type the vehicle will be carrying.
+	uint16 capacity;  ///< Capacity the vehicle will have.
+	uint16 remaining; ///< Capacity remaining from before the previous refit.
+	RefitDesc(CargoID cargo, uint16 capacity, uint16 remaining) :
+			cargo(cargo), capacity(capacity), remaining(remaining) {}
+};
+
 /** %Vehicle data structure. */
 struct Vehicle : VehiclePool::PoolItem<&_vehicle_pool>, BaseVehicle, BaseConsist {
 private:
+	typedef std::list<RefitDesc> RefitList;
+	typedef std::map<CargoID, uint> CapacitiesMap;
+
 	Vehicle *next;                      ///< pointer to the next vehicle in the chain
 	Vehicle *previous;                  ///< NOSAVE: pointer to the previous vehicle in the chain
 	Vehicle *first;                     ///< NOSAVE: pointer to the first vehicle in the chain
 
 	Vehicle *next_shared;               ///< pointer to the next vehicle that shares the order
 	Vehicle *previous_shared;           ///< NOSAVE: pointer to the previous vehicle in the shared order chain
+
 public:
 	friend const SaveLoad *GetVehicleDescription(VehicleType vt); ///< So we can use private/protected variables in the saveload code
 	friend void FixOldVehicles();
@@ -209,10 +231,12 @@ public:
 	byte waiting_triggers;              ///< Triggers to be yet matched before rerandomizing the random bits.
 
 	StationID last_station_visited;     ///< The last station we stopped at.
+	StationID last_loading_station;     ///< Last station the vehicle has stopped at and could possibly leave from with any cargo loaded.
 
 	CargoID cargo_type;                 ///< type of cargo this vehicle is carrying
 	byte cargo_subtype;                 ///< Used for livery refits (NewGRF variations)
 	uint16 cargo_cap;                   ///< total capacity
+	uint16 refit_cap;                   ///< Capacity left over from before last refit.
 	VehicleCargoList cargo;             ///< The cargo this vehicle is carrying
 	uint16 cargo_age_counter;           ///< Ticks till cargo is aged next.
 
@@ -242,6 +266,7 @@ public:
 	virtual ~Vehicle();
 
 	void BeginLoading();
+	void CancelReservation(StationID next, Station *st);
 	void LeaveStation();
 
 	GroundVehicleCache *GetGroundVehicleCache();
@@ -253,6 +278,10 @@ public:
 	void DeleteUnreachedImplicitOrders();
 
 	void HandleLoading(bool mode = false);
+
+	void GetConsistFreeCapacities(SmallMap<CargoID, uint> &capacities) const;
+
+	uint GetConsistTotalCapacity() const;
 
 	/**
 	 * Marks the vehicles to be redrawn and updates cached variables
@@ -595,6 +624,17 @@ public:
 	inline VehicleOrderID GetNumManualOrders() const { return (this->orders.list == NULL) ? 0 : this->orders.list->GetNumManualOrders(); }
 
 	/**
+	 * Get the next station the vehicle will stop at.
+	 * @return ID of the next station the vehicle will stop at or INVALID_STATION.
+	 */
+	inline StationIDStack GetNextStoppingStation() const
+	{
+		return (this->orders.list == NULL) ? INVALID_STATION : this->orders.list->GetNextStoppingStation(this);
+	}
+
+	void ResetRefitCaps();
+
+	/**
 	 * Copy certain configurations and statistics of a vehicle after successful autoreplace/renew
 	 * The function shall copy everything that cannot be copied by a command (like orders / group etc),
 	 * and that shall not be resetted for the new vehicle.
@@ -644,6 +684,18 @@ public:
 
 	void UpdateVisualEffect(bool allow_power_change = true);
 	void ShowVisualEffect() const;
+
+	inline uint16 GetServiceInterval() const { return this->service_interval; }
+
+	inline void SetServiceInterval(uint16 interval) { this->service_interval = interval; }
+
+	inline bool ServiceIntervalIsCustom() const { return HasBit(this->vehicle_flags, VF_SERVINT_IS_CUSTOM); }
+
+	inline bool ServiceIntervalIsPercent() const { return HasBit(this->vehicle_flags, VF_SERVINT_IS_PERCENT); }
+
+	inline void SetServiceIntervalIsCustom(bool on) { SB(this->vehicle_flags, VF_SERVINT_IS_CUSTOM, 1, on); }
+
+	inline void SetServiceIntervalIsPercent(bool on) { SB(this->vehicle_flags, VF_SERVINT_IS_PERCENT, 1, on); }
 
 private:
 	/**

@@ -16,6 +16,8 @@
 
 #include "saveload_internal.h"
 
+#include "../safeguards.h"
+
 /**
  * Converts this order from an old savegame's version;
  * it moves all bits to the new location.
@@ -107,7 +109,7 @@ const SaveLoad *GetOrderDescription()
 		     SLE_VAR(Order, dest,           SLE_UINT16),
 		     SLE_REF(Order, next,           REF_ORDER),
 		 SLE_CONDVAR(Order, refit_cargo,    SLE_UINT8,   36, SL_MAX_VERSION),
-		 SLE_CONDVAR(Order, refit_subtype,  SLE_UINT8,   36, SL_MAX_VERSION),
+		SLE_CONDNULL(1,                                  36, 181), // refit_subtype
 		 SLE_CONDVAR(Order, wait_time,      SLE_UINT16,  67, SL_MAX_VERSION),
 		 SLE_CONDVAR(Order, travel_time,    SLE_UINT16,  67, SL_MAX_VERSION),
 		 SLE_CONDVAR(Order, max_speed,      SLE_UINT16, 172, SL_MAX_VERSION),
@@ -184,6 +186,10 @@ static void Load_ORDR()
 		while ((index = SlIterateArray()) != -1) {
 			Order *order = new (index) Order();
 			SlObject(order, GetOrderDescription());
+			if (IsSavegameVersionBefore(190)) {
+				order->SetTravelTimetabled(order->GetTravelTime() > 0);
+				order->SetWaitTimetabled(order->GetWaitTime() > 0);
+			}
 		}
 	}
 }
@@ -254,15 +260,16 @@ const SaveLoad *GetOrderBackupDescription()
 		     SLE_VAR(OrderBackup, user,                     SLE_UINT32),
 		     SLE_VAR(OrderBackup, tile,                     SLE_UINT32),
 		     SLE_VAR(OrderBackup, group,                    SLE_UINT16),
-		     SLE_VAR(OrderBackup, service_interval,         SLE_INT32),
+		     SLE_VAR(OrderBackup, service_interval,         SLE_UINT32),
 		     SLE_STR(OrderBackup, name,                     SLE_STR, 0),
 		     SLE_VAR(OrderBackup, clone,                    SLE_UINT16),
 		     SLE_VAR(OrderBackup, cur_real_order_index,     SLE_UINT8),
-		 SLE_CONDVAR(OrderBackup, cur_implicit_order_index, SLE_UINT8,     176, SL_MAX_VERSION),
-		 SLE_CONDVAR(OrderBackup, current_order_time,       SLE_UINT32,    176, SL_MAX_VERSION),
-		 SLE_CONDVAR(OrderBackup, lateness_counter,         SLE_INT32,     176, SL_MAX_VERSION),
-		 SLE_CONDVAR(OrderBackup, timetable_start,          SLE_INT32,     176, SL_MAX_VERSION),
-		 SLE_CONDVAR(OrderBackup, vehicle_flags,            SLE_UINT8,     176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, cur_implicit_order_index, SLE_UINT8,                 176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, current_order_time,       SLE_UINT32,                176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, lateness_counter,         SLE_INT32,                 176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, timetable_start,          SLE_INT32,                 176, SL_MAX_VERSION),
+		 SLE_CONDVAR(OrderBackup, vehicle_flags,            SLE_FILE_U8 | SLE_VAR_U16, 176, 179),
+		 SLE_CONDVAR(OrderBackup, vehicle_flags,            SLE_UINT16,                180, SL_MAX_VERSION),
 		     SLE_REF(OrderBackup, orders,                   REF_ORDER),
 		     SLE_END()
 	};

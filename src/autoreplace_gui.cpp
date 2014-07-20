@@ -28,6 +28,8 @@
 
 #include "widgets/autoreplace_widget.h"
 
+#include "safeguards.h"
+
 
 uint GetEngineListHeight(VehicleType type);
 void DrawEngineList(VehicleType type, int x, int r, int y, const GUIEngineList *eng_list, uint16 min, uint16 max, EngineID selected_id, bool show_count, GroupID selected_group);
@@ -45,7 +47,7 @@ static int CDECL EngineNumberSorter(const EngineID *a, const EngineID *b)
  * @param id_g The group the engine belongs to
  *  Note: this function only works if it is called either
  *   - when a new vehicle is build, but before it's counted in num_engines
- *   - when a vehicle is deleted and after it's substracted from num_engines
+ *   - when a vehicle is deleted and after it's subtracted from num_engines
  *   - when not changing the count (used when changing replace orders)
  */
 void InvalidateAutoreplaceWindow(EngineID e, GroupID id_g)
@@ -164,10 +166,21 @@ class ReplaceVehicleWindow : public Window {
 				this->engines[1].Clear();
 				this->sel_engine[1] = INVALID_ENGINE;
 			} else {
+				if (this->reset_sel_engine && this->sel_engine[0] != INVALID_ENGINE) {
+					/* Select the current replacement for sel_engine[0]. */
+					const Company *c = Company::Get(_local_company);
+					this->sel_engine[1] = EngineReplacementForCompany(c, this->sel_engine[0], this->sel_group);
+				}
+				/* Regenerate the list on the right. Note: This resets sel_engine[1] to INVALID_ENGINE, if it is no longer available. */
 				this->GenerateReplaceVehList(false);
 				this->vscroll[1]->SetCount(this->engines[1].Length());
-				if (this->reset_sel_engine && this->sel_engine[1] == INVALID_ENGINE && this->engines[1].Length() != 0) {
-					this->sel_engine[1] = this->engines[1][0];
+				if (this->reset_sel_engine && this->sel_engine[1] != INVALID_ENGINE) {
+					int position = 0;
+					for (EngineID *it = this->engines[1].Begin(); it != this->engines[1].End(); ++it) {
+						if (*it == this->sel_engine[1]) break;
+						++position;
+					}
+					this->vscroll[1]->ScrollTowards(position);
 				}
 			}
 		}
@@ -186,11 +199,10 @@ class ReplaceVehicleWindow : public Window {
 		EngineID veh_from = this->sel_engine[0];
 		EngineID veh_to = this->sel_engine[1];
 		DoCommandP(0, (replace_when_old ? 1 : 0) | (this->sel_group << 16), veh_from + (veh_to << 16), CMD_SET_AUTOREPLACE);
-		this->SetDirty();
 	}
 
 public:
-	ReplaceVehicleWindow(const WindowDesc *desc, VehicleType vehicletype, GroupID id_g) : Window()
+	ReplaceVehicleWindow(WindowDesc *desc, VehicleType vehicletype, GroupID id_g) : Window(desc)
 	{
 		if (vehicletype == VEH_TRAIN) {
 			/* For rail vehicles find the most used vehicle type, which is usually
@@ -218,10 +230,10 @@ public:
 		this->sel_engine[0] = INVALID_ENGINE;
 		this->sel_engine[1] = INVALID_ENGINE;
 
-		this->CreateNestedTree(desc);
+		this->CreateNestedTree();
 		this->vscroll[0] = this->GetScrollbar(WID_RV_LEFT_SCROLLBAR);
 		this->vscroll[1] = this->GetScrollbar(WID_RV_RIGHT_SCROLLBAR);
-		this->FinishInitNested(desc, vehicletype);
+		this->FinishInitNested(vehicletype);
 
 		this->owner = _local_company;
 		this->sel_group = id_g;
@@ -266,10 +278,8 @@ public:
 			}
 
 			case WID_RV_INFO_TAB: {
-				SetDParam(0, STR_REPLACE_NOT_REPLACING);
-				Dimension d = GetStringBoundingBox(STR_BLACK_STRING);
-				SetDParam(0, STR_REPLACE_NOT_REPLACING_VEHICLE_SELECTED);
-				d = maxdim(d, GetStringBoundingBox(STR_BLACK_STRING));
+				Dimension d = GetStringBoundingBox(STR_REPLACE_NOT_REPLACING);
+				d = maxdim(d, GetStringBoundingBox(STR_REPLACE_NOT_REPLACING_VEHICLE_SELECTED));
 				d.width += WD_FRAMETEXT_LEFT +  WD_FRAMETEXT_RIGHT;
 				d.height += WD_FRAMERECT_TOP + WD_FRAMERECT_BOTTOM;
 				*size = maxdim(*size, d);
@@ -341,20 +351,21 @@ public:
 		switch (widget) {
 			case WID_RV_INFO_TAB: {
 				const Company *c = Company::Get(_local_company);
+				StringID str;
 				if (this->sel_engine[0] != INVALID_ENGINE) {
 					if (!EngineHasReplacementForCompany(c, this->sel_engine[0], this->sel_group)) {
-						SetDParam(0, STR_REPLACE_NOT_REPLACING);
+						str = STR_REPLACE_NOT_REPLACING;
 					} else {
 						bool when_old = false;
 						EngineID e = EngineReplacementForCompany(c, this->sel_engine[0], this->sel_group, &when_old);
-						SetDParam(0, when_old ? STR_REPLACE_REPLACING_WHEN_OLD : STR_ENGINE_NAME);
-						SetDParam(1, e);
+						str = when_old ? STR_REPLACE_REPLACING_WHEN_OLD : STR_ENGINE_NAME;
+						SetDParam(0, e);
 					}
 				} else {
-					SetDParam(0, STR_REPLACE_NOT_REPLACING_VEHICLE_SELECTED);
+					str = STR_REPLACE_NOT_REPLACING_VEHICLE_SELECTED;
 				}
 
-				DrawString(r.left + WD_FRAMETEXT_LEFT, r.right - WD_FRAMETEXT_RIGHT, r.top + WD_FRAMERECT_TOP, STR_BLACK_STRING, TC_FROMSTRING, SA_HOR_CENTER);
+				DrawString(r.left + WD_FRAMETEXT_LEFT, r.right - WD_FRAMETEXT_RIGHT, r.top + WD_FRAMERECT_TOP, str, TC_BLACK, SA_HOR_CENTER);
 				break;
 			}
 
@@ -455,7 +466,6 @@ public:
 			case WID_RV_STOP_REPLACE: { // Stop replacing
 				EngineID veh_from = this->sel_engine[0];
 				DoCommandP(0, this->sel_group << 16, veh_from + (INVALID_ENGINE << 16), CMD_SET_AUTOREPLACE);
-				this->SetDirty();
 				break;
 			}
 
@@ -511,9 +521,6 @@ public:
 	{
 		this->vscroll[0]->SetCapacityFromWidget(this, WID_RV_LEFT_MATRIX);
 		this->vscroll[1]->SetCapacityFromWidget(this, WID_RV_RIGHT_MATRIX);
-
-		this->GetWidget<NWidgetCore>(WID_RV_LEFT_MATRIX)->widget_data =
-				this->GetWidget<NWidgetCore>(WID_RV_RIGHT_MATRIX)->widget_data = (this->vscroll[0]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 	}
 
 	/**
@@ -537,12 +544,13 @@ static const NWidgetPart _nested_replace_rail_vehicle_widgets[] = {
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
 		NWidget(WWT_CAPTION, COLOUR_GREY, WID_RV_CAPTION), SetDataTip(STR_REPLACE_VEHICLES_WHITE, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_SHADEBOX, COLOUR_GREY),
+		NWidget(WWT_DEFSIZEBOX, COLOUR_GREY),
 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
-		NWidget(WWT_MATRIX, COLOUR_GREY, WID_RV_LEFT_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 1), SetScrollbar(WID_RV_LEFT_SCROLLBAR),
+		NWidget(WWT_MATRIX, COLOUR_GREY, WID_RV_LEFT_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetMatrixDataTip(1, 0, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 1), SetScrollbar(WID_RV_LEFT_SCROLLBAR),
 		NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_RV_LEFT_SCROLLBAR),
-		NWidget(WWT_MATRIX, COLOUR_GREY, WID_RV_RIGHT_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_RIGHT_ARRAY), SetResize(1, 1), SetScrollbar(WID_RV_RIGHT_SCROLLBAR),
+		NWidget(WWT_MATRIX, COLOUR_GREY, WID_RV_RIGHT_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetMatrixDataTip(1, 0, STR_REPLACE_HELP_RIGHT_ARRAY), SetResize(1, 1), SetScrollbar(WID_RV_RIGHT_SCROLLBAR),
 		NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_RV_RIGHT_SCROLLBAR),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
@@ -565,8 +573,8 @@ static const NWidgetPart _nested_replace_rail_vehicle_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _replace_rail_vehicle_desc(
-	WDP_AUTO, 500, 140,
+static WindowDesc _replace_rail_vehicle_desc(
+	WDP_AUTO, "replace_vehicle_train", 500, 140,
 	WC_REPLACE_VEHICLE, WC_NONE,
 	WDF_CONSTRUCTION,
 	_nested_replace_rail_vehicle_widgets, lengthof(_nested_replace_rail_vehicle_widgets)
@@ -577,12 +585,13 @@ static const NWidgetPart _nested_replace_vehicle_widgets[] = {
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
 		NWidget(WWT_CAPTION, COLOUR_GREY, WID_RV_CAPTION), SetMinimalSize(433, 14), SetDataTip(STR_REPLACE_VEHICLES_WHITE, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_SHADEBOX, COLOUR_GREY),
+		NWidget(WWT_DEFSIZEBOX, COLOUR_GREY),
 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
-		NWidget(WWT_MATRIX, COLOUR_GREY, WID_RV_LEFT_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 1), SetScrollbar(WID_RV_LEFT_SCROLLBAR),
+		NWidget(WWT_MATRIX, COLOUR_GREY, WID_RV_LEFT_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetMatrixDataTip(1, 0, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 1), SetScrollbar(WID_RV_LEFT_SCROLLBAR),
 		NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_RV_LEFT_SCROLLBAR),
-		NWidget(WWT_MATRIX, COLOUR_GREY, WID_RV_RIGHT_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_RIGHT_ARRAY), SetResize(1, 1), SetScrollbar(WID_RV_RIGHT_SCROLLBAR),
+		NWidget(WWT_MATRIX, COLOUR_GREY, WID_RV_RIGHT_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetMatrixDataTip(1, 0, STR_REPLACE_HELP_RIGHT_ARRAY), SetResize(1, 1), SetScrollbar(WID_RV_RIGHT_SCROLLBAR),
 		NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_RV_RIGHT_SCROLLBAR),
 	EndContainer(),
 	NWidget(NWID_HORIZONTAL, NC_EQUALSIZE),
@@ -597,8 +606,8 @@ static const NWidgetPart _nested_replace_vehicle_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _replace_vehicle_desc(
-	WDP_AUTO, 456, 118,
+static WindowDesc _replace_vehicle_desc(
+	WDP_AUTO, "replace_vehicle", 456, 118,
 	WC_REPLACE_VEHICLE, WC_NONE,
 	WDF_CONSTRUCTION,
 	_nested_replace_vehicle_widgets, lengthof(_nested_replace_vehicle_widgets)

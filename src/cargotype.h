@@ -46,7 +46,7 @@ enum CargoClass {
 	CC_LIQUID       = 1 <<  6, ///< Liquids (Oil, Water, Rubber)
 	CC_REFRIGERATED = 1 <<  7, ///< Refrigerated cargo (Food, Fruit)
 	CC_HAZARDOUS    = 1 <<  8, ///< Hazardous cargo (Nuclear Fuel, Explosives, etc.)
-	CC_COVERED      = 1 <<  9, ///< Covered/Sheltered Freight (Transporation in Box Vans, Silo Wagons, etc.)
+	CC_COVERED      = 1 <<  9, ///< Covered/Sheltered Freight (Transportation in Box Vans, Silo Wagons, etc.)
 	CC_SPECIAL      = 1 << 15, ///< Special bit used for livery refit tricks instead of normal cargoes.
 };
 
@@ -163,13 +163,13 @@ static inline bool IsCargoInClass(CargoID c, CargoClass cc)
  * @param var Reference getting the cargospec.
  * @see CargoSpec
  */
-#define FOR_ALL_SORTED_CARGOSPECS(var) for (uint8 index = 0; var = _sorted_cargo_specs[index], index < _sorted_cargo_specs_size; index++)
+#define FOR_ALL_SORTED_CARGOSPECS(var) for (uint8 index = 0; index < _sorted_cargo_specs_size && (var = _sorted_cargo_specs[index], true) ; index++)
 
 /**
  * Loop header for iterating over 'real' cargoes, sorted by name. Phony cargoes like regearing cargoes are skipped.
  * @param var Reference getting the cargospec.
  * @see CargoSpec
  */
-#define FOR_ALL_SORTED_STANDARD_CARGOSPECS(var) for (uint8 index = 0; var = _sorted_cargo_specs[index], index < _sorted_standard_cargo_specs_size; index++)
+#define FOR_ALL_SORTED_STANDARD_CARGOSPECS(var) for (uint8 index = 0; index < _sorted_standard_cargo_specs_size && (var = _sorted_cargo_specs[index], true); index++)
 
 #endif /* CARGOTYPE_H */

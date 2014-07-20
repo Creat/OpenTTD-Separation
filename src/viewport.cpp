@@ -45,9 +45,13 @@
 #include "window_func.h"
 #include "tilehighlight_func.h"
 #include "window_gui.h"
+#include "linkgraph/linkgraph_gui.h"
+#include "viewport_sprite_sorter.h"
 
 #include "table/strings.h"
 #include "table/palettes.h"
+
+#include "safeguards.h"
 
 Point _tile_fract_coords;
 
@@ -77,29 +81,6 @@ struct ChildScreenSpriteToDraw {
 	int next;                       ///< next child to draw (-1 at the end)
 };
 
-/** Parent sprite that should be drawn */
-struct ParentSpriteToDraw {
-	SpriteID image;                 ///< sprite to draw
-	PaletteID pal;                  ///< palette to use
-	const SubSprite *sub;           ///< only draw a rectangular part of the sprite
-
-	int32 x;                        ///< screen X coordinate of sprite
-	int32 y;                        ///< screen Y coordinate of sprite
-
-	int32 left;                     ///< minimal screen X coordinate of sprite (= x + sprite->x_offs), reference point for child sprites
-	int32 top;                      ///< minimal screen Y coordinate of sprite (= y + sprite->y_offs), reference point for child sprites
-
-	int32 xmin;                     ///< minimal world X coordinate of bounding box
-	int32 xmax;                     ///< maximal world X coordinate of bounding box
-	int32 ymin;                     ///< minimal world Y coordinate of bounding box
-	int32 ymax;                     ///< maximal world Y coordinate of bounding box
-	int zmin;                       ///< minimal world Z coordinate of bounding box
-	int zmax;                       ///< maximal world Z coordinate of bounding box
-
-	int first_child;                ///< the first child to draw.
-	bool comparison_done;           ///< Used during sprite sorting: true if sprite has been compared with all other sprites
-};
-
 /** Enumeration of multi-part foundations */
 enum FoundationPart {
 	FOUNDATION_PART_NONE     = 0xFF,  ///< Neither foundation nor groundsprite drawn yet.
@@ -121,7 +102,6 @@ enum SpriteCombineMode {
 typedef SmallVector<TileSpriteToDraw, 64> TileSpriteToDrawVector;
 typedef SmallVector<StringSpriteToDraw, 4> StringSpriteToDrawVector;
 typedef SmallVector<ParentSpriteToDraw, 64> ParentSpriteToDrawVector;
-typedef SmallVector<ParentSpriteToDraw*, 64> ParentSpriteToSortVector;
 typedef SmallVector<ChildScreenSpriteToDraw, 16> ChildScreenSpriteToDrawVector;
 
 /** Data structure storing rendering information */
@@ -153,6 +133,7 @@ static TileInfo *_cur_ti;
 bool _draw_bounding_boxes = false;
 bool _draw_dirty_blocks = false;
 uint _dirty_block_colour = 0;
+static VpSpriteSorter _vp_sprite_sorter = NULL;
 
 static Point MapXYZToViewport(const ViewPort *vp, int x, int y, int z)
 {
@@ -164,6 +145,9 @@ static Point MapXYZToViewport(const ViewPort *vp, int x, int y, int z)
 
 void DeleteWindowViewport(Window *w)
 {
+	if (w->viewport == NULL) return;
+
+	delete w->viewport->overlay;
 	free(w->viewport);
 	w->viewport = NULL;
 }
@@ -217,6 +201,8 @@ void InitializeWindowViewport(Window *w, int x, int y,
 	vp->scrollpos_y = pt.y;
 	vp->dest_scrollpos_x = pt.x;
 	vp->dest_scrollpos_y = pt.y;
+
+	vp->overlay = NULL;
 
 	w->viewport = vp;
 	vp->virtual_left = 0;//pt.x;
@@ -1051,7 +1037,7 @@ static void ViewportAddLandscape()
 	/* determine size of area */
 	{
 		Point pt = RemapCoords(x, y, 241);
-		width = (_vd.dpi.left + _vd.dpi.width - pt.x + 95 * ZOOM_LVL_BASE) >> (6 + ZOOM_LVL_SHIFT);
+		width = (_vd.dpi.left + _vd.dpi.width - pt.x + 96 * ZOOM_LVL_BASE - 1) >> (6 + ZOOM_LVL_SHIFT);
 		height = (_vd.dpi.top + _vd.dpi.height - pt.y) >> (5 + ZOOM_LVL_SHIFT) << 1;
 	}
 
@@ -1282,6 +1268,12 @@ static void ViewportDrawTileSprites(const TileSpriteToDrawVector *tstdv)
 	}
 }
 
+/** This fallback sprite checker always exists. */
+static bool ViewportSortParentSpritesChecker()
+{
+	return true;
+}
+
 /** Sort parent sprites pointer array */
 static void ViewportSortParentSprites(ParentSpriteToSortVector *psdv)
 {
@@ -1382,7 +1374,7 @@ static void ViewportDrawBoundingBoxes(const ParentSpriteToSortVector *psd)
  */
 static void ViewportDrawDirtyBlocks()
 {
-	Blitter *blitter = BlitterFactoryBase::GetCurrentBlitter();
+	Blitter *blitter = BlitterFactory::GetCurrentBlitter();
 	const DrawPixelInfo *dpi = _cur_dpi;
 	void *dst;
 	int right =  UnScaleByZoom(dpi->width,  dpi->zoom);
@@ -1399,22 +1391,8 @@ static void ViewportDrawDirtyBlocks()
 	} while (--bottom > 0);
 }
 
-static void ViewportDrawStrings(DrawPixelInfo *dpi, const StringSpriteToDrawVector *sstdv)
+static void ViewportDrawStrings(ZoomLevel zoom, const StringSpriteToDrawVector *sstdv)
 {
-	DrawPixelInfo dp;
-	ZoomLevel zoom;
-
-	_cur_dpi = &dp;
-	dp = *dpi;
-
-	zoom = dp.zoom;
-	dp.zoom = ZOOM_LVL_NORMAL;
-
-	dp.left   = UnScaleByZoom(dp.left,   zoom);
-	dp.top    = UnScaleByZoom(dp.top,    zoom);
-	dp.width  = UnScaleByZoom(dp.width,  zoom);
-	dp.height = UnScaleByZoom(dp.height, zoom);
-
 	const StringSpriteToDraw *ssend = sstdv->End();
 	for (const StringSpriteToDraw *ss = sstdv->Begin(); ss != ssend; ++ss) {
 		TextColour colour = TC_BLACK;
@@ -1431,17 +1409,14 @@ static void ViewportDrawStrings(DrawPixelInfo *dpi, const StringSpriteToDrawVect
 			/* Do not draw signs nor station names if they are set invisible */
 			if (IsInvisibilitySet(TO_SIGNS) && ss->string != STR_WHITE_SIGN) continue;
 
-			/* if we didn't draw a rectangle, or if transparant building is on,
-			 * draw the text in the colour the rectangle would have */
 			if (IsTransparencySet(TO_SIGNS) && ss->string != STR_WHITE_SIGN) {
-				/* Real colours need the TC_IS_PALETTE_COLOUR flag
-				 * otherwise colours from _string_colourmap are assumed. */
+				/* Don't draw the rectangle.
+				 * Real colours need the TC_IS_PALETTE_COLOUR flag.
+				 * Otherwise colours from _string_colourmap are assumed. */
 				colour = (TextColour)_colour_gradient[ss->colour][6] | TC_IS_PALETTE_COLOUR;
-			}
-
-			/* Draw the rectangle if 'tranparent station signs' is off,
-			 * or if we are drawing a general text sign (STR_WHITE_SIGN) */
-			if (!IsTransparencySet(TO_SIGNS) || ss->string == STR_WHITE_SIGN) {
+			} else {
+				/* Draw the rectangle if 'transparent station signs' is off,
+				 * or if we are drawing a general text sign (STR_WHITE_SIGN). */
 				DrawFrameRect(
 					x, y, x + w, y + h, ss->colour,
 					IsTransparencySet(TO_SIGNS) ? FR_TRANSPARENT : FR_NONE
@@ -1473,7 +1448,7 @@ void ViewportDoDraw(const ViewPort *vp, int left, int top, int right, int bottom
 	int x = UnScaleByZoom(_vd.dpi.left - (vp->virtual_left & mask), vp->zoom) + vp->left;
 	int y = UnScaleByZoom(_vd.dpi.top - (vp->virtual_top & mask), vp->zoom) + vp->top;
 
-	_vd.dpi.dst_ptr = BlitterFactoryBase::GetCurrentBlitter()->MoveTo(old_dpi->dst_ptr, x - old_dpi->left, y - old_dpi->top);
+	_vd.dpi.dst_ptr = BlitterFactory::GetCurrentBlitter()->MoveTo(old_dpi->dst_ptr, x - old_dpi->left, y - old_dpi->top);
 
 	ViewportAddLandscape();
 	ViewportAddVehicles(&_vd.dpi);
@@ -1491,13 +1466,32 @@ void ViewportDoDraw(const ViewPort *vp, int left, int top, int right, int bottom
 		*_vd.parent_sprites_to_sort.Append() = it;
 	}
 
-	ViewportSortParentSprites(&_vd.parent_sprites_to_sort);
+	_vp_sprite_sorter(&_vd.parent_sprites_to_sort);
 	ViewportDrawParentSprites(&_vd.parent_sprites_to_sort, &_vd.child_screen_sprites_to_draw);
 
 	if (_draw_bounding_boxes) ViewportDrawBoundingBoxes(&_vd.parent_sprites_to_sort);
 	if (_draw_dirty_blocks) ViewportDrawDirtyBlocks();
 
-	if (_vd.string_sprites_to_draw.Length() != 0) ViewportDrawStrings(&_vd.dpi, &_vd.string_sprites_to_draw);
+	DrawPixelInfo dp = _vd.dpi;
+	ZoomLevel zoom = _vd.dpi.zoom;
+	dp.zoom = ZOOM_LVL_NORMAL;
+	dp.width = UnScaleByZoom(dp.width, zoom);
+	dp.height = UnScaleByZoom(dp.height, zoom);
+	_cur_dpi = &dp;
+
+	if (vp->overlay != NULL && vp->overlay->GetCargoMask() != 0 && vp->overlay->GetCompanyMask() != 0) {
+		/* translate to window coordinates */
+		dp.left = x;
+		dp.top = y;
+		vp->overlay->Draw(&dp);
+	}
+
+	if (_vd.string_sprites_to_draw.Length() != 0) {
+		/* translate to world coordinates */
+		dp.left = UnScaleByZoom(_vd.dpi.left, zoom);
+		dp.top = UnScaleByZoom(_vd.dpi.top, zoom);
+		ViewportDrawStrings(zoom, &_vd.string_sprites_to_draw);
+	}
 
 	_cur_dpi = old_dpi;
 
@@ -1613,6 +1607,7 @@ void UpdateViewportPosition(Window *w)
 		int delta_x = w->viewport->dest_scrollpos_x - w->viewport->scrollpos_x;
 		int delta_y = w->viewport->dest_scrollpos_y - w->viewport->scrollpos_y;
 
+		bool update_overlay = false;
 		if (delta_x != 0 || delta_y != 0) {
 			if (_settings_client.gui.smooth_scroll) {
 				int max_scroll = ScaleByMapSize1D(512 * ZOOM_LVL_BASE);
@@ -1623,11 +1618,14 @@ void UpdateViewportPosition(Window *w)
 				w->viewport->scrollpos_x = w->viewport->dest_scrollpos_x;
 				w->viewport->scrollpos_y = w->viewport->dest_scrollpos_y;
 			}
+			update_overlay = (w->viewport->scrollpos_x == w->viewport->dest_scrollpos_x &&
+								w->viewport->scrollpos_y == w->viewport->dest_scrollpos_y);
 		}
 
 		ClampViewportToMap(vp, w->viewport->scrollpos_x, w->viewport->scrollpos_y);
 
 		SetViewportPosition(w, w->viewport->scrollpos_x, w->viewport->scrollpos_y);
+		if (update_overlay) RebuildViewportOverlay(w);
 	}
 }
 
@@ -1726,7 +1724,7 @@ static void SetSelectionTilesDirty()
 	int x_size = _thd.size.x;
 	int y_size = _thd.size.y;
 
-	if (!_thd.diagonal) { // Selecting in a straigth rectangle (or a single square)
+	if (!_thd.diagonal) { // Selecting in a straight rectangle (or a single square)
 		int x_start = _thd.pos.x;
 		int y_start = _thd.pos.y;
 
@@ -1987,6 +1985,15 @@ bool HandleViewportClicked(const ViewPort *vp, int x, int y)
 	return result;
 }
 
+void RebuildViewportOverlay(Window *w)
+{
+	if (w->viewport->overlay != NULL &&
+			w->viewport->overlay->GetCompanyMask() != 0 &&
+			w->viewport->overlay->GetCargoMask() != 0) {
+		w->viewport->overlay->RebuildCache();
+		w->SetDirty();
+	}
+}
 
 /**
  * Scrolls the viewport in a window to a given location.
@@ -2010,6 +2017,7 @@ bool ScrollWindowTo(int x, int y, int z, Window *w, bool instant)
 	if (instant) {
 		w->viewport->scrollpos_x = pt.x;
 		w->viewport->scrollpos_y = pt.y;
+		RebuildViewportOverlay(w);
 	}
 
 	w->viewport->dest_scrollpos_x = pt.x;
@@ -2965,4 +2973,42 @@ void SetObjectToPlace(CursorID icon, PaletteID pal, HighLightStyle mode, WindowC
 void ResetObjectToPlace()
 {
 	SetObjectToPlace(SPR_CURSOR_MOUSE, PAL_NONE, HT_NONE, WC_MAIN_WINDOW, 0);
+}
+
+Point GetViewportStationMiddle(const ViewPort *vp, const Station *st)
+{
+	int x = TileX(st->xy) * TILE_SIZE;
+	int y = TileY(st->xy) * TILE_SIZE;
+	int z = GetSlopePixelZ(Clamp(x, 0, MapSizeX() * TILE_SIZE - 1), Clamp(y, 0, MapSizeY() * TILE_SIZE - 1));
+
+	Point p = RemapCoords(x, y, z);
+	p.x = UnScaleByZoom(p.x - vp->virtual_left, vp->zoom) + vp->left;
+	p.y = UnScaleByZoom(p.y - vp->virtual_top, vp->zoom) + vp->top;
+	return p;
+}
+
+/** Helper class for getting the best sprite sorter. */
+struct ViewportSSCSS {
+	VpSorterChecker fct_checker; ///< The check function.
+	VpSpriteSorter fct_sorter;   ///< The sorting function.
+};
+
+/** List of sorters ordered from best to worst. */
+static ViewportSSCSS _vp_sprite_sorters[] = {
+#ifdef WITH_SSE
+	{ &ViewportSortParentSpritesSSE41Checker, &ViewportSortParentSpritesSSE41 },
+#endif
+	{ &ViewportSortParentSpritesChecker, &ViewportSortParentSprites }
+};
+
+/** Choose the "best" sprite sorter and set _vp_sprite_sorter. */
+void InitializeSpriteSorter()
+{
+	for (uint i = 0; i < lengthof(_vp_sprite_sorters); i++) {
+		if (_vp_sprite_sorters[i].fct_checker()) {
+			_vp_sprite_sorter = _vp_sprite_sorters[i].fct_sorter;
+			break;
+		}
+	}
+	assert(_vp_sprite_sorter != NULL);
 }

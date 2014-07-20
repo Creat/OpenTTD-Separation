@@ -17,6 +17,8 @@
 #include "transport_type.h"
 #include "network/core/config.h"
 #include "company_type.h"
+#include "cargotype.h"
+#include "linkgraph/linkgraph_type.h"
 #include "zoom_type.h"
 #include "openttd.h"
 
@@ -137,6 +139,10 @@ struct GUISettings {
 
 	uint16 console_backlog_timeout;          ///< the minimum amount of time items should be in the console backlog before they will be removed in ~3 seconds granularity.
 	uint16 console_backlog_length;           ///< the minimum amount of items in the console backlog before items will be removed.
+
+	uint8  station_gui_group_order;          ///< the order of grouping cargo entries in the station gui
+	uint8  station_gui_sort_by;              ///< sort cargo entries in the station gui by station name or amount
+	uint8  station_gui_sort_order;           ///< the sort order of entries in the station gui - ascending or descending
 #ifdef ENABLE_NETWORK
 	uint16 network_chat_box_width;           ///< width of the chat box in pixels
 	uint8  network_chat_box_height;          ///< height of the chat box in lines
@@ -188,7 +194,12 @@ struct MusicSettings {
 /** Settings related to currency/unit systems. */
 struct LocaleSettings {
 	byte   currency;                         ///< currency we currently use
-	byte   units;                            ///< unit system we show everything
+	byte   units_velocity;                   ///< unit system for velocity
+	byte   units_power;                      ///< unit system for power
+	byte   units_weight;                     ///< unit system for weight
+	byte   units_volume;                     ///< unit system for volume
+	byte   units_force;                      ///< unit system for force
+	byte   units_height;                     ///< unit system for height
 	char  *digit_group_separator;            ///< thousand separator for non-currencies
 	char  *digit_group_separator_currency;   ///< thousand separator for currencies
 	char  *digit_decimal_separator;          ///< decimal separator
@@ -424,7 +435,7 @@ struct OrderSettings {
 	bool   improved_load;                    ///< improved loading algorithm
 	bool   gradual_loading;                  ///< load vehicles gradually
 	bool   selectgoods;                      ///< only send the goods to station if a train has been there
-	bool   no_servicing_if_no_breakdowns;    ///< dont send vehicles to depot when breakdowns are disabled
+	bool   no_servicing_if_no_breakdowns;    ///< don't send vehicles to depot when breakdowns are disabled
 	bool   automatic_timetable_separation;   ///< Enable automatic separation of vehicles in the timetable.
 	bool   serviceathelipad;                 ///< service helicopters at helipads automatically (no need to send to depot)
 };
@@ -464,7 +475,7 @@ struct EconomySettings {
 	bool   fund_buildings;                   ///< allow funding new buildings
 	bool   fund_roads;                       ///< allow funding local road reconstruction
 	bool   give_money;                       ///< allow giving other companies money
-	bool   mod_road_rebuild;                 ///< roadworks remove unneccesary RoadBits
+	bool   mod_road_rebuild;                 ///< roadworks remove unnecessary RoadBits
 	bool   multiple_industry_per_town;       ///< allow many industries of the same type per town
 	uint8  town_growth_rate;                 ///< town growth rate
 	uint8  larger_towns;                     ///< the number of cities to build. These start off larger and grow twice as fast
@@ -476,6 +487,26 @@ struct EconomySettings {
 	uint16 town_noise_population[3];         ///< population to base decision on noise evaluation (@see town_council_tolerance)
 	bool   allow_town_level_crossings;       ///< towns are allowed to build level crossings
 	bool   infrastructure_maintenance;       ///< enable monthly maintenance fee for owner infrastructure
+};
+
+struct LinkGraphSettings {
+	uint16 recalc_time;                         ///< time (in days) for recalculating each link graph component.
+	uint16 recalc_interval;                     ///< time (in days) between subsequent checks for link graphs to be calculated.
+	DistributionTypeByte distribution_pax;      ///< distribution type for passengers
+	DistributionTypeByte distribution_mail;     ///< distribution type for mail
+	DistributionTypeByte distribution_armoured; ///< distribution type for armoured cargo class
+	DistributionTypeByte distribution_default;  ///< distribution type for all other goods
+	uint8 accuracy;                             ///< accuracy when calculating things on the link graph. low accuracy => low running time
+	uint8 demand_size;                          ///< influence of supply ("station size") on the demand function
+	uint8 demand_distance;                      ///< influence of distance between stations on the demand function
+	uint8 short_path_saturation;                ///< percentage up to which short paths are saturated before saturating most capacious paths
+
+	inline DistributionType GetDistributionType(CargoID cargo) const {
+		if (IsCargoInClass(cargo, CC_PASSENGERS)) return this->distribution_pax;
+		if (IsCargoInClass(cargo, CC_MAIL)) return this->distribution_mail;
+		if (IsCargoInClass(cargo, CC_ARMOURED)) return this->distribution_armoured;
+		return this->distribution_default;
+	}
 };
 
 /** Settings related to stations. */
@@ -518,6 +549,7 @@ struct GameSettings {
 	OrderSettings        order;              ///< settings related to orders
 	VehicleSettings      vehicle;            ///< options for vehicles
 	EconomySettings      economy;            ///< settings to change the economy
+	LinkGraphSettings    linkgraph;          ///< settings for link graph calculations
 	StationSettings      station;            ///< settings related to station management
 	LocaleSettings       locale;             ///< settings related to used currency/unit system in the current game
 };

@@ -25,11 +25,14 @@
 #include "tilehighlight_func.h"
 #include "company_base.h"
 #include "hotkeys.h"
+#include "gui.h"
 
 #include "widgets/dock_widget.h"
 
 #include "table/sprites.h"
 #include "table/strings.h"
+
+#include "safeguards.h"
 
 static void ShowBuildDockStationPicker(Window *parent);
 static void ShowBuildDocksDepotPicker(Window *parent);
@@ -40,13 +43,13 @@ void CcBuildDocks(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p
 {
 	if (result.Failed()) return;
 
-	if (_settings_client.sound.confirm) SndPlayTileFx(SND_02_SPLAT, tile);
+	if (_settings_client.sound.confirm) SndPlayTileFx(SND_02_SPLAT_WATER, tile);
 	if (!_settings_client.gui.persistent_buildingtools) ResetObjectToPlace();
 }
 
 void CcBuildCanal(const CommandCost &result, TileIndex tile, uint32 p1, uint32 p2)
 {
-	if (result.Succeeded() && _settings_client.sound.confirm) SndPlayTileFx(SND_02_SPLAT, tile);
+	if (result.Succeeded() && _settings_client.sound.confirm) SndPlayTileFx(SND_02_SPLAT_WATER, tile);
 }
 
 
@@ -87,14 +90,14 @@ static TileIndex GetOtherAqueductEnd(TileIndex tile_from, TileIndex *tile_to = N
 	return endtile;
 }
 
-/** Toolbar window for constructing water infra structure. */
+/** Toolbar window for constructing water infrastructure. */
 struct BuildDocksToolbarWindow : Window {
 	DockToolbarWidgets last_clicked_widget; ///< Contains the last widget that has been clicked on this toolbar.
 
-	BuildDocksToolbarWindow(const WindowDesc *desc, WindowNumber window_number) : Window()
+	BuildDocksToolbarWindow(WindowDesc *desc, WindowNumber window_number) : Window(desc)
 	{
 		this->last_clicked_widget = WID_DT_INVALID;
-		this->InitNested(desc, window_number);
+		this->InitNested(window_number);
 		this->OnInvalidateData();
 		if (_settings_client.gui.link_terraform_toolbar) ShowTerraformToolbar(this);
 	}
@@ -161,14 +164,6 @@ struct BuildDocksToolbarWindow : Window {
 			default: return;
 		}
 		this->last_clicked_widget = (DockToolbarWidgets)widget;
-	}
-
-	virtual EventState OnKeyPress(uint16 key, uint16 keycode)
-	{
-		int num = CheckHotkeyMatch(dockstoolbar_hotkeys, keycode, this);
-		if (num == -1) return ES_NOT_HANDLED;
-		this->OnClick(Point(), num, 1);
-		return ES_HANDLED;
 	}
 
 	virtual void OnPlaceObject(Point pt, TileIndex tile)
@@ -273,23 +268,36 @@ struct BuildDocksToolbarWindow : Window {
 		VpSetPresizeRange(tile_from, tile_to);
 	}
 
-	static Hotkey<BuildDocksToolbarWindow> dockstoolbar_hotkeys[];
+	static HotkeyList hotkeys;
 };
+
+/**
+ * Handler for global hotkeys of the BuildDocksToolbarWindow.
+ * @param hotkey Hotkey
+ * @return ES_HANDLED if hotkey was accepted.
+ */
+static EventState DockToolbarGlobalHotkeys(int hotkey)
+{
+	if (_game_mode != GM_NORMAL) return ES_NOT_HANDLED;
+	Window *w = ShowBuildDocksToolbar();
+	if (w == NULL) return ES_NOT_HANDLED;
+	return w->OnHotkey(hotkey);
+}
 
 const uint16 _dockstoolbar_aqueduct_keys[] = {'B', '8', 0};
 
-Hotkey<BuildDocksToolbarWindow> BuildDocksToolbarWindow::dockstoolbar_hotkeys[] = {
-	Hotkey<BuildDocksToolbarWindow>('1', "canal", WID_DT_CANAL),
-	Hotkey<BuildDocksToolbarWindow>('2', "lock", WID_DT_LOCK),
-	Hotkey<BuildDocksToolbarWindow>('3', "demolish", WID_DT_DEMOLISH),
-	Hotkey<BuildDocksToolbarWindow>('4', "depot", WID_DT_DEPOT),
-	Hotkey<BuildDocksToolbarWindow>('5', "dock", WID_DT_STATION),
-	Hotkey<BuildDocksToolbarWindow>('6', "buoy", WID_DT_BUOY),
-	Hotkey<BuildDocksToolbarWindow>('7', "river", WID_DT_RIVER),
-	Hotkey<BuildDocksToolbarWindow>(_dockstoolbar_aqueduct_keys, "aqueduct", WID_DT_BUILD_AQUEDUCT),
-	HOTKEY_LIST_END(BuildDocksToolbarWindow)
+static Hotkey dockstoolbar_hotkeys[] = {
+	Hotkey('1', "canal", WID_DT_CANAL),
+	Hotkey('2', "lock", WID_DT_LOCK),
+	Hotkey('3', "demolish", WID_DT_DEMOLISH),
+	Hotkey('4', "depot", WID_DT_DEPOT),
+	Hotkey('5', "dock", WID_DT_STATION),
+	Hotkey('6', "buoy", WID_DT_BUOY),
+	Hotkey('7', "river", WID_DT_RIVER),
+	Hotkey(_dockstoolbar_aqueduct_keys, "aqueduct", WID_DT_BUILD_AQUEDUCT),
+	HOTKEY_LIST_END
 };
-Hotkey<BuildDocksToolbarWindow> *_dockstoolbar_hotkeys = BuildDocksToolbarWindow::dockstoolbar_hotkeys;
+HotkeyList BuildDocksToolbarWindow::hotkeys("dockstoolbar", dockstoolbar_hotkeys, DockToolbarGlobalHotkeys);
 
 /**
  * Nested widget parts of docks toolbar, game version.
@@ -313,11 +321,12 @@ static const NWidgetPart _nested_build_docks_toolbar_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _build_docks_toolbar_desc(
-	WDP_ALIGN_TOOLBAR, 0, 0,
+static WindowDesc _build_docks_toolbar_desc(
+	WDP_ALIGN_TOOLBAR, "toolbar_water", 0, 0,
 	WC_BUILD_TOOLBAR, WC_NONE,
 	WDF_CONSTRUCTION,
-	_nested_build_docks_toolbar_widgets, lengthof(_nested_build_docks_toolbar_widgets)
+	_nested_build_docks_toolbar_widgets, lengthof(_nested_build_docks_toolbar_widgets),
+	&BuildDocksToolbarWindow::hotkeys
 );
 
 /**
@@ -333,15 +342,6 @@ Window *ShowBuildDocksToolbar()
 
 	DeleteWindowByClass(WC_BUILD_TOOLBAR);
 	return AllocateWindowDescFront<BuildDocksToolbarWindow>(&_build_docks_toolbar_desc, TRANSPORT_WATER);
-}
-
-EventState DockToolbarGlobalHotkeys(uint16 key, uint16 keycode)
-{
-	int num = CheckHotkeyMatch<BuildDocksToolbarWindow>(_dockstoolbar_hotkeys, keycode, NULL, true);
-	if (num == -1) return ES_NOT_HANDLED;
-	Window *w = ShowBuildDocksToolbar();
-	if (w == NULL) return ES_NOT_HANDLED;
-	return w->OnKeyPress(key, keycode);
 }
 
 /**
@@ -365,8 +365,8 @@ static const NWidgetPart _nested_build_docks_scen_toolbar_widgets[] = {
 };
 
 /** Window definition for the build docks in scenario editor window. */
-static const WindowDesc _build_docks_scen_toolbar_desc(
-	WDP_AUTO, 0, 0,
+static WindowDesc _build_docks_scen_toolbar_desc(
+	WDP_AUTO, "toolbar_water_scen", 0, 0,
 	WC_SCEN_BUILD_TOOLBAR, WC_NONE,
 	WDF_CONSTRUCTION,
 	_nested_build_docks_scen_toolbar_widgets, lengthof(_nested_build_docks_scen_toolbar_widgets)
@@ -392,9 +392,9 @@ enum BuildDockStationWidgets {
 
 struct BuildDocksStationWindow : public PickerWindowBase {
 public:
-	BuildDocksStationWindow(const WindowDesc *desc, Window *parent) : PickerWindowBase(parent)
+	BuildDocksStationWindow(WindowDesc *desc, Window *parent) : PickerWindowBase(desc, parent)
 	{
-		this->InitNested(desc, TRANSPORT_WATER);
+		this->InitNested(TRANSPORT_WATER);
 		this->LowerWidget(_settings_client.gui.station_show_coverage + BDSW_LT_OFF);
 	}
 
@@ -422,8 +422,10 @@ public:
 		int bottom = back_nwi->pos_y + back_nwi->current_y;
 		top = DrawStationCoverageAreaText(back_nwi->pos_x + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, false) + WD_PAR_VSEP_NORMAL;
 		top = DrawStationCoverageAreaText(back_nwi->pos_x + WD_FRAMERECT_LEFT, right - WD_FRAMERECT_RIGHT, top, SCT_ALL, rad, true) + WD_PAR_VSEP_NORMAL;
-		/* Resize background if the text is not equally long as the window. */
-		if (top > bottom || (top < bottom && back_nwi->current_y > back_nwi->smallest_y)) {
+		/* Resize background if the window is too small.
+		 * Never make the window smaller to avoid oscillating if the size change affects the acceptance.
+		 * (This is the case, if making the window bigger moves the mouse into the window.) */
+		if (top > bottom) {
 			ResizeWindow(this, 0, top - bottom);
 		}
 	}
@@ -465,8 +467,8 @@ static const NWidgetPart _nested_build_dock_station_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _build_dock_station_desc(
-	WDP_AUTO, 0, 0,
+static WindowDesc _build_dock_station_desc(
+	WDP_AUTO, NULL, 0, 0,
 	WC_BUILD_STATION, WC_BUILD_TOOLBAR,
 	WDF_CONSTRUCTION,
 	_nested_build_dock_station_widgets, lengthof(_nested_build_dock_station_widgets)
@@ -489,9 +491,9 @@ private:
 	}
 
 public:
-	BuildDocksDepotWindow(const WindowDesc *desc, Window *parent) : PickerWindowBase(parent)
+	BuildDocksDepotWindow(WindowDesc *desc, Window *parent) : PickerWindowBase(desc, parent)
 	{
-		this->InitNested(desc, TRANSPORT_WATER);
+		this->InitNested(TRANSPORT_WATER);
 		this->LowerWidget(_ship_depot_direction + WID_BDD_X);
 		UpdateDocksDirection();
 	}
@@ -542,8 +544,8 @@ static const NWidgetPart _nested_build_docks_depot_widgets[] = {
 	EndContainer(),
 };
 
-static const WindowDesc _build_docks_depot_desc(
-	WDP_AUTO, 0, 0,
+static WindowDesc _build_docks_depot_desc(
+	WDP_AUTO, NULL, 0, 0,
 	WC_BUILD_DEPOT, WC_BUILD_TOOLBAR,
 	WDF_CONSTRUCTION,
 	_nested_build_docks_depot_widgets, lengthof(_nested_build_docks_depot_widgets)

@@ -32,9 +32,12 @@
 #include "company_func.h"
 #include "pathfinder/npf/aystar.h"
 #include <list>
+#include <set>
 
 #include "table/strings.h"
 #include "table/sprites.h"
+
+#include "safeguards.h"
 
 extern const TileTypeProcs
 	_tile_type_clear_procs,
@@ -329,7 +332,7 @@ void GetSlopePixelZOnEdge(Slope tileh, DiagDirection edge, int *z1, int *z2)
 
 /**
  * Get slope of a tile on top of a (possible) foundation
- * If a tile does not have a foundation, the function returns the same as GetTilePixelSlope.
+ * If a tile does not have a foundation, the function returns the same as GetTileSlope.
  *
  * @param tile The tile of interest.
  * @param z returns the z of the foundation slope. (Can be NULL, if not needed)
@@ -667,8 +670,7 @@ CommandCost CmdClearArea(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 	const Company *c = (flags & (DC_AUTO | DC_BANKRUPT)) ? NULL : Company::GetIfValid(_current_company);
 	int limit = (c == NULL ? INT32_MAX : GB(c->clear_limit, 16, 16));
 
-	TileArea ta(tile, p1);
-	TileIterator *iter = HasBit(p2, 0) ? (TileIterator *)new DiagonalTileIterator(tile, p1) : new OrthogonalTileIterator(ta);
+	TileIterator *iter = HasBit(p2, 0) ? (TileIterator *)new DiagonalTileIterator(tile, p1) : new OrthogonalTileIterator(tile, p1);
 	for (; *iter != INVALID_TILE; ++(*iter)) {
 		TileIndex t = *iter;
 		CommandCost ret = DoCommand(t, 0, 0, flags & ~DC_EXEC, CMD_LANDSCAPE_CLEAR);
@@ -692,11 +694,10 @@ CommandCost CmdClearArea(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 
 
 			/* draw explosion animation...
 			 * Disable explosions when game is paused. Looks silly and blocks the view. */
-			TileIndex off = t - ta.tile;
-			if ((TileX(off) == 0 || TileX(off) == ta.w - 1U) && (TileY(off) == 0 || TileY(off) == ta.h - 1U) && _pause_mode == PM_UNPAUSED) {
-				/* big explosion in each corner, or small explosion for single tiles */
+			if ((t == tile || t == p1) && _pause_mode == PM_UNPAUSED) {
+				/* big explosion in two corners, or small explosion for single tiles */
 				CreateEffectVehicleAbove(TileX(t) * TILE_SIZE + TILE_SIZE / 2, TileY(t) * TILE_SIZE + TILE_SIZE / 2, 2,
-					ta.w == 1 && ta.h == 1 ? EV_EXPLOSION_SMALL : EV_EXPLOSION_LARGE
+					TileX(tile) == TileX(p1) && TileY(tile) == TileY(p1) ? EV_EXPLOSION_SMALL : EV_EXPLOSION_LARGE
 				);
 			}
 		} else {
@@ -722,12 +723,13 @@ void RunTileLoop()
 	 * shift register (LFSR). This allows a deterministic pseudorandom ordering, but
 	 * still with minimal state and fast iteration. */
 
-	/* Maximal length LFSR feedback terms, from 12-bit (for 64x64 maps) to 22-bit (for 2048x2048 maps).
+	/* Maximal length LFSR feedback terms, from 12-bit (for 64x64 maps) to 24-bit (for 4096x4096 maps).
 	 * Extracted from http://www.ece.cmu.edu/~koopman/lfsr/ */
 	static const uint32 feedbacks[] = {
-		0xD8F, 0x1296, 0x2496, 0x4357, 0x8679, 0x1030E, 0x206CD, 0x403FE, 0x807B8, 0x1004B2, 0x2006A8
+		0xD8F, 0x1296, 0x2496, 0x4357, 0x8679, 0x1030E, 0x206CD, 0x403FE, 0x807B8, 0x1004B2, 0x2006A8, 0x4004B2, 0x800B87
 	};
-	const uint32 feedback = feedbacks[MapLogX() + MapLogY() - 12];
+	assert_compile(lengthof(feedbacks) == 2 * MAX_MAP_SIZE_BITS - 2 * MIN_MAP_SIZE_BITS + 1);
+	const uint32 feedback = feedbacks[MapLogX() + MapLogY() - 2 * MIN_MAP_SIZE_BITS];
 
 	/* We update every tile every 256 ticks, so divide the map size by 2^8 = 256 */
 	uint count = 1 << (MapLogX() + MapLogY() - 8);
@@ -937,8 +939,7 @@ static void CreateDesertOrRainForest()
 static bool FindSpring(TileIndex tile, void *user_data)
 {
 	int referenceHeight;
-	Slope s = GetTileSlope(tile, &referenceHeight);
-	if (s != SLOPE_FLAT || IsWaterTile(tile)) return false;
+	if (!IsTileFlat(tile, &referenceHeight) || IsWaterTile(tile)) return false;
 
 	/* In the tropics rivers start in the rainforest. */
 	if (_settings_game.game_creation.landscape == LT_TROPIC && GetTropicZone(tile) != TROPICZONE_RAINFOREST) return false;
@@ -974,7 +975,7 @@ static bool FindSpring(TileIndex tile, void *user_data)
 static bool MakeLake(TileIndex tile, void *user_data)
 {
 	uint height = *(uint*)user_data;
-	if (!IsValidTile(tile) || TileHeight(tile) != height || GetTileSlope(tile) != SLOPE_FLAT) return false;
+	if (!IsValidTile(tile) || TileHeight(tile) != height || !IsTileFlat(tile)) return false;
 	if (_settings_game.game_creation.landscape == LT_TROPIC && GetTropicZone(tile) == TROPICZONE_DESERT) return false;
 
 	for (DiagDirection d = DIAGDIR_BEGIN; d < DIAGDIR_END; d++) {
@@ -1098,18 +1099,20 @@ static void BuildRiver(TileIndex begin, TileIndex end)
 
 /**
  * Try to flow the river down from a given begin.
- * @param marks  Array for temporary of iterated tiles.
  * @param spring The springing point of the river.
  * @param begin  The begin point we are looking from; somewhere down hill from the spring.
  * @return True iff a river could/has been built, otherwise false.
  */
-static bool FlowRiver(bool *marks, TileIndex spring, TileIndex begin)
+static bool FlowRiver(TileIndex spring, TileIndex begin)
 {
+	#define SET_MARK(x) marks.insert(x)
+	#define IS_MARKED(x) (marks.find(x) != marks.end())
+
 	uint height = TileHeight(begin);
 	if (IsWaterTile(begin)) return DistanceManhattan(spring, begin) > _settings_game.game_creation.min_river_length;
 
-	MemSetT(marks, 0, MapSize());
-	marks[begin] = true;
+	std::set<TileIndex> marks;
+	SET_MARK(begin);
 
 	/* Breadth first search for the closest tile we can flow down to. */
 	std::list<TileIndex> queue;
@@ -1123,15 +1126,15 @@ static bool FlowRiver(bool *marks, TileIndex spring, TileIndex begin)
 		queue.pop_front();
 
 		uint height2 = TileHeight(end);
-		if (GetTileSlope(end) == SLOPE_FLAT && (height2 < height || (height2 == height && IsWaterTile(end)))) {
+		if (IsTileFlat(end) && (height2 < height || (height2 == height && IsWaterTile(end)))) {
 			found = true;
 			break;
 		}
 
 		for (DiagDirection d = DIAGDIR_BEGIN; d < DIAGDIR_END; d++) {
 			TileIndex t2 = end + TileOffsByDiagDir(d);
-			if (IsValidTile(t2) && !marks[t2] && FlowsDown(end, t2)) {
-				marks[t2] = true;
+			if (IsValidTile(t2) && !IS_MARKED(t2) && FlowsDown(end, t2)) {
+				SET_MARK(t2);
 				count++;
 				queue.push_back(t2);
 			}
@@ -1140,17 +1143,18 @@ static bool FlowRiver(bool *marks, TileIndex spring, TileIndex begin)
 
 	if (found) {
 		/* Flow further down hill. */
-		found = FlowRiver(marks, spring, end);
+		found = FlowRiver(spring, end);
 	} else if (count > 32) {
 		/* Maybe we can make a lake. Find the Nth of the considered tiles. */
 		TileIndex lakeCenter = 0;
-		for (int i = RandomRange(count - 1); i != 0; lakeCenter++) {
-			if (marks[lakeCenter]) i--;
-		}
+		int i = RandomRange(count - 1) + 1;
+		std::set<TileIndex>::const_iterator cit = marks.begin();
+		while (--i) cit++;
+		lakeCenter = *cit;
 
 		if (IsValidTile(lakeCenter) &&
 				/* A river, or lake, can only be built on flat slopes. */
-				GetTileSlope(lakeCenter) == SLOPE_FLAT &&
+				IsTileFlat(lakeCenter) &&
 				/* We want the lake to be built at the height of the river. */
 				TileHeight(begin) == TileHeight(lakeCenter) &&
 				/* We don't want the lake at the entry of the valley. */
@@ -1170,6 +1174,7 @@ static bool FlowRiver(bool *marks, TileIndex spring, TileIndex begin)
 		}
 	}
 
+	marks.clear();
 	if (found) BuildRiver(begin, end);
 	return found;
 }
@@ -1184,18 +1189,15 @@ static void CreateRivers()
 
 	uint wells = ScaleByMapSize(4 << _settings_game.game_creation.amount_of_rivers);
 	SetGeneratingWorldProgress(GWP_RIVER, wells + 256 / 64); // Include the tile loop calls below.
-	bool *marks = CallocT<bool>(MapSize());
 
 	for (; wells != 0; wells--) {
 		IncreaseGeneratingWorldProgress(GWP_RIVER);
 		for (int tries = 0; tries < 128; tries++) {
 			TileIndex t = RandomTile();
 			if (!CircularTileSearch(&t, 8, FindSpring, NULL)) continue;
-			if (FlowRiver(marks, t, t)) break;
+			if (FlowRiver(t, t)) break;
 		}
 	}
-
-	free(marks);
 
 	/* Run tile loop to update the ground density. */
 	for (uint i = 0; i != 256; i++) {
@@ -1295,6 +1297,7 @@ void OnTick_Station();
 void OnTick_Industry();
 
 void OnTick_Companies();
+void OnTick_LinkGraph();
 
 void CallLandscapeTick()
 {
@@ -1304,4 +1307,5 @@ void CallLandscapeTick()
 	OnTick_Industry();
 
 	OnTick_Companies();
+	OnTick_LinkGraph();
 }

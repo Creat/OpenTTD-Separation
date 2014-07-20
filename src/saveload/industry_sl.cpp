@@ -15,6 +15,8 @@
 #include "saveload.h"
 #include "newgrf_sl.h"
 
+#include "../safeguards.h"
+
 static OldPersistentStorage _old_ind_persistent_storage;
 
 static const SaveLoad _industry_desc[] = {
@@ -98,7 +100,7 @@ static void Load_INDY()
 		if (IsSavegameVersionBefore(161) && !IsSavegameVersionBefore(76)) {
 			/* Store the old persistent storage. The GRFID will be added later. */
 			assert(PersistentStorage::CanAllocateItem());
-			i->psa = new PersistentStorage(0);
+			i->psa = new PersistentStorage(0, 0, 0);
 			memcpy(i->psa->storage, _old_ind_persistent_storage.storage, sizeof(i->psa->storage));
 		}
 		Industry::IncIndustryTypeCount(i->type);

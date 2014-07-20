@@ -12,6 +12,8 @@
 #include "stdafx.h"
 #include "tile_map.h"
 
+#include "safeguards.h"
+
 /**
  * Return the slope of a given tile
  * @param tile Tile to compute slope of
@@ -22,11 +24,7 @@ Slope GetTileSlope(TileIndex tile, int *h)
 {
 	assert(tile < MapSize());
 
-	uint x = TileX(tile);
-	uint y = TileY(tile);
-
-	if (x == MapMaxX() || y == MapMaxY() ||
-			((x == 0 || y == 0) && _settings_game.construction.freeform_edges)) {
+	if (!IsInnerTile(tile)) {
 		if (h != NULL) *h = TileHeight(tile);
 		return SLOPE_FLAT;
 	}
@@ -60,6 +58,30 @@ Slope GetTileSlope(TileIndex tile, int *h)
 	if (h != NULL) *h = min;
 
 	return (Slope)r;
+}
+
+/**
+ * Check if a given tile is flat
+ * @param tile Tile to check
+ * @param h If not \c NULL, pointer to storage of z height (only if tile is flat)
+ * @return Whether the tile is flat
+ */
+bool IsTileFlat(TileIndex tile, int *h)
+{
+	assert(tile < MapSize());
+
+	if (!IsInnerTile(tile)) {
+		if (h != NULL) *h = TileHeight(tile);
+		return true;
+	}
+
+	uint z = TileHeight(tile);
+	if (TileHeight(tile + TileDiffXY(1, 0)) != z) return false;
+	if (TileHeight(tile + TileDiffXY(0, 1)) != z) return false;
+	if (TileHeight(tile + TileDiffXY(1, 1)) != z) return false;
+
+	if (h != NULL) *h = z;
+	return true;
 }
 
 /**

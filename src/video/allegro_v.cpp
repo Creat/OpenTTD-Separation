@@ -27,9 +27,11 @@
 #include "allegro_v.h"
 #include <allegro.h>
 
+#include "../safeguards.h"
+
 #ifdef _DEBUG
 /* Allegro replaces SEGV/ABRT signals meaning that the debugger will never
- * be triggered, so rereplace the signals and make the debugger userful. */
+ * be triggered, so rereplace the signals and make the debugger useful. */
 #include <signal.h>
 #endif
 
@@ -92,7 +94,7 @@ static void InitPalette()
 static void CheckPaletteAnim()
 {
 	if (_cur_palette.count_dirty != 0) {
-		Blitter *blitter = BlitterFactoryBase::GetCurrentBlitter();
+		Blitter *blitter = BlitterFactory::GetCurrentBlitter();
 
 		switch (blitter->UsePaletteAnimation()) {
 			case Blitter::PALETTE_ANIMATION_VIDEO_BACKEND:
@@ -191,7 +193,7 @@ static void GetAvailableVideoMode(uint *w, uint *h)
 
 static bool CreateMainSurface(uint w, uint h)
 {
-	int bpp = BlitterFactoryBase::GetCurrentBlitter()->GetScreenDepth();
+	int bpp = BlitterFactory::GetCurrentBlitter()->GetScreenDepth();
 	if (bpp == 0) usererror("Can't use a blitter that blits 0 bpp for normal visuals");
 	set_color_depth(bpp);
 
@@ -217,12 +219,12 @@ static bool CreateMainSurface(uint w, uint h)
 	_cursor.pos.x = mouse_x;
 	_cursor.pos.y = mouse_y;
 
-	BlitterFactoryBase::GetCurrentBlitter()->PostResize();
+	BlitterFactory::GetCurrentBlitter()->PostResize();
 
 	InitPalette();
 
 	char caption[32];
-	snprintf(caption, sizeof(caption), "OpenTTD %s", _openttd_revision);
+	seprintf(caption, lastof(caption), "OpenTTD %s", _openttd_revision);
 	set_window_title(caption);
 
 	enable_hardware_cursor();
@@ -304,7 +306,7 @@ static const VkMapping _vk_mapping[] = {
 	AS(KEY_TILDE,   WKC_BACKQUOTE),
 };
 
-static uint32 ConvertAllegroKeyIntoMy()
+static uint32 ConvertAllegroKeyIntoMy(WChar *character)
 {
 	int scancode;
 	int unicode = ureadkey(&scancode);
@@ -326,7 +328,9 @@ static uint32 ConvertAllegroKeyIntoMy()
 	DEBUG(driver, 0, "Scancode character pressed %u", scancode);
 	DEBUG(driver, 0, "Unicode character pressed %u", unicode);
 #endif
-	return (key << 16) + unicode;
+
+	*character = unicode;
+	return key;
 }
 
 static const uint LEFT_BUTTON  = 0;
@@ -414,7 +418,9 @@ static void PollEvent()
 	if ((key_shifts & KB_ALT_FLAG) && (key[KEY_ENTER] || key[KEY_F])) {
 		ToggleFullScreen(!_fullscreen);
 	} else if (keypressed()) {
-		HandleKeypress(ConvertAllegroKeyIntoMy());
+		WChar character;
+		uint keycode = ConvertAllegroKeyIntoMy(&character);
+		HandleKeypress(keycode, character);
 	}
 }
 
@@ -438,7 +444,7 @@ const char *VideoDriver_Allegro::Start(const char * const *parm)
 
 #if defined _DEBUG
 /* Allegro replaces SEGV/ABRT signals meaning that the debugger will never
- * be triggered, so rereplace the signals and make the debugger userful. */
+ * be triggered, so rereplace the signals and make the debugger useful. */
 	signal(SIGABRT, NULL);
 	signal(SIGSEGV, NULL);
 #endif

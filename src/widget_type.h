@@ -60,9 +60,11 @@ enum WidgetType {
 	WWT_FRAME,      ///< Frame
 	WWT_CAPTION,    ///< Window caption (window title between closebox and stickybox)
 
-	WWT_SHADEBOX,   ///< Shade box (at top-right of a window, between caption and stickybox)
-	WWT_STICKYBOX,  ///< Sticky box (normally at top-right of a window)
-	WWT_DEBUGBOX,   ///< NewGRF debug box (between shade box and caption)
+	WWT_DEBUGBOX,   ///< NewGRF debug box (at top-right of a window, between WWT_CAPTION and WWT_SHADEBOX)
+	WWT_SHADEBOX,   ///< Shade box (at top-right of a window, between WWT_DEBUGBOX and WWT_DEFSIZEBOX)
+	WWT_DEFSIZEBOX, ///< Default window size box (at top-right of a window, between WWT_SHADEBOX and WWT_STICKYBOX)
+	WWT_STICKYBOX,  ///< Sticky box (at top-right of a window, after WWT_DEFSIZEBOX)
+
 	WWT_RESIZEBOX,  ///< Resize box (normally at bottom-right of a window)
 	WWT_CLOSEBOX,   ///< Close box (at top-left of a window)
 	WWT_DROPDOWN,   ///< Drop down list
@@ -179,9 +181,9 @@ public:
 	NWidgetBase *prev;    ///< Pointer to previous widget in container. Managed by parent container widget.
 
 	uint8 padding_top;    ///< Paddings added to the top of the widget. Managed by parent container widget.
-	uint8 padding_right;  ///< Paddings added to the right of the widget. Managed by parent container widget.
+	uint8 padding_right;  ///< Paddings added to the right of the widget. Managed by parent container widget. (parent container may swap this with padding_left for RTL)
 	uint8 padding_bottom; ///< Paddings added to the bottom of the widget. Managed by parent container widget.
-	uint8 padding_left;   ///< Paddings added to the left of the widget. Managed by parent container widget.
+	uint8 padding_left;   ///< Paddings added to the left of the widget. Managed by parent container widget. (parent container may swap this with padding_right for RTL)
 
 protected:
 	inline void StoreSizePosition(SizingType sizing, uint x, uint y, uint given_width, uint given_height);
@@ -308,7 +310,7 @@ public:
 
 /**
  * Highlight the widget or not.
- * @param higlighted Widget must be highlighted (blink).
+ * @param highlight_colour Widget must be highlighted (blink).
  */
 inline void NWidgetCore::SetHighlighted(TextColour highlight_colour)
 {
@@ -775,9 +777,12 @@ public:
 	bool ButtonHit(const Point &pt);
 
 	static void InvalidateDimensionCache();
+
+	static Dimension dropdown_dimension;  ///< Cached size of a dropdown widget.
 private:
 	static Dimension shadebox_dimension;  ///< Cached size of a shadebox widget.
 	static Dimension debugbox_dimension;  ///< Cached size of a debugbox widget.
+	static Dimension defsizebox_dimension; ///< Cached size of a defsizebox widget.
 	static Dimension stickybox_dimension; ///< Cached size of a stickybox widget.
 	static Dimension resizebox_dimension; ///< Cached size of a resizebox widget.
 	static Dimension closebox_dimension;  ///< Cached size of a closebox widget.
@@ -830,7 +835,7 @@ static inline uint ComputeMaxSize(uint base, uint max_space, uint step)
  *   the child widgets (it has no meaning for the compiler but it makes the widget parts easier to read).
  *   Below the last child widget, use an #EndContainer part. This part should be aligned with the #NWidget part that started the container.
  *
- * - Stacked widgets #NWidgetStacked map each of their childs onto the same space. It behaves like a container, except there is no pre/inter/post space,
+ * - Stacked widgets #NWidgetStacked map each of their children onto the same space. It behaves like a container, except there is no pre/inter/post space,
  *   so the widget does not support #SetPIP. #SetPadding is allowed though.
  *   Like the other container widgets, below the last child widgets, a #EndContainer part should be used to denote the end of the stacked widget.
  *
@@ -1018,6 +1023,18 @@ static inline NWidgetPart SetDataTip(uint16 data, StringID tip)
 }
 
 /**
+ * Widget part function for setting the data and tooltip of WWT_MATRIX widgets
+ * @param cols Number of columns. \c 0 means to use draw columns with width according to the resize step size.
+ * @param rows Number of rows. \c 0 means to use draw rows with height according to the resize step size.
+ * @param tip  Tooltip of the widget.
+ * @ingroup NestedWidgetParts
+ */
+static inline NWidgetPart SetMatrixDataTip(uint8 cols, uint8 rows, StringID tip)
+{
+	return SetDataTip((rows << MAT_ROW_START) | (cols << MAT_COL_START), tip);
+}
+
+/**
  * Widget part function for setting additional space around a widget.
  * Parameters start above the widget, and are specified in clock-wise direction.
  * @param top The padding above the widget.
@@ -1071,7 +1088,7 @@ static inline NWidgetPart SetPIP(uint8 pre, uint8 inter, uint8 post)
 /**
  * Attach a scrollbar to a widget.
  * The scrollbar is controlled when using the mousewheel on the widget.
- * Multipe widgets can refer to the same scrollbar to make the mousewheel work in all of them.
+ * Multiple widgets can refer to the same scrollbar to make the mousewheel work in all of them.
  * @param index Widget index of the scrollbar.
  * @ingroup NestedWidgetParts
  */
